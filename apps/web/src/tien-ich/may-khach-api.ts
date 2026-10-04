@@ -16,7 +16,14 @@ mayKhachApi.interceptors.response.use(
   async (loi) => {
     const yeuCauGoc = loi.config;
 
-    if (loi.response?.status === 401 && !yeuCauGoc._daThuLai) {
+    // Bỏ qua tự động làm mới hoặc redirect nếu chính yêu cầu đó là luồng xác thực (đăng nhập, đăng ký, làm mới)
+    const duongDan = yeuCauGoc?.url || '';
+    const laYeuCauXacThuc =
+      duongDan.includes('/xac-thuc/dang-nhap') ||
+      duongDan.includes('/xac-thuc/dang-ky') ||
+      duongDan.includes('/xac-thuc/lam-moi-token');
+
+    if (loi.response?.status === 401 && !yeuCauGoc._daThuLai && !laYeuCauXacThuc) {
       yeuCauGoc._daThuLai = true;
       try {
         await axios.post(
@@ -26,7 +33,7 @@ mayKhachApi.interceptors.response.use(
         );
         return mayKhachApi(yeuCauGoc);
       } catch (loiLamMoi) {
-        if (typeof window !== 'undefined') {
+        if (typeof window !== 'undefined' && window.location.pathname !== '/dang-nhap') {
           window.location.href = '/dang-nhap';
         }
         return Promise.reject(loiLamMoi);

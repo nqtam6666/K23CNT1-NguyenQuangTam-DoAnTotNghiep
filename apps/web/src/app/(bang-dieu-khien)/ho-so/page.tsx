@@ -15,7 +15,7 @@ import {
   AlertCircle,
   School,
 } from 'lucide-react';
-import { capNhatHoSoSchema, doiMatKhauSchema, CapNhatHoSoDto, DoiMatKhauDto } from '@lms/chung';
+import { capNhatHoSoSchema, doiMatKhauSchema, CapNhatHoSoDto, DoiMatKhauDto, layNhanVaiTro } from '@lms/chung';
 import { mayKhachApi } from '../../../tien-ich/may-khach-api';
 import { thongBao } from '../../../tien-ich/thong-bao';
 
@@ -137,7 +137,7 @@ export default function TrangHoSoCaNhan() {
           <p className="text-sm text-slate-500">{hoSo?.email}</p>
           <div className="mt-2 flex flex-wrap gap-2 justify-center sm:justify-start">
             <span className="px-2.5 py-0.5 rounded-full text-xs font-semibold bg-blue-100 text-blue-700 border border-blue-200">
-              {hoSo?.vaiTro}
+              {layNhanVaiTro(hoSo?.vaiTro)}
             </span>
             <span className="px-2.5 py-0.5 rounded-full text-xs font-semibold bg-emerald-100 text-emerald-700 border border-emerald-200">
               Đang hoạt động

@@ -4,8 +4,13 @@ import { useQuery } from '@tanstack/react-query';
 import { Users, GraduationCap, School, BookOpen, ShieldCheck, ArrowUpRight } from 'lucide-react';
 import Link from 'next/link';
 import { mayKhachApi } from '../../../tien-ich/may-khach-api';
+import { useCaiDatHeThong } from '../../../tien-ich/use-cai-dat';
+import { layNhanVaiTro } from '@lms/chung';
 
 export default function TrangBangDieuKhien() {
+  const { layGiaTri } = useCaiDatHeThong();
+  const tenHeThong = layGiaTri('TEN_HE_THONG', 'Hệ thống Quản lý Học tập');
+
   const { data: hoSo } = useQuery({
     queryKey: ['hoSoHienTai'],
     queryFn: async () => {
@@ -29,9 +34,9 @@ export default function TrangBangDieuKhien() {
       <div className="p-6 rounded-2xl bg-gradient-to-r from-blue-700 to-indigo-800 text-white shadow-sm">
         <h2 className="text-2xl font-bold">Xin chào, {hoSo?.hoTen || 'Thành viên'} 👋</h2>
         <p className="mt-1 text-blue-100 text-sm max-w-2xl">
-          Chào mừng bạn đến với Hệ thống Quản lý Học tập LMS Trường học. Vai trò hiện tại của bạn là{' '}
+          Chào mừng bạn đến với {tenHeThong}. Vai trò hiện tại của bạn là{' '}
           <span className="font-semibold text-white underline decoration-blue-300">
-            {hoSo?.vaiTro || 'Đang tải...'}
+            {layNhanVaiTro(hoSo?.vaiTro) || 'Đang tải...'}
           </span>
           .
         </p>

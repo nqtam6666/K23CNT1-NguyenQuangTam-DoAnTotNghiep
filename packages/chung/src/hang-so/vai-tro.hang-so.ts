@@ -19,3 +19,17 @@ export const DANH_SACH_VAI_TRO = [
   VaiTro.HOC_SINH,
   VaiTro.PHU_HUYNH,
 ] as const;
+
+export const NHAN_VAI_TRO: Record<VaiTro, string> = {
+  [VaiTro.QUAN_TRI_VIEN]: 'Quản trị viên',
+  [VaiTro.BAN_GIAM_HIEU]: 'Ban giám hiệu',
+  [VaiTro.GIAO_VU]: 'Giáo vụ',
+  [VaiTro.GIAO_VIEN]: 'Giáo viên',
+  [VaiTro.HOC_SINH]: 'Học sinh',
+  [VaiTro.PHU_HUYNH]: 'Phụ huynh',
+};
+
+export function layNhanVaiTro(vaiTro?: string | null): string {
+  if (!vaiTro) return '';
+  return NHAN_VAI_TRO[vaiTro as VaiTro] || vaiTro;
+}

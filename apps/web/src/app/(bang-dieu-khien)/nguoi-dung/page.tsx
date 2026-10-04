@@ -18,7 +18,7 @@ import {
   Shield,
   X,
 } from 'lucide-react';
-import { taoNguoiDungSchema, TaoNguoiDungDto, VaiTro, DANH_SACH_VAI_TRO } from '@lms/chung';
+import { taoNguoiDungSchema, TaoNguoiDungDto, VaiTro, DANH_SACH_VAI_TRO, layNhanVaiTro } from '@lms/chung';
 import { mayKhachApi } from '../../../tien-ich/may-khach-api';
 import { thongBao } from '../../../tien-ich/thong-bao';
 
@@ -174,7 +174,7 @@ export default function TrangQuanLyNguoiDung() {
             <option value="">-- Tất cả vai trò --</option>
             {DANH_SACH_VAI_TRO.map((vt) => (
               <option key={vt} value={vt}>
-                {vt}
+                {layNhanVaiTro(vt)}
               </option>
             ))}
           </select>
@@ -235,7 +235,7 @@ export default function TrangQuanLyNguoiDung() {
                           item.vaiTro,
                         )}`}
                       >
-                        {item.vaiTro}
+                        {layNhanVaiTro(item.vaiTro)}
                       </span>
                     </td>
                     <td className="py-3.5 px-4">
@@ -396,7 +396,7 @@ export default function TrangQuanLyNguoiDung() {
                 >
                   {DANH_SACH_VAI_TRO.map((vt) => (
                     <option key={vt} value={vt}>
-                      {vt}
+                      {layNhanVaiTro(vt)}
                     </option>
                   ))}
                 </select>

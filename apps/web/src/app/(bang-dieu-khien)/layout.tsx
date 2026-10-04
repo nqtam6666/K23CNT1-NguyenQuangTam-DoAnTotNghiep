@@ -21,7 +21,7 @@ import {
 import { mayKhachApi } from '../../tien-ich/may-khach-api';
 import { thongBao } from '../../tien-ich/thong-bao';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
-import { PayloadJwt, VaiTro } from '@lms/chung';
+import { PayloadJwt, VaiTro, layNhanVaiTro } from '@lms/chung';
 import { useCaiDatHeThong } from '../../tien-ich/use-cai-dat';
 
 const BAN_DO_TIEU_DE_TRANG: Record<string, string> = {
@@ -55,7 +55,11 @@ export default function LayoutBangDieuKhien({ children }: { children: ReactNode 
   const moTaPhu = `${layGiaTri('MA_LOP_KHOA', 'K23CNT1')} ${layGiaTri('TAC_GIA', 'Quang Tâm')}`;
 
   // Lấy hồ sơ người dùng từ API (staleTime 30 giây để luôn đồng bộ chính xác phiên đăng nhập)
-  const { data: nguoiDung, isError } = useQuery<PayloadJwt>({
+  const {
+    data: nguoiDung,
+    isError,
+    isLoading,
+  } = useQuery<PayloadJwt>({
     queryKey: ['ho-so-hien-tai'],
     queryFn: async () => {
       const res = await mayKhachApi.get('/xac-thuc/ho-so-hien-tai');
@@ -165,12 +169,13 @@ export default function LayoutBangDieuKhien({ children }: { children: ReactNode 
     },
   ];
 
-  const menuHienThi = danhMucMenu.filter(
-    (item) =>
-      !nguoiDung ||
-      item.vaiTroChoPhep.includes(nguoiDung.vaiTro as VaiTro) ||
-      nguoiDung.vaiTro === VaiTro.QUAN_TRI_VIEN,
-  );
+  const menuHienThi = nguoiDung
+    ? danhMucMenu.filter(
+        (item) =>
+          item.vaiTroChoPhep.includes(nguoiDung.vaiTro as VaiTro) ||
+          nguoiDung.vaiTro === VaiTro.QUAN_TRI_VIEN,
+      )
+    : [];
 
   return (
     <div className="flex h-screen bg-slate-50 text-slate-900 overflow-hidden">
@@ -187,57 +192,85 @@ export default function LayoutBangDieuKhien({ children }: { children: ReactNode 
         </div>
 
         <nav className="flex-1 p-3.5 space-y-1.5 overflow-y-auto">
-          {menuHienThi.map((item) => {
-            const BieuTuong = item.bieuTuong;
-            const laTrangHienTai =
-              pathname === item.duongDan ||
-              (item.duongDan !== '/bang-dieu-khien' && pathname.startsWith(item.duongDan));
-            return (
-              <Link
-                key={item.duongDan}
-                href={item.duongDan}
-                prefetch={true}
-                className={`group relative flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-sm font-medium transition-all duration-150 active:scale-[0.98] select-none cursor-pointer ${
-                  laTrangHienTai
-                    ? 'bg-blue-50/90 text-blue-700 font-semibold shadow-xs'
-                    : 'text-slate-600 hover:bg-slate-100/80 hover:text-slate-900 hover:translate-x-1'
-                }`}
-              >
-                {/* Vạch chỉ báo Active hiện đại bên lề trái */}
-                {laTrangHienTai && (
-                  <span className="absolute left-0 top-2 bottom-2 w-1 bg-blue-600 rounded-r-full shadow-xs shadow-blue-500/50" />
-                )}
-                <BieuTuong
-                  className={`w-4 h-4 transition-transform duration-150 group-hover:scale-110 ${
-                    laTrangHienTai ? 'text-blue-600' : 'text-slate-400 group-hover:text-slate-700'
+          {isLoading || !nguoiDung ? (
+            <div className="space-y-2 py-1">
+              {[1, 2, 3, 4, 5].map((i) => (
+                <div
+                  key={i}
+                  className="flex items-center gap-3 px-3.5 py-2.5 rounded-xl animate-pulse bg-slate-100/70"
+                >
+                  <div className="w-4 h-4 rounded-md bg-slate-200" />
+                  <div
+                    className="h-3.5 bg-slate-200 rounded"
+                    style={{ width: `${55 + (i % 3) * 18}%` }}
+                  />
+                </div>
+              ))}
+            </div>
+          ) : (
+            menuHienThi.map((item) => {
+              const BieuTuong = item.bieuTuong;
+              const laTrangHienTai =
+                pathname === item.duongDan ||
+                (item.duongDan !== '/bang-dieu-khien' && pathname.startsWith(item.duongDan));
+              return (
+                <Link
+                  key={item.duongDan}
+                  href={item.duongDan}
+                  prefetch={true}
+                  className={`group relative flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-sm font-medium transition-all duration-150 active:scale-[0.98] select-none cursor-pointer ${
+                    laTrangHienTai
+                      ? 'bg-blue-50/90 text-blue-700 font-semibold shadow-xs'
+                      : 'text-slate-600 hover:bg-slate-100/80 hover:text-slate-900 hover:translate-x-1'
                   }`}
-                />
-                <span className="truncate">{item.tieuDe}</span>
-              </Link>
-            );
-          })}
+                >
+                  {/* Vạch chỉ báo Active hiện đại bên lề trái */}
+                  {laTrangHienTai && (
+                    <span className="absolute left-0 top-2 bottom-2 w-1 bg-blue-600 rounded-r-full shadow-xs shadow-blue-500/50" />
+                  )}
+                  <BieuTuong
+                    className={`w-4 h-4 transition-transform duration-150 group-hover:scale-110 ${
+                      laTrangHienTai ? 'text-blue-600' : 'text-slate-400 group-hover:text-slate-700'
+                    }`}
+                  />
+                  <span className="truncate">{item.tieuDe}</span>
+                </Link>
+              );
+            })
+          )}
         </nav>
 
         {/* Thông tin người dùng dưới chân Sidebar */}
         <div className="p-4 border-t border-slate-200 bg-slate-50/50">
           <div className="flex items-center justify-between">
-            <div className="flex items-center gap-2.5 min-w-0">
-              <div className="w-8 h-8 rounded-full bg-blue-100 text-blue-700 font-semibold flex items-center justify-center text-xs shrink-0">
-                {nguoiDung?.hoTen?.charAt(0) || 'U'}
+            {isLoading || !nguoiDung ? (
+              <div className="flex items-center gap-2.5 min-w-0 animate-pulse flex-1">
+                <div className="w-8 h-8 rounded-full bg-slate-200 shrink-0" />
+                <div className="space-y-1.5 flex-1 min-w-0">
+                  <div className="h-3 bg-slate-200 rounded w-24" />
+                  <div className="h-2.5 bg-slate-200 rounded w-16" />
+                </div>
               </div>
-              <div className="truncate">
-                <p className="text-xs font-semibold text-slate-900 truncate">
-                  {nguoiDung?.hoTen || 'Đang tải...'}
-                </p>
-                <span className="inline-block px-1.5 py-0.5 text-[10px] rounded bg-blue-100 text-blue-700 font-medium">
-                  {nguoiDung?.vaiTro || 'VAI_TRO'}
-                </span>
+            ) : (
+              <div className="flex items-center gap-2.5 min-w-0">
+                <div className="w-8 h-8 rounded-full bg-blue-100 text-blue-700 font-semibold flex items-center justify-center text-xs shrink-0">
+                  {nguoiDung.hoTen?.charAt(0) || 'U'}
+                </div>
+                <div className="truncate">
+                  <p className="text-xs font-semibold text-slate-900 truncate">
+                    {nguoiDung.hoTen}
+                  </p>
+                  <span className="inline-block px-1.5 py-0.5 text-[10px] rounded bg-blue-100 text-blue-700 font-medium">
+                    {layNhanVaiTro(nguoiDung.vaiTro)}
+                  </span>
+                </div>
               </div>
-            </div>
+            )}
             <button
               onClick={dangXuat}
+              disabled={isLoading}
               title="Đăng xuất"
-              className="p-1.5 text-slate-400 hover:text-red-600 hover:bg-red-50 rounded-lg transition-colors cursor-pointer"
+              className="p-1.5 text-slate-400 hover:text-red-600 hover:bg-red-50 rounded-lg transition-colors cursor-pointer disabled:opacity-50"
             >
               <LogOut className="w-4 h-4" />
             </button>
@@ -272,53 +305,81 @@ export default function LayoutBangDieuKhien({ children }: { children: ReactNode 
             </div>
 
             <nav className="flex-1 p-3.5 space-y-1.5 overflow-y-auto">
-              {menuHienThi.map((item) => {
-                const BieuTuong = item.bieuTuong;
-                const laTrangHienTai =
-                  pathname === item.duongDan ||
-                  (item.duongDan !== '/bang-dieu-khien' && pathname.startsWith(item.duongDan));
-                return (
-                  <Link
-                    key={item.duongDan}
-                    href={item.duongDan}
-                    onClick={() => setSidebarMo(false)}
-                    prefetch={true}
-                    className={`group relative flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-sm font-medium transition-all active:scale-[0.98] select-none ${
-                      laTrangHienTai
-                        ? 'bg-blue-50 text-blue-700 font-semibold shadow-xs'
-                        : 'text-slate-600 hover:bg-slate-100 hover:text-slate-900'
-                    }`}
-                  >
-                    {laTrangHienTai && (
-                      <span className="absolute left-0 top-2 bottom-2 w-1 bg-blue-600 rounded-r-full" />
-                    )}
-                    <BieuTuong
-                      className={`w-4 h-4 ${laTrangHienTai ? 'text-blue-600' : 'text-slate-400'}`}
-                    />
-                    <span>{item.tieuDe}</span>
-                  </Link>
-                );
-              })}
+              {isLoading || !nguoiDung ? (
+                <div className="space-y-2 py-1">
+                  {[1, 2, 3, 4, 5].map((i) => (
+                    <div
+                      key={i}
+                      className="flex items-center gap-3 px-3.5 py-2.5 rounded-xl animate-pulse bg-slate-100/70"
+                    >
+                      <div className="w-4 h-4 rounded-md bg-slate-200" />
+                      <div
+                        className="h-3.5 bg-slate-200 rounded"
+                        style={{ width: `${55 + (i % 3) * 18}%` }}
+                      />
+                    </div>
+                  ))}
+                </div>
+              ) : (
+                menuHienThi.map((item) => {
+                  const BieuTuong = item.bieuTuong;
+                  const laTrangHienTai =
+                    pathname === item.duongDan ||
+                    (item.duongDan !== '/bang-dieu-khien' && pathname.startsWith(item.duongDan));
+                  return (
+                    <Link
+                      key={item.duongDan}
+                      href={item.duongDan}
+                      onClick={() => setSidebarMo(false)}
+                      prefetch={true}
+                      className={`group relative flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-sm font-medium transition-all active:scale-[0.98] select-none ${
+                        laTrangHienTai
+                          ? 'bg-blue-50 text-blue-700 font-semibold shadow-xs'
+                          : 'text-slate-600 hover:bg-slate-100 hover:text-slate-900'
+                      }`}
+                    >
+                      {laTrangHienTai && (
+                        <span className="absolute left-0 top-2 bottom-2 w-1 bg-blue-600 rounded-r-full" />
+                      )}
+                      <BieuTuong
+                        className={`w-4 h-4 ${laTrangHienTai ? 'text-blue-600' : 'text-slate-400'}`}
+                      />
+                      <span>{item.tieuDe}</span>
+                    </Link>
+                  );
+                })
+              )}
             </nav>
 
             <div className="p-4 border-t border-slate-200 bg-slate-50/50">
               <div className="flex items-center justify-between">
-                <div className="flex items-center gap-2 min-w-0">
-                  <div className="w-8 h-8 rounded-full bg-blue-100 text-blue-700 font-semibold flex items-center justify-center text-xs shrink-0">
-                    {nguoiDung?.hoTen?.charAt(0) || 'U'}
+                {isLoading || !nguoiDung ? (
+                  <div className="flex items-center gap-2 min-w-0 animate-pulse flex-1">
+                    <div className="w-8 h-8 rounded-full bg-slate-200 shrink-0" />
+                    <div className="space-y-1.5 flex-1 min-w-0">
+                      <div className="h-3 bg-slate-200 rounded w-24" />
+                      <div className="h-2.5 bg-slate-200 rounded w-16" />
+                    </div>
                   </div>
-                  <div className="truncate">
-                    <p className="text-xs font-semibold text-slate-900 truncate">
-                      {nguoiDung?.hoTen || 'Đang tải...'}
-                    </p>
-                    <span className="text-[10px] text-blue-600 font-medium">
-                      {nguoiDung?.vaiTro}
-                    </span>
+                ) : (
+                  <div className="flex items-center gap-2 min-w-0">
+                    <div className="w-8 h-8 rounded-full bg-blue-100 text-blue-700 font-semibold flex items-center justify-center text-xs shrink-0">
+                      {nguoiDung.hoTen?.charAt(0) || 'U'}
+                    </div>
+                    <div className="truncate">
+                      <p className="text-xs font-semibold text-slate-900 truncate">
+                        {nguoiDung.hoTen}
+                      </p>
+                      <span className="text-[10px] text-blue-600 font-medium">
+                        {layNhanVaiTro(nguoiDung.vaiTro)}
+                      </span>
+                    </div>
                   </div>
-                </div>
+                )}
                 <button
                   onClick={dangXuat}
-                  className="p-1.5 text-slate-400 hover:text-red-600 hover:bg-red-50 rounded-lg"
+                  disabled={isLoading}
+                  className="p-1.5 text-slate-400 hover:text-red-600 hover:bg-red-50 rounded-lg disabled:opacity-50"
                 >
                   <LogOut className="w-4 h-4" />
                 </button>

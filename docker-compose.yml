@@ -55,6 +55,22 @@ services:
     networks:
       - mang_lms
 
+  # HẠ TẦNG PHÒNG HỌC TRỰC TUYẾN LIVEKIT SFU
+  livekit-lms:
+    image: livekit/livekit-server:latest
+    container_name: lms_livekit
+    restart: unless-stopped
+    command: --dev
+    environment:
+      LIVEKIT_KEYS: "devkey: secret_key_livekit_lms_2026"
+    ports:
+      - '7880:7880'
+      - '7881:7881'
+      - '7882:7882/udp'
+    networks:
+      - mang_lms
+
+
 volumes:
   du_lieu_postgres:
     name: lms_du_lieu_postgres

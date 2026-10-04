@@ -322,13 +322,13 @@ export default function TrangChiTietLopHocPhan({ params }: { params: Promise<{ i
           </div>
 
           <div className="flex flex-col sm:flex-row gap-3">
-            <button
-              onClick={() => alert('Tính năng phòng trực tuyến LiveKit SFU sẽ tích hợp ở Giai đoạn tiếp theo!')}
-              className="inline-flex items-center justify-center gap-2 px-5 py-3 bg-indigo-600 hover:bg-indigo-500 text-white font-semibold rounded-xl text-sm transition-colors shadow-lg shadow-indigo-600/30"
+            <Link
+              href={`/lop-hoc-phan/${id}/phong-hoc`}
+              className="inline-flex items-center justify-center gap-2 px-5 py-3 bg-emerald-600 hover:bg-emerald-500 text-white font-semibold rounded-xl text-sm transition-colors shadow-lg shadow-emerald-600/30"
             >
               <Video className="w-4 h-4" />
-              Vào phòng LiveKit
-            </button>
+              Vào phòng học trực tuyến LiveKit
+            </Link>
           </div>
         </div>
       </div>

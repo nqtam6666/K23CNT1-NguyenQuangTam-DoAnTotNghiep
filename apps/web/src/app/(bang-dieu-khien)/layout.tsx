@@ -82,6 +82,38 @@ export default function LayoutBangDieuKhien({ children }: { children: ReactNode 
       ],
     },
     {
+      tieuDe: 'Học vụ & Đào tạo',
+      duongDan: '/hoc-vu',
+      bieuTuong: GraduationCap,
+      vaiTroChoPhep: [VaiTro.QUAN_TRI_VIEN, VaiTro.BAN_GIAM_HIEU, VaiTro.GIAO_VU],
+    },
+    {
+      tieuDe: 'Lớp học phần',
+      duongDan: '/lop-hoc-phan',
+      bieuTuong: Video,
+      vaiTroChoPhep: [
+        VaiTro.QUAN_TRI_VIEN,
+        VaiTro.BAN_GIAM_HIEU,
+        VaiTro.GIAO_VU,
+        VaiTro.GIAO_VIEN,
+        VaiTro.HOC_SINH,
+        VaiTro.PHU_HUYNH,
+      ],
+    },
+    {
+      tieuDe: 'Thời khóa biểu',
+      duongDan: '/thoi-khoa-bieu',
+      bieuTuong: Calendar,
+      vaiTroChoPhep: [
+        VaiTro.QUAN_TRI_VIEN,
+        VaiTro.BAN_GIAM_HIEU,
+        VaiTro.GIAO_VU,
+        VaiTro.GIAO_VIEN,
+        VaiTro.HOC_SINH,
+        VaiTro.PHU_HUYNH,
+      ],
+    },
+    {
       tieuDe: 'Con em của tôi',
       duongDan: '/phu-huynh/con-em',
       bieuTuong: HeartHandshake,

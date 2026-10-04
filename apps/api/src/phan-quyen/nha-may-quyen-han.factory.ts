@@ -20,6 +20,9 @@ export class NhaMayQuyenHan {
     } else if (nguoiDung.vaiTro === VaiTro.GIAO_VU) {
       // Giáo vụ: Quản lý chương trình học vụ, hồ sơ học sinh, giáo viên, lớp học phần
       can(HanhDong.QuanLy, [
+        DoiTuong.NamHoc,
+        DoiTuong.HocKy,
+        DoiTuong.MonHoc,
         DoiTuong.LopHocPhan,
         DoiTuong.LopHanhChinh,
         DoiTuong.ThoiKhoaBieu,
@@ -33,8 +36,14 @@ export class NhaMayQuyenHan {
     } else if (nguoiDung.vaiTro === VaiTro.GIAO_VIEN) {
       // Giáo viên: Quản lý bài tập, bài giảng, điểm danh, chấm điểm, trợ lý AI
       can(HanhDong.Doc, [
+        DoiTuong.NamHoc,
+        DoiTuong.HocKy,
+        DoiTuong.MonHoc,
+        DoiTuong.LopHanhChinh,
         DoiTuong.LopHocPhan,
+        DoiTuong.ThoiKhoaBieu,
         DoiTuong.BuoiHoc,
+        DoiTuong.GhiDanh,
         DoiTuong.HoSoHocSinh,
         DoiTuong.HoSoGiaoVien,
       ]);
@@ -48,6 +57,7 @@ export class NhaMayQuyenHan {
         DoiTuong.PhienTroLy,
       ]);
       can(HanhDong.Sua, [
+        DoiTuong.LopHocPhan,
         DoiTuong.BaiDang,
         DoiTuong.BinhLuan,
         DoiTuong.TaiLieu,
@@ -70,7 +80,11 @@ export class NhaMayQuyenHan {
     } else if (nguoiDung.vaiTro === VaiTro.HOC_SINH) {
       // Học sinh: Tham gia lớp, nộp bài, xem điểm, hỏi trợ lý AI, làm đơn nghỉ, xem hồ sơ
       can(HanhDong.Doc, [
+        DoiTuong.NamHoc,
+        DoiTuong.HocKy,
+        DoiTuong.MonHoc,
         DoiTuong.LopHocPhan,
+        DoiTuong.ThoiKhoaBieu,
         DoiTuong.BaiDang,
         DoiTuong.BinhLuan,
         DoiTuong.TaiLieu,
@@ -88,15 +102,20 @@ export class NhaMayQuyenHan {
         DoiTuong.PhienTroLy,
       ]);
       can(HanhDong.Sua, DoiTuong.BaiNop);
-      can(HanhDong.ThamGia, DoiTuong.PhongTrucTuyen);
+      can(HanhDong.ThamGia, [DoiTuong.PhongTrucTuyen, DoiTuong.LopHocPhan]);
       can([HanhDong.Doc, HanhDong.Sua], DoiTuong.NguoiDung);
     } else if (nguoiDung.vaiTro === VaiTro.PHU_HUYNH) {
       // Phụ huynh: Theo dõi điểm danh, điểm số con em, nộp đơn xin nghỉ, xem hồ sơ con em
       can(HanhDong.Doc, [
+        DoiTuong.NamHoc,
+        DoiTuong.HocKy,
+        DoiTuong.MonHoc,
+        DoiTuong.LopHocPhan,
+        DoiTuong.ThoiKhoaBieu,
+        DoiTuong.BuoiHoc,
         DoiTuong.BanGhiDiemDanh,
         DoiTuong.DiemSo,
         DoiTuong.ThongBao,
-        DoiTuong.ThoiKhoaBieu,
         DoiTuong.HoSoHocSinh,
       ]);
       can(HanhDong.Tao, DoiTuong.DonXinNghi);

@@ -13,6 +13,9 @@ import { XacThucJwtGuard } from './mo-dun/xac-thuc/ve-si/jwt-auth.guard';
 import { MoDunSucKhoeModule } from './mo-dun/suc-khoe/mo-dun-suc-khoe.module';
 import { MoDunNguoiDungModule } from './mo-dun/nguoi-dung/mo-dun-nguoi-dung.module';
 import { MoDunHoSoModule } from './mo-dun/ho-so/mo-dun-ho-so.module';
+import { MoDunHocVuModule } from './mo-dun/hoc-vu/mo-dun-hoc-vu.module';
+import { MoDunLopHocPhanModule } from './mo-dun/lop-hoc-phan/mo-dun-lop-hoc-phan.module';
+import { MoDunThoiKhoaBieuModule } from './mo-dun/thoi-khoa-bieu/mo-dun-thoi-khoa-bieu.module';
 
 @Module({
   imports: [
@@ -32,6 +35,9 @@ import { MoDunHoSoModule } from './mo-dun/ho-so/mo-dun-ho-so.module';
     MoDunSucKhoeModule,
     MoDunNguoiDungModule,
     MoDunHoSoModule,
+    MoDunHocVuModule,
+    MoDunLopHocPhanModule,
+    MoDunThoiKhoaBieuModule,
   ],
   providers: [
     {

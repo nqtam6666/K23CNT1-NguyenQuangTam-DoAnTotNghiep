@@ -3,6 +3,7 @@
 import { useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
+import { useQueryClient } from '@tanstack/react-query';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { BookOpen, Lock, Mail, Loader2, Eye, EyeOff, Sparkles, KeyRound } from 'lucide-react';
@@ -46,6 +47,7 @@ const TAI_KHOAN_MAU = [
 
 export default function TrangDangNhap() {
   const router = useRouter();
+  const queryClient = useQueryClient();
   const [dangXuLy, setDangXuLy] = useState(false);
   const [hienMatKhau, setHienMatKhau] = useState(false);
   const { layGiaTri, choPhepDangKy } = useCaiDatHeThong();
@@ -77,15 +79,19 @@ export default function TrangDangNhap() {
       const phanHoi = await mayKhachApi.post('/xac-thuc/dang-nhap', duLieu);
       const hoTen = phanHoi.data?.duLieu?.nguoiDung?.hoTen;
 
+      // Xóa sạch bộ đệm tài khoản của phiên đăng nhập trước đó và ép tải mới
+      queryClient.clear();
+      await queryClient.invalidateQueries();
+
       thongBao.thanhCong(
         'Đăng nhập thành công!',
         hoTen ? `Chào mừng ${hoTen} quay trở lại LMS.` : 'Đang chuyển hướng vào hệ thống...',
       );
 
-      // Đợi hiệu ứng toast mượt mà trước khi chuyển trang
+      // Đợi hiệu ứng toast mượt mà trước khi chuyển trang hoàn toàn
       setTimeout(() => {
-        router.push('/bang-dieu-khien');
-      }, 700);
+        window.location.href = '/bang-dieu-khien';
+      }, 500);
     } catch (loi: any) {
       const thongDiep =
         loi.response?.data?.thongDiep ||

@@ -89,14 +89,30 @@ export class DieuKhienXacThuc {
     return ketQua;
   }
 
+  @CongKhai()
   @Post('dang-xuat')
   @HttpCode(HttpStatus.OK)
-  @ApiBearerAuth()
   @ApiOperation({ summary: 'Đăng xuất khỏi hệ thống' })
   @ApiResponse({ status: 200, description: 'Đăng xuất thành công' })
-  async dangXuat(@Res({ passthrough: true }) phanHoi: Response) {
-    phanHoi.clearCookie('access_token');
-    phanHoi.clearCookie('refresh_token');
+  async dangXuat(@Req() yeuCau: Request, @Res({ passthrough: true }) phanHoi: Response) {
+    const laMoiTruongProduction = process.env.NODE_ENV === 'production';
+    const cookieOptions = {
+      httpOnly: true,
+      secure: laMoiTruongProduction,
+      sameSite: 'lax' as const,
+      path: '/',
+    };
+
+    phanHoi.clearCookie('access_token', cookieOptions);
+    phanHoi.clearCookie('refresh_token', cookieOptions);
+
+    // Thu hồi phiên làm việc trong CSDL nếu có refresh_token
+    const refreshToken =
+      (yeuCau as any).cookies?.['refresh_token'] || (yeuCau.body as any)?.refreshToken;
+    if (refreshToken) {
+      await this.dichVuXacThuc.dangXuat(refreshToken).catch(() => {});
+    }
+
     return { thongDiep: 'Đăng xuất thành công' };
   }
 

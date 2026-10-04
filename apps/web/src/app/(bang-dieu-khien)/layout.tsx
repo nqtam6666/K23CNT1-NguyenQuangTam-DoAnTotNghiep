@@ -20,26 +20,48 @@ import {
 } from 'lucide-react';
 import { mayKhachApi } from '../../tien-ich/may-khach-api';
 import { thongBao } from '../../tien-ich/thong-bao';
-import { useQuery } from '@tanstack/react-query';
+import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { PayloadJwt, VaiTro } from '@lms/chung';
 import { useCaiDatHeThong } from '../../tien-ich/use-cai-dat';
+
+const BAN_DO_TIEU_DE_TRANG: Record<string, string> = {
+  '/bang-dieu-khien': 'Tổng quan',
+  '/nguoi-dung': 'Quản lý Người dùng',
+  '/ho-so': 'Hồ sơ Cá nhân',
+  '/hoc-vu': 'Học vụ & Đào tạo',
+  '/lop-hoc-phan': 'Lớp học phần',
+  '/thoi-khoa-bieu': 'Thời khóa biểu',
+  '/cai-dat': 'Cài đặt Hệ thống',
+  '/phu-huynh/con-em': 'Con em của tôi',
+};
+
+function layTieuDeTrang(duongDan: string): string {
+  if (BAN_DO_TIEU_DE_TRANG[duongDan]) return BAN_DO_TIEU_DE_TRANG[duongDan];
+  for (const [key, value] of Object.entries(BAN_DO_TIEU_DE_TRANG)) {
+    if (key !== '/bang-dieu-khien' && duongDan.startsWith(key)) {
+      return value;
+    }
+  }
+  return 'Tổng quan';
+}
 
 export default function LayoutBangDieuKhien({ children }: { children: ReactNode }) {
   const pathname = usePathname();
   const router = useRouter();
+  const queryClient = useQueryClient();
   const [sidebarMo, setSidebarMo] = useState(false);
   const { layGiaTri } = useCaiDatHeThong();
   const tenHeThong = layGiaTri('TEN_HE_THONG', 'LMS Trường Học');
   const moTaPhu = `${layGiaTri('MA_LOP_KHOA', 'K23CNT1')} ${layGiaTri('TAC_GIA', 'Quang Tâm')}`;
 
-  // Lấy hồ sơ người dùng từ React Query Cache (staleTime 5 phút, không fetch thừa khi chuyển trang)
+  // Lấy hồ sơ người dùng từ API (staleTime 30 giây để luôn đồng bộ chính xác phiên đăng nhập)
   const { data: nguoiDung, isError } = useQuery<PayloadJwt>({
     queryKey: ['ho-so-hien-tai'],
     queryFn: async () => {
       const res = await mayKhachApi.get('/xac-thuc/ho-so-hien-tai');
       return res.data?.duLieu;
     },
-    staleTime: 5 * 60 * 1000,
+    staleTime: 30 * 1000,
     retry: false,
   });
 
@@ -52,11 +74,15 @@ export default function LayoutBangDieuKhien({ children }: { children: ReactNode 
   const dangXuat = async () => {
     try {
       await mayKhachApi.post('/xac-thuc/dang-xuat');
-      thongBao.thanhCong('Đã đăng xuất', 'Hẹn gặp lại bạn!');
     } catch {
       // Bỏ qua lỗi mạng khi đăng xuất
     } finally {
-      router.push('/dang-nhap');
+      queryClient.clear(); // Xóa sạch dữ liệu hồ sơ và cài đặt trong bộ nhớ đệm
+      thongBao.thanhCong('Đã đăng xuất', 'Hẹn gặp lại bạn!');
+      // Điều hướng triệt để bằng window.location.href để xóa sạch React state trong bộ nhớ
+      setTimeout(() => {
+        window.location.href = '/dang-nhap';
+      }, 400);
     }
   };
 
@@ -316,9 +342,7 @@ export default function LayoutBangDieuKhien({ children }: { children: ReactNode 
             <div className="flex items-center gap-2 text-sm text-slate-500">
               <span>Bảng điều khiển</span>
               <span>/</span>
-              <span className="font-medium text-slate-800 capitalize">
-                {pathname.replace('/', '').replace(/-/g, ' ') || 'Tổng quan'}
-              </span>
+              <span className="font-medium text-slate-800">{layTieuDeTrang(pathname)}</span>
             </div>
           </div>
 

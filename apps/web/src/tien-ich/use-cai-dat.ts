@@ -27,7 +27,7 @@ export function useCaiDatHeThong() {
       const res = await mayKhachApi.get('/cai-dat/cong-khai');
       return res.data?.duLieu || {};
     },
-    staleTime: 10 * 60 * 1000, // 10 phút
+    staleTime: 60 * 1000, // 1 phút
   });
 
   const caiDat: BanDoCaiDat = {
@@ -36,7 +36,12 @@ export function useCaiDatHeThong() {
   };
 
   const layGiaTri = (khoa: string, macDinh = ''): string => {
-    return caiDat[khoa] ?? macDinh;
+    const val = caiDat[khoa] ?? macDinh;
+    // Tự động bảo vệ chống hiển thị lỗi font chứa ký tự '?' nếu cache cũ còn sót
+    if (typeof val === 'string' && val.includes('?') && GIA_TRI_MAC_DINH[khoa]) {
+      return GIA_TRI_MAC_DINH[khoa];
+    }
+    return val;
   };
 
   const choPhepDangKy = caiDat.CHO_PHEP_DANG_KY === 'true';

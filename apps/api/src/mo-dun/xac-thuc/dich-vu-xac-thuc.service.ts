@@ -212,6 +212,24 @@ export class DichVuXacThuc {
   }
 
   /**
+   * Đăng xuất và thu hồi phiên làm việc trong cơ sở dữ liệu
+   */
+  async dangXuat(refreshToken: string): Promise<void> {
+    try {
+      const payload: any = this.jwtService.verify(refreshToken, {
+        secret:
+          this.configService.get<string>('JWT_REFRESH_SECRET') ||
+          'chuoi_bi_mat_refresh_token_lms_sieu_bao_mat_2026_abc',
+      });
+      if (payload?.phienId) {
+        await this.khoNguoiDung.thuHoiPhien(payload.phienId);
+      }
+    } catch {
+      // Bỏ qua lỗi token hết hạn khi người dùng đăng xuất
+    }
+  }
+
+  /**
    * Sinh cặp JWT Access Token và Refresh Token
    */
   private async taoCapToken(

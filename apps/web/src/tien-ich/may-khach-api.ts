@@ -21,7 +21,8 @@ mayKhachApi.interceptors.response.use(
     const laYeuCauXacThuc =
       duongDan.includes('/xac-thuc/dang-nhap') ||
       duongDan.includes('/xac-thuc/dang-ky') ||
-      duongDan.includes('/xac-thuc/lam-moi-token');
+      duongDan.includes('/xac-thuc/lam-moi-token') ||
+      duongDan.includes('/xac-thuc/dang-xuat');
 
     if (loi.response?.status === 401 && !yeuCauGoc._daThuLai && !laYeuCauXacThuc) {
       yeuCauGoc._daThuLai = true;

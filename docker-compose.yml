@@ -40,7 +40,7 @@ services:
 
   # DỊCH VỤ LƯU TRỮ TỆP TIN MINIO (TƯƠNG THÍCH S3)
   minio-lms:
-    image: minio/minio:latest
+    image: cgr.dev/chainguard/minio:latest
     container_name: lms_minio
     restart: unless-stopped
     command: server /data --console-address ":9001"

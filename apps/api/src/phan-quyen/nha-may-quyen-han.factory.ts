@@ -11,12 +11,14 @@ export class NhaMayQuyenHan {
     const { can, cannot, build } = new AbilityBuilder<QuyenHanApp>(QuyenHanApp);
 
     if (nguoiDung.vaiTro === VaiTro.QUAN_TRI_VIEN) {
-      // Quản trị viên tối cao: Toàn quyền trên mọi đối tượng
+      // Quản trị viên tối cao: Toàn quyền trên mọi đối tượng (trừ mục riêng của phụ huynh)
       can(HanhDong.QuanLy, DoiTuong.TatCa);
+      cannot(HanhDong.Doc, DoiTuong.PhuHuynhHocSinh);
     } else if (nguoiDung.vaiTro === VaiTro.BAN_GIAM_HIEU) {
       // Ban giám hiệu: Xem toàn bộ hệ thống và xuất báo cáo
       can(HanhDong.Doc, DoiTuong.TatCa);
       can(HanhDong.XuatBaoCao, DoiTuong.TatCa);
+      cannot(HanhDong.Doc, DoiTuong.PhuHuynhHocSinh);
     } else if (nguoiDung.vaiTro === VaiTro.GIAO_VU) {
       // Giáo vụ: Quản lý chương trình học vụ, hồ sơ học sinh, giáo viên, lớp học phần
       can(HanhDong.QuanLy, [
@@ -122,6 +124,7 @@ export class NhaMayQuyenHan {
         DoiTuong.DiemSo,
         DoiTuong.ThongBao,
         DoiTuong.HoSoHocSinh,
+        DoiTuong.PhuHuynhHocSinh,
       ]);
       can(HanhDong.Tao, DoiTuong.DonXinNghi);
       can([HanhDong.Doc, HanhDong.Sua], DoiTuong.NguoiDung);

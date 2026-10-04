@@ -34,6 +34,26 @@ async function main() {
   });
   console.log('✓ Quản trị viên:', admin.hoTen, admin.email);
 
+  // 1b. Ban giám hiệu
+  const banGiamHieu = await prisma.nguoiDung.upsert({
+    where: { email: 'bangiamhieu@lms.edu.vn' },
+    update: {
+      hoTen: 'Phạm Thị Hiệu Trưởng',
+      matKhau: matKhauHash,
+      vaiTro: VaiTro.BAN_GIAM_HIEU,
+      kichHoat: true,
+    },
+    create: {
+      email: 'bangiamhieu@lms.edu.vn',
+      matKhau: matKhauHash,
+      hoTen: 'Phạm Thị Hiệu Trưởng',
+      soDienThoai: '0909876543',
+      vaiTro: VaiTro.BAN_GIAM_HIEU,
+      kichHoat: true,
+    },
+  });
+  console.log('✓ Ban giám hiệu:', banGiamHieu.hoTen, banGiamHieu.email);
+
   // 2. Cán bộ Giáo vụ
   const giaoVu = await prisma.nguoiDung.upsert({
     where: { email: 'giaovu@lms.edu.vn' },
@@ -238,7 +258,305 @@ async function main() {
   });
   console.log('✓ Phụ huynh:', phuHuynh.hoTen, 'liên kết với học sinh:', hocSinh.hoTen);
 
-  // 9. Cài đặt hệ thống mặc định (Settings)
+  // 9. Lớp học phần
+  const lopHocPhanToan = await prisma.lopHocPhan.upsert({
+    where: { maLopHocPhan: 'LHP-TOAN10-01' },
+    update: {
+      tenLopHocPhan: 'Toán học 10 - Nhóm 01',
+      idMonHoc: monToan.id,
+      idHocKy: hocKy.id,
+      idGiaoVien: hoSoGiaoVien.id,
+      kichHoat: true,
+    },
+    create: {
+      maLopHocPhan: 'LHP-TOAN10-01',
+      tenLopHocPhan: 'Toán học 10 - Nhóm 01',
+      idMonHoc: monToan.id,
+      idHocKy: hocKy.id,
+      idGiaoVien: hoSoGiaoVien.id,
+      maThamGia: 'TOAN101',
+      kichHoat: true,
+      moTa: 'Lớp học phần Toán học nâng cao khối 10',
+    },
+  });
+
+  const lopHocPhanTin = await prisma.lopHocPhan.upsert({
+    where: { maLopHocPhan: 'LHP-TIN10-01' },
+    update: {
+      tenLopHocPhan: 'Tin học 10 - Lập trình Python',
+      idMonHoc: monTin.id,
+      idHocKy: hocKy.id,
+      idGiaoVien: hoSoGiaoVien.id,
+      kichHoat: true,
+    },
+    create: {
+      maLopHocPhan: 'LHP-TIN10-01',
+      tenLopHocPhan: 'Tin học 10 - Lập trình Python',
+      idMonHoc: monTin.id,
+      idHocKy: hocKy.id,
+      idGiaoVien: hoSoGiaoVien.id,
+      maThamGia: 'PYTHON1',
+      kichHoat: true,
+      moTa: 'Lớp học phần lập trình Python cơ bản và nâng cao',
+    },
+  });
+  console.log('✓ Lớp học phần:', lopHocPhanToan.tenLopHocPhan, ',', lopHocPhanTin.tenLopHocPhan);
+
+  // 10. Ghi danh học sinh vào lớp học phần
+  await prisma.ghiDanh.upsert({
+    where: {
+      idLopHocPhan_idHocSinh: {
+        idLopHocPhan: lopHocPhanToan.id,
+        idHocSinh: hoSoHocSinh.id,
+      },
+    },
+    update: {},
+    create: {
+      idLopHocPhan: lopHocPhanToan.id,
+      idHocSinh: hoSoHocSinh.id,
+    },
+  });
+
+  await prisma.ghiDanh.upsert({
+    where: {
+      idLopHocPhan_idHocSinh: {
+        idLopHocPhan: lopHocPhanTin.id,
+        idHocSinh: hoSoHocSinh.id,
+      },
+    },
+    update: {},
+    create: {
+      idLopHocPhan: lopHocPhanTin.id,
+      idHocSinh: hoSoHocSinh.id,
+    },
+  });
+  console.log('✓ Ghi danh học sinh vào 2 lớp học phần');
+
+  // 11. Buổi học hôm nay và quá khứ
+  const homNay = new Date();
+  const buoiHocHomNay = await prisma.buoiHoc.upsert({
+    where: { id: '00000000-0000-0000-0000-000000000010' },
+    update: {
+      chuDe: 'Phương trình bậc hai và đồ thị parabol',
+      thoiGianBD: new Date(homNay.getFullYear(), homNay.getMonth(), homNay.getDate(), 8, 0, 0),
+      thoiGianKT: new Date(homNay.getFullYear(), homNay.getMonth(), homNay.getDate(), 10, 0, 0),
+    },
+    create: {
+      id: '00000000-0000-0000-0000-000000000010',
+      idLopHocPhan: lopHocPhanToan.id,
+      chuDe: 'Phương trình bậc hai và đồ thị parabol',
+      thoiGianBD: new Date(homNay.getFullYear(), homNay.getMonth(), homNay.getDate(), 8, 0, 0),
+      thoiGianKT: new Date(homNay.getFullYear(), homNay.getMonth(), homNay.getDate(), 10, 0, 0),
+    },
+  });
+
+  // Tạo các buổi học và điểm danh 7 ngày qua để có biểu đồ chuyên cần sinh động
+  for (let i = 1; i <= 6; i++) {
+    const ngayQua = new Date();
+    ngayQua.setDate(ngayQua.getDate() - i);
+    const idBuoi = `00000000-0000-0000-0000-00000000001${i}`;
+
+    const buoiHocQua = await prisma.buoiHoc.upsert({
+      where: { id: idBuoi },
+      update: {
+        thoiGianBD: new Date(ngayQua.getFullYear(), ngayQua.getMonth(), ngayQua.getDate(), 8, 0, 0),
+        thoiGianKT: new Date(ngayQua.getFullYear(), ngayQua.getMonth(), ngayQua.getDate(), 10, 0, 0),
+      },
+      create: {
+        id: idBuoi,
+        idLopHocPhan: lopHocPhanToan.id,
+        chuDe: `Bài học ôn tập chuyên đề ngày -${i}`,
+        thoiGianBD: new Date(ngayQua.getFullYear(), ngayQua.getMonth(), ngayQua.getDate(), 8, 0, 0),
+        thoiGianKT: new Date(ngayQua.getFullYear(), ngayQua.getMonth(), ngayQua.getDate(), 10, 0, 0),
+      },
+    });
+
+    await prisma.banGhiDiemDanh.upsert({
+      where: {
+        idBuoiHoc_idHocSinh: {
+          idBuoiHoc: buoiHocQua.id,
+          idHocSinh: hoSoHocSinh.id,
+        },
+      },
+      update: {
+        trangThai: i === 3 ? 'VANG_CO_PHEP' : 'CO_MAT',
+        ngayDiemDanh: ngayQua,
+      },
+      create: {
+        idBuoiHoc: buoiHocQua.id,
+        idHocSinh: hoSoHocSinh.id,
+        trangThai: i === 3 ? 'VANG_CO_PHEP' : 'CO_MAT',
+        ngayDiemDanh: ngayQua,
+      },
+    });
+  }
+  console.log('✓ Buổi học hôm nay & dữ liệu điểm danh 7 ngày');
+
+  // 12. Bài tập & Bài nộp chờ chấm
+  const hanNopSapToi = new Date();
+  hanNopSapToi.setDate(hanNopSapToi.getDate() + 4);
+
+  const baiTapToan = await prisma.baiTap.upsert({
+    where: { id: '00000000-0000-0000-0000-000000000020' },
+    update: {
+      tieuDe: 'Bài tập tuần 4: Bất phương trình bậc nhất và bậc hai',
+      hanNop: hanNopSapToi,
+    },
+    create: {
+      id: '00000000-0000-0000-0000-000000000020',
+      idLopHocPhan: lopHocPhanToan.id,
+      tieuDe: 'Bài tập tuần 4: Bất phương trình bậc nhất và bậc hai',
+      noiDung: 'Giải các bài tập trong file đính kèm và trình bày lời giải chi tiết.',
+      hanNop: hanNopSapToi,
+      diemToiDa: 10,
+    },
+  });
+
+  const hanNopQua = new Date();
+  hanNopQua.setDate(hanNopQua.getDate() - 2);
+
+  const baiTapChoCham = await prisma.baiTap.upsert({
+    where: { id: '00000000-0000-0000-0000-000000000021' },
+    update: {
+      tieuDe: 'Bài tập tuần 3: Đồ thị hàm số và ứng dụng thực tế',
+      hanNop: hanNopQua,
+    },
+    create: {
+      id: '00000000-0000-0000-0000-000000000021',
+      idLopHocPhan: lopHocPhanToan.id,
+      tieuDe: 'Bài tập tuần 3: Đồ thị hàm số và ứng dụng thực tế',
+      noiDung: 'Vẽ đồ thị và xác định các điểm cực trị.',
+      hanNop: hanNopQua,
+      diemToiDa: 10,
+    },
+  });
+
+  await prisma.baiNop.upsert({
+    where: {
+      idBaiTap_idNguoiDung: {
+        idBaiTap: baiTapChoCham.id,
+        idNguoiDung: hocSinh.id,
+      },
+    },
+    update: {
+      trangThai: 'DA_NOP',
+    },
+    create: {
+      idBaiTap: baiTapChoCham.id,
+      idNguoiDung: hocSinh.id,
+      noiDung: 'Em xin nộp bài giải tuần 3 ạ.',
+      trangThai: 'DA_NOP',
+    },
+  });
+  console.log('✓ Bài tập tuần & Bài nộp chờ giáo viên chấm');
+
+  // 13. Đơn xin nghỉ chờ duyệt
+  await prisma.donXinNghi.upsert({
+    where: { id: '00000000-0000-0000-0000-000000000030' },
+    update: {
+      trangThai: 'CHO_DUYET',
+    },
+    create: {
+      id: '00000000-0000-0000-0000-000000000030',
+      idBuoiHoc: buoiHocHomNay.id,
+      idNguoiDung: hocSinh.id,
+      lyDo: 'Em bị sốt xuất huyết cần đi khám bệnh viện.',
+      trangThai: 'CHO_DUYET',
+    },
+  });
+  console.log('✓ Đơn xin nghỉ chờ giáo viên duyệt');
+
+  // 14. Bản nháp AI chờ duyệt
+  await prisma.banNhapAI.upsert({
+    where: { id: '00000000-0000-0000-0000-000000000040' },
+    update: {
+      trangThai: 'CHO_DUYET',
+    },
+    create: {
+      id: '00000000-0000-0000-0000-000000000040',
+      idLopHocPhan: lopHocPhanToan.id,
+      idGiaoVien: hoSoGiaoVien.id,
+      loaiBanNhap: 'CAU_HOI',
+      tieuDe: 'Bộ 5 câu hỏi trắc nghiệm Phương trình bậc hai do AI gợi ý',
+      duLieuJson: {
+        soCauHoi: 5,
+        doKho: 'Trung bình',
+      },
+      trangThai: 'CHO_DUYET',
+    },
+  });
+  console.log('✓ Bản nháp AI chờ duyệt');
+
+  // 15. Cột điểm và Điểm số cho học sinh
+  const cotDiem = await prisma.cotDiem.upsert({
+    where: { id: '00000000-0000-0000-0000-000000000050' },
+    update: { tenCotDiem: 'Kiểm tra 15 phút (Đại số)', heSo: 1.0 },
+    create: {
+      id: '00000000-0000-0000-0000-000000000050',
+      idLopHocPhan: lopHocPhanToan.id,
+      tenCotDiem: 'Kiểm tra 15 phút (Đại số)',
+      heSo: 1.0,
+    },
+  });
+
+  await prisma.diemSo.upsert({
+    where: {
+      idCotDiem_idHocSinh: {
+        idCotDiem: cotDiem.id,
+        idHocSinh: hoSoHocSinh.id,
+      },
+    },
+    update: { giaTri: 9.5 },
+    create: {
+      idCotDiem: cotDiem.id,
+      idHocSinh: hoSoHocSinh.id,
+      giaTri: 9.5,
+      ghiChu: 'Làm bài xuất sắc, trình bày mạch lạc',
+    },
+  });
+  console.log('✓ Cột điểm và Điểm số mới của học sinh');
+
+  // 16. Nhật ký hệ thống mẫu
+  const danhSachNhatKy = [
+    {
+      id: '00000000-0000-0000-0000-000000000060',
+      idNguoiDung: admin.id,
+      hanhDong: 'DANG_NHAP_THANH_CONG',
+      thucThe: 'NguoiDung',
+      idThucThe: admin.id,
+      diaChiIp: '127.0.0.1',
+      chiTiet: { thietBi: 'Chrome Windows' },
+    },
+    {
+      id: '00000000-0000-0000-0000-000000000061',
+      idNguoiDung: giaoVu.id,
+      hanhDong: 'NHAP_EXCEL_GHI_DANH',
+      thucThe: 'GhiDanh',
+      idThucThe: lopHocPhanToan.id,
+      diaChiIp: '127.0.0.1',
+      chiTiet: { soBanGhi: 35, tepTin: 'danh-sach-10a1.xlsx' },
+    },
+    {
+      id: '00000000-0000-0000-0000-000000000062',
+      idNguoiDung: giaoVien.id,
+      hanhDong: 'TAO_BAI_TAP',
+      thucThe: 'BaiTap',
+      idThucThe: baiTapToan.id,
+      diaChiIp: '127.0.0.1',
+      chiTiet: { tieuDe: baiTapToan.tieuDe },
+    },
+  ];
+
+  for (const nk of danhSachNhatKy) {
+    await prisma.nhatKyHeThong.upsert({
+      where: { id: nk.id },
+      update: {},
+      create: nk,
+    });
+  }
+  console.log('✓ Nhật ký kiểm toán hệ thống mẫu');
+
+  // 17. Cài đặt hệ thống mặc định (Settings)
   const danhSachCaiDatMacDinh = [
     {
       khoa: 'TEN_HE_THONG',

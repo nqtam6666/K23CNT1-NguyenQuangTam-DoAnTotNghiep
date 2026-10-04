@@ -21,6 +21,8 @@
     "ha-tang:tat": "docker-compose down"
   },
   "devDependencies": {
+    "@axe-core/playwright": "^4.13.0",
+    "playwright": "^1.63.0",
     "prettier": "^3.5.3",
     "turbo": "^2.4.4",
     "typescript": "^5.8.2"

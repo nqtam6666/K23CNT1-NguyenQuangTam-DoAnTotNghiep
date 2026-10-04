@@ -1,156 +1,151 @@
 'use client';
 
 import { useQuery } from '@tanstack/react-query';
-import { Users, GraduationCap, School, BookOpen, ShieldCheck, ArrowUpRight } from 'lucide-react';
-import Link from 'next/link';
+import { AlertCircle, RefreshCw, Layers } from 'lucide-react';
 import { mayKhachApi } from '../../../tien-ich/may-khach-api';
-import { useCaiDatHeThong } from '../../../tien-ich/use-cai-dat';
-import { layNhanVaiTro } from '@lms/chung';
+import { PayloadJwt, PhanHoiBangDieuKhien, TienIchBangDieuKhien } from '@lms/chung';
 import { KhungXuongTongQuan } from '../../../thanh-phan/khung-xuong';
+import { BannerChao } from '../../../thanh-phan/bang-dieu-khien/banner-chao';
+import { TheThongKeComponent } from '../../../thanh-phan/bang-dieu-khien/the-thong-ke';
+import { BieuDoChuyenCan } from '../../../thanh-phan/bang-dieu-khien/bieu-do-chuyen-can';
+import { BieuDoVaiTro } from '../../../thanh-phan/bang-dieu-khien/bieu-do-vai-tro';
+import { HoatDongGanDayComponent } from '../../../thanh-phan/bang-dieu-khien/hoat-dong-gan-day';
+import { ViecCanXuLyComponent } from '../../../thanh-phan/bang-dieu-khien/viec-can-xu-ly';
+import { LoiTatTacVu } from '../../../thanh-phan/bang-dieu-khien/loi-tat-tac-vu';
 
 export default function TrangBangDieuKhien() {
-  const { layGiaTri } = useCaiDatHeThong();
-  const tenHeThong = layGiaTri('TEN_HE_THONG', 'Hệ thống Quản lý Học tập');
-
-  const { data: hoSo, isLoading: dangTaiHoSo } = useQuery({
-    queryKey: ['hoSoHienTai'],
+  // 1. Hồ sơ người dùng hiện tại
+  const { data: nguoiDung, isLoading: dangTaiHoSo } = useQuery<PayloadJwt>({
+    queryKey: ['ho-so-hien-tai'],
     queryFn: async () => {
-      const res = await mayKhachApi.get('/ho-so/ca-nhan');
-      return res.data?.duLieu;
+      const res = await mayKhachApi.get('/xac-thuc/ho-so-hien-tai');
+      return res.data?.duLieu || res.data;
     },
+    staleTime: 60 * 1000,
   });
 
-  const { data: duLieuNguoiDung } = useQuery({
-    queryKey: ['danhSachNguoiDungTongQuan'],
+  // 2. Dữ liệu tiện ích bảng điều khiển từ Registry API
+  const {
+    data: phanHoiBangDieuKhien,
+    isLoading: dangTaiTienIch,
+    isError,
+    error,
+    refetch,
+    isFetching,
+  } = useQuery<PhanHoiBangDieuKhien>({
+    queryKey: ['du-lieu-bang-dieu-khien'],
     queryFn: async () => {
-      const res = await mayKhachApi.get('/nguoi-dung?kichThuoc=5');
-      return res.data?.duLieu;
+      const res = await mayKhachApi.get('/bang-dieu-khien');
+      return res.data?.duLieu || res.data;
     },
-    enabled: hoSo?.vaiTro === 'QUAN_TRI_VIEN' || hoSo?.vaiTro === 'GIAO_VU',
+    staleTime: 60 * 1000, // Khớp với TTL 60s phía backend Redis
   });
 
-  if (dangTaiHoSo || !hoSo) {
+  // Trạng thái 1: Đang tải khung xương
+  if (dangTaiHoSo || dangTaiTienIch) {
     return <KhungXuongTongQuan />;
   }
 
+  // Trạng thái 2: Lỗi tải dữ liệu có nút thử lại
+  if (isError) {
+    return (
+      <div className="min-h-[50vh] flex items-center justify-center p-4">
+        <div className="max-w-md w-full text-center bg-white rounded-2xl border border-red-200 p-8 shadow-xs">
+          <div className="w-12 h-12 rounded-xl bg-red-50 text-red-600 flex items-center justify-center mx-auto mb-4">
+            <AlertCircle className="w-6 h-6" />
+          </div>
+          <h3 className="font-bold text-slate-900 text-lg">Không thể tải dữ liệu bảng điều khiển</h3>
+          <p className="mt-2 text-xs text-slate-600 leading-relaxed">
+            Đã có lỗi xảy ra trong quá trình tổng hợp số liệu từ máy chủ. Vui lòng kiểm tra lại kết
+            nối mạng hoặc thử lại sau.
+          </p>
+          <button
+            onClick={() => refetch()}
+            disabled={isFetching}
+            className="mt-5 inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-blue-600 hover:bg-blue-700 text-white text-xs font-semibold transition-colors disabled:opacity-50"
+          >
+            <RefreshCw className={`w-3.5 h-3.5 ${isFetching ? 'animate-spin' : ''}`} />
+            Thử lại ngay
+          </button>
+        </div>
+      </div>
+    );
+  }
+
+  const danhSachTienIch = phanHoiBangDieuKhien?.tienIch || [];
+
+  // Lọc tiện ích theo loại
+  const cacTheThongKe = danhSachTienIch.filter((t) => t.loai === 'THE_THONG_KE' && t.duLieu);
+  const bieuDoChuyenCan = danhSachTienIch.find((t) => t.id === 'bieu-do-chuyen-can-7-ngay');
+  const bieuDoVaiTro = danhSachTienIch.find((t) => t.id === 'bieu-do-phan-bo-vai-tro');
+  const hoatDongGanDay = danhSachTienIch.find((t) => t.loai === 'HOAT_DONG_GAN_DAY');
+  const viecCanXuLy = danhSachTienIch.find((t) => t.loai === 'VIEC_CAN_XU_LY');
+
+  // Trạng thái 3: Dữ liệu rỗng
+  if (danhSachTienIch.length === 0) {
+    return (
+      <div className="space-y-6">
+        <BannerChao hoTen={nguoiDung?.hoTen} vaiTro={nguoiDung?.vaiTro} />
+        <div className="p-12 text-center bg-white rounded-2xl border border-slate-200 shadow-2xs">
+          <Layers className="w-12 h-12 text-slate-300 mx-auto mb-3" />
+          <h3 className="font-bold text-slate-800 text-base">Chưa có dữ liệu thống kê</h3>
+          <p className="text-xs text-slate-500 mt-1 max-w-sm mx-auto">
+            Hệ thống chưa ghi nhận các hoạt động của bạn. Hãy bắt đầu khám phá các tính năng theo
+            vai trò được cấp phép.
+          </p>
+          <div className="mt-6">
+            <LoiTatTacVu vaiTro={nguoiDung?.vaiTro} />
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  // Trạng thái 4: Hiển thị đầy đủ số liệu thực tế
   return (
     <div className="space-y-6">
-      {/* Banner Chào Mừng */}
-      <div className="p-6 rounded-2xl bg-gradient-to-r from-blue-700 to-indigo-800 text-white shadow-sm">
-        <h2 className="text-2xl font-bold">Xin chào, {hoSo?.hoTen || 'Thành viên'} 👋</h2>
-        <p className="mt-1 text-blue-100 text-sm max-w-2xl">
-          Chào mừng bạn đến với {tenHeThong}. Vai trò hiện tại của bạn là{' '}
-          <span className="font-semibold text-white underline decoration-blue-300">
-            {layNhanVaiTro(hoSo?.vaiTro) || 'Đang tải...'}
-          </span>
-          .
-        </p>
-      </div>
+      {/* 1. Banner chào mừng thu gọn */}
+      <BannerChao hoTen={nguoiDung?.hoTen} vaiTro={nguoiDung?.vaiTro} />
 
-      {/* Thẻ Thống kê nhanh */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-        <div className="p-5 rounded-xl bg-white border border-slate-200 shadow-2xs">
-          <div className="flex items-center justify-between">
-            <span className="text-xs font-semibold text-slate-500 uppercase tracking-wider">
-              Tổng Người Dùng
-            </span>
-            <div className="w-8 h-8 rounded-lg bg-blue-50 text-blue-600 flex items-center justify-center">
-              <Users className="w-4 h-4" />
+      {/* 2. Lưới thẻ thống kê số liệu */}
+      {cacTheThongKe.length > 0 && (
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+          {cacTheThongKe.map((the) => (
+            <TheThongKeComponent key={the.id} duLieu={the.duLieu} />
+          ))}
+        </div>
+      )}
+
+      {/* 3. Phần biểu đồ trực quan Recharts */}
+      {(bieuDoChuyenCan || bieuDoVaiTro) && (
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
+          {bieuDoChuyenCan && (
+            <div className={bieuDoVaiTro ? 'lg:col-span-7' : 'lg:col-span-12'}>
+              <BieuDoChuyenCan
+                tieuDe={bieuDoChuyenCan.tieuDe}
+                duLieu={bieuDoChuyenCan.duLieu || []}
+              />
             </div>
-          </div>
-          <p className="text-2xl font-bold text-slate-900 mt-2">{duLieuNguoiDung?.tongSo ?? '1'}</p>
-          <span className="text-xs text-slate-400 mt-1 inline-block">Hệ thống đang hoạt động</span>
-        </div>
+          )}
 
-        <div className="p-5 rounded-xl bg-white border border-slate-200 shadow-2xs">
-          <div className="flex items-center justify-between">
-            <span className="text-xs font-semibold text-slate-500 uppercase tracking-wider">
-              Học Sinh & Sinh Viên
-            </span>
-            <div className="w-8 h-8 rounded-lg bg-emerald-50 text-emerald-600 flex items-center justify-center">
-              <GraduationCap className="w-4 h-4" />
+          {bieuDoVaiTro && (
+            <div className={bieuDoChuyenCan ? 'lg:col-span-5' : 'lg:col-span-12'}>
+              <BieuDoVaiTro tieuDe={bieuDoVaiTro.tieuDe} duLieu={bieuDoVaiTro.duLieu || []} />
             </div>
-          </div>
-          <p className="text-2xl font-bold text-slate-900 mt-2">Sẵn sàng</p>
-          <span className="text-xs text-emerald-600 mt-1 inline-block">Niên khóa 2025-2026</span>
+          )}
         </div>
+      )}
 
-        <div className="p-5 rounded-xl bg-white border border-slate-200 shadow-2xs">
-          <div className="flex items-center justify-between">
-            <span className="text-xs font-semibold text-slate-500 uppercase tracking-wider">
-              Bảo Mật CASL
-            </span>
-            <div className="w-8 h-8 rounded-lg bg-indigo-50 text-indigo-600 flex items-center justify-center">
-              <ShieldCheck className="w-4 h-4" />
-            </div>
-          </div>
-          <p className="text-2xl font-bold text-slate-900 mt-2">RBAC + ABAC</p>
-          <span className="text-xs text-indigo-600 mt-1 inline-block">Chống lỗi IDOR</span>
+      {/* 4. Khối Việc cần xử lý và Hoạt động gần đây */}
+      {(viecCanXuLy || hoatDongGanDay) && (
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+          {viecCanXuLy && <ViecCanXuLyComponent danhSach={viecCanXuLy.duLieu || []} />}
+          {hoatDongGanDay && <HoatDongGanDayComponent danhSach={hoatDongGanDay.duLieu || []} />}
         </div>
+      )}
 
-        <div className="p-5 rounded-xl bg-white border border-slate-200 shadow-2xs">
-          <div className="flex items-center justify-between">
-            <span className="text-xs font-semibold text-slate-500 uppercase tracking-wider">
-              Cơ sở dữ liệu
-            </span>
-            <div className="w-8 h-8 rounded-lg bg-purple-50 text-purple-600 flex items-center justify-center">
-              <School className="w-4 h-4" />
-            </div>
-          </div>
-          <p className="text-2xl font-bold text-slate-900 mt-2">PostgreSQL 16</p>
-          <span className="text-xs text-purple-600 mt-1 inline-block">pgvector Active</span>
-        </div>
-      </div>
-
-      {/* Lối tắt tác vụ */}
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-        <div className="p-6 rounded-xl bg-white border border-slate-200 shadow-2xs">
-          <h3 className="font-semibold text-slate-900 text-base mb-4">Lối tắt Quản lý</h3>
-          <div className="space-y-3">
-            <Link
-              href="/nguoi-dung"
-              className="flex items-center justify-between p-3 rounded-lg border border-slate-100 hover:bg-slate-50 transition-colors group"
-            >
-              <div className="flex items-center gap-3">
-                <Users className="w-4 h-4 text-blue-600" />
-                <span className="text-sm font-medium text-slate-700">
-                  Quản lý danh sách Người dùng
-                </span>
-              </div>
-              <ArrowUpRight className="w-4 h-4 text-slate-400 group-hover:text-blue-600 transition-colors" />
-            </Link>
-
-            <Link
-              href="/ho-so"
-              className="flex items-center justify-between p-3 rounded-lg border border-slate-100 hover:bg-slate-50 transition-colors group"
-            >
-              <div className="flex items-center gap-3">
-                <GraduationCap className="w-4 h-4 text-emerald-600" />
-                <span className="text-sm font-medium text-slate-700">Cập nhật Hồ sơ cá nhân</span>
-              </div>
-              <ArrowUpRight className="w-4 h-4 text-slate-400 group-hover:text-emerald-600 transition-colors" />
-            </Link>
-          </div>
-        </div>
-
-        <div className="p-6 rounded-xl bg-white border border-slate-200 shadow-2xs">
-          <h3 className="font-semibold text-slate-900 text-base mb-2">Thông tin Hệ thống Đồ án</h3>
-          <p className="text-xs text-slate-600 mb-4 leading-relaxed">
-            Đồ án Tốt nghiệp chuyên ngành CNTT trường Đại học - Sinh viên thực hiện: Nguyễn Quang
-            Tâm (K23CNT1 - MSSV: 2310900093).
-          </p>
-          <div className="p-3.5 rounded-lg bg-slate-50 border border-slate-200/60 text-xs text-slate-600 space-y-1">
-            <p>
-              <strong>Kiến trúc:</strong> NestJS 10, Next.js 15, PostgreSQL 16 (pgvector), Redis 7,
-              MinIO.
-            </p>
-            <p>
-              <strong>Phân quyền:</strong> CASL Ability Factory (6 vai trò trường học: Quản trị, Ban
-              giám hiệu, Giáo vụ, Giáo viên, Học sinh, Phụ huynh).
-            </p>
-          </div>
-        </div>
-      </div>
+      {/* 5. Lối tắt thao tác nhanh */}
+      <LoiTatTacVu vaiTro={nguoiDung?.vaiTro} />
     </div>
   );
 }

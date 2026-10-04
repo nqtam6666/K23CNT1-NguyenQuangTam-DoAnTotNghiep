@@ -16,6 +16,7 @@ export * from './so-do/hoc-vu.so-do';
 export * from './so-do/lop-hoc-phan.so-do';
 export * from './so-do/phong-hoc.so-do';
 export * from './so-do/cai-dat.so-do';
+export * from './so-do/bang-dieu-khien.so-do';
 
 // KIỂU DỮ LIỆU TYPESCRIPT
 export * from './kieu-du-lieu/phan-hoi.kieu';
@@ -25,3 +26,4 @@ export * from './kieu-du-lieu/ho-so.kieu';
 export * from './kieu-du-lieu/hoc-vu.kieu';
 export * from './kieu-du-lieu/phong-hoc.kieu';
 export * from './kieu-du-lieu/cai-dat.kieu';
+export * from './kieu-du-lieu/bang-dieu-khien.kieu';

@@ -16,7 +16,7 @@ import { useCaiDatHeThong } from '../../../tien-ich/use-cai-dat';
 export default function TrangGioiThieu() {
   const { layGiaTri } = useCaiDatHeThong();
   const tenHeThong = layGiaTri('TEN_HE_THONG', 'Hệ thống Quản lý Học tập LMS Trường học');
-  const tenTruong = layGiaTri('TEN_TRUONG', 'Trường Đại học Công nghệ');
+  const tenTruong = layGiaTri('TEN_TRUONG', 'Trường Đại học Nguyễn Trãi');
   const tacGia = layGiaTri('TAC_GIA', 'Nguyễn Quang Tâm');
   const maLop = layGiaTri('MA_LOP_KHOA', 'K23CNT1');
   const mssv = layGiaTri('MSSV', '2310900093');

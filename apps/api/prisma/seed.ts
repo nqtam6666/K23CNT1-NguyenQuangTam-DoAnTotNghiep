@@ -576,7 +576,7 @@ async function main() {
     },
     {
       khoa: 'TEN_TRUONG',
-      giaTri: 'Trường Đại học Công nghệ',
+      giaTri: 'Trường Đại học Nguyễn Trãi',
       nhom: 'CHUNG',
       moTa: 'Tên cơ sở giáo dục hoặc viện đào tạo',
       kieuDuLieu: 'CHUOI',

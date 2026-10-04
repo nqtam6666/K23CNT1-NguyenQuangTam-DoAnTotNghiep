@@ -7,7 +7,7 @@ import { BanDoCaiDat } from '@lms/chung';
 export const GIA_TRI_MAC_DINH: BanDoCaiDat = {
   TEN_HE_THONG: 'LMS Trường Học',
   KHAU_HIEU: 'Hệ thống Quản lý Học tập Thế hệ Mới',
-  TEN_TRUONG: 'Trường Đại học Công nghệ',
+  TEN_TRUONG: 'Trường Đại học Nguyễn Trãi',
   TAC_GIA: 'Nguyễn Quang Tâm',
   MA_LOP_KHOA: 'K23CNT1',
   MSSV: '2310900093',

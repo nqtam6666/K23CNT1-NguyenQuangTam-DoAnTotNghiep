@@ -19,7 +19,7 @@ export default function TrangChu() {
 
   const tenHeThong = layGiaTri('TEN_HE_THONG', 'LMS Trường Học');
   const khauHieu = layGiaTri('KHAU_HIEU', 'Hệ thống Quản lý Học tập Thế hệ Mới');
-  const tenTruong = layGiaTri('TEN_TRUONG', 'Trường Đại học Công nghệ');
+  const tenTruong = layGiaTri('TEN_TRUONG', 'Trường Đại học Nguyễn Trãi');
   const tacGia = layGiaTri('TAC_GIA', 'Nguyễn Quang Tâm');
   const maLopKhoa = layGiaTri('MA_LOP_KHOA', 'K23CNT1');
   const mssv = layGiaTri('MSSV', '2310900093');

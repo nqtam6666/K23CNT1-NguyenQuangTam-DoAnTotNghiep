@@ -38,7 +38,7 @@ const TU_DIEN_CAU_HINH: Record<string, ThongTinCauHinh> = {
   TEN_TRUONG: {
     nhan: 'Tên trường / Viện đào tạo',
     moTa: 'Tên cơ sở giáo dục đại học hoặc đơn vị chủ quản hệ thống quản lý học tập.',
-    placeholder: 'Ví dụ: Trường Đại học Công nghệ',
+    placeholder: 'Ví dụ: Trường Đại học Nguyễn Trãi',
     kieu: 'text',
     tabId: 'he-thong',
   },

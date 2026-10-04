@@ -65,6 +65,22 @@ export default function LayoutBangDieuKhien({ children }: { children: ReactNode 
   const { layGiaTri } = useCaiDatHeThong();
   const tenHeThong = layGiaTri('TEN_HE_THONG', 'LMS Trường Học');
   const moTaPhu = `${layGiaTri('MA_LOP_KHOA', 'K23CNT1')} ${layGiaTri('TAC_GIA', 'Quang Tâm')}`;
+  const urlLogo = layGiaTri('URL_LOGO');
+  const urlFavicon = layGiaTri('URL_FAVICON', '/favicon.ico');
+  const urlIcon = layGiaTri('URL_ICON');
+
+  // Cập nhật Favicon động theo cấu hình hệ thống
+  useEffect(() => {
+    if (typeof window !== 'undefined' && urlFavicon) {
+      let link: HTMLLinkElement | null = document.querySelector("link[rel*='icon']");
+      if (!link) {
+        link = document.createElement('link');
+        link.rel = 'icon';
+        document.head.appendChild(link);
+      }
+      link.href = urlFavicon;
+    }
+  }, [urlFavicon]);
 
   // Đọc trạng thái thu gọn đã lưu từ localStorage khi tải trang
   useEffect(() => {
@@ -246,8 +262,16 @@ export default function LayoutBangDieuKhien({ children }: { children: ReactNode 
             className="flex items-center gap-2.5 min-w-0 group"
             title={tenHeThong}
           >
-            <div className="w-9 h-9 rounded-xl bg-blue-600 flex items-center justify-center text-white font-bold shadow-xs shrink-0 group-hover:scale-105 transition-transform">
-              <GraduationCap className="w-5 h-5" />
+            <div className="w-9 h-9 rounded-xl bg-blue-600 flex items-center justify-center text-white font-bold shadow-xs shrink-0 group-hover:scale-105 transition-transform overflow-hidden">
+              {thuGon && urlIcon ? (
+                // eslint-disable-next-line @next/next/no-img-element
+                <img src={urlIcon} alt="Icon" className="w-full h-full object-contain p-1" />
+              ) : urlLogo ? (
+                // eslint-disable-next-line @next/next/no-img-element
+                <img src={urlLogo} alt="Logo" className="w-full h-full object-contain p-1" />
+              ) : (
+                <GraduationCap className="w-5 h-5" />
+              )}
             </div>
             {!thuGon && (
               <div className="truncate transition-opacity duration-200">
@@ -427,8 +451,13 @@ export default function LayoutBangDieuKhien({ children }: { children: ReactNode 
           <aside className="relative flex-1 flex flex-col max-w-xs w-full bg-white z-10 shadow-2xl animate-in slide-in-from-left duration-200">
             <div className="h-16 flex items-center justify-between px-6 border-b border-slate-200">
               <div className="flex items-center gap-2.5">
-                <div className="w-8 h-8 rounded-lg bg-blue-600 flex items-center justify-center text-white font-bold shadow-xs">
-                  <GraduationCap className="w-5 h-5" />
+                <div className="w-8 h-8 rounded-lg bg-blue-600 flex items-center justify-center text-white font-bold shadow-xs overflow-hidden">
+                  {urlLogo ? (
+                    // eslint-disable-next-line @next/next/no-img-element
+                    <img src={urlLogo} alt="Logo" className="w-full h-full object-contain p-0.5" />
+                  ) : (
+                    <GraduationCap className="w-5 h-5" />
+                  )}
                 </div>
                 <div>
                   <h1 className="font-bold text-slate-900 text-sm">{tenHeThong}</h1>

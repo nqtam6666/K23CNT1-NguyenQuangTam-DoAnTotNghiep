@@ -91,6 +91,27 @@ const TU_DIEN_CAU_HINH: Record<string, ThongTinCauHinh> = {
     kieu: 'textarea',
     tabId: 'giao-dien',
   },
+  URL_LOGO: {
+    nhan: 'Logo trường học / Hệ thống',
+    moTa: 'Đường dẫn hình ảnh Logo đầy đủ (hiển thị trên thanh bên Sidebar và trang chủ/đăng nhập). Hỗ trợ định dạng .png, .svg, .jpg.',
+    placeholder: 'Ví dụ: /logo.png hoặc https://example.com/logo.png',
+    kieu: 'text',
+    tabId: 'giao-dien',
+  },
+  URL_FAVICON: {
+    nhan: 'Biểu tượng trang (Favicon)',
+    moTa: 'Đường dẫn file favicon (.ico, .png, .svg) hiển thị trên tiêu đề tab của trình duyệt web.',
+    placeholder: 'Ví dụ: /favicon.ico hoặc https://example.com/favicon.ico',
+    kieu: 'text',
+    tabId: 'giao-dien',
+  },
+  URL_ICON: {
+    nhan: 'Biểu tượng thu gọn (App Icon)',
+    moTa: 'Biểu tượng vuông hoặc rút gọn khi thanh bên điều hướng thu gọn sang chế độ thanh biểu tượng (Icon Rail).',
+    placeholder: 'Ví dụ: /icon.png hoặc https://example.com/app-icon.png',
+    kieu: 'text',
+    tabId: 'giao-dien',
+  },
   EMAIL_LIEN_HE: {
     nhan: 'Hòm thư điện tử liên hệ',
     moTa: 'Email chính thức tiếp nhận phản hồi, giải đáp thắc mắc và hỗ trợ kỹ thuật.',
@@ -135,8 +156,8 @@ const DANH_SACH_TAB: TabCaiDat[] = [
   },
   {
     id: 'giao-dien',
-    ten: 'Giao diện & Banner',
-    moTa: 'Tùy chỉnh tiêu đề và thông điệp hiển thị trên trang bìa',
+    ten: 'Giao diện & Thương hiệu',
+    moTa: 'Tùy chỉnh Logo, Favicon, Icon, tiêu đề và thông điệp hiển thị trên hệ thống',
     bieuTuong: Sparkles,
   },
   {
@@ -447,15 +468,12 @@ export default function TrangCaiDatHeThong() {
                     key={item.khoa}
                     className="pt-6 first:pt-0 grid grid-cols-1 lg:grid-cols-12 gap-5 items-start"
                   >
-                    {/* Cột thông tin: Tên Việt hoá + mã tham số + mô tả */}
+                    {/* Cột thông tin: Tên Việt hoá + mô tả */}
                     <div className="lg:col-span-5 space-y-1.5">
                       <div className="flex items-center gap-2 flex-wrap">
                         <label className="text-sm font-bold text-slate-900">
                           {thongTin?.nhan || item.khoa}
                         </label>
-                        <span className="font-mono text-[10px] text-slate-400 bg-slate-100 px-1.5 py-0.5 rounded border border-slate-200/60">
-                          {item.khoa}
-                        </span>
                       </div>
                       <p className="text-xs text-slate-500 leading-relaxed">
                         {thongTin?.moTa || item.moTa || 'Cấu hình tham số của hệ thống.'}
@@ -511,13 +529,35 @@ export default function TrangCaiDatHeThong() {
                         />
                       ) : (
                         /* Input văn bản thông thường */
-                        <input
-                          type="text"
-                          value={giaTriHienTai}
-                          onChange={(e) => thayDoiGiaTri(item.khoa, e.target.value)}
-                          className="w-full px-3.5 py-2 text-sm border border-slate-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all text-slate-900 bg-white placeholder:text-slate-400 shadow-2xs"
-                          placeholder={thongTin?.placeholder || 'Nhập giá trị...'}
-                        />
+                        <div className="space-y-2">
+                          <input
+                            type="text"
+                            value={giaTriHienTai}
+                            onChange={(e) => thayDoiGiaTri(item.khoa, e.target.value)}
+                            className="w-full px-3.5 py-2 text-sm border border-slate-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all text-slate-900 bg-white placeholder:text-slate-400 shadow-2xs"
+                            placeholder={thongTin?.placeholder || 'Nhập giá trị...'}
+                          />
+                          {/* Khung xem trước hình ảnh Logo / Favicon / Icon */}
+                          {giaTriHienTai &&
+                            (item.khoa === 'URL_LOGO' ||
+                              item.khoa === 'URL_FAVICON' ||
+                              item.khoa === 'URL_ICON') && (
+                              <div className="flex items-center gap-3 p-2 bg-slate-50 rounded-lg border border-slate-200 w-fit">
+                                <span className="text-xs text-slate-500 font-medium">
+                                  Xem trước:
+                                </span>
+                                {/* eslint-disable-next-line @next/next/no-img-element */}
+                                <img
+                                  src={giaTriHienTai}
+                                  alt="Xem trước"
+                                  className="h-7 w-auto max-w-[120px] object-contain rounded border border-slate-200 bg-white p-0.5"
+                                  onError={(e) => {
+                                    (e.currentTarget as HTMLElement).style.display = 'none';
+                                  }}
+                                />
+                              </div>
+                            )}
+                        </div>
                       )}
                     </div>
                   </div>

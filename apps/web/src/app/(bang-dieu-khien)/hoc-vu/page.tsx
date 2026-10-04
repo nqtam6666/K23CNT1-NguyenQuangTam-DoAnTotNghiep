@@ -19,6 +19,7 @@ import {
 import { mayKhachApi } from '../../../tien-ich/may-khach-api';
 import { thongBao } from '../../../tien-ich/thong-bao';
 import { KhungXuong } from '../../../thanh-phan/khung-xuong';
+import { HopThoai } from '../../../thanh-phan/hop-thoai';
 import {
   NamHoc,
   HocKy,
@@ -516,303 +517,291 @@ export default function TrangQuanLyHocVu() {
       )}
 
       {/* MODAL THÊM NĂM HỌC */}
-      {moModalNamHoc && (
-        <div className="fixed inset-0 bg-slate-900/50 backdrop-blur-sm z-50 flex items-center justify-center p-4">
-          <div className="bg-white rounded-xl shadow-xl max-w-md w-full p-6 space-y-4">
-            <h3 className="text-lg font-bold text-slate-900">Thêm Năm học mới</h3>
-            {thongBaoLoi && (
-              <div className="p-3 bg-rose-50 text-rose-700 text-xs rounded-lg flex items-center gap-2">
-                <AlertCircle className="w-4 h-4 shrink-0" />
-                <span>{thongBaoLoi}</span>
-              </div>
-            )}
-            <div className="space-y-3">
-              <div>
-                <label className="block text-xs font-medium text-slate-700 mb-1">
-                  Tên năm học (Định dạng YYYY-YYYY)
-                </label>
-                <input
-                  type="text"
-                  placeholder="Ví dụ: 2026-2027"
-                  value={formNamHoc.tenNamHoc}
-                  onChange={(e) => setFormNamHoc({ ...formNamHoc, tenNamHoc: e.target.value })}
-                  className="w-full px-3 py-2 border border-slate-300 rounded-lg text-sm focus:ring-2 focus:ring-indigo-500 focus:outline-none"
-                />
-              </div>
-              <div className="flex items-center gap-2">
-                <input
-                  type="checkbox"
-                  id="namHienTai"
-                  checked={formNamHoc.hienTai}
-                  onChange={(e) => setFormNamHoc({ ...formNamHoc, hienTai: e.target.checked })}
-                  className="rounded text-indigo-600 focus:ring-indigo-500 h-4 w-4"
-                />
-                <label htmlFor="namHienTai" className="text-sm text-slate-700">
-                  Đặt làm năm học hiện tại
-                </label>
-              </div>
+      <HopThoai
+        mo={moModalNamHoc}
+        onDong={() => setMoModalNamHoc(false)}
+        tieuDe="Thêm Năm học mới"
+        moTa="Tạo năm học mới cho hệ thống quản lý học tập"
+        kichThuoc="nho"
+      >
+        <div className="space-y-4">
+          <div className="space-y-3">
+            <div>
+              <label className="block text-xs font-medium text-slate-700 mb-1">
+                Tên năm học (Định dạng YYYY-YYYY)
+              </label>
+              <input
+                type="text"
+                placeholder="Ví dụ: 2026-2027"
+                value={formNamHoc.tenNamHoc}
+                onChange={(e) => setFormNamHoc({ ...formNamHoc, tenNamHoc: e.target.value })}
+                className="w-full px-3 py-2 border border-slate-300 rounded-lg text-sm focus:ring-2 focus:ring-indigo-500 focus:outline-none"
+              />
             </div>
-            <div className="flex justify-end gap-3 pt-3">
-              <button
-                type="button"
-                onClick={() => setMoModalNamHoc(false)}
-                className="px-4 py-2 border border-slate-300 text-slate-700 rounded-lg text-sm hover:bg-slate-50"
-              >
-                Hủy
-              </button>
-              <button
-                type="button"
-                disabled={taoNamHocMutation.isPending}
-                onClick={() => taoNamHocMutation.mutate(formNamHoc)}
-                className="px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white rounded-lg text-sm font-medium disabled:opacity-50"
-              >
-                {taoNamHocMutation.isPending ? 'Đang lưu...' : 'Tạo Năm học'}
-              </button>
+            <div className="flex items-center gap-2">
+              <input
+                type="checkbox"
+                id="namHienTai"
+                checked={formNamHoc.hienTai}
+                onChange={(e) => setFormNamHoc({ ...formNamHoc, hienTai: e.target.checked })}
+                className="rounded text-indigo-600 focus:ring-indigo-500 h-4 w-4"
+              />
+              <label htmlFor="namHienTai" className="text-sm text-slate-700 cursor-pointer">
+                Đặt làm năm học hiện tại
+              </label>
             </div>
           </div>
+          <div className="flex justify-end gap-3 pt-3 border-t border-slate-100">
+            <button
+              type="button"
+              onClick={() => setMoModalNamHoc(false)}
+              className="px-4 py-2 border border-slate-300 text-slate-700 rounded-lg text-sm hover:bg-slate-50 cursor-pointer"
+            >
+              Hủy
+            </button>
+            <button
+              type="button"
+              disabled={taoNamHocMutation.isPending}
+              onClick={() => taoNamHocMutation.mutate(formNamHoc)}
+              className="px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white rounded-lg text-sm font-medium disabled:opacity-50 cursor-pointer"
+            >
+              {taoNamHocMutation.isPending ? 'Đang lưu...' : 'Tạo Năm học'}
+            </button>
+          </div>
         </div>
-      )}
+      </HopThoai>
 
       {/* MODAL THÊM HỌC KỲ */}
-      {moModalHocKy && (
-        <div className="fixed inset-0 bg-slate-900/50 backdrop-blur-sm z-50 flex items-center justify-center p-4">
-          <div className="bg-white rounded-xl shadow-xl max-w-md w-full p-6 space-y-4">
-            <h3 className="text-lg font-bold text-slate-900">Thêm Học kỳ mới</h3>
-            {thongBaoLoi && (
-              <div className="p-3 bg-rose-50 text-rose-700 text-xs rounded-lg flex items-center gap-2">
-                <AlertCircle className="w-4 h-4 shrink-0" />
-                <span>{thongBaoLoi}</span>
-              </div>
-            )}
-            <div className="space-y-3">
+      <HopThoai
+        mo={moModalHocKy}
+        onDong={() => setMoModalHocKy(false)}
+        tieuDe="Thêm Học kỳ mới"
+        moTa="Thiết lập học kỳ và khoảng thời gian diễn ra"
+        kichThuoc="nho"
+      >
+        <div className="space-y-4">
+          <div className="space-y-3">
+            <div>
+              <label className="block text-xs font-medium text-slate-700 mb-1">Tên học kỳ</label>
+              <input
+                type="text"
+                placeholder="Ví dụ: Học kỳ 1"
+                value={formHocKy.tenHocKy}
+                onChange={(e) => setFormHocKy({ ...formHocKy, tenHocKy: e.target.value })}
+                className="w-full px-3 py-2 border border-slate-300 rounded-lg text-sm focus:ring-2 focus:ring-indigo-500 focus:outline-none"
+              />
+            </div>
+            <div className="grid grid-cols-2 gap-3">
               <div>
-                <label className="block text-xs font-medium text-slate-700 mb-1">Tên học kỳ</label>
+                <label className="block text-xs font-medium text-slate-700 mb-1">
+                  Ngày bắt đầu
+                </label>
                 <input
-                  type="text"
-                  placeholder="Ví dụ: Học kỳ 1"
-                  value={formHocKy.tenHocKy}
-                  onChange={(e) => setFormHocKy({ ...formHocKy, tenHocKy: e.target.value })}
+                  type="date"
+                  value={formHocKy.ngayBatDau}
+                  onChange={(e) => setFormHocKy({ ...formHocKy, ngayBatDau: e.target.value })}
                   className="w-full px-3 py-2 border border-slate-300 rounded-lg text-sm focus:ring-2 focus:ring-indigo-500 focus:outline-none"
                 />
               </div>
-              <div className="grid grid-cols-2 gap-3">
-                <div>
-                  <label className="block text-xs font-medium text-slate-700 mb-1">
-                    Ngày bắt đầu
-                  </label>
-                  <input
-                    type="date"
-                    value={formHocKy.ngayBatDau}
-                    onChange={(e) => setFormHocKy({ ...formHocKy, ngayBatDau: e.target.value })}
-                    className="w-full px-3 py-2 border border-slate-300 rounded-lg text-sm focus:ring-2 focus:ring-indigo-500 focus:outline-none"
-                  />
-                </div>
-                <div>
-                  <label className="block text-xs font-medium text-slate-700 mb-1">
-                    Ngày kết thúc
-                  </label>
-                  <input
-                    type="date"
-                    value={formHocKy.ngayKetThuc}
-                    onChange={(e) => setFormHocKy({ ...formHocKy, ngayKetThuc: e.target.value })}
-                    className="w-full px-3 py-2 border border-slate-300 rounded-lg text-sm focus:ring-2 focus:ring-indigo-500 focus:outline-none"
-                  />
-                </div>
-              </div>
-              <div className="flex items-center gap-2">
-                <input
-                  type="checkbox"
-                  id="hkHienTai"
-                  checked={formHocKy.hienTai}
-                  onChange={(e) => setFormHocKy({ ...formHocKy, hienTai: e.target.checked })}
-                  className="rounded text-indigo-600 focus:ring-indigo-500 h-4 w-4"
-                />
-                <label htmlFor="hkHienTai" className="text-sm text-slate-700">
-                  Đang diễn ra (Học kỳ hiện tại)
+              <div>
+                <label className="block text-xs font-medium text-slate-700 mb-1">
+                  Ngày kết thúc
                 </label>
+                <input
+                  type="date"
+                  value={formHocKy.ngayKetThuc}
+                  onChange={(e) => setFormHocKy({ ...formHocKy, ngayKetThuc: e.target.value })}
+                  className="w-full px-3 py-2 border border-slate-300 rounded-lg text-sm focus:ring-2 focus:ring-indigo-500 focus:outline-none"
+                />
               </div>
             </div>
-            <div className="flex justify-end gap-3 pt-3">
-              <button
-                type="button"
-                onClick={() => setMoModalHocKy(false)}
-                className="px-4 py-2 border border-slate-300 text-slate-700 rounded-lg text-sm hover:bg-slate-50"
-              >
-                Hủy
-              </button>
-              <button
-                type="button"
-                disabled={taoHocKyMutation.isPending}
-                onClick={() => taoHocKyMutation.mutate(formHocKy)}
-                className="px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white rounded-lg text-sm font-medium disabled:opacity-50"
-              >
-                {taoHocKyMutation.isPending ? 'Đang lưu...' : 'Tạo Học kỳ'}
-              </button>
+            <div className="flex items-center gap-2">
+              <input
+                type="checkbox"
+                id="hkHienTai"
+                checked={formHocKy.hienTai}
+                onChange={(e) => setFormHocKy({ ...formHocKy, hienTai: e.target.checked })}
+                className="rounded text-indigo-600 focus:ring-indigo-500 h-4 w-4"
+              />
+              <label htmlFor="hkHienTai" className="text-sm text-slate-700 cursor-pointer">
+                Đang diễn ra (Học kỳ hiện tại)
+              </label>
             </div>
           </div>
+          <div className="flex justify-end gap-3 pt-3 border-t border-slate-100">
+            <button
+              type="button"
+              onClick={() => setMoModalHocKy(false)}
+              className="px-4 py-2 border border-slate-300 text-slate-700 rounded-lg text-sm hover:bg-slate-50 cursor-pointer"
+            >
+              Hủy
+            </button>
+            <button
+              type="button"
+              disabled={taoHocKyMutation.isPending}
+              onClick={() => taoHocKyMutation.mutate(formHocKy)}
+              className="px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white rounded-lg text-sm font-medium disabled:opacity-50 cursor-pointer"
+            >
+              {taoHocKyMutation.isPending ? 'Đang lưu...' : 'Tạo Học kỳ'}
+            </button>
+          </div>
         </div>
-      )}
+      </HopThoai>
 
       {/* MODAL THÊM MÔN HỌC */}
-      {moModalMonHoc && (
-        <div className="fixed inset-0 bg-slate-900/50 backdrop-blur-sm z-50 flex items-center justify-center p-4">
-          <div className="bg-white rounded-xl shadow-xl max-w-md w-full p-6 space-y-4">
-            <h3 className="text-lg font-bold text-slate-900">Thêm Môn học mới</h3>
-            {thongBaoLoi && (
-              <div className="p-3 bg-rose-50 text-rose-700 text-xs rounded-lg flex items-center gap-2">
-                <AlertCircle className="w-4 h-4 shrink-0" />
-                <span>{thongBaoLoi}</span>
-              </div>
-            )}
-            <div className="space-y-3">
-              <div>
-                <label className="block text-xs font-medium text-slate-700 mb-1">Mã môn học</label>
-                <input
-                  type="text"
-                  placeholder="Ví dụ: TOAN10, TINHOC11"
-                  value={formMonHoc.maMonHoc}
-                  onChange={(e) =>
-                    setFormMonHoc({ ...formMonHoc, maMonHoc: e.target.value.toUpperCase() })
-                  }
-                  className="w-full px-3 py-2 border border-slate-300 rounded-lg text-sm font-mono focus:ring-2 focus:ring-indigo-500 focus:outline-none uppercase"
-                />
-              </div>
-              <div>
-                <label className="block text-xs font-medium text-slate-700 mb-1">Tên môn học</label>
-                <input
-                  type="text"
-                  placeholder="Ví dụ: Toán học 10"
-                  value={formMonHoc.tenMonHoc}
-                  onChange={(e) => setFormMonHoc({ ...formMonHoc, tenMonHoc: e.target.value })}
-                  className="w-full px-3 py-2 border border-slate-300 rounded-lg text-sm focus:ring-2 focus:ring-indigo-500 focus:outline-none"
-                />
-              </div>
-              <div>
-                <label className="block text-xs font-medium text-slate-700 mb-1">
-                  Số tín chỉ / Số tiết quy đổi
-                </label>
-                <input
-                  type="number"
-                  min="1"
-                  max="10"
-                  value={formMonHoc.soTinChi}
-                  onChange={(e) =>
-                    setFormMonHoc({ ...formMonHoc, soTinChi: parseInt(e.target.value) || 1 })
-                  }
-                  className="w-full px-3 py-2 border border-slate-300 rounded-lg text-sm focus:ring-2 focus:ring-indigo-500 focus:outline-none"
-                />
-              </div>
-              <div>
-                <label className="block text-xs font-medium text-slate-700 mb-1">
-                  Mô tả môn học
-                </label>
-                <textarea
-                  rows={2}
-                  placeholder="Mô tả tóm tắt nội dung môn học..."
-                  value={formMonHoc.moTa || ''}
-                  onChange={(e) => setFormMonHoc({ ...formMonHoc, moTa: e.target.value })}
-                  className="w-full px-3 py-2 border border-slate-300 rounded-lg text-sm focus:ring-2 focus:ring-indigo-500 focus:outline-none"
-                />
-              </div>
+      <HopThoai
+        mo={moModalMonHoc}
+        onDong={() => setMoModalMonHoc(false)}
+        tieuDe="Thêm Môn học mới"
+        moTa="Thêm môn học vào chương trình đào tạo"
+        kichThuoc="nho"
+      >
+        <div className="space-y-4">
+          <div className="space-y-3">
+            <div>
+              <label className="block text-xs font-medium text-slate-700 mb-1">Mã môn học</label>
+              <input
+                type="text"
+                placeholder="Ví dụ: TOAN10, TINHOC11"
+                value={formMonHoc.maMonHoc}
+                onChange={(e) =>
+                  setFormMonHoc({ ...formMonHoc, maMonHoc: e.target.value.toUpperCase() })
+                }
+                className="w-full px-3 py-2 border border-slate-300 rounded-lg text-sm font-mono focus:ring-2 focus:ring-indigo-500 focus:outline-none uppercase"
+              />
             </div>
-            <div className="flex justify-end gap-3 pt-3">
-              <button
-                type="button"
-                onClick={() => setMoModalMonHoc(false)}
-                className="px-4 py-2 border border-slate-300 text-slate-700 rounded-lg text-sm hover:bg-slate-50"
-              >
-                Hủy
-              </button>
-              <button
-                type="button"
-                disabled={taoMonHocMutation.isPending}
-                onClick={() => taoMonHocMutation.mutate(formMonHoc)}
-                className="px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white rounded-lg text-sm font-medium disabled:opacity-50"
-              >
-                {taoMonHocMutation.isPending ? 'Đang lưu...' : 'Tạo Môn học'}
-              </button>
+            <div>
+              <label className="block text-xs font-medium text-slate-700 mb-1">Tên môn học</label>
+              <input
+                type="text"
+                placeholder="Ví dụ: Toán học 10"
+                value={formMonHoc.tenMonHoc}
+                onChange={(e) => setFormMonHoc({ ...formMonHoc, tenMonHoc: e.target.value })}
+                className="w-full px-3 py-2 border border-slate-300 rounded-lg text-sm focus:ring-2 focus:ring-indigo-500 focus:outline-none"
+              />
+            </div>
+            <div>
+              <label className="block text-xs font-medium text-slate-700 mb-1">
+                Số tín chỉ / Số tiết quy đổi
+              </label>
+              <input
+                type="number"
+                min="1"
+                max="10"
+                value={formMonHoc.soTinChi}
+                onChange={(e) =>
+                  setFormMonHoc({ ...formMonHoc, soTinChi: parseInt(e.target.value) || 1 })
+                }
+                className="w-full px-3 py-2 border border-slate-300 rounded-lg text-sm focus:ring-2 focus:ring-indigo-500 focus:outline-none"
+              />
+            </div>
+            <div>
+              <label className="block text-xs font-medium text-slate-700 mb-1">
+                Mô tả môn học
+              </label>
+              <textarea
+                rows={2}
+                placeholder="Mô tả tóm tắt nội dung môn học..."
+                value={formMonHoc.moTa || ''}
+                onChange={(e) => setFormMonHoc({ ...formMonHoc, moTa: e.target.value })}
+                className="w-full px-3 py-2 border border-slate-300 rounded-lg text-sm focus:ring-2 focus:ring-indigo-500 focus:outline-none"
+              />
             </div>
           </div>
+          <div className="flex justify-end gap-3 pt-3 border-t border-slate-100">
+            <button
+              type="button"
+              onClick={() => setMoModalMonHoc(false)}
+              className="px-4 py-2 border border-slate-300 text-slate-700 rounded-lg text-sm hover:bg-slate-50 cursor-pointer"
+            >
+              Hủy
+            </button>
+            <button
+              type="button"
+              disabled={taoMonHocMutation.isPending}
+              onClick={() => taoMonHocMutation.mutate(formMonHoc)}
+              className="px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white rounded-lg text-sm font-medium disabled:opacity-50 cursor-pointer"
+            >
+              {taoMonHocMutation.isPending ? 'Đang lưu...' : 'Tạo Môn học'}
+            </button>
+          </div>
         </div>
-      )}
+      </HopThoai>
 
       {/* MODAL THÊM LỚP HÀNH CHÍNH */}
-      {moModalLopHanhChinh && (
-        <div className="fixed inset-0 bg-slate-900/50 backdrop-blur-sm z-50 flex items-center justify-center p-4">
-          <div className="bg-white rounded-xl shadow-xl max-w-md w-full p-6 space-y-4">
-            <h3 className="text-lg font-bold text-slate-900">Thêm Lớp hành chính mới</h3>
-            {thongBaoLoi && (
-              <div className="p-3 bg-rose-50 text-rose-700 text-xs rounded-lg flex items-center gap-2">
-                <AlertCircle className="w-4 h-4 shrink-0" />
-                <span>{thongBaoLoi}</span>
-              </div>
-            )}
-            <div className="space-y-3">
-              <div>
-                <label className="block text-xs font-medium text-slate-700 mb-1">Mã lớp</label>
-                <input
-                  type="text"
-                  placeholder="Ví dụ: 10A1, 11B2"
-                  value={formLopHanhChinh.maLop}
-                  onChange={(e) =>
-                    setFormLopHanhChinh({
-                      ...formLopHanhChinh,
-                      maLop: e.target.value.toUpperCase(),
-                    })
-                  }
-                  className="w-full px-3 py-2 border border-slate-300 rounded-lg text-sm font-mono focus:ring-2 focus:ring-indigo-500 focus:outline-none uppercase"
-                />
-              </div>
-              <div>
-                <label className="block text-xs font-medium text-slate-700 mb-1">Tên lớp</label>
-                <input
-                  type="text"
-                  placeholder="Ví dụ: Lớp 10A1 Chuyên Toán"
-                  value={formLopHanhChinh.tenLop}
-                  onChange={(e) =>
-                    setFormLopHanhChinh({ ...formLopHanhChinh, tenLop: e.target.value })
-                  }
-                  className="w-full px-3 py-2 border border-slate-300 rounded-lg text-sm focus:ring-2 focus:ring-indigo-500 focus:outline-none"
-                />
-              </div>
-              <div>
-                <label className="block text-xs font-medium text-slate-700 mb-1">Khối lớp</label>
-                <select
-                  value={formLopHanhChinh.khoiLop}
-                  onChange={(e) =>
-                    setFormLopHanhChinh({
-                      ...formLopHanhChinh,
-                      khoiLop: parseInt(e.target.value) || 10,
-                    })
-                  }
-                  className="w-full px-3 py-2 border border-slate-300 rounded-lg text-sm focus:ring-2 focus:ring-indigo-500 focus:outline-none bg-white"
-                >
-                  <option value={10}>Khối 10</option>
-                  <option value={11}>Khối 11</option>
-                  <option value={12}>Khối 12</option>
-                </select>
-              </div>
+      <HopThoai
+        mo={moModalLopHanhChinh}
+        onDong={() => setMoModalLopHanhChinh(false)}
+        tieuDe="Thêm Lớp hành chính mới"
+        moTa="Tạo lớp sinh hoạt hành chính theo khối"
+        kichThuoc="nho"
+      >
+        <div className="space-y-4">
+          <div className="space-y-3">
+            <div>
+              <label className="block text-xs font-medium text-slate-700 mb-1">Mã lớp</label>
+              <input
+                type="text"
+                placeholder="Ví dụ: 10A1, 11B2"
+                value={formLopHanhChinh.maLop}
+                onChange={(e) =>
+                  setFormLopHanhChinh({
+                    ...formLopHanhChinh,
+                    maLop: e.target.value.toUpperCase(),
+                  })
+                }
+                className="w-full px-3 py-2 border border-slate-300 rounded-lg text-sm font-mono focus:ring-2 focus:ring-indigo-500 focus:outline-none uppercase"
+              />
             </div>
-            <div className="flex justify-end gap-3 pt-3">
-              <button
-                type="button"
-                onClick={() => setMoModalLopHanhChinh(false)}
-                className="px-4 py-2 border border-slate-300 text-slate-700 rounded-lg text-sm hover:bg-slate-50"
+            <div>
+              <label className="block text-xs font-medium text-slate-700 mb-1">Tên lớp</label>
+              <input
+                type="text"
+                placeholder="Ví dụ: Lớp 10A1 Chuyên Toán"
+                value={formLopHanhChinh.tenLop}
+                onChange={(e) =>
+                  setFormLopHanhChinh({ ...formLopHanhChinh, tenLop: e.target.value })
+                }
+                className="w-full px-3 py-2 border border-slate-300 rounded-lg text-sm focus:ring-2 focus:ring-indigo-500 focus:outline-none"
+              />
+            </div>
+            <div>
+              <label className="block text-xs font-medium text-slate-700 mb-1">Khối lớp</label>
+              <select
+                value={formLopHanhChinh.khoiLop}
+                onChange={(e) =>
+                  setFormLopHanhChinh({
+                    ...formLopHanhChinh,
+                    khoiLop: parseInt(e.target.value) || 10,
+                  })
+                }
+                className="w-full px-3 py-2 border border-slate-300 rounded-lg text-sm focus:ring-2 focus:ring-indigo-500 focus:outline-none bg-white"
               >
-                Hủy
-              </button>
-              <button
-                type="button"
-                disabled={taoLopMutation.isPending}
-                onClick={() => taoLopMutation.mutate(formLopHanhChinh)}
-                className="px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white rounded-lg text-sm font-medium disabled:opacity-50"
-              >
-                {taoLopMutation.isPending ? 'Đang lưu...' : 'Tạo Lớp'}
-              </button>
+                <option value={10}>Khối 10</option>
+                <option value={11}>Khối 11</option>
+                <option value={12}>Khối 12</option>
+              </select>
             </div>
           </div>
+          <div className="flex justify-end gap-3 pt-3 border-t border-slate-100">
+            <button
+              type="button"
+              onClick={() => setMoModalLopHanhChinh(false)}
+              className="px-4 py-2 border border-slate-300 text-slate-700 rounded-lg text-sm hover:bg-slate-50 cursor-pointer"
+            >
+              Hủy
+            </button>
+            <button
+              type="button"
+              disabled={taoLopMutation.isPending}
+              onClick={() => taoLopMutation.mutate(formLopHanhChinh)}
+              className="px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white rounded-lg text-sm font-medium disabled:opacity-50 cursor-pointer"
+            >
+              {taoLopMutation.isPending ? 'Đang lưu...' : 'Tạo Lớp'}
+            </button>
+          </div>
         </div>
-      )}
+      </HopThoai>
     </div>
   );
 }

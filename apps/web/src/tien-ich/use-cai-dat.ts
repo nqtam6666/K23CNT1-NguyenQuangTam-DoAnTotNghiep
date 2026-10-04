@@ -18,6 +18,9 @@ export const GIA_TRI_MAC_DINH: BanDoCaiDat = {
     'Đồ án tốt nghiệp chuyên ngành Công nghệ Thông tin. Tối ưu hóa trải nghiệm giảng dạy trực tuyến, quản lý học vụ và hỗ trợ học tập thông minh.',
   CHO_PHEP_DANG_KY: 'true',
   THONG_BAO_CHUNG: 'Chào mừng bạn đến với Hệ thống Quản lý Học tập LMS Trường học!',
+  URL_LOGO: '',
+  URL_FAVICON: '/favicon.ico',
+  URL_ICON: '',
 };
 
 export function useCaiDatHeThong() {

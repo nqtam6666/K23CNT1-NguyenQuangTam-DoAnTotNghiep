@@ -20,6 +20,7 @@ import {
 } from 'lucide-react';
 import { mayKhachApi } from '../../../../tien-ich/may-khach-api';
 import { thongBao } from '../../../../tien-ich/thong-bao';
+import { HopThoai } from '../../../../thanh-phan/hop-thoai';
 import {
   LopHocPhan,
   ThoiKhoaBieu,
@@ -582,202 +583,188 @@ export default function TrangChiTietLopHocPhan({ params }: { params: Promise<{ i
       )}
 
       {/* MODAL THÊM TIẾT HỌC THỜI KHÓA BIỂU */}
-      {moModalTkb && (
-        <div className="fixed inset-0 bg-slate-900/50 backdrop-blur-sm z-50 flex items-center justify-center p-4">
-          <div className="bg-white rounded-xl shadow-xl max-w-md w-full p-6 space-y-4">
-            <h3 className="text-lg font-bold text-slate-900">Thêm Tiết học vào Thời khóa biểu</h3>
-            {thongBaoLoi && (
-              <div className="p-3 bg-rose-50 text-rose-700 text-xs rounded-lg flex items-center gap-2">
-                <AlertCircle className="w-4 h-4 shrink-0" />
-                <span>{thongBaoLoi}</span>
-              </div>
-            )}
-            <div className="space-y-3">
+      <HopThoai
+        mo={moModalTkb}
+        onDong={() => setMoModalTkb(false)}
+        tieuDe="Thêm Tiết học vào Thời khóa biểu"
+        moTa="Thiết lập buổi học định kỳ hàng tuần cho lớp học phần"
+        kichThuoc="nho"
+      >
+        <div className="space-y-4">
+          <div className="space-y-3">
+            <div>
+              <label className="block text-xs font-medium text-slate-700 mb-1">
+                Thứ trong tuần
+              </label>
+              <select
+                value={formTkb.thuTrongTuan}
+                onChange={(e) =>
+                  setFormTkb({ ...formTkb, thuTrongTuan: parseInt(e.target.value) || 2 })
+                }
+                className="w-full px-3 py-2 border border-slate-300 rounded-lg text-sm bg-white focus:ring-2 focus:ring-indigo-500"
+              >
+                <option value={2}>Thứ Hai</option>
+                <option value={3}>Thứ Ba</option>
+                <option value={4}>Thứ Tư</option>
+                <option value={5}>Thứ Năm</option>
+                <option value={6}>Thứ Sáu</option>
+                <option value={7}>Thứ Bảy</option>
+                <option value={8}>Chủ Nhật</option>
+              </select>
+            </div>
+
+            <div className="grid grid-cols-2 gap-3">
               <div>
                 <label className="block text-xs font-medium text-slate-700 mb-1">
-                  Thứ trong tuần
+                  Tiết bắt đầu
                 </label>
-                <select
-                  value={formTkb.thuTrongTuan}
-                  onChange={(e) =>
-                    setFormTkb({ ...formTkb, thuTrongTuan: parseInt(e.target.value) || 2 })
-                  }
-                  className="w-full px-3 py-2 border border-slate-300 rounded-lg text-sm bg-white focus:ring-2 focus:ring-indigo-500"
-                >
-                  <option value={2}>Thứ Hai</option>
-                  <option value={3}>Thứ Ba</option>
-                  <option value={4}>Thứ Tư</option>
-                  <option value={5}>Thứ Năm</option>
-                  <option value={6}>Thứ Sáu</option>
-                  <option value={7}>Thứ Bảy</option>
-                  <option value={8}>Chủ Nhật</option>
-                </select>
-              </div>
-
-              <div className="grid grid-cols-2 gap-3">
-                <div>
-                  <label className="block text-xs font-medium text-slate-700 mb-1">
-                    Tiết bắt đầu
-                  </label>
-                  <input
-                    type="number"
-                    min={1}
-                    max={12}
-                    value={formTkb.tietBatDau}
-                    onChange={(e) =>
-                      setFormTkb({ ...formTkb, tietBatDau: parseInt(e.target.value) || 1 })
-                    }
-                    className="w-full px-3 py-2 border border-slate-300 rounded-lg text-sm focus:ring-2 focus:ring-indigo-500"
-                  />
-                </div>
-                <div>
-                  <label className="block text-xs font-medium text-slate-700 mb-1">Số tiết</label>
-                  <input
-                    type="number"
-                    min={1}
-                    max={5}
-                    value={formTkb.soTiet}
-                    onChange={(e) =>
-                      setFormTkb({ ...formTkb, soTiet: parseInt(e.target.value) || 1 })
-                    }
-                    className="w-full px-3 py-2 border border-slate-300 rounded-lg text-sm focus:ring-2 focus:ring-indigo-500"
-                  />
-                </div>
-              </div>
-
-              <div>
-                <label className="block text-xs font-medium text-slate-700 mb-1">Phòng học</label>
                 <input
-                  type="text"
-                  placeholder="VD: P102, Lab 3, Trực tuyến"
-                  value={formTkb.phongHoc || ''}
-                  onChange={(e) => setFormTkb({ ...formTkb, phongHoc: e.target.value })}
+                  type="number"
+                  min={1}
+                  max={12}
+                  value={formTkb.tietBatDau}
+                  onChange={(e) =>
+                    setFormTkb({ ...formTkb, tietBatDau: parseInt(e.target.value) || 1 })
+                  }
+                  className="w-full px-3 py-2 border border-slate-300 rounded-lg text-sm focus:ring-2 focus:ring-indigo-500"
+                />
+              </div>
+              <div>
+                <label className="block text-xs font-medium text-slate-700 mb-1">Số tiết</label>
+                <input
+                  type="number"
+                  min={1}
+                  max={5}
+                  value={formTkb.soTiet}
+                  onChange={(e) =>
+                    setFormTkb({ ...formTkb, soTiet: parseInt(e.target.value) || 1 })
+                  }
                   className="w-full px-3 py-2 border border-slate-300 rounded-lg text-sm focus:ring-2 focus:ring-indigo-500"
                 />
               </div>
             </div>
 
-            <div className="flex justify-end gap-3 pt-3">
-              <button
-                type="button"
-                onClick={() => setMoModalTkb(false)}
-                className="px-4 py-2 border border-slate-300 text-slate-700 rounded-lg text-sm hover:bg-slate-50"
-              >
-                Hủy
-              </button>
-              <button
-                type="button"
-                disabled={taoTkbMutation.isPending}
-                onClick={() => taoTkbMutation.mutate(formTkb)}
-                className="px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white rounded-lg text-sm font-semibold disabled:opacity-50"
-              >
-                {taoTkbMutation.isPending ? 'Đang lưu...' : 'Thêm tiết học'}
-              </button>
+            <div>
+              <label className="block text-xs font-medium text-slate-700 mb-1">Phòng học</label>
+              <input
+                type="text"
+                placeholder="VD: P102, Lab 3, Trực tuyến"
+                value={formTkb.phongHoc || ''}
+                onChange={(e) => setFormTkb({ ...formTkb, phongHoc: e.target.value })}
+                className="w-full px-3 py-2 border border-slate-300 rounded-lg text-sm focus:ring-2 focus:ring-indigo-500"
+              />
             </div>
           </div>
+
+          <div className="flex justify-end gap-3 pt-3 border-t border-slate-100">
+            <button
+              type="button"
+              onClick={() => setMoModalTkb(false)}
+              className="px-4 py-2 border border-slate-300 text-slate-700 rounded-lg text-sm hover:bg-slate-50 cursor-pointer"
+            >
+              Hủy
+            </button>
+            <button
+              type="button"
+              disabled={taoTkbMutation.isPending}
+              onClick={() => taoTkbMutation.mutate(formTkb)}
+              className="px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white rounded-lg text-sm font-semibold disabled:opacity-50 cursor-pointer"
+            >
+              {taoTkbMutation.isPending ? 'Đang lưu...' : 'Thêm tiết học'}
+            </button>
+          </div>
         </div>
-      )}
+      </HopThoai>
 
       {/* MODAL GHI DANH 1 HỌC SINH */}
-      {moModalGhiDanh && (
-        <div className="fixed inset-0 bg-slate-900/50 backdrop-blur-sm z-50 flex items-center justify-center p-4">
-          <div className="bg-white rounded-xl shadow-xl max-w-md w-full p-6 space-y-4">
-            <h3 className="text-lg font-bold text-slate-900">Ghi danh Học sinh vào lớp</h3>
-            {thongBaoLoi && (
-              <div className="p-3 bg-rose-50 text-rose-700 text-xs rounded-lg flex items-center gap-2">
-                <AlertCircle className="w-4 h-4 shrink-0" />
-                <span>{thongBaoLoi}</span>
-              </div>
-            )}
-            <div>
-              <label className="block text-xs font-medium text-slate-700 mb-1">Chọn học sinh</label>
-              <select
-                value={idHocSinhChon}
-                onChange={(e) => setIdHocSinhChon(e.target.value)}
-                className="w-full px-3 py-2 border border-slate-300 rounded-lg text-sm bg-white focus:ring-2 focus:ring-indigo-500"
-              >
-                <option value="">-- Chọn học sinh từ danh sách --</option>
-                {tatCaHocSinh?.map((hs: any) => (
-                  <option key={hs.id} value={hs.id}>
-                    {hs.maHocSinh} - {hs.nguoiDung.hoTen} (
-                    {hs.lopHanhChinh?.tenLop || 'Chưa xếp lớp'})
-                  </option>
-                ))}
-              </select>
-            </div>
-            <div className="flex justify-end gap-3 pt-3">
-              <button
-                type="button"
-                onClick={() => setMoModalGhiDanh(false)}
-                className="px-4 py-2 border border-slate-300 text-slate-700 rounded-lg text-sm hover:bg-slate-50"
-              >
-                Hủy
-              </button>
-              <button
-                type="button"
-                disabled={!idHocSinhChon || ghiDanhMutation.isPending}
-                onClick={() => ghiDanhMutation.mutate(idHocSinhChon)}
-                className="px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white rounded-lg text-sm font-semibold disabled:opacity-50"
-              >
-                {ghiDanhMutation.isPending ? 'Đang ghi danh...' : 'Ghi danh'}
-              </button>
-            </div>
+      <HopThoai
+        mo={moModalGhiDanh}
+        onDong={() => setMoModalGhiDanh(false)}
+        tieuDe="Ghi danh Học sinh vào lớp"
+        moTa="Thêm học sinh cụ thể vào danh sách lớp học phần"
+        kichThuoc="nho"
+      >
+        <div className="space-y-4">
+          <div>
+            <label className="block text-xs font-medium text-slate-700 mb-1">Chọn học sinh</label>
+            <select
+              value={idHocSinhChon}
+              onChange={(e) => setIdHocSinhChon(e.target.value)}
+              className="w-full px-3 py-2 border border-slate-300 rounded-lg text-sm bg-white focus:ring-2 focus:ring-indigo-500"
+            >
+              <option value="">-- Chọn học sinh từ danh sách --</option>
+              {tatCaHocSinh?.map((hs: any) => (
+                <option key={hs.id} value={hs.id}>
+                  {hs.maHocSinh} - {hs.nguoiDung.hoTen} ({hs.lopHanhChinh?.tenLop || 'Chưa xếp lớp'})
+                </option>
+              ))}
+            </select>
+          </div>
+          <div className="flex justify-end gap-3 pt-3 border-t border-slate-100">
+            <button
+              type="button"
+              onClick={() => setMoModalGhiDanh(false)}
+              className="px-4 py-2 border border-slate-300 text-slate-700 rounded-lg text-sm hover:bg-slate-50 cursor-pointer"
+            >
+              Hủy
+            </button>
+            <button
+              type="button"
+              disabled={!idHocSinhChon || ghiDanhMutation.isPending}
+              onClick={() => ghiDanhMutation.mutate(idHocSinhChon)}
+              className="px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white rounded-lg text-sm font-semibold disabled:opacity-50 cursor-pointer"
+            >
+              {ghiDanhMutation.isPending ? 'Đang ghi danh...' : 'Ghi danh'}
+            </button>
           </div>
         </div>
-      )}
+      </HopThoai>
 
       {/* MODAL GHI DANH THEO LỚP HÀNH CHÍNH */}
-      {moModalImportLop && (
-        <div className="fixed inset-0 bg-slate-900/50 backdrop-blur-sm z-50 flex items-center justify-center p-4">
-          <div className="bg-white rounded-xl shadow-xl max-w-md w-full p-6 space-y-4">
-            <h3 className="text-lg font-bold text-slate-900">Ghi danh theo Lớp hành chính</h3>
-            <p className="text-xs text-slate-500">
-              Toàn bộ học sinh thuộc lớp hành chính được chọn sẽ được tự động ghi danh vào lớp học
-              phần này.
-            </p>
-            {thongBaoLoi && (
-              <div className="p-3 bg-rose-50 text-rose-700 text-xs rounded-lg flex items-center gap-2">
-                <AlertCircle className="w-4 h-4 shrink-0" />
-                <span>{thongBaoLoi}</span>
-              </div>
-            )}
-            <div>
-              <label className="block text-xs font-medium text-slate-700 mb-1">
-                Chọn lớp hành chính
-              </label>
-              <select
-                value={idLopHanhChinhChon}
-                onChange={(e) => setIdLopHanhChinhChon(e.target.value)}
-                className="w-full px-3 py-2 border border-slate-300 rounded-lg text-sm bg-white focus:ring-2 focus:ring-indigo-500"
-              >
-                <option value="">-- Chọn lớp hành chính --</option>
-                {danhSachLopHanhChinh?.map((lop: any) => (
-                  <option key={lop.id} value={lop.id}>
-                    {lop.maLop} - {lop.tenLop} ({lop._count?.danhSachHocSinh || 0} học sinh)
-                  </option>
-                ))}
-              </select>
-            </div>
-            <div className="flex justify-end gap-3 pt-3">
-              <button
-                type="button"
-                onClick={() => setMoModalImportLop(false)}
-                className="px-4 py-2 border border-slate-300 text-slate-700 rounded-lg text-sm hover:bg-slate-50"
-              >
-                Hủy
-              </button>
-              <button
-                type="button"
-                disabled={!idLopHanhChinhChon || ghiDanhTheoLopMutation.isPending}
-                onClick={() => ghiDanhTheoLopMutation.mutate(idLopHanhChinhChon)}
-                className="px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white rounded-lg text-sm font-semibold disabled:opacity-50"
-              >
-                {ghiDanhTheoLopMutation.isPending ? 'Đang import...' : 'Tiến hành ghi danh'}
-              </button>
-            </div>
+      <HopThoai
+        mo={moModalImportLop}
+        onDong={() => setMoModalImportLop(false)}
+        tieuDe="Ghi danh theo Lớp hành chính"
+        moTa="Toàn bộ học sinh thuộc lớp hành chính được chọn sẽ được tự động ghi danh vào lớp học phần này"
+        kichThuoc="nho"
+      >
+        <div className="space-y-4">
+          <div>
+            <label className="block text-xs font-medium text-slate-700 mb-1">
+              Chọn lớp hành chính
+            </label>
+            <select
+              value={idLopHanhChinhChon}
+              onChange={(e) => setIdLopHanhChinhChon(e.target.value)}
+              className="w-full px-3 py-2 border border-slate-300 rounded-lg text-sm bg-white focus:ring-2 focus:ring-indigo-500"
+            >
+              <option value="">-- Chọn lớp hành chính --</option>
+              {danhSachLopHanhChinh?.map((lop: any) => (
+                <option key={lop.id} value={lop.id}>
+                  {lop.maLop} - {lop.tenLop} ({lop._count?.danhSachHocSinh || 0} học sinh)
+                </option>
+              ))}
+            </select>
+          </div>
+          <div className="flex justify-end gap-3 pt-3 border-t border-slate-100">
+            <button
+              type="button"
+              onClick={() => setMoModalImportLop(false)}
+              className="px-4 py-2 border border-slate-300 text-slate-700 rounded-lg text-sm hover:bg-slate-50 cursor-pointer"
+            >
+              Hủy
+            </button>
+            <button
+              type="button"
+              disabled={!idLopHanhChinhChon || ghiDanhTheoLopMutation.isPending}
+              onClick={() => ghiDanhTheoLopMutation.mutate(idLopHanhChinhChon)}
+              className="px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white rounded-lg text-sm font-semibold disabled:opacity-50 cursor-pointer"
+            >
+              {ghiDanhTheoLopMutation.isPending ? 'Đang import...' : 'Tiến hành ghi danh'}
+            </button>
           </div>
         </div>
-      )}
+      </HopThoai>
     </div>
   );
 }

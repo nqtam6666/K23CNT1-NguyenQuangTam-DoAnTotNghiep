@@ -22,6 +22,7 @@ import { taoNguoiDungSchema, TaoNguoiDungDto, VaiTro, DANH_SACH_VAI_TRO, layNhan
 import { mayKhachApi } from '../../../tien-ich/may-khach-api';
 import { thongBao } from '../../../tien-ich/thong-bao';
 import { KhungXuongBang } from '../../../thanh-phan/khung-xuong';
+import { HopThoai } from '../../../thanh-phan/hop-thoai';
 
 export default function TrangQuanLyNguoiDung() {
   const queryClient = useQueryClient();
@@ -317,151 +318,146 @@ export default function TrangQuanLyNguoiDung() {
       </div>
 
       {/* Modal Tạo Người Dùng Mới */}
-      {modalTaoMo && (
-        <div className="fixed inset-0 z-50 bg-slate-900/40 backdrop-blur-xs flex items-center justify-center p-4">
-          <div className="bg-white rounded-2xl max-w-md w-full p-6 shadow-xl border border-slate-200">
-            <div className="flex items-center justify-between pb-4 border-b border-slate-100">
-              <h3 className="text-lg font-bold text-slate-900">Thêm người dùng mới</h3>
-              <button
-                onClick={() => setModalTaoMo(false)}
-                className="text-slate-400 hover:text-slate-600"
-              >
-                <X className="w-5 h-5" />
-              </button>
-            </div>
-
-            <form onSubmit={handleSubmit(xuLyTaoNguoiDung)} className="mt-4 space-y-4">
-              <div>
-                <label className="block text-xs font-semibold text-slate-700 mb-1">
-                  Họ và tên *
-                </label>
-                <input
-                  type="text"
-                  {...register('hoTen')}
-                  placeholder="Ví dụ: Nguyễn Văn An"
-                  className="w-full px-3 py-2 border border-slate-300 rounded-lg text-sm focus:ring-2 focus:ring-blue-500"
-                />
-                {errors.hoTen && (
-                  <p className="mt-1 text-xs text-red-600">{errors.hoTen.message}</p>
-                )}
-              </div>
-
-              <div>
-                <label className="block text-xs font-semibold text-slate-700 mb-1">Email *</label>
-                <input
-                  type="email"
-                  {...register('email')}
-                  placeholder="an.nv@lms.edu.vn"
-                  className="w-full px-3 py-2 border border-slate-300 rounded-lg text-sm focus:ring-2 focus:ring-blue-500"
-                />
-                {errors.email && (
-                  <p className="mt-1 text-xs text-red-600">{errors.email.message}</p>
-                )}
-              </div>
-
-              <div>
-                <label className="block text-xs font-semibold text-slate-700 mb-1">
-                  Mật khẩu khởi tạo *
-                </label>
-                <input
-                  type="password"
-                  {...register('matKhau')}
-                  placeholder="Tối thiểu 8 ký tự"
-                  className="w-full px-3 py-2 border border-slate-300 rounded-lg text-sm focus:ring-2 focus:ring-blue-500"
-                />
-                {errors.matKhau && (
-                  <p className="mt-1 text-xs text-red-600">{errors.matKhau.message}</p>
-                )}
-              </div>
-
-              <div>
-                <label className="block text-xs font-semibold text-slate-700 mb-1">
-                  Số điện thoại
-                </label>
-                <input
-                  type="text"
-                  {...register('soDienThoai')}
-                  placeholder="0987654321"
-                  className="w-full px-3 py-2 border border-slate-300 rounded-lg text-sm focus:ring-2 focus:ring-blue-500"
-                />
-              </div>
-
-              <div>
-                <label className="block text-xs font-semibold text-slate-700 mb-1">Vai trò *</label>
-                <select
-                  {...register('vaiTro')}
-                  className="w-full px-3 py-2 border border-slate-300 rounded-lg text-sm bg-white focus:ring-2 focus:ring-blue-500"
-                >
-                  {DANH_SACH_VAI_TRO.map((vt) => (
-                    <option key={vt} value={vt}>
-                      {layNhanVaiTro(vt)}
-                    </option>
-                  ))}
-                </select>
-              </div>
-
-              <div className="pt-4 flex items-center justify-end gap-3 border-t border-slate-100">
-                <button
-                  type="button"
-                  onClick={() => setModalTaoMo(false)}
-                  className="px-4 py-2 text-sm text-slate-600 hover:bg-slate-100 rounded-lg"
-                >
-                  Hủy
-                </button>
-                <button
-                  type="submit"
-                  disabled={isSubmitting}
-                  className="px-4 py-2 text-sm font-medium bg-blue-600 hover:bg-blue-700 text-white rounded-lg disabled:opacity-60 flex items-center gap-2"
-                >
-                  {isSubmitting && <Loader2 className="w-4 h-4 animate-spin" />}
-                  Tạo người dùng
-                </button>
-              </div>
-            </form>
+      <HopThoai
+        mo={modalTaoMo}
+        onDong={() => setModalTaoMo(false)}
+        tieuDe="Thêm người dùng mới"
+        moTa="Tạo tài khoản người dùng mới và phân quyền vai trò trong hệ thống"
+        kichThuoc="nho"
+      >
+        <form onSubmit={handleSubmit(xuLyTaoNguoiDung)} className="space-y-4">
+          <div>
+            <label className="block text-xs font-semibold text-slate-700 mb-1">
+              Họ và tên *
+            </label>
+            <input
+              type="text"
+              {...register('hoTen')}
+              placeholder="Ví dụ: Nguyễn Văn An"
+              className="w-full px-3 py-2 border border-slate-300 rounded-lg text-sm focus:ring-2 focus:ring-blue-500"
+            />
+            {errors.hoTen && (
+              <p className="mt-1 text-xs text-red-600">{errors.hoTen.message}</p>
+            )}
           </div>
-        </div>
-      )}
 
-      {/* Modal Đặt Lại Mật Khẩu */}
-      {modalDatMatKhauMo && (
-        <div className="fixed inset-0 z-50 bg-slate-900/40 backdrop-blur-xs flex items-center justify-center p-4">
-          <div className="bg-white rounded-2xl max-w-sm w-full p-6 shadow-xl border border-slate-200">
-            <h3 className="text-base font-bold text-slate-900 mb-2">Đặt lại mật khẩu</h3>
-            <p className="text-xs text-slate-500 mb-4">
-              Nhập mật khẩu mới cho người dùng. Người dùng sẽ bị thu hồi các phiên đăng nhập cũ.
-            </p>
+          <div>
+            <label className="block text-xs font-semibold text-slate-700 mb-1">Email *</label>
+            <input
+              type="email"
+              {...register('email')}
+              placeholder="an.nv@lms.edu.vn"
+              className="w-full px-3 py-2 border border-slate-300 rounded-lg text-sm focus:ring-2 focus:ring-blue-500"
+            />
+            {errors.email && (
+              <p className="mt-1 text-xs text-red-600">{errors.email.message}</p>
+            )}
+          </div>
 
+          <div>
+            <label className="block text-xs font-semibold text-slate-700 mb-1">
+              Mật khẩu khởi tạo *
+            </label>
             <input
               type="password"
-              placeholder="Mật khẩu mới (tối thiểu 8 ký tự)"
-              value={matKhauMoi}
-              onChange={(e) => setMatKhauMoi(e.target.value)}
-              className="w-full px-3 py-2 border border-slate-300 rounded-lg text-sm mb-4 focus:ring-2 focus:ring-blue-500"
+              {...register('matKhau')}
+              placeholder="Tối thiểu 8 ký tự"
+              className="w-full px-3 py-2 border border-slate-300 rounded-lg text-sm focus:ring-2 focus:ring-blue-500"
             />
+            {errors.matKhau && (
+              <p className="mt-1 text-xs text-red-600">{errors.matKhau.message}</p>
+            )}
+          </div>
 
-            <div className="flex items-center justify-end gap-2">
-              <button
-                onClick={() => setModalDatMatKhauMo(null)}
-                className="px-3 py-1.5 text-xs text-slate-600 hover:bg-slate-100 rounded-md"
-              >
-                Hủy
-              </button>
-              <button
-                disabled={matKhauMoi.length < 8 || mutationDatLaiMatKhau.isPending}
-                onClick={() =>
-                  mutationDatLaiMatKhau.mutate({
-                    id: modalDatMatKhauMo,
-                    matKhauMoi,
-                  })
-                }
-                className="px-3 py-1.5 text-xs font-medium bg-indigo-600 hover:bg-indigo-700 text-white rounded-md disabled:opacity-50"
-              >
-                Xác nhận đổi
-              </button>
-            </div>
+          <div>
+            <label className="block text-xs font-semibold text-slate-700 mb-1">
+              Số điện thoại
+            </label>
+            <input
+              type="text"
+              {...register('soDienThoai')}
+              placeholder="0987654321"
+              className="w-full px-3 py-2 border border-slate-300 rounded-lg text-sm focus:ring-2 focus:ring-blue-500"
+            />
+          </div>
+
+          <div>
+            <label className="block text-xs font-semibold text-slate-700 mb-1">Vai trò *</label>
+            <select
+              {...register('vaiTro')}
+              className="w-full px-3 py-2 border border-slate-300 rounded-lg text-sm bg-white focus:ring-2 focus:ring-blue-500"
+            >
+              {DANH_SACH_VAI_TRO.map((vt) => (
+                <option key={vt} value={vt}>
+                  {layNhanVaiTro(vt)}
+                </option>
+              ))}
+            </select>
+          </div>
+
+          <div className="pt-4 flex items-center justify-end gap-3 border-t border-slate-100">
+            <button
+              type="button"
+              onClick={() => setModalTaoMo(false)}
+              className="px-4 py-2 text-sm text-slate-600 hover:bg-slate-100 rounded-lg"
+            >
+              Hủy
+            </button>
+            <button
+              type="submit"
+              disabled={isSubmitting}
+              className="px-4 py-2 text-sm font-medium bg-blue-600 hover:bg-blue-700 text-white rounded-lg disabled:opacity-60 flex items-center gap-2"
+            >
+              {isSubmitting && <Loader2 className="w-4 h-4 animate-spin" />}
+              Tạo người dùng
+            </button>
+          </div>
+        </form>
+      </HopThoai>
+
+      {/* Modal Đặt Lại Mật Khẩu */}
+      <HopThoai
+        mo={Boolean(modalDatMatKhauMo)}
+        onDong={() => setModalDatMatKhauMo(null)}
+        tieuDe="Đặt lại mật khẩu"
+        moTa="Nhập mật khẩu mới cho người dùng. Người dùng sẽ bị thu hồi các phiên đăng nhập cũ."
+        kichThuoc="nho"
+      >
+        <div className="space-y-4">
+          <input
+            type="password"
+            placeholder="Mật khẩu mới (tối thiểu 8 ký tự)"
+            value={matKhauMoi}
+            onChange={(e) => setMatKhauMoi(e.target.value)}
+            className="w-full px-3 py-2 border border-slate-300 rounded-lg text-sm focus:ring-2 focus:ring-blue-500"
+          />
+
+          <div className="flex items-center justify-end gap-2 pt-2 border-t border-slate-100">
+            <button
+              type="button"
+              onClick={() => setModalDatMatKhauMo(null)}
+              className="px-3 py-1.5 text-xs text-slate-600 hover:bg-slate-100 rounded-md"
+            >
+              Hủy
+            </button>
+            <button
+              type="button"
+              disabled={matKhauMoi.length < 8 || mutationDatLaiMatKhau.isPending}
+              onClick={() =>
+                modalDatMatKhauMo &&
+                mutationDatLaiMatKhau.mutate({
+                  id: modalDatMatKhauMo,
+                  matKhauMoi,
+                })
+              }
+              className="px-3 py-1.5 text-xs font-medium bg-indigo-600 hover:bg-indigo-700 text-white rounded-md disabled:opacity-50 flex items-center gap-1.5"
+            >
+              {mutationDatLaiMatKhau.isPending && <Loader2 className="w-3.5 h-3.5 animate-spin" />}
+              Xác nhận đổi
+            </button>
           </div>
         </div>
-      )}
+      </HopThoai>
     </div>
   );
 }

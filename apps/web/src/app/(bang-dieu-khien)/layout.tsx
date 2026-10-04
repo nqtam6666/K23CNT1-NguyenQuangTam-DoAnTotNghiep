@@ -11,9 +11,6 @@ import {
   PanelLeftClose,
   PanelLeftOpen,
   Search,
-  Moon,
-  Sun,
-  Globe,
 } from 'lucide-react';
 import { mayKhachApi } from '../../tien-ich/may-khach-api';
 import { thongBao } from '../../tien-ich/thong-bao';
@@ -29,6 +26,7 @@ import {
 import { ChiBaoSucKhoe } from '../../thanh-phan/chi-bao-suc-khoe';
 import { TimKiemNhanh } from '../../thanh-phan/tim-kiem-nhanh';
 import { DichNgonNgu } from '../../thanh-phan/dich-ngon-ngu';
+import { ThemeToggleButton2 } from '../../thanh-phan/nut-chuyen-giao-dien';
 
 const BAN_DO_TIEU_DE_TRANG: Record<string, string> = {
   '/bang-dieu-khien': 'Tổng quan',
@@ -628,20 +626,11 @@ export default function LayoutBangDieuKhien({ children }: { children: ReactNode 
             {/* Bộ dịch ngôn ngữ đa quốc gia GTranslate */}
             <DichNgonNgu />
 
-            {/* Nút chế độ Sáng / Tối */}
-            <button
-              onClick={batTatSangToi}
-              data-testid="nut-che-do-sang-toi"
-              title={cheDoSangToi === 'sang' ? 'Chuyển sang Chế độ tối' : 'Chuyển sang Chế độ sáng'}
-              aria-label="Chuyển đổi giao diện sáng tối"
-              className="p-2 text-slate-500 hover:text-slate-800 dark:text-slate-400 dark:hover:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-xl transition-all cursor-pointer active:scale-90"
-            >
-              {cheDoSangToi === 'sang' ? (
-                <Moon className="w-4 h-4 text-slate-600 hover:text-indigo-600 transition-colors" />
-              ) : (
-                <Sun className="w-4 h-4 text-amber-400 hover:text-amber-300 transition-colors" />
-              )}
-            </button>
+            {/* Nút chế độ Sáng / Tối (ThemeToggleButton2 Framer Motion) */}
+            <ThemeToggleButton2
+              isDark={cheDoSangToi === 'toi'}
+              onToggle={batTatSangToi}
+            />
           </div>
         </header>
 

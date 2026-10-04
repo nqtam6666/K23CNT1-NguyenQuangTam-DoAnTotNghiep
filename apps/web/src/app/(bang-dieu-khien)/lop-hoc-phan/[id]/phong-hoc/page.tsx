@@ -3,14 +3,21 @@
 import { useState, use, useEffect } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
+import dynamic from 'next/dynamic';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import {
-  LiveKitRoom,
-  VideoConference,
-  RoomAudioRenderer,
-  ControlBar,
-} from '@livekit/components-react';
-import '@livekit/components-styles';
+
+const ThanhPhanPhongHocLiveKit = dynamic(
+  () => import('./thanh-phan-phong-hoc'),
+  {
+    ssr: false,
+    loading: () => (
+      <div className="h-full w-full flex flex-col items-center justify-center space-y-3 bg-slate-950 text-slate-400">
+        <Loader2 className="w-8 h-8 animate-spin text-blue-500" />
+        <p className="text-sm font-medium">Đang tải giao diện phòng học LiveKit...</p>
+      </div>
+    ),
+  }
+);
 import {
   ArrowLeft,
   Video,
@@ -209,20 +216,11 @@ export default function TrangPhongHocTrucTuyen({
       {/* KHÔNG GIAN PHÒNG HỌC LIVEKIT ROOM */}
       <div className="flex-1 relative flex overflow-hidden">
         <div className="flex-1 h-full w-full">
-          <LiveKitRoom
-            serverUrl={duLieuToken.urlMayChuLiveKit}
+          <ThanhPhanPhongHocLiveKit
+            urlMayChuLiveKit={duLieuToken.urlMayChuLiveKit}
             token={duLieuToken.token}
-            connect={true}
-            video={true}
-            audio={true}
-            data-lk-theme="default"
             onDisconnected={xuLyRoiPhong}
-            className="h-full w-full flex flex-col"
-          >
-            {/* Lưới hiển thị video và bảng điều khiển chuẩn LiveKit */}
-            <VideoConference />
-            <RoomAudioRenderer />
-          </LiveKitRoom>
+          />
         </div>
 
         {/* SIDEBAR NHẬT KÝ ĐIỂM DANH */}

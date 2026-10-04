@@ -5,7 +5,7 @@ import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
-import { BookOpen, Lock, Mail, AlertCircle, Loader2 } from 'lucide-react';
+import { BookOpen, Lock, Mail, Loader2 } from 'lucide-react';
 import { dangNhapSchema, DangNhapDto } from '@lms/chung';
 import { mayKhachApi } from '../../../tien-ich/may-khach-api';
 import { thongBao } from '../../../tien-ich/thong-bao';
@@ -13,7 +13,6 @@ import { thongBao } from '../../../tien-ich/thong-bao';
 export default function TrangDangNhap() {
   const router = useRouter();
   const [dangXuLy, setDangXuLy] = useState(false);
-  const [thongBaoLoi, setThongBaoLoi] = useState<string | null>(null);
 
   const {
     register,
@@ -29,7 +28,6 @@ export default function TrangDangNhap() {
 
   const xuLyDangNhap = async (duLieu: DangNhapDto) => {
     setDangXuLy(true);
-    setThongBaoLoi(null);
     try {
       const phanHoi = await mayKhachApi.post('/xac-thuc/dang-nhap', duLieu);
       const hoTen = phanHoi.data?.duLieu?.nguoiDung?.hoTen;
@@ -49,7 +47,6 @@ export default function TrangDangNhap() {
         loi.response?.data?.message ||
         'Đăng nhập không thành công. Vui lòng kiểm tra lại email hoặc mật khẩu.';
       
-      setThongBaoLoi(thongDiep);
       thongBao.thatBai('Đăng nhập thất bại', thongDiep);
     } finally {
       setDangXuLy(false);
@@ -68,13 +65,6 @@ export default function TrangDangNhap() {
             Hệ thống Quản lý Học tập & Lớp học Trực tuyến
           </p>
         </div>
-
-        {thongBaoLoi && (
-          <div className="p-3 rounded-lg bg-red-50 border border-red-200 text-red-700 text-sm flex items-center gap-2">
-            <AlertCircle className="w-4 h-4 shrink-0" />
-            <span>{thongBaoLoi}</span>
-          </div>
-        )}
 
         <form className="mt-8 space-y-5" onSubmit={handleSubmit(xuLyDangNhap)}>
           <div>

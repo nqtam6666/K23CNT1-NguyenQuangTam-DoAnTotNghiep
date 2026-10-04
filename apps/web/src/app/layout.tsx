@@ -2,6 +2,7 @@ import type { Metadata } from 'next';
 import './globals.css';
 import { Toaster } from 'sonner';
 import { BoCungCapTruyVan } from '../cung-cap/bo-cung-cap-truy-van';
+import { ThanhTienTrinhChuyenTrang } from '../thanh-phan/thanh-tien-trinh-chuyen-trang';
 
 export const metadata: Metadata = {
   title: 'Hệ thống Quản lý Học tập LMS Trường học',
@@ -17,6 +18,7 @@ export default function RootLayout({
   return (
     <html lang="vi" suppressHydrationWarning>
       <body className="antialiased min-h-screen bg-slate-50 text-slate-900">
+        <ThanhTienTrinhChuyenTrang />
         <BoCungCapTruyVan>
           {children}
           <Toaster position="top-right" richColors closeButton expand={false} />

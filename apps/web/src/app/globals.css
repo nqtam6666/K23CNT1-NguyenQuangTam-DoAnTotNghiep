@@ -54,3 +54,39 @@ body {
   color: #0f172a;
   min-height: 100vh;
 }
+
+/* ==========================================================
+   HIỆU ỨNG TƯƠNG TÁC XÚC GIÁC & PHẢN HỒI NÚT BẤM (TACTILE)
+   ========================================================== */
+button,
+a[role="button"],
+.nut-hieu-ung {
+  user-select: none;
+  -webkit-tap-highlight-color: transparent;
+}
+
+/* Khi người dùng nhấn chuột hoặc chạm màn hình: nút co nhẹ tạo cảm giác bấm vật lý */
+button:active:not(:disabled),
+a[role="button"]:active:not(:disabled),
+.nut-hieu-ung:active:not(:disabled) {
+  transform: scale(0.975);
+  transition: transform 0.08s ease-in-out;
+}
+
+/* ==========================================================
+   HIỆU ỨNG CHUYỂN TRANG MƯỢT MÀ (PAGE TRANSITION ANIMATION)
+   ========================================================== */
+@keyframes hieuUngXuatHienTrang {
+  0% {
+    opacity: 0;
+    transform: translateY(6px);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.hieu-ung-chuyen-trang {
+  animation: hieuUngXuatHienTrang 0.2s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}

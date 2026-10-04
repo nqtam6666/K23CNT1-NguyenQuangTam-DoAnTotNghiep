@@ -146,22 +146,33 @@ export default function LayoutBangDieuKhien({ children }: { children: ReactNode 
           </div>
         </div>
 
-        <nav className="flex-1 p-4 space-y-1 overflow-y-auto">
+        <nav className="flex-1 p-3.5 space-y-1.5 overflow-y-auto">
           {menuHienThi.map((item) => {
             const BieuTuong = item.bieuTuong;
-            const laTrangHienTai = pathname === item.duongDan;
+            const laTrangHienTai =
+              pathname === item.duongDan ||
+              (item.duongDan !== '/bang-dieu-khien' && pathname.startsWith(item.duongDan));
             return (
               <Link
                 key={item.duongDan}
                 href={item.duongDan}
-                className={`flex items-center gap-3 px-3.5 py-2.5 rounded-lg text-sm font-medium transition-all ${
+                prefetch={true}
+                className={`group relative flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-sm font-medium transition-all duration-150 active:scale-[0.98] select-none cursor-pointer ${
                   laTrangHienTai
-                    ? 'bg-blue-50 text-blue-700 shadow-xs'
-                    : 'text-slate-600 hover:bg-slate-100 hover:text-slate-900'
+                    ? 'bg-blue-50/90 text-blue-700 font-semibold shadow-xs'
+                    : 'text-slate-600 hover:bg-slate-100/80 hover:text-slate-900 hover:translate-x-1'
                 }`}
               >
-                <BieuTuong className={`w-4 h-4 ${laTrangHienTai ? 'text-blue-600' : 'text-slate-400'}`} />
-                {item.tieuDe}
+                {/* Vạch chỉ báo Active hiện đại bên lề trái */}
+                {laTrangHienTai && (
+                  <span className="absolute left-0 top-2 bottom-2 w-1 bg-blue-600 rounded-r-full shadow-xs shadow-blue-500/50" />
+                )}
+                <BieuTuong
+                  className={`w-4 h-4 transition-transform duration-150 group-hover:scale-110 ${
+                    laTrangHienTai ? 'text-blue-600' : 'text-slate-400 group-hover:text-slate-700'
+                  }`}
+                />
+                <span className="truncate">{item.tieuDe}</span>
               </Link>
             );
           })}
@@ -184,13 +195,90 @@ export default function LayoutBangDieuKhien({ children }: { children: ReactNode 
             <button
               onClick={dangXuat}
               title="Đăng xuất"
-              className="p-1.5 text-slate-400 hover:text-red-600 hover:bg-red-50 rounded-md transition-colors"
+              className="p-1.5 text-slate-400 hover:text-red-600 hover:bg-red-50 rounded-lg transition-colors cursor-pointer"
             >
               <LogOut className="w-4 h-4" />
             </button>
           </div>
         </div>
       </aside>
+
+      {/* Mobile Drawer Backdrop & Sidebar */}
+      {sidebarMo && (
+        <div className="fixed inset-0 z-50 md:hidden flex">
+          <div
+            className="fixed inset-0 bg-slate-900/40 backdrop-blur-xs transition-opacity duration-200"
+            onClick={() => setSidebarMo(false)}
+          />
+          <aside className="relative flex-1 flex flex-col max-w-xs w-full bg-white z-10 shadow-2xl animate-in slide-in-from-left duration-200">
+            <div className="h-16 flex items-center justify-between px-6 border-b border-slate-200">
+              <div className="flex items-center gap-2.5">
+                <div className="w-8 h-8 rounded-lg bg-blue-600 flex items-center justify-center text-white font-bold shadow-sm">
+                  <GraduationCap className="w-5 h-5" />
+                </div>
+                <div>
+                  <h1 className="font-bold text-slate-900 text-sm">LMS Trường Học</h1>
+                  <p className="text-[10px] text-slate-500">K23CNT1 Quang Tâm</p>
+                </div>
+              </div>
+              <button
+                onClick={() => setSidebarMo(false)}
+                className="p-1.5 text-slate-400 hover:text-slate-700 rounded-lg hover:bg-slate-100"
+              >
+                <X className="w-5 h-5" />
+              </button>
+            </div>
+
+            <nav className="flex-1 p-3.5 space-y-1.5 overflow-y-auto">
+              {menuHienThi.map((item) => {
+                const BieuTuong = item.bieuTuong;
+                const laTrangHienTai =
+                  pathname === item.duongDan ||
+                  (item.duongDan !== '/bang-dieu-khien' && pathname.startsWith(item.duongDan));
+                return (
+                  <Link
+                    key={item.duongDan}
+                    href={item.duongDan}
+                    onClick={() => setSidebarMo(false)}
+                    prefetch={true}
+                    className={`group relative flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-sm font-medium transition-all active:scale-[0.98] select-none ${
+                      laTrangHienTai
+                        ? 'bg-blue-50 text-blue-700 font-semibold shadow-xs'
+                        : 'text-slate-600 hover:bg-slate-100 hover:text-slate-900'
+                    }`}
+                  >
+                    {laTrangHienTai && (
+                      <span className="absolute left-0 top-2 bottom-2 w-1 bg-blue-600 rounded-r-full" />
+                    )}
+                    <BieuTuong className={`w-4 h-4 ${laTrangHienTai ? 'text-blue-600' : 'text-slate-400'}`} />
+                    <span>{item.tieuDe}</span>
+                  </Link>
+                );
+              })}
+            </nav>
+
+            <div className="p-4 border-t border-slate-200 bg-slate-50/50">
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-2 min-w-0">
+                  <div className="w-8 h-8 rounded-full bg-blue-100 text-blue-700 font-semibold flex items-center justify-center text-xs shrink-0">
+                    {nguoiDung?.hoTen?.charAt(0) || 'U'}
+                  </div>
+                  <div className="truncate">
+                    <p className="text-xs font-semibold text-slate-900 truncate">{nguoiDung?.hoTen || 'Đang tải...'}</p>
+                    <span className="text-[10px] text-blue-600 font-medium">{nguoiDung?.vaiTro}</span>
+                  </div>
+                </div>
+                <button
+                  onClick={dangXuat}
+                  className="p-1.5 text-slate-400 hover:text-red-600 hover:bg-red-50 rounded-lg"
+                >
+                  <LogOut className="w-4 h-4" />
+                </button>
+              </div>
+            </div>
+          </aside>
+        </div>
+      )}
 
       {/* Main Content Area */}
       <div className="flex-1 flex flex-col min-w-0 overflow-hidden">
@@ -199,7 +287,7 @@ export default function LayoutBangDieuKhien({ children }: { children: ReactNode 
           <div className="flex items-center gap-3">
             <button
               onClick={() => setSidebarMo(!sidebarMo)}
-              className="md:hidden p-2 text-slate-600 hover:bg-slate-100 rounded-lg"
+              className="md:hidden p-2 text-slate-600 hover:bg-slate-100 rounded-lg cursor-pointer"
             >
               <Menu className="w-5 h-5" />
             </button>
@@ -220,9 +308,11 @@ export default function LayoutBangDieuKhien({ children }: { children: ReactNode 
           </div>
         </header>
 
-        {/* Dynamic Page Body */}
+        {/* Dynamic Page Body with Smooth Transition */}
         <main className="flex-1 overflow-y-auto p-4 sm:p-6 lg:p-8 bg-slate-50">
-          <div className="max-w-7xl mx-auto">{children}</div>
+          <div key={pathname} className="max-w-7xl mx-auto hieu-ung-chuyen-trang">
+            {children}
+          </div>
         </main>
       </div>
     </div>

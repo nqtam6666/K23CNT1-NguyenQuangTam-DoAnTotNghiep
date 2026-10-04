@@ -17,7 +17,11 @@
     "test:e2e": "jest --config ./test/jest-e2e.json",
     "typecheck": "tsc --noEmit",
     "prisma:sinh": "prisma generate",
-    "prisma:chuyen-doi": "prisma migrate dev"
+    "prisma:chuyen-doi": "prisma migrate dev",
+    "prisma:gieo-mam": "ts-node prisma/seed.ts"
+  },
+  "prisma": {
+    "seed": "ts-node prisma/seed.ts"
   },
   "dependencies": {
     "@casl/ability": "^6.7.3",

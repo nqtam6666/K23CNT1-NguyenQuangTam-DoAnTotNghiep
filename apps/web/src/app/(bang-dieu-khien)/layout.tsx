@@ -17,6 +17,8 @@ import {
   GraduationCap,
   Shield,
   HeartHandshake,
+  PanelLeftClose,
+  PanelLeftOpen,
 } from 'lucide-react';
 import { mayKhachApi } from '../../tien-ich/may-khach-api';
 import { thongBao } from '../../tien-ich/thong-bao';
@@ -50,9 +52,46 @@ export default function LayoutBangDieuKhien({ children }: { children: ReactNode 
   const router = useRouter();
   const queryClient = useQueryClient();
   const [sidebarMo, setSidebarMo] = useState(false);
+  const [thuGon, setThuGon] = useState(false);
   const { layGiaTri } = useCaiDatHeThong();
   const tenHeThong = layGiaTri('TEN_HE_THONG', 'LMS Trường Học');
   const moTaPhu = `${layGiaTri('MA_LOP_KHOA', 'K23CNT1')} ${layGiaTri('TAC_GIA', 'Quang Tâm')}`;
+
+  // Đọc trạng thái thu gọn đã lưu từ localStorage khi tải trang
+  useEffect(() => {
+    try {
+      const trangThaiLuu = localStorage.getItem('lms_sidebar_thu_gon');
+      if (trangThaiLuu !== null) {
+        setThuGon(trangThaiLuu === 'true');
+      }
+    } catch {
+      // Bỏ qua nếu môi trường không cho phép truy cập localStorage
+    }
+  }, []);
+
+  const batTatThuGon = () => {
+    setThuGon((prev) => {
+      const trangThaiMoi = !prev;
+      try {
+        localStorage.setItem('lms_sidebar_thu_gon', String(trangThaiMoi));
+      } catch {
+        // Bỏ qua lỗi ghi localStorage
+      }
+      return trangThaiMoi;
+    });
+  };
+
+  // Phím tắt bàn phím Ctrl+B hoặc Cmd+B để bật/tắt thu gọn thanh bên nhanh
+  useEffect(() => {
+    const xuLyPhimTat = (e: KeyboardEvent) => {
+      if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 'b') {
+        e.preventDefault();
+        batTatThuGon();
+      }
+    };
+    window.addEventListener('keydown', xuLyPhimTat);
+    return () => window.removeEventListener('keydown', xuLyPhimTat);
+  }, []);
 
   // Lấy hồ sơ người dùng từ API (staleTime 30 giây để luôn đồng bộ chính xác phiên đăng nhập)
   const {
@@ -180,30 +219,62 @@ export default function LayoutBangDieuKhien({ children }: { children: ReactNode 
   return (
     <div className="flex h-screen bg-slate-50 text-slate-900 overflow-hidden">
       {/* Sidebar Desktop */}
-      <aside className="hidden md:flex md:w-64 md:flex-col bg-white border-r border-slate-200">
-        <div className="h-16 flex items-center gap-2.5 px-6 border-b border-slate-200">
-          <div className="w-8 h-8 rounded-lg bg-blue-600 flex items-center justify-center text-white font-bold shadow-sm">
-            <GraduationCap className="w-5 h-5" />
-          </div>
-          <div>
-            <h1 className="font-bold text-slate-900 leading-tight">{tenHeThong}</h1>
-            <p className="text-[11px] text-slate-500">{moTaPhu}</p>
-          </div>
+      <aside
+        className={`hidden md:flex flex-col bg-white border-r border-slate-200 transition-all duration-300 ease-in-out shrink-0 select-none ${
+          thuGon ? 'w-20' : 'w-64'
+        }`}
+      >
+        <div
+          className={`h-16 flex items-center border-b border-slate-200 transition-all duration-300 ${
+            thuGon ? 'justify-center px-2' : 'justify-between px-4'
+          }`}
+        >
+          <Link
+            href="/bang-dieu-khien"
+            className="flex items-center gap-2.5 min-w-0 group"
+            title={tenHeThong}
+          >
+            <div className="w-9 h-9 rounded-xl bg-blue-600 flex items-center justify-center text-white font-bold shadow-xs shrink-0 group-hover:scale-105 transition-transform">
+              <GraduationCap className="w-5 h-5" />
+            </div>
+            {!thuGon && (
+              <div className="truncate transition-opacity duration-200">
+                <h1 className="font-bold text-slate-900 leading-tight truncate text-sm">
+                  {tenHeThong}
+                </h1>
+                <p className="text-[11px] text-slate-500 truncate">{moTaPhu}</p>
+              </div>
+            )}
+          </Link>
+
+          {!thuGon && (
+            <button
+              onClick={batTatThuGon}
+              title="Thu gọn thanh bên (Ctrl+B)"
+              className="p-1.5 text-slate-400 hover:text-slate-700 hover:bg-slate-100 rounded-lg transition-colors cursor-pointer"
+            >
+              <PanelLeftClose className="w-4 h-4" />
+            </button>
+          )}
         </div>
 
-        <nav className="flex-1 p-3.5 space-y-1.5 overflow-y-auto">
+        <nav className="flex-1 p-3 space-y-1.5 overflow-y-auto overflow-x-hidden">
           {isLoading || !nguoiDung ? (
             <div className="space-y-2 py-1">
               {[1, 2, 3, 4, 5].map((i) => (
                 <div
                   key={i}
-                  className="flex items-center gap-3 px-3.5 py-2.5 rounded-xl animate-pulse bg-slate-100/70"
+                  className={`flex items-center gap-3 p-2.5 rounded-xl animate-pulse bg-slate-100/70 ${
+                    thuGon ? 'justify-center' : ''
+                  }`}
                 >
-                  <div className="w-4 h-4 rounded-md bg-slate-200" />
-                  <div
-                    className="h-3.5 bg-slate-200 rounded"
-                    style={{ width: `${55 + (i % 3) * 18}%` }}
-                  />
+                  <div className="w-5 h-5 rounded-md bg-slate-200 shrink-0" />
+                  {!thuGon && (
+                    <div
+                      className="h-3.5 bg-slate-200 rounded"
+                      style={{ width: `${55 + (i % 3) * 18}%` }}
+                    />
+                  )}
                 </div>
               ))}
             </div>
@@ -218,10 +289,13 @@ export default function LayoutBangDieuKhien({ children }: { children: ReactNode 
                   key={item.duongDan}
                   href={item.duongDan}
                   prefetch={true}
-                  className={`group relative flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-sm font-medium transition-all duration-150 active:scale-[0.98] select-none cursor-pointer ${
+                  title={thuGon ? item.tieuDe : undefined}
+                  className={`group relative flex items-center rounded-xl text-sm font-medium transition-all duration-150 active:scale-[0.98] select-none cursor-pointer ${
+                    thuGon ? 'justify-center p-2.5' : 'gap-3 px-3.5 py-2.5'
+                  } ${
                     laTrangHienTai
                       ? 'bg-blue-50/90 text-blue-700 font-semibold shadow-xs'
-                      : 'text-slate-600 hover:bg-slate-100/80 hover:text-slate-900 hover:translate-x-1'
+                      : 'text-slate-600 hover:bg-slate-100/80 hover:text-slate-900 hover:translate-x-0.5'
                   }`}
                 >
                   {/* Vạch chỉ báo Active hiện đại bên lề trái */}
@@ -229,11 +303,11 @@ export default function LayoutBangDieuKhien({ children }: { children: ReactNode 
                     <span className="absolute left-0 top-2 bottom-2 w-1 bg-blue-600 rounded-r-full shadow-xs shadow-blue-500/50" />
                   )}
                   <BieuTuong
-                    className={`w-4 h-4 transition-transform duration-150 group-hover:scale-110 ${
+                    className={`w-5 h-5 shrink-0 transition-transform duration-150 group-hover:scale-110 ${
                       laTrangHienTai ? 'text-blue-600' : 'text-slate-400 group-hover:text-slate-700'
                     }`}
                   />
-                  <span className="truncate">{item.tieuDe}</span>
+                  {!thuGon && <span className="truncate">{item.tieuDe}</span>}
                 </Link>
               );
             })
@@ -241,17 +315,44 @@ export default function LayoutBangDieuKhien({ children }: { children: ReactNode 
         </nav>
 
         {/* Thông tin người dùng dưới chân Sidebar */}
-        <div className="p-4 border-t border-slate-200 bg-slate-50/50">
-          <div className="flex items-center justify-between">
-            {isLoading || !nguoiDung ? (
-              <div className="flex items-center gap-2.5 min-w-0 animate-pulse flex-1">
-                <div className="w-8 h-8 rounded-full bg-slate-200 shrink-0" />
+        <div
+          className={`p-3 border-t border-slate-200 bg-slate-50/50 transition-all ${
+            thuGon ? 'flex flex-col items-center gap-2' : ''
+          }`}
+        >
+          {isLoading || !nguoiDung ? (
+            <div
+              className={`flex items-center gap-2.5 min-w-0 animate-pulse ${
+                thuGon ? 'justify-center' : 'flex-1'
+              }`}
+            >
+              <div className="w-8 h-8 rounded-full bg-slate-200 shrink-0" />
+              {!thuGon && (
                 <div className="space-y-1.5 flex-1 min-w-0">
                   <div className="h-3 bg-slate-200 rounded w-24" />
                   <div className="h-2.5 bg-slate-200 rounded w-16" />
                 </div>
+              )}
+            </div>
+          ) : thuGon ? (
+            <div className="flex flex-col items-center gap-2.5 py-1">
+              <div
+                title={`${nguoiDung.hoTen} (${layNhanVaiTro(nguoiDung.vaiTro)})`}
+                className="w-9 h-9 rounded-full bg-blue-100 text-blue-700 font-semibold flex items-center justify-center text-xs shrink-0 cursor-default ring-2 ring-white shadow-2xs"
+              >
+                {nguoiDung.hoTen?.charAt(0) || 'U'}
               </div>
-            ) : (
+              <button
+                onClick={dangXuat}
+                disabled={isLoading}
+                title="Đăng xuất"
+                className="p-1.5 text-slate-400 hover:text-red-600 hover:bg-red-50 rounded-lg transition-colors cursor-pointer disabled:opacity-50"
+              >
+                <LogOut className="w-4 h-4" />
+              </button>
+            </div>
+          ) : (
+            <div className="flex items-center justify-between">
               <div className="flex items-center gap-2.5 min-w-0">
                 <div className="w-8 h-8 rounded-full bg-blue-100 text-blue-700 font-semibold flex items-center justify-center text-xs shrink-0">
                   {nguoiDung.hoTen?.charAt(0) || 'U'}
@@ -265,16 +366,16 @@ export default function LayoutBangDieuKhien({ children }: { children: ReactNode 
                   </span>
                 </div>
               </div>
-            )}
-            <button
-              onClick={dangXuat}
-              disabled={isLoading}
-              title="Đăng xuất"
-              className="p-1.5 text-slate-400 hover:text-red-600 hover:bg-red-50 rounded-lg transition-colors cursor-pointer disabled:opacity-50"
-            >
-              <LogOut className="w-4 h-4" />
-            </button>
-          </div>
+              <button
+                onClick={dangXuat}
+                disabled={isLoading}
+                title="Đăng xuất"
+                className="p-1.5 text-slate-400 hover:text-red-600 hover:bg-red-50 rounded-lg transition-colors cursor-pointer disabled:opacity-50"
+              >
+                <LogOut className="w-4 h-4" />
+              </button>
+            </div>
+          )}
         </div>
       </aside>
 
@@ -393,14 +494,30 @@ export default function LayoutBangDieuKhien({ children }: { children: ReactNode 
       <div className="flex-1 flex flex-col min-w-0 overflow-hidden">
         {/* Top Header */}
         <header className="h-16 bg-white border-b border-slate-200 flex items-center justify-between px-4 sm:px-6">
-          <div className="flex items-center gap-3">
+          <div className="flex items-center gap-2 sm:gap-3">
+            {/* Nút bật/tắt drawer trên Mobile */}
             <button
               onClick={() => setSidebarMo(!sidebarMo)}
-              className="md:hidden p-2 text-slate-600 hover:bg-slate-100 rounded-lg cursor-pointer"
+              title="Menu điện thoại"
+              className="md:hidden p-2 text-slate-600 hover:bg-slate-100 rounded-lg cursor-pointer transition-colors"
             >
               <Menu className="w-5 h-5" />
             </button>
-            <div className="flex items-center gap-2 text-sm text-slate-500">
+
+            {/* Nút Toggle thu gọn/mở rộng thanh bên trên Desktop */}
+            <button
+              onClick={batTatThuGon}
+              title={thuGon ? 'Mở rộng thanh bên (Ctrl+B)' : 'Thu gọn thanh bên (Ctrl+B)'}
+              className="hidden md:inline-flex items-center justify-center p-2 text-slate-500 hover:text-slate-900 hover:bg-slate-100 active:scale-95 rounded-lg cursor-pointer transition-all"
+            >
+              {thuGon ? (
+                <PanelLeftOpen className="w-5 h-5 text-blue-600" />
+              ) : (
+                <PanelLeftClose className="w-5 h-5" />
+              )}
+            </button>
+
+            <div className="flex items-center gap-2 text-sm text-slate-500 pl-1">
               <span>Bảng điều khiển</span>
               <span>/</span>
               <span className="font-medium text-slate-800">{layTieuDeTrang(pathname)}</span>

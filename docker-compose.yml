@@ -1,0 +1,69 @@
+services:
+  # CƠ SỞ DỮ LIỆU POSTGRESQL 16 VỚI TIỆN ÍCH MỞ RỘNG PGVECTOR
+  postgres-lms:
+    image: pgvector/pgvector:pg16
+    container_name: lms_postgres
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: ${CSDL_NGUOI_DUNG:-postgres}
+      POSTGRES_PASSWORD: ${CSDL_MAT_KHAU:-postgres}
+      POSTGRES_DB: ${CSDL_TEN:-lms_truong_hoc}
+    ports:
+      - '${CSDL_CONG:-5432}:5432'
+    volumes:
+      - du_lieu_postgres:/var/lib/postgresql/data
+    healthcheck:
+      test: ['CMD-SHELL', 'pg_isready -U postgres']
+      interval: 5s
+      timeout: 5s
+      retries: 5
+    networks:
+      - mang_lms
+
+  # HỆ THỐNG BỘ NHỚ ĐỆM VÀ HÀNG ĐỢI REDIS 7
+  redis-lms:
+    image: redis:7-alpine
+    container_name: lms_redis
+    restart: unless-stopped
+    command: redis-server --requirepass ${REDIS_MAT_KHAU:-redis_matkhau_123}
+    ports:
+      - '${REDIS_CONG:-6379}:6379'
+    volumes:
+      - du_lieu_redis:/data
+    healthcheck:
+      test: ['CMD', 'redis-cli', '-a', '${REDIS_MAT_KHAU:-redis_matkhau_123}', 'ping']
+      interval: 5s
+      timeout: 5s
+      retries: 5
+    networks:
+      - mang_lms
+
+  # DỊCH VỤ LƯU TRỮ TỆP TIN MINIO (TƯƠNG THÍCH S3)
+  minio-lms:
+    image: minio/minio:latest
+    container_name: lms_minio
+    restart: unless-stopped
+    command: server /data --console-address ":9001"
+    environment:
+      MINIO_ROOT_USER: ${MINIO_KHOA_TRUY_CAP:-minioadmin}
+      MINIO_ROOT_PASSWORD: ${MINIO_KHOA_BI_MAT:-minioadmin}
+    ports:
+      - '${MINIO_CONG_API:-9000}:9000'
+      - '${MINIO_CONG_DIEU_KHIEN:-9001}:9001'
+    volumes:
+      - du_lieu_minio:/data
+    networks:
+      - mang_lms
+
+volumes:
+  du_lieu_postgres:
+    name: lms_du_lieu_postgres
+  du_lieu_redis:
+    name: lms_du_lieu_redis
+  du_lieu_minio:
+    name: lms_du_lieu_minio
+
+networks:
+  mang_lms:
+    name: lms_mang_noi_bo
+    driver: bridge

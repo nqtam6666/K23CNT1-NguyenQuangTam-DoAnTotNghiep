@@ -1,0 +1,32 @@
+{
+  "name": "lms-truong-hoc-monorepo",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Hệ thống Quản lý Học tập LMS Trường học - K23CNT1 Nguyễn Quang Tâm",
+  "packageManager": "pnpm@10.5.2",
+  "scripts": {
+    "dev": "turbo run dev --parallel",
+    "dev:api": "turbo run dev --filter=@lms/api",
+    "dev:web": "turbo run dev --filter=@lms/web",
+    "build": "turbo run build",
+    "lint": "turbo run lint",
+    "test": "turbo run test",
+    "test:cov": "turbo run test:cov",
+    "typecheck": "turbo run typecheck",
+    "dinh-dang": "prettier --write \"**/*.{ts,tsx,js,jsx,json,md}\"",
+    "kiem-tra-dinh-dang": "prettier --check \"**/*.{ts,tsx,js,jsx,json,md}\"",
+    "prisma:sinh": "turbo run prisma:sinh",
+    "prisma:chuyen-doi": "turbo run prisma:chuyen-doi",
+    "ha-tang:bat": "docker-compose up -d",
+    "ha-tang:tat": "docker-compose down"
+  },
+  "devDependencies": {
+    "prettier": "^3.5.3",
+    "turbo": "^2.4.4",
+    "typescript": "^5.8.2"
+  },
+  "engines": {
+    "node": ">=20.0.0",
+    "pnpm": ">=9.0.0"
+  }
+}

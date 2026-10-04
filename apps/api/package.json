@@ -1,0 +1,77 @@
+{
+  "name": "@lms/api",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Backend API NestJS cho Hệ thống LMS Trường học",
+  "scripts": {
+    "build": "nest build",
+    "dinh-dang": "prettier --write \"src/**/*.ts\" \"test/**/*.ts\"",
+    "start": "nest start",
+    "dev": "nest start --watch",
+    "start:debug": "nest start --debug --watch",
+    "start:prod": "node dist/main",
+    "lint": "eslint \"{src,apps,libs,test}/**/*.ts\"",
+    "test": "jest",
+    "test:watch": "jest --watch",
+    "test:cov": "jest --coverage",
+    "test:e2e": "jest --config ./test/jest-e2e.json",
+    "typecheck": "tsc --noEmit",
+    "prisma:sinh": "prisma generate",
+    "prisma:chuyen-doi": "prisma migrate dev"
+  },
+  "dependencies": {
+    "@casl/ability": "^6.7.3",
+    "@lms/chung": "workspace:*",
+    "@nestjs/common": "^10.4.15",
+    "@nestjs/config": "^3.3.0",
+    "@nestjs/core": "^10.4.15",
+    "@nestjs/jwt": "^10.2.0",
+    "@nestjs/passport": "^10.0.3",
+    "@nestjs/platform-express": "^10.4.15",
+    "@nestjs/swagger": "^8.1.1",
+    "@nestjs/throttler": "^6.4.0",
+    "@prisma/client": "^6.4.1",
+    "argon2": "^0.41.1",
+    "cookie-parser": "^1.4.7",
+    "passport": "^0.7.0",
+    "passport-jwt": "^4.0.1",
+    "reflect-metadata": "^0.2.2",
+    "rxjs": "^7.8.1",
+    "swagger-ui-express": "^5.0.1",
+    "zod": "^3.24.2"
+  },
+  "devDependencies": {
+    "@nestjs/cli": "^10.4.9",
+    "@nestjs/schematics": "^10.2.3",
+    "@nestjs/testing": "^10.4.15",
+    "@types/cookie-parser": "^1.4.8",
+    "@types/express": "^5.0.0",
+    "@types/jest": "^29.5.14",
+    "@types/node": "^22.13.9",
+    "@types/passport-jwt": "^4.0.1",
+    "@types/supertest": "^6.0.2",
+    "jest": "^29.7.0",
+    "prisma": "^6.4.1",
+    "source-map-support": "^0.5.21",
+    "supertest": "^7.0.0",
+    "ts-jest": "^29.2.5",
+    "ts-loader": "^9.5.2",
+    "ts-node": "^10.9.2",
+    "tsconfig-paths": "^4.2.0",
+    "typescript": "^5.8.2"
+  },
+  "jest": {
+    "moduleFileExtensions": ["js", "json", "ts"],
+    "rootDir": "src",
+    "testRegex": ".*\\.spec\\.ts$",
+    "transform": {
+      "^.+\\.(t|j)s$": "ts-jest"
+    },
+    "collectCoverageFrom": ["**/*.(t|j)s"],
+    "coverageDirectory": "../coverage",
+    "testEnvironment": "node",
+    "moduleNameMapper": {
+      "^@lms/chung(.*)$": "<rootDir>/../../../packages/chung/src$1"
+    }
+  }
+}

@@ -156,7 +156,9 @@ export function DichNgonNgu() {
         className="group inline-flex items-center gap-1.5 px-2.5 py-1.5 rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 hover:bg-slate-100 dark:bg-slate-800/80 dark:hover:bg-slate-800 text-slate-700 dark:text-slate-200 cursor-pointer transition-all active:scale-95 focus:outline-none focus:ring-2 focus:ring-blue-500/20 shadow-2xs text-xs font-semibold"
       >
         <Globe className="w-3.5 h-3.5 text-slate-400 group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors shrink-0" />
-        <span className="text-sm leading-none">{thongTinHienTai.co}</span>
+        <span className="inline-flex items-center justify-center text-sm leading-none shrink-0 select-none -translate-y-px">
+          {thongTinHienTai.co}
+        </span>
         <span className="hidden sm:inline font-medium text-slate-700 dark:text-slate-200 max-w-[85px] truncate">
           {thongTinHienTai.ten}
         </span>
@@ -191,7 +193,9 @@ export function DichNgonNgu() {
                   }`}
                 >
                   <div className="flex items-center gap-2.5">
-                    <span className="text-base leading-none shrink-0">{lang.co}</span>
+                    <span className="inline-flex items-center justify-center w-5 text-base leading-none shrink-0 select-none -translate-y-[1.5px]">
+                      {lang.co}
+                    </span>
                     <span className="truncate">{lang.ten}</span>
                   </div>
                   {laDangChon && (

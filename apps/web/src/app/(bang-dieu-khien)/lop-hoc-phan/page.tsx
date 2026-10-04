@@ -188,13 +188,13 @@ export default function TrangLopHocPhan() {
       {/* Tìm kiếm */}
       <div className="flex items-center gap-3">
         <div className="relative w-full sm:w-96">
-          <Search className="w-4 h-4 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2" />
+          <Search className="w-4 h-4 text-slate-400 dark:text-slate-500 absolute left-3 top-1/2 -translate-y-1/2" />
           <input
             type="text"
             placeholder="Tìm theo mã hoặc tên lớp học phần..."
             value={tuKhoa}
             onChange={(e) => setTuKhoa(e.target.value)}
-            className="w-full pl-9 pr-4 py-2 bg-white border border-slate-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 shadow-sm"
+            className="w-full pl-9 pr-4 py-2 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 text-slate-900 dark:text-slate-100 placeholder-slate-400 dark:placeholder-slate-500 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 shadow-sm transition-colors"
           />
         </div>
       </div>
@@ -207,7 +207,7 @@ export default function TrangLopHocPhan() {
           {danhSachLop.duLieu.map((lop: any) => (
             <div
               key={lop.id}
-              className="bg-white border border-slate-200 rounded-2xl overflow-hidden shadow-sm hover:shadow-md hover:border-indigo-300 transition-all flex flex-col group"
+              className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl overflow-hidden shadow-sm hover:shadow-md hover:border-indigo-400/50 transition-all flex flex-col group"
             >
               {/* Card Banner */}
               <div className="bg-gradient-to-r from-indigo-600 to-violet-600 p-5 text-white">
@@ -231,41 +231,41 @@ export default function TrangLopHocPhan() {
 
               {/* Card Body */}
               <div className="p-5 flex-1 flex flex-col justify-between space-y-4">
-                <div className="space-y-3 text-xs text-slate-600">
+                <div className="space-y-3 text-xs text-slate-600 dark:text-slate-400">
                   <div className="flex items-center justify-between">
-                    <span className="text-slate-400 flex items-center gap-1">
+                    <span className="text-slate-400 dark:text-slate-500 flex items-center gap-1">
                       <Calendar className="w-3.5 h-3.5" /> Học kỳ:
                     </span>
-                    <span className="font-medium text-slate-800">{lop.hocKy?.tenHocKy || '—'}</span>
+                    <span className="font-medium text-slate-800 dark:text-slate-200">{lop.hocKy?.tenHocKy || '—'}</span>
                   </div>
 
                   <div className="flex items-center justify-between">
-                    <span className="text-slate-400 flex items-center gap-1">
+                    <span className="text-slate-400 dark:text-slate-500 flex items-center gap-1">
                       <Users className="w-3.5 h-3.5" /> Sĩ số:
                     </span>
-                    <span className="font-semibold text-slate-800 bg-slate-100 px-2 py-0.5 rounded">
+                    <span className="font-semibold text-slate-800 dark:text-slate-200 bg-slate-100 dark:bg-slate-800/90 px-2 py-0.5 rounded border border-transparent dark:border-slate-700">
                       {lop._count?.danhSachGhiDanh || 0} học sinh
                     </span>
                   </div>
 
                   {lop.giaoVien && (
-                    <div className="pt-2 border-t border-slate-100 flex items-center gap-2.5">
-                      <div className="w-7 h-7 rounded-full bg-indigo-100 text-indigo-700 font-bold flex items-center justify-center text-xs">
+                    <div className="pt-2 border-t border-slate-100 dark:border-slate-800 flex items-center gap-2.5">
+                      <div className="w-7 h-7 rounded-full bg-indigo-100 dark:bg-indigo-950/80 text-indigo-700 dark:text-indigo-300 border border-indigo-200/50 dark:border-indigo-800/60 font-bold flex items-center justify-center text-xs">
                         {lop.giaoVien.nguoiDung.hoTen.charAt(0)}
                       </div>
                       <div className="truncate">
-                        <p className="font-medium text-slate-900 truncate">
+                        <p className="font-medium text-slate-900 dark:text-slate-100 truncate">
                           {lop.giaoVien.nguoiDung.hoTen}
                         </p>
-                        <p className="text-[11px] text-slate-400">Giáo viên phụ trách</p>
+                        <p className="text-[11px] text-slate-400 dark:text-slate-500">Giáo viên phụ trách</p>
                       </div>
                     </div>
                   )}
 
                   {laAdminHoacGiaoVu && lop.maThamGia && (
-                    <div className="p-2 bg-slate-50 rounded-lg border border-slate-100 flex items-center justify-between">
-                      <span className="text-slate-500 font-mono text-[11px]">Mã mời:</span>
-                      <span className="font-mono font-bold text-indigo-600 bg-white px-2 py-0.5 rounded border border-slate-200">
+                    <div className="p-2 bg-slate-50 dark:bg-slate-800/60 rounded-lg border border-slate-100 dark:border-slate-800 flex items-center justify-between">
+                      <span className="text-slate-500 dark:text-slate-400 font-mono text-[11px]">Mã mời:</span>
+                      <span className="font-mono font-bold text-indigo-600 dark:text-indigo-300 bg-white dark:bg-slate-900 px-2 py-0.5 rounded border border-slate-200 dark:border-slate-700">
                         {lop.maThamGia}
                       </span>
                     </div>
@@ -275,7 +275,7 @@ export default function TrangLopHocPhan() {
                 {/* Action button */}
                 <Link
                   href={`/lop-hoc-phan/${lop.id}`}
-                  className="w-full inline-flex items-center justify-center gap-2 py-2 px-4 bg-slate-900 hover:bg-indigo-600 text-white text-xs font-semibold rounded-lg transition-colors"
+                  className="w-full inline-flex items-center justify-center gap-2 py-2 px-4 bg-slate-900 hover:bg-indigo-600 dark:bg-indigo-600 dark:hover:bg-indigo-500 text-white text-xs font-semibold rounded-lg transition-colors shadow-xs"
                 >
                   <span>Truy cập Lớp học</span>
                   <ArrowRight className="w-3.5 h-3.5" />

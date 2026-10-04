@@ -145,6 +145,16 @@ body {
   background-color: #020617; /* slate-950 */
 }
 
+.dark .bg-slate-100,
+.dark .bg-slate-100\/80,
+.dark .bg-slate-100\/70 {
+  background-color: #1e293b; /* slate-800 */
+}
+
+.dark .bg-slate-200 {
+  background-color: #334155; /* slate-700 */
+}
+
 .dark .text-slate-900 {
   color: #f8fafc;
 }
@@ -163,6 +173,82 @@ body {
 
 .dark .text-slate-500 {
   color: #94a3b8;
+}
+
+/* Tăng tương phản cho chữ màu thương hiệu trong Dark Mode */
+.dark .text-indigo-600,
+.dark .text-indigo-700 {
+  color: #a5b4fc; /* indigo-300 */
+}
+
+.dark .text-blue-600,
+.dark .text-blue-700 {
+  color: #93c5fd; /* blue-300 */
+}
+
+.dark .text-purple-600,
+.dark .text-purple-700 {
+  color: #d8b4fe; /* purple-300 */
+}
+
+.dark .text-emerald-600,
+.dark .text-emerald-700 {
+  color: #6ee7b7; /* emerald-300 */
+}
+
+.dark .text-amber-600,
+.dark .text-amber-700,
+.dark .text-amber-900 {
+  color: #fcd34d; /* amber-300 */
+}
+
+.dark .text-rose-600,
+.dark .text-rose-700,
+.dark .text-rose-900 {
+  color: #fda4af; /* rose-300 */
+}
+
+.dark .text-sky-600,
+.dark .text-sky-700,
+.dark .text-sky-900 {
+  color: #7dd3fc; /* sky-300 */
+}
+
+/* Tự động tối ưu nền huy hiệu / badge trong Dark Mode */
+.dark .bg-indigo-50,
+.dark .bg-indigo-100 {
+  background-color: rgba(99, 102, 241, 0.18);
+  color: #c7d2fe;
+}
+
+.dark .bg-blue-50,
+.dark .bg-blue-100 {
+  background-color: rgba(59, 130, 246, 0.18);
+  color: #bfdbfe;
+}
+
+.dark .bg-emerald-50,
+.dark .bg-emerald-100 {
+  background-color: rgba(16, 185, 129, 0.18);
+  color: #a7f3d0;
+}
+
+.dark .bg-purple-50,
+.dark .bg-purple-100 {
+  background-color: rgba(168, 85, 247, 0.18);
+  color: #e9d5ff;
+}
+
+.dark .bg-rose-50,
+.dark .bg-rose-100 {
+  background-color: rgba(244, 63, 94, 0.18);
+  color: #fecdd3;
+}
+
+.dark .bg-amber-50,
+.dark .bg-amber-100 {
+  background-color: rgba(245, 158, 11, 0.18);
+  color: #fde68a;
 }
 
 .dark input,

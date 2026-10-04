@@ -113,19 +113,19 @@ export default function TrangQuanLyNguoiDung() {
   const layMauBadgeVaiTro = (vaiTro: string) => {
     switch (vaiTro) {
       case 'QUAN_TRI_VIEN':
-        return 'bg-purple-100 text-purple-700 border-purple-200';
+        return 'bg-purple-100 dark:bg-purple-950/70 text-purple-700 dark:text-purple-300 border-purple-200 dark:border-purple-800';
       case 'BAN_GIAM_HIEU':
-        return 'bg-amber-100 text-amber-700 border-amber-200';
+        return 'bg-amber-100 dark:bg-amber-950/70 text-amber-700 dark:text-amber-300 border-amber-200 dark:border-amber-800';
       case 'GIAO_VU':
-        return 'bg-blue-100 text-blue-700 border-blue-200';
+        return 'bg-blue-100 dark:bg-blue-950/70 text-blue-700 dark:text-blue-300 border-blue-200 dark:border-blue-800';
       case 'GIAO_VIEN':
-        return 'bg-emerald-100 text-emerald-700 border-emerald-200';
+        return 'bg-emerald-100 dark:bg-emerald-950/70 text-emerald-700 dark:text-emerald-300 border-emerald-200 dark:border-emerald-800';
       case 'HOC_SINH':
-        return 'bg-sky-100 text-sky-700 border-sky-200';
+        return 'bg-sky-100 dark:bg-sky-950/70 text-sky-700 dark:text-sky-300 border-sky-200 dark:border-sky-800';
       case 'PHU_HUYNH':
-        return 'bg-orange-100 text-orange-700 border-orange-200';
+        return 'bg-orange-100 dark:bg-orange-950/70 text-orange-700 dark:text-orange-300 border-orange-200 dark:border-orange-800';
       default:
-        return 'bg-slate-100 text-slate-700 border-slate-200';
+        return 'bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 border-slate-200 dark:border-slate-700';
     }
   };
 
@@ -134,8 +134,8 @@ export default function TrangQuanLyNguoiDung() {
       {/* Tiêu đề & Nút Thao tác */}
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
         <div>
-          <h2 className="text-2xl font-bold text-slate-900 tracking-tight">Quản lý Người dùng</h2>
-          <p className="text-sm text-slate-500 mt-1">
+          <h2 className="text-2xl font-bold text-slate-900 dark:text-slate-100 tracking-tight">Quản lý Người dùng</h2>
+          <p className="text-sm text-slate-500 dark:text-slate-400 mt-1">
             Quản lý tài khoản, phân quyền vai trò và trạng thái hoạt động trong hệ thống LMS
           </p>
         </div>
@@ -149,9 +149,9 @@ export default function TrangQuanLyNguoiDung() {
       </div>
 
       {/* Thanh Tìm kiếm & Bộ lọc */}
-      <div className="p-4 rounded-xl bg-white border border-slate-200 shadow-2xs flex flex-col sm:flex-row items-center gap-4">
+      <div className="p-4 rounded-xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-2xs flex flex-col sm:flex-row items-center gap-4">
         <div className="relative flex-1 w-full">
-          <Search className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" />
+          <Search className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 dark:text-slate-500" />
           <input
             type="text"
             placeholder="Tìm theo họ tên, email, số điện thoại..."
@@ -160,7 +160,7 @@ export default function TrangQuanLyNguoiDung() {
               setTuKhoa(e.target.value);
               setTrangHienTai(1);
             }}
-            className="w-full pl-9 pr-4 py-2 border border-slate-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+            className="w-full pl-9 pr-4 py-2 border border-slate-300 dark:border-slate-700 rounded-lg text-sm text-slate-900 dark:text-slate-100 placeholder-slate-400 dark:placeholder-slate-500 bg-white dark:bg-slate-950 focus:outline-none focus:ring-2 focus:ring-blue-500"
           />
         </div>
 
@@ -218,7 +218,7 @@ export default function TrangQuanLyNguoiDung() {
                   <tr key={item.id} className="hover:bg-slate-50/70 transition-colors">
                     <td className="py-3.5 px-4">
                       <div className="flex items-center gap-3">
-                        <div className="w-9 h-9 rounded-full bg-slate-100 text-slate-700 font-semibold flex items-center justify-center text-xs border border-slate-200">
+                        <div className="w-9 h-9 rounded-full bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 font-semibold flex items-center justify-center text-xs border border-slate-200 dark:border-slate-700">
                           {item.hoTen?.charAt(0) || 'U'}
                         </div>
                         <div>

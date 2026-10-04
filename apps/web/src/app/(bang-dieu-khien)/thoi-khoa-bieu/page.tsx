@@ -62,14 +62,14 @@ export default function TrangThoiKhoaBieu() {
     { tiet: 10, gio: '16:25 - 17:10', buoi: 'Chiều' },
   ];
 
-  // Bảng màu cho các thẻ môn học
+  // Bảng màu cho các thẻ môn học (Tối ưu độ tương phản cho cả Light và Dark mode)
   const mauThe = [
-    'bg-indigo-50 border-indigo-200 text-indigo-900',
-    'bg-emerald-50 border-emerald-200 text-emerald-900',
-    'bg-amber-50 border-amber-200 text-amber-900',
-    'bg-rose-50 border-rose-200 text-rose-900',
-    'bg-violet-50 border-violet-200 text-violet-900',
-    'bg-sky-50 border-sky-200 text-sky-900',
+    'bg-indigo-50 dark:bg-indigo-950/70 border-indigo-200 dark:border-indigo-800 text-indigo-900 dark:text-indigo-200',
+    'bg-emerald-50 dark:bg-emerald-950/70 border-emerald-200 dark:border-emerald-800 text-emerald-900 dark:text-emerald-200',
+    'bg-amber-50 dark:bg-amber-950/70 border-amber-200 dark:border-amber-800 text-amber-900 dark:text-amber-200',
+    'bg-rose-50 dark:bg-rose-950/70 border-rose-200 dark:border-rose-800 text-rose-900 dark:text-rose-200',
+    'bg-violet-50 dark:bg-violet-950/70 border-violet-200 dark:border-violet-800 text-violet-900 dark:text-violet-200',
+    'bg-sky-50 dark:bg-sky-950/70 border-sky-200 dark:border-sky-800 text-sky-900 dark:text-sky-200',
   ];
 
   // Tìm tiết học bắt đầu tại tiết và thứ cụ thể
@@ -190,7 +190,7 @@ export default function TrangThoiKhoaBieu() {
                           <td
                             key={thu.ma}
                             rowSpan={tietHoc.soTiet}
-                            className={`p-2.5 border-r border-slate-200 align-top transition-all ${classMau} border rounded-lg shadow-sm`}
+                            className={`p-2.5 border-r border-slate-200 dark:border-slate-800 align-top transition-all ${classMau} border rounded-lg shadow-sm`}
                           >
                             <div className="space-y-1">
                               <span className="font-mono text-[10px] font-bold uppercase tracking-wider block opacity-75">
@@ -206,7 +206,7 @@ export default function TrangThoiKhoaBieu() {
                               <div className="pt-1.5 mt-1 border-t border-current/10 flex flex-col gap-0.5 text-[10px] opacity-80">
                                 <span className="flex items-center gap-1">
                                   <MapPin className="w-3 h-3 shrink-0" />
-                                  {tietHoc.phongHoc || 'Phòng LiveKit'}
+                                  {tietHoc.phongHoc || 'Phòng trực tuyến'}
                                 </span>
                                 {tietHoc.lopHocPhan?.giaoVien && (
                                   <span className="flex items-center gap-1">
@@ -223,7 +223,7 @@ export default function TrangThoiKhoaBieu() {
                       return (
                         <td
                           key={thu.ma}
-                          className="p-2 border-r border-slate-200 text-center text-slate-300 hover:bg-indigo-50/20"
+                          className="p-2 border-r border-slate-200 dark:border-slate-800 text-center text-slate-300 dark:text-slate-600 hover:bg-indigo-50/20 dark:hover:bg-indigo-950/20"
                         >
                           —
                         </td>

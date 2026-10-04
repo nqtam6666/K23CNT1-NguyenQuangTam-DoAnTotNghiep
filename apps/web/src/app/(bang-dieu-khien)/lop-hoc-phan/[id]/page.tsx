@@ -341,20 +341,20 @@ export default function TrangChiTietLopHocPhan({ params }: { params: Promise<{ i
               className="inline-flex items-center justify-center gap-2 px-5 py-3 bg-emerald-600 hover:bg-emerald-500 text-white font-semibold rounded-xl text-sm transition-colors shadow-lg shadow-emerald-600/30"
             >
               <Video className="w-4 h-4" />
-              Vào phòng học trực tuyến LiveKit
+              Vào phòng học trực tuyến
             </Link>
           </div>
         </div>
       </div>
 
       {/* Tabs */}
-      <div className="flex border-b border-slate-200">
+      <div className="flex border-b border-slate-200 dark:border-slate-800">
         <button
           onClick={() => setTabHienTai('thoi-khoa-bieu')}
           className={`flex items-center gap-2 px-5 py-3 text-sm font-medium border-b-2 transition-colors ${
             tabHienTai === 'thoi-khoa-bieu'
-              ? 'border-indigo-600 text-indigo-600'
-              : 'border-transparent text-slate-500 hover:text-slate-700'
+              ? 'border-indigo-600 dark:border-indigo-400 text-indigo-600 dark:text-indigo-400'
+              : 'border-transparent text-slate-500 dark:text-slate-400 hover:text-slate-700 dark:hover:text-slate-200'
           }`}
         >
           <Clock className="w-4 h-4" />
@@ -364,8 +364,8 @@ export default function TrangChiTietLopHocPhan({ params }: { params: Promise<{ i
           onClick={() => setTabHienTai('hoc-sinh')}
           className={`flex items-center gap-2 px-5 py-3 text-sm font-medium border-b-2 transition-colors ${
             tabHienTai === 'hoc-sinh'
-              ? 'border-indigo-600 text-indigo-600'
-              : 'border-transparent text-slate-500 hover:text-slate-700'
+              ? 'border-indigo-600 dark:border-indigo-400 text-indigo-600 dark:text-indigo-400'
+              : 'border-transparent text-slate-500 dark:text-slate-400 hover:text-slate-700 dark:hover:text-slate-200'
           }`}
         >
           <Users className="w-4 h-4" />
@@ -422,25 +422,25 @@ export default function TrangChiTietLopHocPhan({ params }: { params: Promise<{ i
                 danhSachTkb.map((tkb) => (
                   <div
                     key={tkb.id}
-                    className="p-4 bg-slate-50 border border-slate-200 rounded-xl flex items-center justify-between"
+                    className="p-4 bg-slate-50 dark:bg-slate-800/60 border border-slate-200 dark:border-slate-700/60 rounded-xl flex items-center justify-between"
                   >
                     <div className="space-y-1">
-                      <span className="px-2 py-0.5 bg-indigo-100 text-indigo-700 font-bold text-xs rounded">
+                      <span className="px-2 py-0.5 bg-indigo-100 dark:bg-indigo-950/80 text-indigo-700 dark:text-indigo-300 font-bold text-xs rounded border border-transparent dark:border-indigo-800/60">
                         Thứ {tkb.thuTrongTuan === 8 ? 'CN' : tkb.thuTrongTuan}
                       </span>
-                      <p className="text-sm font-semibold text-slate-800">
+                      <p className="text-sm font-semibold text-slate-800 dark:text-slate-200">
                         Tiết {tkb.tietBatDau} - Tiết {tkb.tietBatDau + tkb.soTiet - 1} ({tkb.soTiet}{' '}
                         tiết)
                       </p>
-                      <p className="text-xs text-slate-500">
-                        Phòng: {tkb.phongHoc || 'Trực tuyến LiveKit'}
+                      <p className="text-xs text-slate-500 dark:text-slate-400">
+                        Phòng: {tkb.phongHoc || 'Trực tuyến'}
                       </p>
                     </div>
 
                     {(laAdminHoacGiaoVu || laGiaoVien) && (
                       <button
                         onClick={() => xoaTkbMutation.mutate(tkb.id)}
-                        className="text-slate-400 hover:text-rose-600 p-1 rounded-md transition-colors"
+                        className="text-slate-400 hover:text-rose-600 dark:hover:text-rose-400 p-1 rounded-md transition-colors"
                       >
                         <Trash2 className="w-4 h-4" />
                       </button>
@@ -456,22 +456,22 @@ export default function TrangChiTietLopHocPhan({ params }: { params: Promise<{ i
           </div>
 
           {/* Danh sách các buổi học cụ thể */}
-          <div className="bg-white border border-slate-200 rounded-xl p-5 shadow-sm space-y-4">
-            <h3 className="font-bold text-slate-900 text-base">Danh sách Buổi học cụ thể</h3>
-            <div className="divide-y divide-slate-100">
+          <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl p-5 shadow-sm space-y-4">
+            <h3 className="font-bold text-slate-900 dark:text-slate-100 text-base">Danh sách Buổi học cụ thể</h3>
+            <div className="divide-y divide-slate-100 dark:divide-slate-800">
               {dangTaiBuoiHoc ? (
                 <div className="text-center py-6 text-slate-400">Đang tải buổi học...</div>
               ) : danhSachBuoiHoc && danhSachBuoiHoc.length > 0 ? (
                 danhSachBuoiHoc.map((buoi) => (
                   <div key={buoi.id} className="py-3 flex items-center justify-between">
                     <div>
-                      <h4 className="text-sm font-semibold text-slate-800">{buoi.chuDe}</h4>
-                      <p className="text-xs text-slate-400 mt-0.5">
+                      <h4 className="text-sm font-semibold text-slate-800 dark:text-slate-200">{buoi.chuDe}</h4>
+                      <p className="text-xs text-slate-400 dark:text-slate-500 mt-0.5">
                         {new Date(buoi.thoiGianBD).toLocaleString('vi-VN')} -{' '}
                         {new Date(buoi.thoiGianKT).toLocaleTimeString('vi-VN')}
                       </p>
                     </div>
-                    <span className="px-2.5 py-1 bg-slate-100 text-slate-600 rounded-full text-xs font-medium">
+                    <span className="px-2.5 py-1 bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 rounded-full text-xs font-medium border border-transparent dark:border-slate-700">
                       {buoi.trangThai === 'CHUA_BAT_DAU' ? 'Chưa bắt đầu' : buoi.trangThai}
                     </span>
                   </div>
@@ -515,9 +515,9 @@ export default function TrangChiTietLopHocPhan({ params }: { params: Promise<{ i
             </div>
           )}
 
-          <div className="bg-white border border-slate-200 rounded-xl overflow-hidden shadow-sm">
-            <table className="w-full text-left text-sm text-slate-600">
-              <thead className="bg-slate-50 border-b border-slate-200 text-slate-700 font-semibold">
+          <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl overflow-hidden shadow-sm">
+            <table className="w-full text-left text-sm text-slate-600 dark:text-slate-400">
+              <thead className="bg-slate-50 dark:bg-slate-950 border-b border-slate-200 dark:border-slate-800 text-slate-700 dark:text-slate-300 font-semibold">
                 <tr>
                   <th className="py-3 px-4">Mã học sinh</th>
                   <th className="py-3 px-4">Họ và tên</th>
@@ -526,7 +526,7 @@ export default function TrangChiTietLopHocPhan({ params }: { params: Promise<{ i
                   {laAdminHoacGiaoVu && <th className="py-3 px-4 text-right">Thao tác</th>}
                 </tr>
               </thead>
-              <tbody className="divide-y divide-slate-100">
+              <tbody className="divide-y divide-slate-100 dark:divide-slate-800">
                 {dangTaiGhiDanh ? (
                   <tr>
                     <td colSpan={5} className="py-10 text-center text-slate-400">
@@ -535,33 +535,33 @@ export default function TrangChiTietLopHocPhan({ params }: { params: Promise<{ i
                   </tr>
                 ) : danhSachGhiDanh && danhSachGhiDanh.length > 0 ? (
                   danhSachGhiDanh.map((gd: any) => (
-                    <tr key={gd.id} className="hover:bg-slate-50/80 transition-colors">
-                      <td className="py-3 px-4 font-mono font-semibold text-indigo-600">
+                    <tr key={gd.id} className="hover:bg-slate-50/80 dark:hover:bg-slate-800/50 transition-colors">
+                      <td className="py-3 px-4 font-mono font-semibold text-indigo-600 dark:text-indigo-400">
                         {gd.hocSinh?.maHocSinh}
                       </td>
                       <td className="py-3 px-4">
-                        <p className="font-semibold text-slate-800">
+                        <p className="font-semibold text-slate-800 dark:text-slate-200">
                           {gd.hocSinh?.nguoiDung.hoTen}
                         </p>
-                        <p className="text-xs text-slate-400">{gd.hocSinh?.nguoiDung.email}</p>
+                        <p className="text-xs text-slate-400 dark:text-slate-500">{gd.hocSinh?.nguoiDung.email}</p>
                       </td>
                       <td className="py-3 px-4">
                         {gd.hocSinh?.lopHanhChinh ? (
-                          <span className="px-2 py-0.5 bg-slate-100 text-slate-700 font-medium text-xs rounded">
+                          <span className="px-2 py-0.5 bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 font-medium text-xs rounded border border-transparent dark:border-slate-700">
                             {gd.hocSinh.lopHanhChinh.tenLop}
                           </span>
                         ) : (
-                          <span className="text-xs text-slate-400 italic">Chưa xếp lớp</span>
+                          <span className="text-xs text-slate-400 dark:text-slate-500 italic">Chưa xếp lớp</span>
                         )}
                       </td>
-                      <td className="py-3 px-4 text-xs text-slate-500">
+                      <td className="py-3 px-4 text-xs text-slate-500 dark:text-slate-400">
                         {new Date(gd.ngayGhiDanh).toLocaleDateString('vi-VN')}
                       </td>
                       {laAdminHoacGiaoVu && (
                         <td className="py-3 px-4 text-right">
                           <button
                             onClick={() => xoaGhiDanhMutation.mutate(gd.hocSinh.id)}
-                            className="text-xs text-rose-600 hover:text-rose-800 font-medium px-2 py-1 hover:bg-rose-50 rounded"
+                            className="text-xs text-rose-600 dark:text-rose-400 hover:text-rose-800 dark:hover:text-rose-300 font-medium px-2 py-1 hover:bg-rose-50 dark:hover:bg-rose-950/50 rounded"
                           >
                             Xóa khỏi lớp
                           </button>

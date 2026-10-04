@@ -60,13 +60,14 @@ export default function TrangPhongHocTrucTuyen({
     retry: false,
   });
 
-  // 2. Lấy hồ sơ người dùng hiện tại
+  // 2. Lấy hồ sơ người dùng hiện tại (Dùng chung cache 0ms)
   const { data: nguoiDungHienTai } = useQuery<PayloadJwt>({
-    queryKey: ['nguoi-dung-hien-tai'],
+    queryKey: ['ho-so-hien-tai'],
     queryFn: async () => {
       const res = await mayKhachApi.get('/xac-thuc/ho-so-hien-tai');
-      return res.data.duLieu;
+      return res.data?.duLieu;
     },
+    staleTime: 5 * 60 * 1000,
   });
 
   // 3. Lấy AccessToken LiveKit từ Backend (Có kiểm tra quyền CASL & chống IDOR)

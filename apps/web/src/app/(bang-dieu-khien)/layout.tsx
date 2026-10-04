@@ -20,26 +20,30 @@ import {
 } from 'lucide-react';
 import { mayKhachApi } from '../../tien-ich/may-khach-api';
 import { thongBao } from '../../tien-ich/thong-bao';
+import { useQuery } from '@tanstack/react-query';
 import { PayloadJwt, VaiTro } from '@lms/chung';
 
 export default function LayoutBangDieuKhien({ children }: { children: ReactNode }) {
   const pathname = usePathname();
   const router = useRouter();
-  const [nguoiDung, setNguoiDung] = useState<PayloadJwt | null>(null);
   const [sidebarMo, setSidebarMo] = useState(false);
 
+  // Lấy hồ sơ người dùng từ React Query Cache (staleTime 5 phút, không fetch thừa khi chuyển trang)
+  const { data: nguoiDung, isError } = useQuery<PayloadJwt>({
+    queryKey: ['ho-so-hien-tai'],
+    queryFn: async () => {
+      const res = await mayKhachApi.get('/xac-thuc/ho-so-hien-tai');
+      return res.data?.duLieu;
+    },
+    staleTime: 5 * 60 * 1000,
+    retry: false,
+  });
+
   useEffect(() => {
-    mayKhachApi
-      .get('/xac-thuc/ho-so-hien-tai')
-      .then((res) => {
-        if (res.data?.duLieu) {
-          setNguoiDung(res.data.duLieu);
-        }
-      })
-      .catch(() => {
-        router.push('/dang-nhap');
-      });
-  }, [router]);
+    if (isError) {
+      router.push('/dang-nhap');
+    }
+  }, [isError, router]);
 
   const dangXuat = async () => {
     try {

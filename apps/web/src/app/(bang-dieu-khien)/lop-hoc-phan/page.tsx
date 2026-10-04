@@ -38,13 +38,14 @@ export default function TrangLopHocPhan() {
     moTa: '',
   });
 
-  // Lấy thông tin user hiện tại
+  // Lấy thông tin user hiện tại (Dùng chung cache với Layout, 0ms latency)
   const { data: nguoiDungHienTai } = useQuery<PayloadJwt>({
-    queryKey: ['nguoi-dung-hien-tai'],
+    queryKey: ['ho-so-hien-tai'],
     queryFn: async () => {
       const res = await mayKhachApi.get('/xac-thuc/ho-so-hien-tai');
-      return res.data.duLieu;
+      return res.data?.duLieu;
     },
+    staleTime: 5 * 60 * 1000,
   });
 
   // Lấy danh sách lớp học phần

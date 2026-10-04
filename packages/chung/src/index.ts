@@ -11,8 +11,10 @@ export * from './phan-quyen/doi-tuong';
 export * from './so-do/phan-trang.so-do';
 export * from './so-do/xac-thuc.so-do';
 export * from './so-do/nguoi-dung.so-do';
+export * from './so-do/ho-so.so-do';
 
 // KIỂU DỮ LIỆU TYPESCRIPT
 export * from './kieu-du-lieu/phan-hoi.kieu';
 export * from './kieu-du-lieu/xac-thuc.kieu';
 export * from './kieu-du-lieu/nguoi-dung.kieu';
+export * from './kieu-du-lieu/ho-so.kieu';

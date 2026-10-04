@@ -11,6 +11,8 @@ import { PhanQuyenCaslGuard } from './phan-quyen/phan-quyen-casl.guard';
 import { MoDunXacThucModule } from './mo-dun/xac-thuc/mo-dun-xac-thuc.module';
 import { XacThucJwtGuard } from './mo-dun/xac-thuc/ve-si/jwt-auth.guard';
 import { MoDunSucKhoeModule } from './mo-dun/suc-khoe/mo-dun-suc-khoe.module';
+import { MoDunNguoiDungModule } from './mo-dun/nguoi-dung/mo-dun-nguoi-dung.module';
+import { MoDunHoSoModule } from './mo-dun/ho-so/mo-dun-ho-so.module';
 
 @Module({
   imports: [
@@ -28,6 +30,8 @@ import { MoDunSucKhoeModule } from './mo-dun/suc-khoe/mo-dun-suc-khoe.module';
     MoDunPhanQuyenModule,
     MoDunXacThucModule,
     MoDunSucKhoeModule,
+    MoDunNguoiDungModule,
+    MoDunHoSoModule,
   ],
   providers: [
     {

@@ -29,7 +29,7 @@ export const taoNguoiDungSchema = z.object({
     .regex(/^[0-9]{10,11}$/, 'Số điện thoại không đúng định dạng')
     .optional(),
   vaiTro: z.nativeEnum(VaiTro),
-  kichHoat: z.boolean().default(true),
+  kichHoat: z.boolean().optional(),
 });
 
 /**
@@ -43,6 +43,24 @@ export const capNhatNguoiDungSchema = z.object({
 });
 
 /**
+ * Schema Zod bật/tắt kích hoạt tài khoản người dùng
+ */
+export const chuyenTrangThaiNguoiDungSchema = z.object({
+  kichHoat: z.boolean({ required_error: 'Trạng thái kích hoạt là bắt buộc' }),
+  lyDo: z.string().trim().max(255).optional(),
+});
+
+/**
+ * Schema Zod Quản trị viên đặt lại mật khẩu cho người dùng
+ */
+export const datLaiMatKhauAdminSchema = z.object({
+  matKhauMoi: z
+    .string({ required_error: 'Mật khẩu mới không được để trống' })
+    .min(8, 'Mật khẩu mới tối thiểu 8 ký tự')
+    .max(100),
+});
+
+/**
  * Schema Zod truy vấn danh sách người dùng với bộ lọc
  */
 export const truyVanNguoiDungSchema = truyVanPhanTrangSchema.extend({
@@ -53,4 +71,6 @@ export const truyVanNguoiDungSchema = truyVanPhanTrangSchema.extend({
 export type CapNhatHoSoDto = z.infer<typeof capNhatHoSoSchema>;
 export type TaoNguoiDungDto = z.infer<typeof taoNguoiDungSchema>;
 export type CapNhatNguoiDungDto = z.infer<typeof capNhatNguoiDungSchema>;
+export type ChuyenTrangThaiNguoiDungDto = z.infer<typeof chuyenTrangThaiNguoiDungSchema>;
+export type DatLaiMatKhauAdminDto = z.infer<typeof datLaiMatKhauAdminSchema>;
 export type TruyVanNguoiDungDto = z.infer<typeof truyVanNguoiDungSchema>;

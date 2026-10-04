@@ -1,0 +1,110 @@
+# ==========================================
+# 1. TỆP TÀI LIỆU MARKDOWN (.md)
+# ==========================================
+# Bỏ qua toàn bộ file .md theo yêu cầu nhưng vẫn giữ lại README.md
+*.md
+*.MD
+!README.md
+!README.MD
+!readme.md
+
+
+# ==========================================
+# 2. CẤU HÌNH VÀ DỮ LIỆU AGENT
+# ==========================================
+.agents/
+.agent/
+_agents/
+_agent/
+.gemini/
+AGENTS.md
+GEMINI.md
+*.agent
+mcp_config*.json
+skills-lock.json
+.skills/
+
+
+# ==========================================
+# 3. BẢO MẬT, MÃ BÍ MẬT & CHỨNG THỰC (SECRETS)
+# ==========================================
+# Biến môi trường
+.env
+.env.*
+!.env.example
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
+
+# Khóa bí mật và chứng chỉ SSL/TLS
+*.pem
+*.key
+*.cert
+*.crt
+*.p12
+*.pfx
+*.pub
+id_rsa*
+id_ed25519*
+
+# Thư mục chứa bí mật và token
+secrets/
+credentials/
+tokens/
+*secret*
+*credential*
+
+# ==========================================
+# 4. NODE, MONOREPO & BUILD ARTIFACTS
+# ==========================================
+# Quản lý gói phụ thuộc
+node_modules/
+.pnpm-store/
+.npm/
+.yarn/
+
+# Thư mục build và biên dịch
+dist/
+build/
+out/
+.next/
+.turbo/
+.cache/
+
+# Báo cáo kiểm thử & coverage
+coverage/
+*.lcov
+.nyc_output/
+
+# Cache TypeScript & Linter
+*.tsbuildinfo
+.eslintcache
+
+# ==========================================
+# 5. NHẬT KÝ & TỆP TẠM (LOGS & TEMPORARY)
+# ==========================================
+logs/
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+*.tmp
+*.temp
+
+# ==========================================
+# 6. HỆ ĐIỀU HÀNH & MÔI TRƯỜNG PHÁT TRIỂN (IDE)
+# ==========================================
+# Hệ điều hành
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# IDE & Trình soạn thảo
+.idea/
+.vscode/*
+!.vscode/extensions.json
+*.swp
+*.swo
+*~

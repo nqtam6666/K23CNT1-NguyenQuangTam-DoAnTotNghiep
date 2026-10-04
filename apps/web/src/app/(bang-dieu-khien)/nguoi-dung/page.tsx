@@ -25,6 +25,7 @@ import {
   DANH_SACH_VAI_TRO,
 } from '@lms/chung';
 import { mayKhachApi } from '../../../tien-ich/may-khach-api';
+import { thongBao } from '../../../tien-ich/thong-bao';
 
 export default function TrangQuanLyNguoiDung() {
   const queryClient = useQueryClient();
@@ -56,8 +57,15 @@ export default function TrangQuanLyNguoiDung() {
     mutationFn: async ({ id, kichHoat }: { id: string; kichHoat: boolean }) => {
       await mayKhachApi.patch(`/nguoi-dung/${id}/trang-thai`, { kichHoat });
     },
-    onSuccess: () => {
+    onSuccess: (_, variables) => {
       queryClient.invalidateQueries({ queryKey: ['danhSachNguoiDung'] });
+      thongBao.thanhCong(
+        variables.kichHoat ? 'Đã kích hoạt tài khoản' : 'Đã khóa tài khoản',
+        'Cập nhật trạng thái người dùng thành công.',
+      );
+    },
+    onError: (err: any) => {
+      thongBao.loiHeThong(err, 'Lỗi khi cập nhật trạng thái người dùng');
     },
   });
 
@@ -69,7 +77,10 @@ export default function TrangQuanLyNguoiDung() {
     onSuccess: () => {
       setModalDatMatKhauMo(null);
       setMatKhauMoi('');
-      alert('Đã đặt lại mật khẩu thành công!');
+      thongBao.thanhCong('Đặt lại mật khẩu thành công', 'Mật khẩu mới đã được cập nhật.');
+    },
+    onError: (err: any) => {
+      thongBao.loiHeThong(err, 'Lỗi khi đặt lại mật khẩu');
     },
   });
 
@@ -96,8 +107,9 @@ export default function TrangQuanLyNguoiDung() {
       queryClient.invalidateQueries({ queryKey: ['danhSachNguoiDung'] });
       setModalTaoMo(false);
       reset();
+      thongBao.thanhCong('Tạo tài khoản thành công', `Tài khoản ${duLieu.email} đã được tạo.`);
     } catch (loi: any) {
-      alert(loi.response?.data?.thongDiep || 'Lỗi khi tạo người dùng');
+      thongBao.loiHeThong(loi, 'Lỗi khi tạo người dùng mới');
     }
   };
 

@@ -17,6 +17,7 @@ import {
   AlertCircle,
 } from 'lucide-react';
 import { mayKhachApi } from '../../../tien-ich/may-khach-api';
+import { thongBao } from '../../../tien-ich/thong-bao';
 import {
   NamHoc,
   HocKy,
@@ -107,9 +108,11 @@ export default function TrangQuanLyHocVu() {
       setMoModalNamHoc(false);
       setFormNamHoc({ tenNamHoc: '', hienTai: false });
       setThongBaoLoi(null);
+      thongBao.thanhCong('Tạo năm học thành công', 'Năm học mới đã được lưu vào hệ thống.');
     },
     onError: (err: any) => {
       setThongBaoLoi(err.response?.data?.thongDiep || 'Lỗi khi tạo năm học');
+      thongBao.loiHeThong(err, 'Lỗi khi tạo năm học');
     },
   });
 
@@ -119,9 +122,11 @@ export default function TrangQuanLyHocVu() {
       queryClient.invalidateQueries({ queryKey: ['nam-hoc'] });
       setMoModalHocKy(false);
       setThongBaoLoi(null);
+      thongBao.thanhCong('Tạo học kỳ thành công', 'Học kỳ mới đã được kích hoạt.');
     },
     onError: (err: any) => {
       setThongBaoLoi(err.response?.data?.thongDiep || 'Lỗi khi tạo học kỳ');
+      thongBao.loiHeThong(err, 'Lỗi khi tạo học kỳ');
     },
   });
 
@@ -132,9 +137,11 @@ export default function TrangQuanLyHocVu() {
       setMoModalMonHoc(false);
       setFormMonHoc({ maMonHoc: '', tenMonHoc: '', soTinChi: 3, moTa: '' });
       setThongBaoLoi(null);
+      thongBao.thanhCong('Tạo môn học thành công', 'Môn học mới đã sẵn sàng để mở lớp học phần.');
     },
     onError: (err: any) => {
       setThongBaoLoi(err.response?.data?.thongDiep || 'Lỗi khi tạo môn học');
+      thongBao.loiHeThong(err, 'Lỗi khi tạo môn học');
     },
   });
 
@@ -145,9 +152,11 @@ export default function TrangQuanLyHocVu() {
       setMoModalLopHanhChinh(false);
       setFormLopHanhChinh({ maLop: '', tenLop: '', khoiLop: 10, idGiaoVienCN: null });
       setThongBaoLoi(null);
+      thongBao.thanhCong('Tạo lớp hành chính thành công', 'Lớp hành chính mới đã được thêm.');
     },
     onError: (err: any) => {
       setThongBaoLoi(err.response?.data?.thongDiep || 'Lỗi khi tạo lớp hành chính');
+      thongBao.loiHeThong(err, 'Lỗi khi tạo lớp hành chính');
     },
   });
 

@@ -19,6 +19,7 @@ import {
   HeartHandshake,
 } from 'lucide-react';
 import { mayKhachApi } from '../../tien-ich/may-khach-api';
+import { thongBao } from '../../tien-ich/thong-bao';
 import { PayloadJwt, VaiTro } from '@lms/chung';
 
 export default function LayoutBangDieuKhien({ children }: { children: ReactNode }) {
@@ -43,6 +44,9 @@ export default function LayoutBangDieuKhien({ children }: { children: ReactNode 
   const dangXuat = async () => {
     try {
       await mayKhachApi.post('/xac-thuc/dang-xuat');
+      thongBao.thanhCong('Đã đăng xuất', 'Hẹn gặp lại bạn!');
+    } catch {
+      // Bỏ qua lỗi mạng khi đăng xuất
     } finally {
       router.push('/dang-nhap');
     }

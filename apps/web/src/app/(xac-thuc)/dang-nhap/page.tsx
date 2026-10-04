@@ -8,6 +8,7 @@ import { useRouter } from 'next/navigation';
 import { BookOpen, Lock, Mail, AlertCircle, Loader2 } from 'lucide-react';
 import { dangNhapSchema, DangNhapDto } from '@lms/chung';
 import { mayKhachApi } from '../../../tien-ich/may-khach-api';
+import { thongBao } from '../../../tien-ich/thong-bao';
 
 export default function TrangDangNhap() {
   const router = useRouter();
@@ -30,12 +31,26 @@ export default function TrangDangNhap() {
     setDangXuLy(true);
     setThongBaoLoi(null);
     try {
-      await mayKhachApi.post('/xac-thuc/dang-nhap', duLieu);
-      router.push('/');
+      const phanHoi = await mayKhachApi.post('/xac-thuc/dang-nhap', duLieu);
+      const hoTen = phanHoi.data?.duLieu?.nguoiDung?.hoTen;
+      
+      thongBao.thanhCong(
+        'Đăng nhập thành công!',
+        hoTen ? `Chào mừng ${hoTen} quay trở lại LMS.` : 'Đang chuyển hướng vào hệ thống...',
+      );
+
+      // Đợi hiệu ứng toast mượt mà trước khi chuyển trang
+      setTimeout(() => {
+        router.push('/bang-dieu-khien');
+      }, 700);
     } catch (loi: any) {
       const thongDiep =
-        loi.response?.data?.thongDiep || 'Đăng nhập không thành công. Vui lòng kiểm tra lại.';
+        loi.response?.data?.thongDiep ||
+        loi.response?.data?.message ||
+        'Đăng nhập không thành công. Vui lòng kiểm tra lại email hoặc mật khẩu.';
+      
       setThongBaoLoi(thongDiep);
+      thongBao.thatBai('Đăng nhập thất bại', thongDiep);
     } finally {
       setDangXuLy(false);
     }

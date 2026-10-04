@@ -17,6 +17,7 @@ import {
   AlertCircle,
 } from 'lucide-react';
 import { mayKhachApi } from '../../../tien-ich/may-khach-api';
+import { thongBao } from '../../../tien-ich/thong-bao';
 import { LopHocPhan, TaoLopHocPhanInput, VaiTro, PayloadJwt } from '@lms/chung';
 
 export default function TrangLopHocPhan() {
@@ -89,14 +90,17 @@ export default function TrangLopHocPhan() {
   const thamGiaMutation = useMutation({
     mutationFn: (code: string) =>
       mayKhachApi.post('/lop-hoc-phan/tham-gia-bang-ma', { maThamGia: code }),
-    onSuccess: () => {
+    onSuccess: (res) => {
       queryClient.invalidateQueries({ queryKey: ['lop-hoc-phan'] });
       setMoModalThamGia(false);
       setMaThamGia('');
       setThongBaoLoi(null);
+      thongBao.thanhCong('Ghi danh thành công!', res.data?.thongDiep || 'Bạn đã tham gia lớp học phần thành công.');
     },
     onError: (err: any) => {
-      setThongBaoLoi(err.response?.data?.thongDiep || 'Mã tham gia không hợp lệ hoặc lỗi kết nối');
+      const msg = err.response?.data?.thongDiep || 'Mã tham gia không hợp lệ hoặc lỗi kết nối';
+      setThongBaoLoi(msg);
+      thongBao.thatBai('Tham gia lớp học thất bại', msg);
     },
   });
 
@@ -114,9 +118,12 @@ export default function TrangLopHocPhan() {
         moTa: '',
       });
       setThongBaoLoi(null);
+      thongBao.thanhCong('Tạo lớp học phần thành công!', 'Lớp học phần mới đã được khởi tạo trên hệ thống.');
     },
     onError: (err: any) => {
-      setThongBaoLoi(err.response?.data?.thongDiep || 'Lỗi khi tạo lớp học phần');
+      const msg = err.response?.data?.thongDiep || 'Lỗi khi tạo lớp học phần';
+      setThongBaoLoi(msg);
+      thongBao.thatBai('Tạo lớp thất bại', msg);
     },
   });
 

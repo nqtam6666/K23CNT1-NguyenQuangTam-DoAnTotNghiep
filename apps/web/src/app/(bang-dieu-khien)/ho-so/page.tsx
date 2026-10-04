@@ -22,6 +22,7 @@ import {
   DoiMatKhauDto,
 } from '@lms/chung';
 import { mayKhachApi } from '../../../tien-ich/may-khach-api';
+import { thongBao } from '../../../tien-ich/thong-bao';
 
 export default function TrangHoSoCaNhan() {
   const queryClient = useQueryClient();
@@ -59,8 +60,11 @@ export default function TrangHoSoCaNhan() {
       await mayKhachApi.patch('/ho-so/ca-nhan', duLieu);
       queryClient.invalidateQueries({ queryKey: ['hoSoCaNhan'] });
       setThongBaoThanhCong('Cập nhật thông tin thành công!');
+      thongBao.thanhCong('Cập nhật hồ sơ thành công', 'Thông tin cá nhân đã được lưu vào hệ thống.');
     } catch (loi: any) {
-      setThongBaoLoi(loi.response?.data?.thongDiep || 'Không thể cập nhật hồ sơ');
+      const msg = loi.response?.data?.thongDiep || 'Không thể cập nhật hồ sơ';
+      setThongBaoLoi(msg);
+      thongBao.loiHeThong(loi, 'Không thể cập nhật hồ sơ');
     }
   };
 
@@ -81,8 +85,11 @@ export default function TrangHoSoCaNhan() {
       await mayKhachApi.post('/xac-thuc/doi-mat-khau', duLieu);
       setThongBaoThanhCong('Đổi mật khẩu thành công!');
       resetFormDoiMatKhau();
+      thongBao.thanhCong('Đổi mật khẩu thành công', 'Mật khẩu bảo vệ tài khoản của bạn đã được thay đổi.');
     } catch (loi: any) {
-      setThongBaoLoi(loi.response?.data?.thongDiep || 'Không thể đổi mật khẩu');
+      const msg = loi.response?.data?.thongDiep || 'Không thể đổi mật khẩu';
+      setThongBaoLoi(msg);
+      thongBao.loiHeThong(loi, 'Không thể đổi mật khẩu');
     }
   };
 

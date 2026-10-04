@@ -19,6 +19,7 @@ import {
   UserPlus,
 } from 'lucide-react';
 import { mayKhachApi } from '../../../../tien-ich/may-khach-api';
+import { thongBao } from '../../../../tien-ich/thong-bao';
 import {
   LopHocPhan,
   ThoiKhoaBieu,
@@ -131,9 +132,12 @@ export default function TrangChiTietLopHocPhan({ params }: { params: Promise<{ i
       setMoModalTkb(false);
       setThongBaoLoi(null);
       setThongBaoThanhCong('Thêm tiết học thành công');
+      thongBao.thanhCong('Thêm tiết học thành công!');
     },
     onError: (err: any) => {
-      setThongBaoLoi(err.response?.data?.thongDiep || 'Lỗi khi thêm tiết học (trùng lịch)');
+      const msg = err.response?.data?.thongDiep || 'Lỗi khi thêm tiết học (trùng lịch)';
+      setThongBaoLoi(msg);
+      thongBao.thatBai('Thêm tiết học thất bại', msg);
     },
   });
 
@@ -141,10 +145,14 @@ export default function TrangChiTietLopHocPhan({ params }: { params: Promise<{ i
     mutationFn: () => mayKhachApi.post(`/thoi-khoa-bieu/lop/${id}/sinh-buoi-hoc`),
     onSuccess: (res) => {
       queryClient.invalidateQueries({ queryKey: ['buoi-hoc-lop', id] });
-      setThongBaoThanhCong(res.data.duLieu?.thongBao || 'Đã sinh danh sách buổi học tự động');
+      const msg = res.data.duLieu?.thongBao || 'Đã sinh danh sách buổi học tự động';
+      setThongBaoThanhCong(msg);
+      thongBao.thanhCong('Sinh lịch học thành công!', msg);
     },
     onError: (err: any) => {
-      setThongBaoLoi(err.response?.data?.thongDiep || 'Lỗi khi sinh buổi học');
+      const msg = err.response?.data?.thongDiep || 'Lỗi khi sinh buổi học';
+      setThongBaoLoi(msg);
+      thongBao.thatBai('Sinh buổi học thất bại', msg);
     },
   });
 
@@ -158,9 +166,12 @@ export default function TrangChiTietLopHocPhan({ params }: { params: Promise<{ i
       setIdHocSinhChon('');
       setThongBaoLoi(null);
       setThongBaoThanhCong('Ghi danh học sinh thành công');
+      thongBao.thanhCong('Ghi danh thành công!', 'Đã thêm học sinh vào lớp học phần.');
     },
     onError: (err: any) => {
-      setThongBaoLoi(err.response?.data?.thongDiep || 'Lỗi khi ghi danh');
+      const msg = err.response?.data?.thongDiep || 'Lỗi khi ghi danh';
+      setThongBaoLoi(msg);
+      thongBao.thatBai('Ghi danh thất bại', msg);
     },
   });
 
@@ -174,9 +185,12 @@ export default function TrangChiTietLopHocPhan({ params }: { params: Promise<{ i
       setIdLopHanhChinhChon('');
       setThongBaoLoi(null);
       setThongBaoThanhCong('Ghi danh theo lớp hành chính thành công');
+      thongBao.thanhCong('Ghi danh theo lớp thành công!', 'Toàn bộ học sinh trong lớp sinh hoạt đã được thêm vào lớp học phần.');
     },
     onError: (err: any) => {
-      setThongBaoLoi(err.response?.data?.thongDiep || 'Lỗi khi ghi danh theo lớp');
+      const msg = err.response?.data?.thongDiep || 'Lỗi khi ghi danh theo lớp';
+      setThongBaoLoi(msg);
+      thongBao.thatBai('Ghi danh thất bại', msg);
     },
   });
 
@@ -187,9 +201,12 @@ export default function TrangChiTietLopHocPhan({ params }: { params: Promise<{ i
       queryClient.invalidateQueries({ queryKey: ['ghi-danh-lop', id] });
       queryClient.invalidateQueries({ queryKey: ['chi-tiet-lop', id] });
       setThongBaoThanhCong('Đã xóa học sinh khỏi lớp học phần');
+      thongBao.thanhCong('Đã rút tên học sinh khỏi lớp học phần.');
     },
     onError: (err: any) => {
-      setThongBaoLoi(err.response?.data?.thongDiep || 'Lỗi khi xóa học sinh');
+      const msg = err.response?.data?.thongDiep || 'Lỗi khi xóa học sinh';
+      setThongBaoLoi(msg);
+      thongBao.thatBai('Rút tên học sinh thất bại', msg);
     },
   });
 
@@ -198,6 +215,12 @@ export default function TrangChiTietLopHocPhan({ params }: { params: Promise<{ i
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['tkb-lop', id] });
       setThongBaoThanhCong('Đã xóa tiết học');
+      thongBao.thanhCong('Đã xóa tiết học khỏi thời khóa biểu.');
+    },
+    onError: (err: any) => {
+      const msg = err.response?.data?.thongDiep || 'Lỗi khi xóa tiết học';
+      setThongBaoLoi(msg);
+      thongBao.thatBai('Xóa tiết học thất bại', msg);
     },
   });
 

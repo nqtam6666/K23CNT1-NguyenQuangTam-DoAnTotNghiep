@@ -1,6 +1,6 @@
 'use client';
 
-import { ReactNode, useEffect, useState } from 'react';
+import { ReactNode, useEffect, useState, useRef } from 'react';
 import { createPortal } from 'react-dom';
 import { X } from 'lucide-react';
 
@@ -25,6 +25,7 @@ const banDoKichThuoc = {
  * - 100% sử dụng React createPortal vào document.body để luôn phủ toàn màn hình (Full viewport)
  * - Miễn nhiễm với mọi thuộc tính transform, overflow-hidden hoặc stacking context của container cha
  * - Tự động khóa cuộn trang, bắt phím Escape và click ngoài nền để đóng
+ * - Chống vô tình đóng modal khi người dùng bôi đen kéo văn bản từ trong modal ra ngoài nền tối (Drag-selection protection)
  */
 export function HopThoai({
   mo,
@@ -35,6 +36,7 @@ export function HopThoai({
   children,
 }: ThuocTinhHopThoai) {
   const [daGanVaoDom, setDaGanVaoDom] = useState(false);
+  const chuotNhanVaoNenRef = useRef(false);
 
   useEffect(() => {
     setDaGanVaoDom(true);
@@ -66,11 +68,23 @@ export function HopThoai({
     <div
       role="dialog"
       aria-modal="true"
+      onMouseDown={(e) => {
+        // Chỉ đánh dấu true nếu mousedown bắt đầu trực tiếp từ chính lớp nền tối bên ngoài
+        chuotNhanVaoNenRef.current = e.target === e.currentTarget;
+      }}
       onClick={(e) => {
-        // Chỉ đóng khi click trực tiếp vào lớp nền tối bên ngoài
-        if (e.target === e.currentTarget) {
+        // Chỉ đóng khi:
+        // 1. Thao tác nhả chuột/click diễn ra trên chính nền tối (e.target === e.currentTarget)
+        // 2. VÀ mousedown cũng bắt đầu từ nền tối (chuotNhanVaoNenRef.current === true)
+        // Nếu người dùng bôi đen kéo chữ từ trong modal ra ngoài thì chuotNhanVaoNenRef.current là false -> KHÔNG ĐÓNG!
+        const laClickHopLe =
+          e.target === e.currentTarget &&
+          (chuotNhanVaoNenRef.current || e.detail === 0);
+
+        if (laClickHopLe) {
           onDong();
         }
+        chuotNhanVaoNenRef.current = false;
       }}
       className="fixed inset-0 z-[99999] bg-slate-950/60 backdrop-blur-xs flex items-center justify-center p-4 sm:p-6 overflow-y-auto animate-in fade-in duration-150"
     >

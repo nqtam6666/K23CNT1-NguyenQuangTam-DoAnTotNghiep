@@ -264,11 +264,6 @@ export default function LayoutBangDieuKhien({ children }: { children: ReactNode 
     } else {
       thucHienDoiGiaoDien();
     }
-
-    thongBao.thanhCong(
-      tiepTheo === 'toi' ? 'Chế độ tối' : 'Chế độ sáng',
-      'Đã cập nhật giao diện hiển thị',
-    );
   };
 
   return (

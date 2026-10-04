@@ -1,10 +1,6 @@
 'use client';
 
-import {
-  LiveKitRoom,
-  VideoConference,
-  RoomAudioRenderer,
-} from '@livekit/components-react';
+import { LiveKitRoom, VideoConference, RoomAudioRenderer } from '@livekit/components-react';
 import '@livekit/components-styles';
 
 interface ThuocTinhThanhPhanPhongHoc {

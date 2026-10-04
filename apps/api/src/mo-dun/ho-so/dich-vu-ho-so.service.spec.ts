@@ -80,9 +80,9 @@ describe('DichVuHoSo (Unit Test & Kiểm tra Chống IDOR)', () => {
         vaiTro: VaiTro.HOC_SINH,
       };
 
-      await expect(
-        dichVu.layChiTietHocSinh('ho-so-1', hackerHocSinh),
-      ).rejects.toThrow(ForbiddenException);
+      await expect(dichVu.layChiTietHocSinh('ho-so-1', hackerHocSinh)).rejects.toThrow(
+        ForbiddenException,
+      );
     });
 
     it('Phụ huynh xem hồ sơ con em ĐÃ liên kết -> Cho phép', async () => {
@@ -114,9 +114,9 @@ describe('DichVuHoSo (Unit Test & Kiểm tra Chống IDOR)', () => {
         vaiTro: VaiTro.PHU_HUYNH,
       };
 
-      await expect(
-        dichVu.layChiTietHocSinh('ho-so-1', phuHuynhKhac),
-      ).rejects.toThrow(ForbiddenException);
+      await expect(dichVu.layChiTietHocSinh('ho-so-1', phuHuynhKhac)).rejects.toThrow(
+        ForbiddenException,
+      );
     });
   });
 

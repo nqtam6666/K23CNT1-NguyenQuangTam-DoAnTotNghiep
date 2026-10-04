@@ -15,12 +15,7 @@ import {
   AlertCircle,
   School,
 } from 'lucide-react';
-import {
-  capNhatHoSoSchema,
-  doiMatKhauSchema,
-  CapNhatHoSoDto,
-  DoiMatKhauDto,
-} from '@lms/chung';
+import { capNhatHoSoSchema, doiMatKhauSchema, CapNhatHoSoDto, DoiMatKhauDto } from '@lms/chung';
 import { mayKhachApi } from '../../../tien-ich/may-khach-api';
 import { thongBao } from '../../../tien-ich/thong-bao';
 
@@ -60,7 +55,10 @@ export default function TrangHoSoCaNhan() {
       await mayKhachApi.patch('/ho-so/ca-nhan', duLieu);
       queryClient.invalidateQueries({ queryKey: ['hoSoCaNhan'] });
       setThongBaoThanhCong('Cập nhật thông tin thành công!');
-      thongBao.thanhCong('Cập nhật hồ sơ thành công', 'Thông tin cá nhân đã được lưu vào hệ thống.');
+      thongBao.thanhCong(
+        'Cập nhật hồ sơ thành công',
+        'Thông tin cá nhân đã được lưu vào hệ thống.',
+      );
     } catch (loi: any) {
       const msg = loi.response?.data?.thongDiep || 'Không thể cập nhật hồ sơ';
       setThongBaoLoi(msg);
@@ -85,7 +83,10 @@ export default function TrangHoSoCaNhan() {
       await mayKhachApi.post('/xac-thuc/doi-mat-khau', duLieu);
       setThongBaoThanhCong('Đổi mật khẩu thành công!');
       resetFormDoiMatKhau();
-      thongBao.thanhCong('Đổi mật khẩu thành công', 'Mật khẩu bảo vệ tài khoản của bạn đã được thay đổi.');
+      thongBao.thanhCong(
+        'Đổi mật khẩu thành công',
+        'Mật khẩu bảo vệ tài khoản của bạn đã được thay đổi.',
+      );
     } catch (loi: any) {
       const msg = loi.response?.data?.thongDiep || 'Không thể đổi mật khẩu';
       setThongBaoLoi(msg);
@@ -200,7 +201,9 @@ export default function TrangHoSoCaNhan() {
               </div>
 
               <div>
-                <label className="block text-xs font-semibold text-slate-700 mb-1">Số điện thoại</label>
+                <label className="block text-xs font-semibold text-slate-700 mb-1">
+                  Số điện thoại
+                </label>
                 <input
                   type="text"
                   {...dangKyThongTin('soDienThoai')}
@@ -320,9 +323,7 @@ export default function TrangHoSoCaNhan() {
               className="w-full px-3 py-2 border border-slate-300 rounded-lg text-sm focus:ring-2 focus:ring-blue-500"
             />
             {loiDoiMatKhau.matKhauHienTai && (
-              <p className="mt-1 text-xs text-red-600">
-                {loiDoiMatKhau.matKhauHienTai.message}
-              </p>
+              <p className="mt-1 text-xs text-red-600">{loiDoiMatKhau.matKhauHienTai.message}</p>
             )}
           </div>
 
@@ -351,9 +352,7 @@ export default function TrangHoSoCaNhan() {
               className="w-full px-3 py-2 border border-slate-300 rounded-lg text-sm focus:ring-2 focus:ring-blue-500"
             />
             {loiDoiMatKhau.xacNhanMatKhauMoi && (
-              <p className="mt-1 text-xs text-red-600">
-                {loiDoiMatKhau.xacNhanMatKhauMoi.message}
-              </p>
+              <p className="mt-1 text-xs text-red-600">{loiDoiMatKhau.xacNhanMatKhauMoi.message}</p>
             )}
           </div>
 

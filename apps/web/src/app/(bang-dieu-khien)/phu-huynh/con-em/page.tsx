@@ -5,7 +5,11 @@ import { HeartHandshake, GraduationCap, School, AlertCircle, Loader2 } from 'luc
 import { mayKhachApi } from '../../../../tien-ich/may-khach-api';
 
 export default function TrangConEmPhuHuynh() {
-  const { data: danhSachConEm, isLoading, isError } = useQuery({
+  const {
+    data: danhSachConEm,
+    isLoading,
+    isError,
+  } = useQuery({
     queryKey: ['danhSachConEmPhuHuynh'],
     queryFn: async () => {
       const res = await mayKhachApi.get('/ho-so/con-em');
@@ -37,8 +41,8 @@ export default function TrangConEmPhuHuynh() {
           <HeartHandshake className="w-12 h-12 text-slate-300 mx-auto mb-3" />
           <p className="font-medium text-slate-700">Chưa có liên kết học sinh nào</p>
           <p className="text-xs text-slate-400 mt-1 max-w-sm mx-auto">
-            Vui lòng liên hệ phòng Giáo vụ hoặc Giáo viên chủ nhiệm để xác nhận và thiết lập liên kết
-            tài khoản phụ huynh.
+            Vui lòng liên hệ phòng Giáo vụ hoặc Giáo viên chủ nhiệm để xác nhận và thiết lập liên
+            kết tài khoản phụ huynh.
           </p>
         </div>
       ) : (

@@ -646,3 +646,22 @@ model NhatKyHeThong {
   @@index([idNguoiDung])
   @@index([ngayTao])
 }
+
+// ==========================================
+// 9. CÀI ĐẶT & CẤU HÌNH HỆ THỐNG
+// ==========================================
+
+model CaiDatHeThong {
+  id          String   @id @default(uuid()) @map("id") @db.Uuid
+  khoa        String   @unique @map("khoa") @db.VarChar(100)
+  giaTri      String   @map("gia_tri") @db.Text
+  nhom        String   @default("CHUNG") @map("nhom") @db.VarChar(50)
+  moTa        String?  @map("mo_ta") @db.VarChar(255)
+  kieuDuLieu  String   @default("CHUOI") @map("kieu_du_lieu") @db.VarChar(20) // CHUOI, SO, LOGIC, JSON
+  congKhai    Boolean  @default(true) @map("cong_khai")
+  ngayTao     DateTime @default(now()) @map("ngay_tao") @db.Timestamptz(6)
+  ngayCapNhat DateTime @updatedAt @map("ngay_cap_nhat") @db.Timestamptz(6)
+
+  @@map("cai_dat_he_thong")
+  @@index([nhom])
+}

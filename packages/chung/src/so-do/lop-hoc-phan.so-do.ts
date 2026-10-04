@@ -104,33 +104,38 @@ export type CapNhatThoiKhoaBieuInput = z.infer<typeof capNhatThoiKhoaBieuSchema>
 // 4. BUỔI HỌC
 // ==========================================
 
-export const taoBuoiHocSchema = z.object({
-  idLopHocPhan: z
-    .string({ required_error: 'Lớp học phần không được để trống' })
-    .uuid('ID lớp học phần phải là UUID hợp lệ'),
-  chuDe: z
-    .string({ required_error: 'Chủ đề buổi học không được để trống' })
-    .min(2, 'Chủ đề tối thiểu 2 ký tự')
-    .max(200, 'Chủ đề tối đa 200 ký tự'),
-  thoiGianBD: z
-    .string({ required_error: 'Thời gian bắt đầu không được để trống' })
-    .refine((val) => !isNaN(Date.parse(val)), 'Thời gian bắt đầu không hợp lệ'),
-  thoiGianKT: z
-    .string({ required_error: 'Thời gian kết thúc không được để trống' })
-    .refine((val) => !isNaN(Date.parse(val)), 'Thời gian kết thúc không hợp lệ'),
-  trangThai: z.nativeEnum(TrangThaiBuoiHoc).optional().default(TrangThaiBuoiHoc.CHUA_BAT_DAU),
-}).refine(
-  (data) => new Date(data.thoiGianBD) < new Date(data.thoiGianKT),
-  {
+export const taoBuoiHocSchema = z
+  .object({
+    idLopHocPhan: z
+      .string({ required_error: 'Lớp học phần không được để trống' })
+      .uuid('ID lớp học phần phải là UUID hợp lệ'),
+    chuDe: z
+      .string({ required_error: 'Chủ đề buổi học không được để trống' })
+      .min(2, 'Chủ đề tối thiểu 2 ký tự')
+      .max(200, 'Chủ đề tối đa 200 ký tự'),
+    thoiGianBD: z
+      .string({ required_error: 'Thời gian bắt đầu không được để trống' })
+      .refine((val) => !isNaN(Date.parse(val)), 'Thời gian bắt đầu không hợp lệ'),
+    thoiGianKT: z
+      .string({ required_error: 'Thời gian kết thúc không được để trống' })
+      .refine((val) => !isNaN(Date.parse(val)), 'Thời gian kết thúc không hợp lệ'),
+    trangThai: z.nativeEnum(TrangThaiBuoiHoc).optional().default(TrangThaiBuoiHoc.CHUA_BAT_DAU),
+  })
+  .refine((data) => new Date(data.thoiGianBD) < new Date(data.thoiGianKT), {
     message: 'Thời gian bắt đầu phải trước thời gian kết thúc',
     path: ['thoiGianKT'],
-  }
-);
+  });
 
 export const capNhatBuoiHocSchema = z.object({
   chuDe: z.string().min(2).max(200).optional(),
-  thoiGianBD: z.string().refine((val) => !isNaN(Date.parse(val)), 'Thời gian bắt đầu không hợp lệ').optional(),
-  thoiGianKT: z.string().refine((val) => !isNaN(Date.parse(val)), 'Thời gian kết thúc không hợp lệ').optional(),
+  thoiGianBD: z
+    .string()
+    .refine((val) => !isNaN(Date.parse(val)), 'Thời gian bắt đầu không hợp lệ')
+    .optional(),
+  thoiGianKT: z
+    .string()
+    .refine((val) => !isNaN(Date.parse(val)), 'Thời gian kết thúc không hợp lệ')
+    .optional(),
   trangThai: z.nativeEnum(TrangThaiBuoiHoc).optional(),
 });
 

@@ -55,18 +55,14 @@ export class DichVuPhongHoc {
     // 2. Kiểm soát phân quyền & chống IDOR
     let laChuTri = false;
 
-    if (
-      nguoiDung.vaiTro === VaiTro.QUAN_TRI_VIEN ||
-      nguoiDung.vaiTro === VaiTro.GIAO_VU
-    ) {
+    if (nguoiDung.vaiTro === VaiTro.QUAN_TRI_VIEN || nguoiDung.vaiTro === VaiTro.GIAO_VU) {
       laChuTri = true;
     } else if (nguoiDung.vaiTro === VaiTro.GIAO_VIEN) {
       // Giáo viên phải là người trực tiếp giảng dạy lớp này
       if (lopHocPhan.giaoVien?.idNguoiDung !== nguoiDung.id) {
         throw new ForbiddenException({
           thanhCong: false,
-          thongDiep:
-            'Bạn không phải giáo viên phụ trách lớp học phần này (Kiểm soát chống IDOR)',
+          thongDiep: 'Bạn không phải giáo viên phụ trách lớp học phần này (Kiểm soát chống IDOR)',
         });
       }
       laChuTri = true;
@@ -118,10 +114,8 @@ export class DichVuPhongHoc {
     // 4. Khởi tạo AccessToken LiveKit với phân quyền tương ứng
     const apiKey = this.configService.get<string>('LIVEKIT_API_KEY') || 'devkey';
     const apiSecret =
-      this.configService.get<string>('LIVEKIT_API_SECRET') ||
-      'secret_key_livekit_lms_2026';
-    const urlMayChuLiveKit =
-      this.configService.get<string>('LIVEKIT_URL') || 'ws://localhost:7880';
+      this.configService.get<string>('LIVEKIT_API_SECRET') || 'secret_key_livekit_lms_2026';
+    const urlMayChuLiveKit = this.configService.get<string>('LIVEKIT_URL') || 'ws://localhost:7880';
 
     const at = new AccessToken(apiKey, apiSecret, {
       identity: nguoiDung.id,
@@ -187,11 +181,7 @@ export class DichVuPhongHoc {
   /**
    * Bật / Tắt trạng thái mở phòng học
    */
-  async batTatPhongHoc(
-    idLopHocPhan: string,
-    dangMo: boolean,
-    nguoiDung: PayloadJwt,
-  ) {
+  async batTatPhongHoc(idLopHocPhan: string, dangMo: boolean, nguoiDung: PayloadJwt) {
     const phong = await this.khoPhongHoc.timPhongTheoLop(idLopHocPhan);
     if (!phong) {
       throw new NotFoundException({
@@ -202,10 +192,8 @@ export class DichVuPhongHoc {
 
     // Kiểm tra quyền: Giáo viên phụ trách hoặc Admin/Giáo vụ
     const laAdminHoacGiaoVu =
-      nguoiDung.vaiTro === VaiTro.QUAN_TRI_VIEN ||
-      nguoiDung.vaiTro === VaiTro.GIAO_VU;
-    const laGiaoVienPhuTrach =
-      phong.lopHocPhan?.giaoVien?.idNguoiDung === nguoiDung.id;
+      nguoiDung.vaiTro === VaiTro.QUAN_TRI_VIEN || nguoiDung.vaiTro === VaiTro.GIAO_VU;
+    const laGiaoVienPhuTrach = phong.lopHocPhan?.giaoVien?.idNguoiDung === nguoiDung.id;
 
     if (!laAdminHoacGiaoVu && !laGiaoVienPhuTrach) {
       throw new ForbiddenException({
@@ -224,8 +212,7 @@ export class DichVuPhongHoc {
   async xuLyWebhook(authorizationHeader: string, bodyRaw: string | Buffer) {
     const apiKey = this.configService.get<string>('LIVEKIT_API_KEY') || 'devkey';
     const apiSecret =
-      this.configService.get<string>('LIVEKIT_API_SECRET') ||
-      'secret_key_livekit_lms_2026';
+      this.configService.get<string>('LIVEKIT_API_SECRET') || 'secret_key_livekit_lms_2026';
 
     const receiver = new WebhookReceiver(apiKey, apiSecret);
     let event: any;
@@ -251,9 +238,7 @@ export class DichVuPhongHoc {
     const phong = await this.khoPhongHoc.timTheoTenPhong(tenPhong);
     if (!phong) return { thanhCong: true };
 
-    const buoiHocHienTai = await this.khoPhongHoc.timBuoiHocHienTai(
-      phong.idLopHocPhan,
-    );
+    const buoiHocHienTai = await this.khoPhongHoc.timBuoiHocHienTai(phong.idLopHocPhan);
 
     switch (suKien) {
       case 'room_started':
@@ -298,10 +283,7 @@ export class DichVuPhongHoc {
 
       case 'participant_left':
         if (event.participant?.identity && buoiHocHienTai) {
-          await this.khoPhongHoc.ghiNhatKyRoi(
-            buoiHocHienTai.id,
-            event.participant.identity,
-          );
+          await this.khoPhongHoc.ghiNhatKyRoi(buoiHocHienTai.id, event.participant.identity);
         }
         break;
 
@@ -315,11 +297,7 @@ export class DichVuPhongHoc {
   /**
    * Lấy báo cáo điểm danh và nhật ký tham gia của buổi học
    */
-  async layBaoCaoBuoiHoc(
-    idLopHocPhan: string,
-    idBuoiHoc: string,
-    nguoiDung: PayloadJwt,
-  ) {
+  async layBaoCaoBuoiHoc(idLopHocPhan: string, idBuoiHoc: string, nguoiDung: PayloadJwt) {
     // 1. Kiểm tra quyền truy cập lớp học phần
     const lopHocPhan = await this.prisma.lopHocPhan.findUnique({
       where: { id: idLopHocPhan },

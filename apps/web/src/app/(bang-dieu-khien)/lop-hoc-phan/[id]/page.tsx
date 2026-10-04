@@ -65,7 +65,11 @@ export default function TrangChiTietLopHocPhan({ params }: { params: Promise<{ i
   });
 
   // Lấy chi tiết lớp
-  const { data: lopHocPhan, isLoading: dangTaiLop, error: loiLop } = useQuery<LopHocPhan>({
+  const {
+    data: lopHocPhan,
+    isLoading: dangTaiLop,
+    error: loiLop,
+  } = useQuery<LopHocPhan>({
     queryKey: ['chi-tiet-lop', id],
     queryFn: async () => {
       const res = await mayKhachApi.get(`/lop-hoc-phan/${id}`);
@@ -186,7 +190,10 @@ export default function TrangChiTietLopHocPhan({ params }: { params: Promise<{ i
       setIdLopHanhChinhChon('');
       setThongBaoLoi(null);
       setThongBaoThanhCong('Ghi danh theo lớp hành chính thành công');
-      thongBao.thanhCong('Ghi danh theo lớp thành công!', 'Toàn bộ học sinh trong lớp sinh hoạt đã được thêm vào lớp học phần.');
+      thongBao.thanhCong(
+        'Ghi danh theo lớp thành công!',
+        'Toàn bộ học sinh trong lớp sinh hoạt đã được thêm vào lớp học phần.',
+      );
     },
     onError: (err: any) => {
       const msg = err.response?.data?.thongDiep || 'Lỗi khi ghi danh theo lớp';
@@ -232,7 +239,9 @@ export default function TrangChiTietLopHocPhan({ params }: { params: Promise<{ i
   const laGiaoVien = nguoiDungHienTai?.vaiTro === VaiTro.GIAO_VIEN;
 
   if (dangTaiLop) {
-    return <div className="text-center py-20 text-slate-400">Đang tải thông tin lớp học phần...</div>;
+    return (
+      <div className="text-center py-20 text-slate-400">Đang tải thông tin lớp học phần...</div>
+    );
   }
 
   if (loiLop || !lopHocPhan) {
@@ -281,7 +290,10 @@ export default function TrangChiTietLopHocPhan({ params }: { params: Promise<{ i
           <span className="flex items-center gap-2">
             <CheckCircle2 className="w-4 h-4 shrink-0" /> {thongBaoThanhCong}
           </span>
-          <button onClick={() => setThongBaoThanhCong(null)} className="text-xs font-bold underline">
+          <button
+            onClick={() => setThongBaoThanhCong(null)}
+            className="text-xs font-bold underline"
+          >
             Đóng
           </button>
         </div>
@@ -368,7 +380,9 @@ export default function TrangChiTietLopHocPhan({ params }: { params: Promise<{ i
             <div className="flex items-center justify-between">
               <div>
                 <h3 className="font-bold text-slate-900 text-base">Lịch học tuần định kỳ</h3>
-                <p className="text-xs text-slate-500">Các tiết học cố định lặp lại theo tuần trong học kỳ</p>
+                <p className="text-xs text-slate-500">
+                  Các tiết học cố định lặp lại theo tuần trong học kỳ
+                </p>
               </div>
 
               {(laAdminHoacGiaoVu || laGiaoVien) && (
@@ -400,7 +414,9 @@ export default function TrangChiTietLopHocPhan({ params }: { params: Promise<{ i
 
             <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
               {dangTaiTkb ? (
-                <div className="col-span-3 text-center py-6 text-slate-400">Đang tải lịch học...</div>
+                <div className="col-span-3 text-center py-6 text-slate-400">
+                  Đang tải lịch học...
+                </div>
               ) : danhSachTkb && danhSachTkb.length > 0 ? (
                 danhSachTkb.map((tkb) => (
                   <div
@@ -412,9 +428,12 @@ export default function TrangChiTietLopHocPhan({ params }: { params: Promise<{ i
                         Thứ {tkb.thuTrongTuan === 8 ? 'CN' : tkb.thuTrongTuan}
                       </span>
                       <p className="text-sm font-semibold text-slate-800">
-                        Tiết {tkb.tietBatDau} - Tiết {tkb.tietBatDau + tkb.soTiet - 1} ({tkb.soTiet} tiết)
+                        Tiết {tkb.tietBatDau} - Tiết {tkb.tietBatDau + tkb.soTiet - 1} ({tkb.soTiet}{' '}
+                        tiết)
                       </p>
-                      <p className="text-xs text-slate-500">Phòng: {tkb.phongHoc || 'Trực tuyến LiveKit'}</p>
+                      <p className="text-xs text-slate-500">
+                        Phòng: {tkb.phongHoc || 'Trực tuyến LiveKit'}
+                      </p>
                     </div>
 
                     {(laAdminHoacGiaoVu || laGiaoVien) && (
@@ -458,7 +477,8 @@ export default function TrangChiTietLopHocPhan({ params }: { params: Promise<{ i
                 ))
               ) : (
                 <div className="text-center py-8 text-slate-400 italic">
-                  Chưa có buổi học nào. Nhấn &quot;Tự động sinh buổi học&quot; để sinh lịch học theo thời khóa biểu.
+                  Chưa có buổi học nào. Nhấn &quot;Tự động sinh buổi học&quot; để sinh lịch học theo
+                  thời khóa biểu.
                 </div>
               )}
             </div>
@@ -519,7 +539,9 @@ export default function TrangChiTietLopHocPhan({ params }: { params: Promise<{ i
                         {gd.hocSinh?.maHocSinh}
                       </td>
                       <td className="py-3 px-4">
-                        <p className="font-semibold text-slate-800">{gd.hocSinh?.nguoiDung.hoTen}</p>
+                        <p className="font-semibold text-slate-800">
+                          {gd.hocSinh?.nguoiDung.hoTen}
+                        </p>
                         <p className="text-xs text-slate-400">{gd.hocSinh?.nguoiDung.email}</p>
                       </td>
                       <td className="py-3 px-4">
@@ -572,10 +594,14 @@ export default function TrangChiTietLopHocPhan({ params }: { params: Promise<{ i
             )}
             <div className="space-y-3">
               <div>
-                <label className="block text-xs font-medium text-slate-700 mb-1">Thứ trong tuần</label>
+                <label className="block text-xs font-medium text-slate-700 mb-1">
+                  Thứ trong tuần
+                </label>
                 <select
                   value={formTkb.thuTrongTuan}
-                  onChange={(e) => setFormTkb({ ...formTkb, thuTrongTuan: parseInt(e.target.value) || 2 })}
+                  onChange={(e) =>
+                    setFormTkb({ ...formTkb, thuTrongTuan: parseInt(e.target.value) || 2 })
+                  }
                   className="w-full px-3 py-2 border border-slate-300 rounded-lg text-sm bg-white focus:ring-2 focus:ring-indigo-500"
                 >
                   <option value={2}>Thứ Hai</option>
@@ -590,13 +616,17 @@ export default function TrangChiTietLopHocPhan({ params }: { params: Promise<{ i
 
               <div className="grid grid-cols-2 gap-3">
                 <div>
-                  <label className="block text-xs font-medium text-slate-700 mb-1">Tiết bắt đầu</label>
+                  <label className="block text-xs font-medium text-slate-700 mb-1">
+                    Tiết bắt đầu
+                  </label>
                   <input
                     type="number"
                     min={1}
                     max={12}
                     value={formTkb.tietBatDau}
-                    onChange={(e) => setFormTkb({ ...formTkb, tietBatDau: parseInt(e.target.value) || 1 })}
+                    onChange={(e) =>
+                      setFormTkb({ ...formTkb, tietBatDau: parseInt(e.target.value) || 1 })
+                    }
                     className="w-full px-3 py-2 border border-slate-300 rounded-lg text-sm focus:ring-2 focus:ring-indigo-500"
                   />
                 </div>
@@ -607,7 +637,9 @@ export default function TrangChiTietLopHocPhan({ params }: { params: Promise<{ i
                     min={1}
                     max={5}
                     value={formTkb.soTiet}
-                    onChange={(e) => setFormTkb({ ...formTkb, soTiet: parseInt(e.target.value) || 1 })}
+                    onChange={(e) =>
+                      setFormTkb({ ...formTkb, soTiet: parseInt(e.target.value) || 1 })
+                    }
                     className="w-full px-3 py-2 border border-slate-300 rounded-lg text-sm focus:ring-2 focus:ring-indigo-500"
                   />
                 </div>
@@ -667,7 +699,8 @@ export default function TrangChiTietLopHocPhan({ params }: { params: Promise<{ i
                 <option value="">-- Chọn học sinh từ danh sách --</option>
                 {tatCaHocSinh?.map((hs: any) => (
                   <option key={hs.id} value={hs.id}>
-                    {hs.maHocSinh} - {hs.nguoiDung.hoTen} ({hs.lopHanhChinh?.tenLop || 'Chưa xếp lớp'})
+                    {hs.maHocSinh} - {hs.nguoiDung.hoTen} (
+                    {hs.lopHanhChinh?.tenLop || 'Chưa xếp lớp'})
                   </option>
                 ))}
               </select>
@@ -699,7 +732,8 @@ export default function TrangChiTietLopHocPhan({ params }: { params: Promise<{ i
           <div className="bg-white rounded-xl shadow-xl max-w-md w-full p-6 space-y-4">
             <h3 className="text-lg font-bold text-slate-900">Ghi danh theo Lớp hành chính</h3>
             <p className="text-xs text-slate-500">
-              Toàn bộ học sinh thuộc lớp hành chính được chọn sẽ được tự động ghi danh vào lớp học phần này.
+              Toàn bộ học sinh thuộc lớp hành chính được chọn sẽ được tự động ghi danh vào lớp học
+              phần này.
             </p>
             {thongBaoLoi && (
               <div className="p-3 bg-rose-50 text-rose-700 text-xs rounded-lg flex items-center gap-2">
@@ -708,7 +742,9 @@ export default function TrangChiTietLopHocPhan({ params }: { params: Promise<{ i
               </div>
             )}
             <div>
-              <label className="block text-xs font-medium text-slate-700 mb-1">Chọn lớp hành chính</label>
+              <label className="block text-xs font-medium text-slate-700 mb-1">
+                Chọn lớp hành chính
+              </label>
               <select
                 value={idLopHanhChinhChon}
                 onChange={(e) => setIdLopHanhChinhChon(e.target.value)}

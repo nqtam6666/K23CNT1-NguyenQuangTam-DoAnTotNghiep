@@ -60,7 +60,14 @@ export class DichVuXacThuc {
       vaiTro: duLieu.vaiTro || VaiTro.HOC_SINH,
     });
 
-    return this.taoCapToken(nguoiDungMoi.id, nguoiDungMoi.email, nguoiDungMoi.hoTen, nguoiDungMoi.vaiTro as VaiTro, thongTinThietBi, diaChiIp);
+    return this.taoCapToken(
+      nguoiDungMoi.id,
+      nguoiDungMoi.email,
+      nguoiDungMoi.hoTen,
+      nguoiDungMoi.vaiTro as VaiTro,
+      thongTinThietBi,
+      diaChiIp,
+    );
   }
 
   /**

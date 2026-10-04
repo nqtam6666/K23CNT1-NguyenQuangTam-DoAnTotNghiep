@@ -19,6 +19,7 @@ async function main() {
     where: { email: 'admin@lms.edu.vn' },
     update: {
       hoTen: 'Quản Trị Viên Hệ Thống',
+      matKhau: matKhauHash,
       vaiTro: VaiTro.QUAN_TRI_VIEN,
       kichHoat: true,
     },
@@ -38,6 +39,7 @@ async function main() {
     where: { email: 'giaovu@lms.edu.vn' },
     update: {
       hoTen: 'Nguyễn Thị Giáo Vụ',
+      matKhau: matKhauHash,
       vaiTro: VaiTro.GIAO_VU,
       kichHoat: true,
     },
@@ -57,6 +59,7 @@ async function main() {
     where: { email: 'giaovien1@lms.edu.vn' },
     update: {
       hoTen: 'Trần Văn Giáo Viên',
+      matKhau: matKhauHash,
       vaiTro: VaiTro.GIAO_VIEN,
       kichHoat: true,
     },
@@ -166,6 +169,7 @@ async function main() {
     where: { email: 'hocsinh1@lms.edu.vn' },
     update: {
       hoTen: 'Lê Hoàng Học Sinh',
+      matKhau: matKhauHash,
       vaiTro: VaiTro.HOC_SINH,
       kichHoat: true,
     },
@@ -202,6 +206,7 @@ async function main() {
     where: { email: 'phuhuynh1@lms.edu.vn' },
     update: {
       hoTen: 'Phạm Văn Phụ Huynh',
+      matKhau: matKhauHash,
       vaiTro: VaiTro.PHU_HUYNH,
       kichHoat: true,
     },
@@ -232,6 +237,122 @@ async function main() {
     },
   });
   console.log('✓ Phụ huynh:', phuHuynh.hoTen, 'liên kết với học sinh:', hocSinh.hoTen);
+
+  // 9. Cài đặt hệ thống mặc định (Settings)
+  const danhSachCaiDatMacDinh = [
+    {
+      khoa: 'TEN_HE_THONG',
+      giaTri: 'LMS Trường Học',
+      nhom: 'CHUNG',
+      moTa: 'Tên hiển thị thương hiệu của toàn hệ thống',
+      kieuDuLieu: 'CHUOI',
+      congKhai: true,
+    },
+    {
+      khoa: 'KHAU_HIEU',
+      giaTri: 'Hệ thống Quản lý Học tập Thế hệ Mới',
+      nhom: 'CHUNG',
+      moTa: 'Khẩu hiệu / Slogan hiển thị ở đầu trang và banner',
+      kieuDuLieu: 'CHUOI',
+      congKhai: true,
+    },
+    {
+      khoa: 'TEN_TRUONG',
+      giaTri: 'Trường Đại học Công nghệ',
+      nhom: 'CHUNG',
+      moTa: 'Tên cơ sở giáo dục hoặc viện đào tạo',
+      kieuDuLieu: 'CHUOI',
+      congKhai: true,
+    },
+    {
+      khoa: 'TAC_GIA',
+      giaTri: 'Nguyễn Quang Tâm',
+      nhom: 'CHUNG',
+      moTa: 'Tác giả / Sinh viên thực hiện đồ án',
+      kieuDuLieu: 'CHUOI',
+      congKhai: true,
+    },
+    {
+      khoa: 'MA_LOP_KHOA',
+      giaTri: 'K23CNT1',
+      nhom: 'CHUNG',
+      moTa: 'Lớp sinh hoạt / Khóa học của tác giả',
+      kieuDuLieu: 'CHUOI',
+      congKhai: true,
+    },
+    {
+      khoa: 'MSSV',
+      giaTri: '2310900093',
+      nhom: 'CHUNG',
+      moTa: 'Mã số sinh viên thực hiện đồ án',
+      kieuDuLieu: 'CHUOI',
+      congKhai: true,
+    },
+    {
+      khoa: 'EMAIL_LIEN_HE',
+      giaTri: 'nguyenquangtam179@gmail.com',
+      nhom: 'LIEN_HE',
+      moTa: 'Hòm thư điện tử tiếp nhận liên hệ và hỗ trợ',
+      kieuDuLieu: 'CHUOI',
+      congKhai: true,
+    },
+    {
+      khoa: 'SO_DIEN_THOAI',
+      giaTri: '0987654321',
+      nhom: 'LIEN_HE',
+      moTa: 'Số điện thoại hotline hỗ trợ kỹ thuật',
+      kieuDuLieu: 'CHUOI',
+      congKhai: true,
+    },
+    {
+      khoa: 'BANNER_TIEU_DE',
+      giaTri: 'Nền tảng Học tập Toàn diện Tích hợp Phòng học LiveKit & Trợ lý AI',
+      nhom: 'GIAO_DIEN',
+      moTa: 'Tiêu đề chính trên trang bìa (Landing page)',
+      kieuDuLieu: 'CHUOI',
+      congKhai: true,
+    },
+    {
+      khoa: 'BANNER_MO_TA',
+      giaTri:
+        'Đồ án tốt nghiệp chuyên ngành Công nghệ Thông tin (K23CNT1 - Sinh viên Nguyễn Quang Tâm). Tối ưu hóa trải nghiệm giảng dạy trực tuyến, quản lý học vụ và hỗ trợ học tập thông minh.',
+      nhom: 'GIAO_DIEN',
+      moTa: 'Đoạn giới thiệu tóm tắt bên dưới tiêu đề trang chủ',
+      kieuDuLieu: 'CHUOI',
+      congKhai: true,
+    },
+    {
+      khoa: 'CHO_PHEP_DANG_KY',
+      giaTri: 'true',
+      nhom: 'HOC_VU',
+      moTa: 'Cho phép người dùng tự đăng ký tài khoản mới trên giao diện khách',
+      kieuDuLieu: 'LOGIC',
+      congKhai: true,
+    },
+    {
+      khoa: 'THONG_BAO_CHUNG',
+      giaTri: 'Chào mừng bạn đến với Hệ thống Quản lý Học tập LMS Trường học!',
+      nhom: 'CHUNG',
+      moTa: 'Thông báo ghim trên toàn hệ thống',
+      kieuDuLieu: 'CHUOI',
+      congKhai: true,
+    },
+  ];
+
+  for (const cd of danhSachCaiDatMacDinh) {
+    await prisma.caiDatHeThong.upsert({
+      where: { khoa: cd.khoa },
+      update: {
+        giaTri: cd.giaTri,
+        nhom: cd.nhom,
+        moTa: cd.moTa,
+        kieuDuLieu: cd.kieuDuLieu,
+        congKhai: cd.congKhai,
+      },
+      create: cd,
+    });
+  }
+  console.log(`✓ Đã nạp ${danhSachCaiDatMacDinh.length} thiết lập cài đặt hệ thống mẫu.`);
 
   console.log('--- Hoàn thành gieo mầm dữ liệu chuẩn mực ---');
 }

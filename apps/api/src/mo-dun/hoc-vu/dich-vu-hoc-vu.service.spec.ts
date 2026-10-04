@@ -38,10 +38,7 @@ describe('DichVuHocVuService', () => {
     };
 
     const module: TestingModule = await Test.createTestingModule({
-      providers: [
-        DichVuHocVuService,
-        { provide: KhoHocVuRepository, useValue: khoMock },
-      ],
+      providers: [DichVuHocVuService, { provide: KhoHocVuRepository, useValue: khoMock }],
     }).compile();
 
     dichVu = module.get<DichVuHocVuService>(DichVuHocVuService);

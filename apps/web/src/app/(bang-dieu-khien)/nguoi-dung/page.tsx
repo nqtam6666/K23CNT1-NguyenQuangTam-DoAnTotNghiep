@@ -18,12 +18,7 @@ import {
   Shield,
   X,
 } from 'lucide-react';
-import {
-  taoNguoiDungSchema,
-  TaoNguoiDungDto,
-  VaiTro,
-  DANH_SACH_VAI_TRO,
-} from '@lms/chung';
+import { taoNguoiDungSchema, TaoNguoiDungDto, VaiTro, DANH_SACH_VAI_TRO } from '@lms/chung';
 import { mayKhachApi } from '../../../tien-ich/may-khach-api';
 import { thongBao } from '../../../tien-ich/thong-bao';
 
@@ -202,7 +197,9 @@ export default function TrangQuanLyNguoiDung() {
           <div className="py-16 text-center text-slate-500">
             <Users className="w-12 h-12 text-slate-300 mx-auto mb-3" />
             <p className="font-medium text-slate-700">Chưa tìm thấy người dùng nào</p>
-            <p className="text-xs text-slate-400 mt-1">Thử thay đổi bộ lọc hoặc thêm tài khoản mới.</p>
+            <p className="text-xs text-slate-400 mt-1">
+              Thử thay đổi bộ lọc hoặc thêm tài khoản mới.
+            </p>
           </div>
         ) : (
           <div className="overflow-x-auto">
@@ -280,7 +277,11 @@ export default function TrangQuanLyNguoiDung() {
                               : 'text-slate-400 hover:text-emerald-600 hover:bg-emerald-50'
                           }`}
                         >
-                          {item.kichHoat ? <Lock className="w-4 h-4" /> : <Unlock className="w-4 h-4" />}
+                          {item.kichHoat ? (
+                            <Lock className="w-4 h-4" />
+                          ) : (
+                            <Unlock className="w-4 h-4" />
+                          )}
                         </button>
                       </div>
                     </td>

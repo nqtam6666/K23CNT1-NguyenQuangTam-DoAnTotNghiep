@@ -146,7 +146,8 @@ export default function TrangQuanLyHocVu() {
   });
 
   const taoLopMutation = useMutation({
-    mutationFn: (duLieu: TaoLopHanhChinhInput) => mayKhachApi.post('/hoc-vu/lop-hanh-chinh', duLieu),
+    mutationFn: (duLieu: TaoLopHanhChinhInput) =>
+      mayKhachApi.post('/hoc-vu/lop-hanh-chinh', duLieu),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['lop-hanh-chinh'] });
       setMoModalLopHanhChinh(false);
@@ -165,7 +166,9 @@ export default function TrangQuanLyHocVu() {
       {/* Header */}
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
         <div>
-          <h1 className="text-2xl font-bold tracking-tight text-slate-900">Quản lý Học vụ & Đào tạo</h1>
+          <h1 className="text-2xl font-bold tracking-tight text-slate-900">
+            Quản lý Học vụ & Đào tạo
+          </h1>
           <p className="text-sm text-slate-500 mt-1">
             Thiết lập danh mục năm học, học kỳ, môn học và lớp hành chính của nhà trường
           </p>
@@ -237,7 +240,9 @@ export default function TrangQuanLyHocVu() {
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             {dangTaiNamHoc ? (
-              <div className="col-span-2 text-center py-12 text-slate-400">Đang tải dữ liệu năm học...</div>
+              <div className="col-span-2 text-center py-12 text-slate-400">
+                Đang tải dữ liệu năm học...
+              </div>
             ) : danhSachNamHoc && danhSachNamHoc.length > 0 ? (
               danhSachNamHoc.map((nh: any) => (
                 <div
@@ -252,7 +257,9 @@ export default function TrangQuanLyHocVu() {
                         <Calendar className="w-5 h-5" />
                       </div>
                       <div>
-                        <h3 className="font-semibold text-slate-800 text-base">Năm học {nh.tenNamHoc}</h3>
+                        <h3 className="font-semibold text-slate-800 text-base">
+                          Năm học {nh.tenNamHoc}
+                        </h3>
                         {nh.hienTai ? (
                           <span className="inline-flex items-center gap-1 text-xs text-emerald-600 font-medium mt-0.5">
                             <CheckCircle2 className="w-3.5 h-3.5" /> Năm học hiện tại
@@ -307,7 +314,9 @@ export default function TrangQuanLyHocVu() {
                         </div>
                       ))
                     ) : (
-                      <p className="text-xs text-slate-400 italic">Chưa có học kỳ nào được cấu hình</p>
+                      <p className="text-xs text-slate-400 italic">
+                        Chưa có học kỳ nào được cấu hình
+                      </p>
                     )}
                   </div>
                 </div>
@@ -369,7 +378,9 @@ export default function TrangQuanLyHocVu() {
                 ) : ketQuaMonHoc?.duLieu && ketQuaMonHoc.duLieu.length > 0 ? (
                   ketQuaMonHoc.duLieu.map((mh: any) => (
                     <tr key={mh.id} className="hover:bg-slate-50/80 transition-colors">
-                      <td className="py-3 px-4 font-mono font-semibold text-indigo-600">{mh.maMonHoc}</td>
+                      <td className="py-3 px-4 font-mono font-semibold text-indigo-600">
+                        {mh.maMonHoc}
+                      </td>
                       <td className="py-3 px-4 font-medium text-slate-900">{mh.tenMonHoc}</td>
                       <td className="py-3 px-4 text-center">{mh.soTinChi}</td>
                       <td className="py-3 px-4 text-center">
@@ -377,7 +388,9 @@ export default function TrangQuanLyHocVu() {
                           {mh._count?.cacLopHocPhan || 0} lớp
                         </span>
                       </td>
-                      <td className="py-3 px-4 text-xs text-slate-500 max-w-xs truncate">{mh.moTa || '—'}</td>
+                      <td className="py-3 px-4 text-xs text-slate-500 max-w-xs truncate">
+                        {mh.moTa || '—'}
+                      </td>
                     </tr>
                   ))
                 ) : (
@@ -431,7 +444,9 @@ export default function TrangQuanLyHocVu() {
                 ) : ketQuaLopHanhChinh?.duLieu && ketQuaLopHanhChinh.duLieu.length > 0 ? (
                   ketQuaLopHanhChinh.duLieu.map((lop: any) => (
                     <tr key={lop.id} className="hover:bg-slate-50/80 transition-colors">
-                      <td className="py-3 px-4 font-mono font-semibold text-indigo-600">{lop.maLop}</td>
+                      <td className="py-3 px-4 font-mono font-semibold text-indigo-600">
+                        {lop.maLop}
+                      </td>
                       <td className="py-3 px-4 font-medium text-slate-900">{lop.tenLop}</td>
                       <td className="py-3 px-4 text-center">
                         <span className="px-2 py-0.5 bg-indigo-50 text-indigo-700 rounded text-xs font-semibold">
@@ -441,8 +456,12 @@ export default function TrangQuanLyHocVu() {
                       <td className="py-3 px-4">
                         {lop.giaoVienChuNhiem ? (
                           <div>
-                            <p className="font-medium text-slate-800">{lop.giaoVienChuNhiem.nguoiDung.hoTen}</p>
-                            <p className="text-xs text-slate-400">{lop.giaoVienChuNhiem.nguoiDung.email}</p>
+                            <p className="font-medium text-slate-800">
+                              {lop.giaoVienChuNhiem.nguoiDung.hoTen}
+                            </p>
+                            <p className="text-xs text-slate-400">
+                              {lop.giaoVienChuNhiem.nguoiDung.email}
+                            </p>
                           </div>
                         ) : (
                           <span className="text-xs text-slate-400 italic">Chưa phân công</span>
@@ -550,7 +569,9 @@ export default function TrangQuanLyHocVu() {
               </div>
               <div className="grid grid-cols-2 gap-3">
                 <div>
-                  <label className="block text-xs font-medium text-slate-700 mb-1">Ngày bắt đầu</label>
+                  <label className="block text-xs font-medium text-slate-700 mb-1">
+                    Ngày bắt đầu
+                  </label>
                   <input
                     type="date"
                     value={formHocKy.ngayBatDau}
@@ -559,7 +580,9 @@ export default function TrangQuanLyHocVu() {
                   />
                 </div>
                 <div>
-                  <label className="block text-xs font-medium text-slate-700 mb-1">Ngày kết thúc</label>
+                  <label className="block text-xs font-medium text-slate-700 mb-1">
+                    Ngày kết thúc
+                  </label>
                   <input
                     type="date"
                     value={formHocKy.ngayKetThuc}
@@ -652,7 +675,9 @@ export default function TrangQuanLyHocVu() {
                 />
               </div>
               <div>
-                <label className="block text-xs font-medium text-slate-700 mb-1">Mô tả môn học</label>
+                <label className="block text-xs font-medium text-slate-700 mb-1">
+                  Mô tả môn học
+                </label>
                 <textarea
                   rows={2}
                   placeholder="Mô tả tóm tắt nội dung môn học..."
@@ -702,7 +727,10 @@ export default function TrangQuanLyHocVu() {
                   placeholder="Ví dụ: 10A1, 11B2"
                   value={formLopHanhChinh.maLop}
                   onChange={(e) =>
-                    setFormLopHanhChinh({ ...formLopHanhChinh, maLop: e.target.value.toUpperCase() })
+                    setFormLopHanhChinh({
+                      ...formLopHanhChinh,
+                      maLop: e.target.value.toUpperCase(),
+                    })
                   }
                   className="w-full px-3 py-2 border border-slate-300 rounded-lg text-sm font-mono focus:ring-2 focus:ring-indigo-500 focus:outline-none uppercase"
                 />
@@ -713,7 +741,9 @@ export default function TrangQuanLyHocVu() {
                   type="text"
                   placeholder="Ví dụ: Lớp 10A1 Chuyên Toán"
                   value={formLopHanhChinh.tenLop}
-                  onChange={(e) => setFormLopHanhChinh({ ...formLopHanhChinh, tenLop: e.target.value })}
+                  onChange={(e) =>
+                    setFormLopHanhChinh({ ...formLopHanhChinh, tenLop: e.target.value })
+                  }
                   className="w-full px-3 py-2 border border-slate-300 rounded-lg text-sm focus:ring-2 focus:ring-indigo-500 focus:outline-none"
                 />
               </div>
@@ -722,7 +752,10 @@ export default function TrangQuanLyHocVu() {
                 <select
                   value={formLopHanhChinh.khoiLop}
                   onChange={(e) =>
-                    setFormLopHanhChinh({ ...formLopHanhChinh, khoiLop: parseInt(e.target.value) || 10 })
+                    setFormLopHanhChinh({
+                      ...formLopHanhChinh,
+                      khoiLop: parseInt(e.target.value) || 10,
+                    })
                   }
                   className="w-full px-3 py-2 border border-slate-300 rounded-lg text-sm focus:ring-2 focus:ring-indigo-500 focus:outline-none bg-white"
                 >

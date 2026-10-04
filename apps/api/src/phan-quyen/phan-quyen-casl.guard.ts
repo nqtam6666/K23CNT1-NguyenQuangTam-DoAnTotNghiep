@@ -1,9 +1,4 @@
-import {
-  Injectable,
-  CanActivate,
-  ExecutionContext,
-  ForbiddenException,
-} from '@nestjs/common';
+import { Injectable, CanActivate, ExecutionContext, ForbiddenException } from '@nestjs/common';
 import { Reflector } from '@nestjs/core';
 import { NhaMayQuyenHan } from './nha-may-quyen-han.factory';
 import { KHOA_QUYEN_HAN, YeuCauQuyenHan } from '../cot-loi/trang-tri/kiem-tra-quyen.decorator';

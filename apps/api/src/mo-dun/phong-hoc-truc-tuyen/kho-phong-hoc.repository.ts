@@ -91,7 +91,14 @@ export class KhoPhongHoc {
 
     // 2. Tìm buổi học gần nhất trong ngày hôm nay
     const dauNgay = new Date(bayGio.getFullYear(), bayGio.getMonth(), bayGio.getDate(), 0, 0, 0);
-    const cuoiNgay = new Date(bayGio.getFullYear(), bayGio.getMonth(), bayGio.getDate(), 23, 59, 59);
+    const cuoiNgay = new Date(
+      bayGio.getFullYear(),
+      bayGio.getMonth(),
+      bayGio.getDate(),
+      23,
+      59,
+      59,
+    );
 
     return this.prisma.buoiHoc.findFirst({
       where: {

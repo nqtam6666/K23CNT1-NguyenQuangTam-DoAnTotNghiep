@@ -78,8 +78,7 @@ export function HopThoai({
         // 2. VÀ mousedown cũng bắt đầu từ nền tối (chuotNhanVaoNenRef.current === true)
         // Nếu người dùng bôi đen kéo chữ từ trong modal ra ngoài thì chuotNhanVaoNenRef.current là false -> KHÔNG ĐÓNG!
         const laClickHopLe =
-          e.target === e.currentTarget &&
-          (chuotNhanVaoNenRef.current || e.detail === 0);
+          e.target === e.currentTarget && (chuotNhanVaoNenRef.current || e.detail === 0);
 
         if (laClickHopLe) {
           onDong();
@@ -108,9 +107,7 @@ export function HopThoai({
         </div>
 
         {/* Nội dung bên trong hộp thoại */}
-        <div className="flex-1 overflow-y-auto pr-1 -mr-1 space-y-4">
-          {children}
-        </div>
+        <div className="flex-1 overflow-y-auto pr-1 -mr-1 space-y-4">{children}</div>
       </div>
     </div>,
     document.body,

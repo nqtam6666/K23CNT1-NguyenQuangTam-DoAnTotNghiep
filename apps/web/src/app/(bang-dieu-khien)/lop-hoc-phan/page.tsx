@@ -97,7 +97,10 @@ export default function TrangLopHocPhan() {
       setMoModalThamGia(false);
       setMaThamGia('');
       setThongBaoLoi(null);
-      thongBao.thanhCong('Ghi danh thành công!', res.data?.thongDiep || 'Bạn đã tham gia lớp học phần thành công.');
+      thongBao.thanhCong(
+        'Ghi danh thành công!',
+        res.data?.thongDiep || 'Bạn đã tham gia lớp học phần thành công.',
+      );
     },
     onError: (err: any) => {
       const msg = err.response?.data?.thongDiep || 'Mã tham gia không hợp lệ hoặc lỗi kết nối';
@@ -120,7 +123,10 @@ export default function TrangLopHocPhan() {
         moTa: '',
       });
       setThongBaoLoi(null);
-      thongBao.thanhCong('Tạo lớp học phần thành công!', 'Lớp học phần mới đã được khởi tạo trên hệ thống.');
+      thongBao.thanhCong(
+        'Tạo lớp học phần thành công!',
+        'Lớp học phần mới đã được khởi tạo trên hệ thống.',
+      );
     },
     onError: (err: any) => {
       const msg = err.response?.data?.thongDiep || 'Lỗi khi tạo lớp học phần';
@@ -140,7 +146,9 @@ export default function TrangLopHocPhan() {
       {/* Header */}
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
         <div>
-          <h1 className="text-2xl font-bold tracking-tight text-slate-900">Không gian Lớp học phần</h1>
+          <h1 className="text-2xl font-bold tracking-tight text-slate-900">
+            Không gian Lớp học phần
+          </h1>
           <p className="text-sm text-slate-500 mt-1">
             Không gian học tập trực tuyến tích hợp phòng LiveKit SFU, tài liệu và thời khóa biểu
           </p>
@@ -227,9 +235,7 @@ export default function TrangLopHocPhan() {
                     <span className="text-slate-400 flex items-center gap-1">
                       <Calendar className="w-3.5 h-3.5" /> Học kỳ:
                     </span>
-                    <span className="font-medium text-slate-800">
-                      {lop.hocKy?.tenHocKy || '—'}
-                    </span>
+                    <span className="font-medium text-slate-800">{lop.hocKy?.tenHocKy || '—'}</span>
                   </div>
 
                   <div className="flex items-center justify-between">
@@ -345,7 +351,9 @@ export default function TrangLopHocPhan() {
         <div className="space-y-4">
           <div className="space-y-3">
             <div>
-              <label className="block text-xs font-semibold text-slate-700 mb-1">Mã lớp học phần</label>
+              <label className="block text-xs font-semibold text-slate-700 mb-1">
+                Mã lớp học phần
+              </label>
               <input
                 type="text"
                 placeholder="VD: LHP_TOAN_10A1"
@@ -358,7 +366,9 @@ export default function TrangLopHocPhan() {
             </div>
 
             <div>
-              <label className="block text-xs font-semibold text-slate-700 mb-1">Tên lớp học phần</label>
+              <label className="block text-xs font-semibold text-slate-700 mb-1">
+                Tên lớp học phần
+              </label>
               <input
                 type="text"
                 placeholder="VD: Toán 10 - Lớp nâng cao A1"
@@ -403,7 +413,9 @@ export default function TrangLopHocPhan() {
             </div>
 
             <div>
-              <label className="block text-xs font-semibold text-slate-700 mb-1">Giáo viên phụ trách</label>
+              <label className="block text-xs font-semibold text-slate-700 mb-1">
+                Giáo viên phụ trách
+              </label>
               <select
                 value={formTaoLop.idGiaoVien}
                 onChange={(e) => setFormTaoLop({ ...formTaoLop, idGiaoVien: e.target.value })}
@@ -419,7 +431,9 @@ export default function TrangLopHocPhan() {
             </div>
 
             <div>
-              <label className="block text-xs font-semibold text-slate-700 mb-1">Mô tả tóm tắt</label>
+              <label className="block text-xs font-semibold text-slate-700 mb-1">
+                Mô tả tóm tắt
+              </label>
               <textarea
                 rows={2}
                 placeholder="Mục tiêu và yêu cầu môn học..."

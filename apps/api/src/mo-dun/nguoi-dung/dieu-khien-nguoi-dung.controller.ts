@@ -45,7 +45,9 @@ export class DieuKhienNguoiDung {
   @KiemTraQuyen(HanhDong.Doc, DoiTuong.NguoiDung)
   @ApiOperation({ summary: 'Lấy danh sách người dùng có phân trang và bộ lọc' })
   @ApiResponse({ status: 200, description: 'Danh sách người dùng trả về thành công' })
-  async layDanhSach(@Query(new ZodValidationPipe(truyVanNguoiDungSchema)) thamSo: TruyVanNguoiDungDto) {
+  async layDanhSach(
+    @Query(new ZodValidationPipe(truyVanNguoiDungSchema)) thamSo: TruyVanNguoiDungDto,
+  ) {
     return this.dichVuNguoiDung.layDanhSach(thamSo);
   }
 
@@ -83,7 +85,8 @@ export class DieuKhienNguoiDung {
   @ApiResponse({ status: 200, description: 'Chuyển đổi trạng thái thành công' })
   async chuyenTrangThai(
     @Param('id') id: string,
-    @Body(new ZodValidationPipe(chuyenTrangThaiNguoiDungSchema)) duLieu: ChuyenTrangThaiNguoiDungDto,
+    @Body(new ZodValidationPipe(chuyenTrangThaiNguoiDungSchema))
+    duLieu: ChuyenTrangThaiNguoiDungDto,
     @NguoiDungHienTai() nguoiDungHienTai: PayloadJwt,
   ) {
     return this.dichVuNguoiDung.chuyenTrangThai(id, duLieu, nguoiDungHienTai.id);
@@ -105,10 +108,7 @@ export class DieuKhienNguoiDung {
   @KiemTraQuyen(HanhDong.Xoa, DoiTuong.NguoiDung)
   @ApiOperation({ summary: 'Xóa mềm tài khoản người dùng' })
   @ApiResponse({ status: 200, description: 'Xóa người dùng thành công' })
-  async xoa(
-    @Param('id') id: string,
-    @NguoiDungHienTai() nguoiDungHienTai: PayloadJwt,
-  ) {
+  async xoa(@Param('id') id: string, @NguoiDungHienTai() nguoiDungHienTai: PayloadJwt) {
     return this.dichVuNguoiDung.xoa(id, nguoiDungHienTai.id);
   }
 }

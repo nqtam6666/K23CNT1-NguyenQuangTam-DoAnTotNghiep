@@ -26,11 +26,7 @@ mayKhachApi.interceptors.response.use(
     if (loi.response?.status === 401 && !yeuCauGoc._daThuLai && !laYeuCauXacThuc) {
       yeuCauGoc._daThuLai = true;
       try {
-        await axios.post(
-          `${URL_API_GOC}/xac-thuc/lam-moi-token`,
-          {},
-          { withCredentials: true },
-        );
+        await axios.post(`${URL_API_GOC}/xac-thuc/lam-moi-token`, {}, { withCredentials: true });
         return mayKhachApi(yeuCauGoc);
       } catch (loiLamMoi) {
         if (typeof window !== 'undefined' && window.location.pathname !== '/dang-nhap') {

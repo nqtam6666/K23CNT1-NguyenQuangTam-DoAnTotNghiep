@@ -37,7 +37,12 @@ export const taoNguoiDungSchema = z.object({
  */
 export const capNhatNguoiDungSchema = z.object({
   hoTen: z.string().trim().min(2).max(100).optional(),
-  soDienThoai: z.string().trim().regex(/^[0-9]{10,11}$/).optional().nullable(),
+  soDienThoai: z
+    .string()
+    .trim()
+    .regex(/^[0-9]{10,11}$/)
+    .optional()
+    .nullable(),
   vaiTro: z.nativeEnum(VaiTro).optional(),
   kichHoat: z.boolean().optional(),
 });

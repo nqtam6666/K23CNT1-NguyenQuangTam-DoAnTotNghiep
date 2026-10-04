@@ -9,10 +9,14 @@ import { BookOpen, Lock, Mail, Loader2 } from 'lucide-react';
 import { dangNhapSchema, DangNhapDto } from '@lms/chung';
 import { mayKhachApi } from '../../../tien-ich/may-khach-api';
 import { thongBao } from '../../../tien-ich/thong-bao';
+import { useCaiDatHeThong } from '../../../tien-ich/use-cai-dat';
 
 export default function TrangDangNhap() {
   const router = useRouter();
   const [dangXuLy, setDangXuLy] = useState(false);
+  const { layGiaTri, choPhepDangKy } = useCaiDatHeThong();
+  const tenHeThong = layGiaTri('TEN_HE_THONG', 'LMS Trường Học');
+  const khauHieu = layGiaTri('KHAU_HIEU', 'Hệ thống Quản lý Học tập & Lớp học Trực tuyến');
 
   const {
     register,
@@ -31,7 +35,7 @@ export default function TrangDangNhap() {
     try {
       const phanHoi = await mayKhachApi.post('/xac-thuc/dang-nhap', duLieu);
       const hoTen = phanHoi.data?.duLieu?.nguoiDung?.hoTen;
-      
+
       thongBao.thanhCong(
         'Đăng nhập thành công!',
         hoTen ? `Chào mừng ${hoTen} quay trở lại LMS.` : 'Đang chuyển hướng vào hệ thống...',
@@ -46,7 +50,7 @@ export default function TrangDangNhap() {
         loi.response?.data?.thongDiep ||
         loi.response?.data?.message ||
         'Đăng nhập không thành công. Vui lòng kiểm tra lại email hoặc mật khẩu.';
-      
+
       thongBao.thatBai('Đăng nhập thất bại', thongDiep);
     } finally {
       setDangXuLy(false);
@@ -60,17 +64,15 @@ export default function TrangDangNhap() {
           <div className="inline-flex items-center justify-center w-12 h-12 rounded-xl bg-blue-600 text-white mb-4 shadow-sm">
             <BookOpen className="w-6 h-6" />
           </div>
-          <h2 className="text-2xl font-bold text-slate-900 tracking-tight">Đăng nhập LMS</h2>
-          <p className="mt-2 text-sm text-slate-600">
-            Hệ thống Quản lý Học tập & Lớp học Trực tuyến
-          </p>
+          <h2 className="text-2xl font-bold text-slate-900 tracking-tight">
+            Đăng nhập {tenHeThong}
+          </h2>
+          <p className="mt-2 text-sm text-slate-600">{khauHieu}</p>
         </div>
 
         <form className="mt-8 space-y-5" onSubmit={handleSubmit(xuLyDangNhap)}>
           <div>
-            <label className="block text-sm font-medium text-slate-700 mb-1">
-              Địa chỉ Email
-            </label>
+            <label className="block text-sm font-medium text-slate-700 mb-1">Địa chỉ Email</label>
             <div className="relative">
               <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-slate-400">
                 <Mail className="w-5 h-5" />
@@ -82,9 +84,7 @@ export default function TrangDangNhap() {
                 className="w-full pl-10 pr-3 py-2 border border-slate-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
               />
             </div>
-            {errors.email && (
-              <p className="mt-1 text-xs text-red-600">{errors.email.message}</p>
-            )}
+            {errors.email && <p className="mt-1 text-xs text-red-600">{errors.email.message}</p>}
           </div>
 
           <div>
@@ -129,12 +129,18 @@ export default function TrangDangNhap() {
           </button>
         </form>
 
-        <div className="text-center pt-2 text-xs text-slate-500">
-          Chưa có tài khoản?{' '}
-          <Link href="/dang-ky" className="text-blue-600 hover:text-blue-700 font-medium">
-            Đăng ký tài khoản học sinh
-          </Link>
-        </div>
+        {choPhepDangKy ? (
+          <div className="text-center pt-2 text-xs text-slate-500">
+            Chưa có tài khoản?{' '}
+            <Link href="/dang-ky" className="text-blue-600 hover:text-blue-700 font-medium">
+              Đăng ký tài khoản học sinh
+            </Link>
+          </div>
+        ) : (
+          <div className="text-center pt-2 text-xs text-slate-400">
+            Cổng đăng ký trực tuyến hiện đang đóng bởi Quản trị viên
+          </div>
+        )}
       </div>
     </div>
   );

@@ -22,11 +22,15 @@ import { mayKhachApi } from '../../tien-ich/may-khach-api';
 import { thongBao } from '../../tien-ich/thong-bao';
 import { useQuery } from '@tanstack/react-query';
 import { PayloadJwt, VaiTro } from '@lms/chung';
+import { useCaiDatHeThong } from '../../tien-ich/use-cai-dat';
 
 export default function LayoutBangDieuKhien({ children }: { children: ReactNode }) {
   const pathname = usePathname();
   const router = useRouter();
   const [sidebarMo, setSidebarMo] = useState(false);
+  const { layGiaTri } = useCaiDatHeThong();
+  const tenHeThong = layGiaTri('TEN_HE_THONG', 'LMS Trường Học');
+  const moTaPhu = `${layGiaTri('MA_LOP_KHOA', 'K23CNT1')} ${layGiaTri('TAC_GIA', 'Quang Tâm')}`;
 
   // Lấy hồ sơ người dùng từ React Query Cache (staleTime 5 phút, không fetch thừa khi chuyển trang)
   const { data: nguoiDung, isError } = useQuery<PayloadJwt>({
@@ -127,6 +131,12 @@ export default function LayoutBangDieuKhien({ children }: { children: ReactNode 
       bieuTuong: HeartHandshake,
       vaiTroChoPhep: [VaiTro.PHU_HUYNH, VaiTro.QUAN_TRI_VIEN],
     },
+    {
+      tieuDe: 'Cài đặt Hệ thống',
+      duongDan: '/cai-dat',
+      bieuTuong: Settings,
+      vaiTroChoPhep: [VaiTro.QUAN_TRI_VIEN],
+    },
   ];
 
   const menuHienThi = danhMucMenu.filter(
@@ -145,8 +155,8 @@ export default function LayoutBangDieuKhien({ children }: { children: ReactNode 
             <GraduationCap className="w-5 h-5" />
           </div>
           <div>
-            <h1 className="font-bold text-slate-900 leading-tight">LMS Trường Học</h1>
-            <p className="text-[11px] text-slate-500">K23CNT1 Quang Tâm</p>
+            <h1 className="font-bold text-slate-900 leading-tight">{tenHeThong}</h1>
+            <p className="text-[11px] text-slate-500">{moTaPhu}</p>
           </div>
         </div>
 
@@ -190,7 +200,9 @@ export default function LayoutBangDieuKhien({ children }: { children: ReactNode 
                 {nguoiDung?.hoTen?.charAt(0) || 'U'}
               </div>
               <div className="truncate">
-                <p className="text-xs font-semibold text-slate-900 truncate">{nguoiDung?.hoTen || 'Đang tải...'}</p>
+                <p className="text-xs font-semibold text-slate-900 truncate">
+                  {nguoiDung?.hoTen || 'Đang tải...'}
+                </p>
                 <span className="inline-block px-1.5 py-0.5 text-[10px] rounded bg-blue-100 text-blue-700 font-medium">
                   {nguoiDung?.vaiTro || 'VAI_TRO'}
                 </span>
@@ -221,8 +233,8 @@ export default function LayoutBangDieuKhien({ children }: { children: ReactNode 
                   <GraduationCap className="w-5 h-5" />
                 </div>
                 <div>
-                  <h1 className="font-bold text-slate-900 text-sm">LMS Trường Học</h1>
-                  <p className="text-[10px] text-slate-500">K23CNT1 Quang Tâm</p>
+                  <h1 className="font-bold text-slate-900 text-sm">{tenHeThong}</h1>
+                  <p className="text-[10px] text-slate-500">{moTaPhu}</p>
                 </div>
               </div>
               <button
@@ -254,7 +266,9 @@ export default function LayoutBangDieuKhien({ children }: { children: ReactNode 
                     {laTrangHienTai && (
                       <span className="absolute left-0 top-2 bottom-2 w-1 bg-blue-600 rounded-r-full" />
                     )}
-                    <BieuTuong className={`w-4 h-4 ${laTrangHienTai ? 'text-blue-600' : 'text-slate-400'}`} />
+                    <BieuTuong
+                      className={`w-4 h-4 ${laTrangHienTai ? 'text-blue-600' : 'text-slate-400'}`}
+                    />
                     <span>{item.tieuDe}</span>
                   </Link>
                 );
@@ -268,8 +282,12 @@ export default function LayoutBangDieuKhien({ children }: { children: ReactNode 
                     {nguoiDung?.hoTen?.charAt(0) || 'U'}
                   </div>
                   <div className="truncate">
-                    <p className="text-xs font-semibold text-slate-900 truncate">{nguoiDung?.hoTen || 'Đang tải...'}</p>
-                    <span className="text-[10px] text-blue-600 font-medium">{nguoiDung?.vaiTro}</span>
+                    <p className="text-xs font-semibold text-slate-900 truncate">
+                      {nguoiDung?.hoTen || 'Đang tải...'}
+                    </p>
+                    <span className="text-[10px] text-blue-600 font-medium">
+                      {nguoiDung?.vaiTro}
+                    </span>
                   </div>
                 </div>
                 <button

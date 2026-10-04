@@ -150,7 +150,9 @@ export class DichVuLopHocPhanService {
         where: { idNguoiDung: nguoiDung.sub },
       });
       if (!hoSo || lop.idGiaoVien !== hoSo.id) {
-        throw new ForbiddenException('Bạn không có quyền chỉnh sửa lớp học phần của giáo viên khác');
+        throw new ForbiddenException(
+          'Bạn không có quyền chỉnh sửa lớp học phần của giáo viên khác',
+        );
       }
     }
 

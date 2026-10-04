@@ -146,7 +146,9 @@ export class DichVuThoiKhoaBieuService {
 
     if (!lop) throw new NotFoundException('Không tìm thấy lớp học phần');
     if (lop.cacThoiKhoaBieu.length === 0) {
-      throw new BadRequestException('Lớp học phần chưa có thời khóa biểu tuần nào để sinh buổi học');
+      throw new BadRequestException(
+        'Lớp học phần chưa có thời khóa biểu tuần nào để sinh buổi học',
+      );
     }
 
     const ngayBatDau = new Date(lop.hocKy.ngayBatDau);

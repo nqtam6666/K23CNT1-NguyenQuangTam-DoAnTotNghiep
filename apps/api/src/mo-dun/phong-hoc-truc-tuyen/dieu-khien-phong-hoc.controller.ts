@@ -17,12 +17,7 @@ import { XacThucJwtGuard } from '../xac-thuc/ve-si/jwt-auth.guard';
 import { PhanQuyenCaslGuard } from '../../phan-quyen/phan-quyen-casl.guard';
 import { KiemTraQuyen } from '../../cot-loi/trang-tri/kiem-tra-quyen.decorator';
 import { NguoiDungHienTai } from '../../cot-loi/trang-tri/nguoi-dung-hien-tai.decorator';
-import {
-  HanhDong,
-  DoiTuong,
-  PayloadJwt,
-  TrangThaiDiemDanh,
-} from '@lms/chung';
+import { HanhDong, DoiTuong, PayloadJwt, TrangThaiDiemDanh } from '@lms/chung';
 
 @ApiTags('Phòng học trực tuyến & LiveKit')
 @Controller('phong-hoc-truc-tuyen')
@@ -43,11 +38,7 @@ export class DieuKhienPhongHoc {
     @Body('idBuoiHoc') idBuoiHoc: string | undefined,
     @NguoiDungHienTai() nguoiDung: PayloadJwt,
   ) {
-    const duLieu = await this.dichVuPhongHoc.taoTokenTruyCap(
-      idLop,
-      nguoiDung,
-      idBuoiHoc,
-    );
+    const duLieu = await this.dichVuPhongHoc.taoTokenTruyCap(idLop, nguoiDung, idBuoiHoc);
 
     return {
       thanhCong: true,
@@ -69,11 +60,7 @@ export class DieuKhienPhongHoc {
     @Body('dangMo') dangMo: boolean,
     @NguoiDungHienTai() nguoiDung: PayloadJwt,
   ) {
-    const phong = await this.dichVuPhongHoc.batTatPhongHoc(
-      idLop,
-      dangMo,
-      nguoiDung,
-    );
+    const phong = await this.dichVuPhongHoc.batTatPhongHoc(idLop, dangMo, nguoiDung);
 
     return {
       thanhCong: true,
@@ -88,10 +75,7 @@ export class DieuKhienPhongHoc {
    */
   @Post('webhook')
   @ApiOperation({ summary: 'Nhận sự kiện Webhook từ LiveKit Server' })
-  async nhanWebhookLiveKit(
-    @Headers('authorization') authHeader: string,
-    @Req() req: Request,
-  ) {
+  async nhanWebhookLiveKit(@Headers('authorization') authHeader: string, @Req() req: Request) {
     // Lấy raw body hoặc stringified body
     const bodyRaw =
       typeof req.body === 'string' || Buffer.isBuffer(req.body)
@@ -116,11 +100,7 @@ export class DieuKhienPhongHoc {
     @Param('idBuoiHoc', ParseUUIDPipe) idBuoiHoc: string,
     @NguoiDungHienTai() nguoiDung: PayloadJwt,
   ) {
-    const duLieu = await this.dichVuPhongHoc.layBaoCaoBuoiHoc(
-      idLop,
-      idBuoiHoc,
-      nguoiDung,
-    );
+    const duLieu = await this.dichVuPhongHoc.layBaoCaoBuoiHoc(idLop, idBuoiHoc, nguoiDung);
 
     return {
       thanhCong: true,

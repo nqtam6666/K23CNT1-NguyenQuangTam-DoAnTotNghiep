@@ -23,35 +23,40 @@ export type CapNhatNamHocInput = z.infer<typeof capNhatNamHocSchema>;
 // 2. HỌC KỲ
 // ==========================================
 
-export const taoHocKySchema = z.object({
-  idNamHoc: z
-    .string({ required_error: 'Năm học không được để trống' })
-    .uuid('ID năm học phải là UUID hợp lệ'),
-  tenHocKy: z
-    .string({ required_error: 'Tên học kỳ không được để trống' })
-    .min(1, 'Tên học kỳ không được để trống')
-    .max(50, 'Tên học kỳ tối đa 50 ký tự'),
-  hienTai: z.boolean().optional().default(false),
-  ngayBatDau: z
-    .string({ required_error: 'Ngày bắt đầu không được để trống' })
-    .refine((val) => !isNaN(Date.parse(val)), 'Ngày bắt đầu không hợp lệ'),
-  ngayKetThuc: z
-    .string({ required_error: 'Ngày kết thúc không được để trống' })
-    .refine((val) => !isNaN(Date.parse(val)), 'Ngày kết thúc không hợp lệ'),
-}).refine(
-  (data) => new Date(data.ngayBatDau) < new Date(data.ngayKetThuc),
-  {
+export const taoHocKySchema = z
+  .object({
+    idNamHoc: z
+      .string({ required_error: 'Năm học không được để trống' })
+      .uuid('ID năm học phải là UUID hợp lệ'),
+    tenHocKy: z
+      .string({ required_error: 'Tên học kỳ không được để trống' })
+      .min(1, 'Tên học kỳ không được để trống')
+      .max(50, 'Tên học kỳ tối đa 50 ký tự'),
+    hienTai: z.boolean().optional().default(false),
+    ngayBatDau: z
+      .string({ required_error: 'Ngày bắt đầu không được để trống' })
+      .refine((val) => !isNaN(Date.parse(val)), 'Ngày bắt đầu không hợp lệ'),
+    ngayKetThuc: z
+      .string({ required_error: 'Ngày kết thúc không được để trống' })
+      .refine((val) => !isNaN(Date.parse(val)), 'Ngày kết thúc không hợp lệ'),
+  })
+  .refine((data) => new Date(data.ngayBatDau) < new Date(data.ngayKetThuc), {
     message: 'Ngày bắt đầu phải trước ngày kết thúc',
     path: ['ngayKetThuc'],
-  }
-);
+  });
 
 export const capNhatHocKySchema = z.object({
   idNamHoc: z.string().uuid('ID năm học phải là UUID hợp lệ').optional(),
   tenHocKy: z.string().min(1).max(50).optional(),
   hienTai: z.boolean().optional(),
-  ngayBatDau: z.string().refine((val) => !isNaN(Date.parse(val)), 'Ngày bắt đầu không hợp lệ').optional(),
-  ngayKetThuc: z.string().refine((val) => !isNaN(Date.parse(val)), 'Ngày kết thúc không hợp lệ').optional(),
+  ngayBatDau: z
+    .string()
+    .refine((val) => !isNaN(Date.parse(val)), 'Ngày bắt đầu không hợp lệ')
+    .optional(),
+  ngayKetThuc: z
+    .string()
+    .refine((val) => !isNaN(Date.parse(val)), 'Ngày kết thúc không hợp lệ')
+    .optional(),
 });
 
 export type TaoHocKyInput = z.infer<typeof taoHocKySchema>;

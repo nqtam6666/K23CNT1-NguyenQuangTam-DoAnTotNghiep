@@ -154,9 +154,7 @@ export class DichVuHoSo {
     return this.khoHoSo.taoHoSoHocSinh({
       nguoiDung: { connect: { id: duLieu.idNguoiDung } },
       maHocSinh: duLieu.maHocSinh,
-      lopHanhChinh: duLieu.idLopHanhChinh
-        ? { connect: { id: duLieu.idLopHanhChinh } }
-        : undefined,
+      lopHanhChinh: duLieu.idLopHanhChinh ? { connect: { id: duLieu.idLopHanhChinh } } : undefined,
       ngaySinh: duLieu.ngaySinh ? new Date(duLieu.ngaySinh) : undefined,
       diaChi: duLieu.diaChi,
     });

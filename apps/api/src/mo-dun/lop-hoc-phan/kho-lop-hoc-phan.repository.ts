@@ -1,11 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { PrismaService } from '../../cot-loi/csdl/prisma.service';
 import { Prisma } from '@prisma/client';
-import {
-  TaoLopHocPhanInput,
-  CapNhatLopHocPhanInput,
-  TruyVanLopHocPhanInput,
-} from '@lms/chung';
+import { TaoLopHocPhanInput, CapNhatLopHocPhanInput, TruyVanLopHocPhanInput } from '@lms/chung';
 
 @Injectable()
 export class KhoLopHocPhanRepository {

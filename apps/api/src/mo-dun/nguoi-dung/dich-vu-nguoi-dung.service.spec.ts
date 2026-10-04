@@ -21,10 +21,7 @@ describe('DichVuNguoiDung (Unit Test)', () => {
     };
 
     const module: TestingModule = await Test.createTestingModule({
-      providers: [
-        DichVuNguoiDung,
-        { provide: KhoNguoiDung, useValue: mockKhoNguoiDung },
-      ],
+      providers: [DichVuNguoiDung, { provide: KhoNguoiDung, useValue: mockKhoNguoiDung }],
     }).compile();
 
     dichVu = module.get<DichVuNguoiDung>(DichVuNguoiDung);
@@ -34,9 +31,7 @@ describe('DichVuNguoiDung (Unit Test)', () => {
     it('phải ném NotFoundException nếu người dùng không tồn tại', async () => {
       (mockKhoNguoiDung.timTheoId as jest.Mock).mockResolvedValue(null);
 
-      await expect(dichVu.layChiTiet('id-khong-ton-tai')).rejects.toThrow(
-        NotFoundException,
-      );
+      await expect(dichVu.layChiTiet('id-khong-ton-tai')).rejects.toThrow(NotFoundException);
     });
 
     it('phải trả về thông tin người dùng không chứa mật khẩu', async () => {
@@ -116,16 +111,10 @@ describe('DichVuNguoiDung (Unit Test)', () => {
         kichHoat: false,
       });
 
-      const ketQua = await dichVu.chuyenTrangThai(
-        'target-user',
-        { kichHoat: false },
-        'admin-1',
-      );
+      const ketQua = await dichVu.chuyenTrangThai('target-user', { kichHoat: false }, 'admin-1');
 
       expect(ketQua.kichHoat).toBe(false);
-      expect(mockKhoNguoiDung.thuHoiTatCaPhienCuaNguoiDung).toHaveBeenCalledWith(
-        'target-user',
-      );
+      expect(mockKhoNguoiDung.thuHoiTatCaPhienCuaNguoiDung).toHaveBeenCalledWith('target-user');
     });
   });
 });

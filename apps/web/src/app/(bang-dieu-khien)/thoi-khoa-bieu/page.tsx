@@ -80,9 +80,7 @@ export default function TrangThoiKhoaBieu() {
   const biGopTiet = (thu: number, tiet: number) => {
     return danhSachTkb?.some(
       (tkb) =>
-        tkb.thuTrongTuan === thu &&
-        tkb.tietBatDau < tiet &&
-        tkb.tietBatDau + tkb.soTiet > tiet,
+        tkb.thuTrongTuan === thu && tkb.tietBatDau < tiet && tkb.tietBatDau + tkb.soTiet > tiet,
     );
   };
 
@@ -135,7 +133,10 @@ export default function TrangThoiKhoaBieu() {
                   Tiết / Giờ
                 </th>
                 {cacThu.map((thu) => (
-                  <th key={thu.ma} className="py-3.5 px-3 border-r border-slate-800 text-center font-bold">
+                  <th
+                    key={thu.ma}
+                    className="py-3.5 px-3 border-r border-slate-800 text-center font-bold"
+                  >
                     {thu.ten}
                   </th>
                 ))}

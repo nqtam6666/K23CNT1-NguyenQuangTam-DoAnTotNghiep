@@ -166,7 +166,11 @@ describe('DichVuLopHocPhanService', () => {
     it('phải ghi danh thành công khi học sinh chưa có trong lớp', async () => {
       khoMock.timLopHocPhanTheoId.mockResolvedValue({ id: 'lhp-1' });
       khoMock.kiemTraGhiDanh.mockResolvedValue(null);
-      khoMock.taoGhiDanh.mockResolvedValue({ id: 'gd-1', idLopHocPhan: 'lhp-1', idHocSinh: 'hs-1' });
+      khoMock.taoGhiDanh.mockResolvedValue({
+        id: 'gd-1',
+        idLopHocPhan: 'lhp-1',
+        idHocSinh: 'hs-1',
+      });
 
       const ketQua = await dichVu.ghiDanhHocSinh('lhp-1', 'hs-1');
       expect(ketQua).toBeDefined();

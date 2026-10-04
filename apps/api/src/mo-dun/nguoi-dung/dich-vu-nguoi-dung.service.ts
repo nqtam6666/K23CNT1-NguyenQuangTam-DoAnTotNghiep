@@ -97,11 +97,7 @@ export class DichVuNguoiDung {
   /**
    * Khóa hoặc mở khóa tài khoản người dùng
    */
-  async chuyenTrangThai(
-    id: string,
-    duLieu: ChuyenTrangThaiNguoiDungDto,
-    idNguoiThucHien: string,
-  ) {
+  async chuyenTrangThai(id: string, duLieu: ChuyenTrangThaiNguoiDungDto, idNguoiThucHien: string) {
     if (id === idNguoiThucHien && !duLieu.kichHoat) {
       throw new BadRequestException({
         thanhCong: false,

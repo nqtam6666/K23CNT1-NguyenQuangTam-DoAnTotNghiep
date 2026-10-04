@@ -131,9 +131,9 @@ describe('DichVuPhongHoc (Kiểm thử Lớp học trực tuyến LiveKit & Ch�
     it('2. Chống IDOR: Giáo viên lạ không được phép lấy token chủ trì của lớp học', async () => {
       prisma.lopHocPhan.findUnique.mockResolvedValue(mockClassSection);
 
-      await expect(
-        service.taoTokenTruyCap('lop-1', mockOtherTeacherPayload),
-      ).rejects.toThrow(ForbiddenException);
+      await expect(service.taoTokenTruyCap('lop-1', mockOtherTeacherPayload)).rejects.toThrow(
+        ForbiddenException,
+      );
     });
 
     it('3. Chống IDOR: Học sinh chưa ghi danh vào lớp bị từ chối cấp token', async () => {
@@ -141,17 +141,17 @@ describe('DichVuPhongHoc (Kiểm thử Lớp học trực tuyến LiveKit & Ch�
       prisma.hoSoHocSinh.findUnique.mockResolvedValue({ id: 'hs-profile-2' });
       prisma.ghiDanh.findUnique.mockResolvedValue(null); // Chưa ghi danh
 
-      await expect(
-        service.taoTokenTruyCap('lop-1', mockOtherStudentPayload),
-      ).rejects.toThrow(ForbiddenException);
+      await expect(service.taoTokenTruyCap('lop-1', mockOtherStudentPayload)).rejects.toThrow(
+        ForbiddenException,
+      );
     });
 
     it('4. Phụ huynh không được phép tham gia phòng học trực tuyến', async () => {
       prisma.lopHocPhan.findUnique.mockResolvedValue(mockClassSection);
 
-      await expect(
-        service.taoTokenTruyCap('lop-1', mockParentPayload),
-      ).rejects.toThrow(ForbiddenException);
+      await expect(service.taoTokenTruyCap('lop-1', mockParentPayload)).rejects.toThrow(
+        ForbiddenException,
+      );
     });
 
     it('5. Thành công cấp token CHU_TRI cho giáo viên phụ trách lớp', async () => {
@@ -203,9 +203,9 @@ describe('DichVuPhongHoc (Kiểm thử Lớp học trực tuyến LiveKit & Ch�
         lopHocPhan: mockClassSection,
       });
 
-      await expect(
-        service.batTatPhongHoc('lop-1', true, mockOtherTeacherPayload),
-      ).rejects.toThrow(ForbiddenException);
+      await expect(service.batTatPhongHoc('lop-1', true, mockOtherTeacherPayload)).rejects.toThrow(
+        ForbiddenException,
+      );
     });
   });
 });

@@ -27,9 +27,7 @@ export default function TrangBangDieuKhien() {
     <div className="space-y-6">
       {/* Banner Chào Mừng */}
       <div className="p-6 rounded-2xl bg-gradient-to-r from-blue-700 to-indigo-800 text-white shadow-sm">
-        <h2 className="text-2xl font-bold">
-          Xin chào, {hoSo?.hoTen || 'Thành viên'} 👋
-        </h2>
+        <h2 className="text-2xl font-bold">Xin chào, {hoSo?.hoTen || 'Thành viên'} 👋</h2>
         <p className="mt-1 text-blue-100 text-sm max-w-2xl">
           Chào mừng bạn đến với Hệ thống Quản lý Học tập LMS Trường học. Vai trò hiện tại của bạn là{' '}
           <span className="font-semibold text-white underline decoration-blue-300">
@@ -50,9 +48,7 @@ export default function TrangBangDieuKhien() {
               <Users className="w-4 h-4" />
             </div>
           </div>
-          <p className="text-2xl font-bold text-slate-900 mt-2">
-            {duLieuNguoiDung?.tongSo ?? '1'}
-          </p>
+          <p className="text-2xl font-bold text-slate-900 mt-2">{duLieuNguoiDung?.tongSo ?? '1'}</p>
           <span className="text-xs text-slate-400 mt-1 inline-block">Hệ thống đang hoạt động</span>
         </div>
 
@@ -107,7 +103,9 @@ export default function TrangBangDieuKhien() {
             >
               <div className="flex items-center gap-3">
                 <Users className="w-4 h-4 text-blue-600" />
-                <span className="text-sm font-medium text-slate-700">Quản lý danh sách Người dùng</span>
+                <span className="text-sm font-medium text-slate-700">
+                  Quản lý danh sách Người dùng
+                </span>
               </div>
               <ArrowUpRight className="w-4 h-4 text-slate-400 group-hover:text-blue-600 transition-colors" />
             </Link>
@@ -128,11 +126,18 @@ export default function TrangBangDieuKhien() {
         <div className="p-6 rounded-xl bg-white border border-slate-200 shadow-2xs">
           <h3 className="font-semibold text-slate-900 text-base mb-2">Thông tin Hệ thống Đồ án</h3>
           <p className="text-xs text-slate-600 mb-4 leading-relaxed">
-            Đồ án Tốt nghiệp chuyên ngành CNTT trường Đại học - Sinh viên thực hiện: Nguyễn Quang Tâm (K23CNT1 - MSSV: 2310900093).
+            Đồ án Tốt nghiệp chuyên ngành CNTT trường Đại học - Sinh viên thực hiện: Nguyễn Quang
+            Tâm (K23CNT1 - MSSV: 2310900093).
           </p>
           <div className="p-3.5 rounded-lg bg-slate-50 border border-slate-200/60 text-xs text-slate-600 space-y-1">
-            <p><strong>Kiến trúc:</strong> NestJS 10, Next.js 15, PostgreSQL 16 (pgvector), Redis 7, MinIO.</p>
-            <p><strong>Phân quyền:</strong> CASL Ability Factory (6 vai trò trường học: Quản trị, Ban giám hiệu, Giáo vụ, Giáo viên, Học sinh, Phụ huynh).</p>
+            <p>
+              <strong>Kiến trúc:</strong> NestJS 10, Next.js 15, PostgreSQL 16 (pgvector), Redis 7,
+              MinIO.
+            </p>
+            <p>
+              <strong>Phân quyền:</strong> CASL Ability Factory (6 vai trò trường học: Quản trị, Ban
+              giám hiệu, Giáo vụ, Giáo viên, Học sinh, Phụ huynh).
+            </p>
           </div>
         </div>
       </div>

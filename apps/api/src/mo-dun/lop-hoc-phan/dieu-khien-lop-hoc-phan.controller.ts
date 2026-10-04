@@ -149,7 +149,8 @@ export class DieuKhienLopHocPhanController {
   @KiemTraQuyen(HanhDong.Tao, DoiTuong.GhiDanh)
   async ghiDanhTheoLopHanhChinh(
     @Param('id', ParseUUIDPipe) id: string,
-    @Body(new ZodValidationPipe(ghiDanhTheoLopHanhChinhSchema)) duLieu: GhiDanhTheoLopHanhChinhInput,
+    @Body(new ZodValidationPipe(ghiDanhTheoLopHanhChinhSchema))
+    duLieu: GhiDanhTheoLopHanhChinhInput,
   ) {
     return this.dichVuLopHocPhan.ghiDanhTheoLopHanhChinh(id, duLieu.idLopHanhChinh);
   }

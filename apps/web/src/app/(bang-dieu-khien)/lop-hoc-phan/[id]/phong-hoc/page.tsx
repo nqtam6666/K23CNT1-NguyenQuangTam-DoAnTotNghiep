@@ -6,18 +6,15 @@ import { useRouter } from 'next/navigation';
 import dynamic from 'next/dynamic';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 
-const ThanhPhanPhongHocLiveKit = dynamic(
-  () => import('./thanh-phan-phong-hoc'),
-  {
-    ssr: false,
-    loading: () => (
-      <div className="h-full w-full flex flex-col items-center justify-center space-y-3 bg-slate-950 text-slate-400">
-        <Loader2 className="w-8 h-8 animate-spin text-blue-500" />
-        <p className="text-sm font-medium">Đang tải giao diện phòng học LiveKit...</p>
-      </div>
-    ),
-  }
-);
+const ThanhPhanPhongHocLiveKit = dynamic(() => import('./thanh-phan-phong-hoc'), {
+  ssr: false,
+  loading: () => (
+    <div className="h-full w-full flex flex-col items-center justify-center space-y-3 bg-slate-950 text-slate-400">
+      <Loader2 className="w-8 h-8 animate-spin text-blue-500" />
+      <p className="text-sm font-medium">Đang tải giao diện phòng học LiveKit...</p>
+    </div>
+  ),
+});
 import {
   ArrowLeft,
   Video,
@@ -35,11 +32,7 @@ import { mayKhachApi } from '../../../../../tien-ich/may-khach-api';
 import { thongBao } from '../../../../../tien-ich/thong-bao';
 import { KetQuaTokenLiveKit, LopHocPhan, PayloadJwt, VaiTro } from '@lms/chung';
 
-export default function TrangPhongHocTrucTuyen({
-  params,
-}: {
-  params: Promise<{ id: string }>;
-}) {
+export default function TrangPhongHocTrucTuyen({ params }: { params: Promise<{ id: string }> }) {
   const { id } = use(params);
   const router = useRouter();
   const queryClient = useQueryClient();

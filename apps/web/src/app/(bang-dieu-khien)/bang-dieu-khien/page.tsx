@@ -6,12 +6,13 @@ import Link from 'next/link';
 import { mayKhachApi } from '../../../tien-ich/may-khach-api';
 import { useCaiDatHeThong } from '../../../tien-ich/use-cai-dat';
 import { layNhanVaiTro } from '@lms/chung';
+import { KhungXuongTongQuan } from '../../../thanh-phan/khung-xuong';
 
 export default function TrangBangDieuKhien() {
   const { layGiaTri } = useCaiDatHeThong();
   const tenHeThong = layGiaTri('TEN_HE_THONG', 'Hệ thống Quản lý Học tập');
 
-  const { data: hoSo } = useQuery({
+  const { data: hoSo, isLoading: dangTaiHoSo } = useQuery({
     queryKey: ['hoSoHienTai'],
     queryFn: async () => {
       const res = await mayKhachApi.get('/ho-so/ca-nhan');
@@ -27,6 +28,10 @@ export default function TrangBangDieuKhien() {
     },
     enabled: hoSo?.vaiTro === 'QUAN_TRI_VIEN' || hoSo?.vaiTro === 'GIAO_VU',
   });
+
+  if (dangTaiHoSo || !hoSo) {
+    return <KhungXuongTongQuan />;
+  }
 
   return (
     <div className="space-y-6">

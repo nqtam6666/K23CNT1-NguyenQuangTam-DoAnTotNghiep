@@ -18,6 +18,7 @@ import {
 import { capNhatHoSoSchema, doiMatKhauSchema, CapNhatHoSoDto, DoiMatKhauDto, layNhanVaiTro } from '@lms/chung';
 import { mayKhachApi } from '../../../tien-ich/may-khach-api';
 import { thongBao } from '../../../tien-ich/thong-bao';
+import { KhungXuongHoSo } from '../../../thanh-phan/khung-xuong';
 
 export default function TrangHoSoCaNhan() {
   const queryClient = useQueryClient();
@@ -95,12 +96,7 @@ export default function TrangHoSoCaNhan() {
   };
 
   if (isLoading) {
-    return (
-      <div className="py-20 text-center">
-        <Loader2 className="w-8 h-8 animate-spin text-blue-600 mx-auto mb-2" />
-        <p className="text-sm text-slate-500">Đang tải thông tin hồ sơ...</p>
-      </div>
-    );
+    return <KhungXuongHoSo />;
   }
 
   return (

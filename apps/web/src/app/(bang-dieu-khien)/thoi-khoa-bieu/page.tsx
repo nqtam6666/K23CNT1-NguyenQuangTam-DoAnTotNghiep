@@ -14,6 +14,7 @@ import {
 } from 'lucide-react';
 import { mayKhachApi } from '../../../tien-ich/may-khach-api';
 import { ThoiKhoaBieu, HocKy } from '@lms/chung';
+import { KhungXuong } from '../../../thanh-phan/khung-xuong';
 
 export default function TrangThoiKhoaBieu() {
   const [idHocKyLoc, setIdHocKyLoc] = useState<string>('');
@@ -144,11 +145,25 @@ export default function TrangThoiKhoaBieu() {
             </thead>
             <tbody className="divide-y divide-slate-200">
               {isLoading ? (
-                <tr>
-                  <td colSpan={8} className="py-20 text-center text-slate-400 text-sm">
-                    Đang tải thời khóa biểu...
-                  </td>
-                </tr>
+                [1, 2, 3, 4, 5, 6].map((i) => (
+                  <tr key={i} className="animate-pulse">
+                    <td className="py-3 px-3 border-r border-slate-200 bg-slate-50/80 text-center">
+                      <KhungXuong className="h-4 w-12 mx-auto" />
+                      <KhungXuong className="h-2.5 w-16 mx-auto mt-1" />
+                    </td>
+                    {Array.from({ length: 7 }).map((_, c) => (
+                      <td key={c} className="p-2 border-r border-slate-200">
+                        {(i + c) % 3 === 0 && (
+                          <div className="p-2.5 rounded-lg bg-indigo-50/70 border border-indigo-100 space-y-1.5">
+                            <KhungXuong className="h-3 w-16" />
+                            <KhungXuong className="h-3.5 w-24" />
+                            <KhungXuong className="h-2.5 w-20" />
+                          </div>
+                        )}
+                      </td>
+                    ))}
+                  </tr>
+                ))
               ) : (
                 cacTiet.map((t) => (
                   <tr key={t.tiet} className="hover:bg-slate-50/50 transition-colors">

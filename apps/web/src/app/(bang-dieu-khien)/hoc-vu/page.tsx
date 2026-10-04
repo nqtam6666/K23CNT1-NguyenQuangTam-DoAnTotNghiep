@@ -18,6 +18,7 @@ import {
 } from 'lucide-react';
 import { mayKhachApi } from '../../../tien-ich/may-khach-api';
 import { thongBao } from '../../../tien-ich/thong-bao';
+import { KhungXuong } from '../../../thanh-phan/khung-xuong';
 import {
   NamHoc,
   HocKy,
@@ -240,9 +241,28 @@ export default function TrangQuanLyHocVu() {
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             {dangTaiNamHoc ? (
-              <div className="col-span-2 text-center py-12 text-slate-400">
-                Đang tải dữ liệu năm học...
-              </div>
+              [1, 2, 3, 4].map((i) => (
+                <div
+                  key={i}
+                  className="bg-white border border-slate-200 rounded-xl p-5 shadow-2xs space-y-4"
+                >
+                  <div className="flex items-center justify-between pb-3 border-b border-slate-100">
+                    <div className="flex items-center gap-3">
+                      <KhungXuong className="w-10 h-10 rounded-lg" />
+                      <div className="space-y-1.5">
+                        <KhungXuong className="h-4 w-32" />
+                        <KhungXuong className="h-3 w-20" />
+                      </div>
+                    </div>
+                    <KhungXuong className="h-7 w-24 rounded-md" />
+                  </div>
+                  <div className="space-y-2">
+                    <KhungXuong className="h-3 w-28" />
+                    <KhungXuong className="h-10 w-full rounded-lg" />
+                    <KhungXuong className="h-10 w-full rounded-lg" />
+                  </div>
+                </div>
+              ))
             ) : danhSachNamHoc && danhSachNamHoc.length > 0 ? (
               danhSachNamHoc.map((nh: any) => (
                 <div
@@ -370,11 +390,15 @@ export default function TrangQuanLyHocVu() {
               </thead>
               <tbody className="divide-y divide-slate-100">
                 {dangTaiMonHoc ? (
-                  <tr>
-                    <td colSpan={5} className="py-10 text-center text-slate-400">
-                      Đang tải danh mục môn học...
-                    </td>
-                  </tr>
+                  [1, 2, 3, 4, 5].map((i) => (
+                    <tr key={i}>
+                      <td className="py-3 px-4"><KhungXuong className="h-4 w-16" /></td>
+                      <td className="py-3 px-4"><KhungXuong className="h-4 w-40" /></td>
+                      <td className="py-3 px-4 text-center"><KhungXuong className="h-4 w-8 mx-auto" /></td>
+                      <td className="py-3 px-4 text-center"><KhungXuong className="h-4 w-12 mx-auto" /></td>
+                      <td className="py-3 px-4"><KhungXuong className="h-4 w-48" /></td>
+                    </tr>
+                  ))
                 ) : ketQuaMonHoc?.duLieu && ketQuaMonHoc.duLieu.length > 0 ? (
                   ketQuaMonHoc.duLieu.map((mh: any) => (
                     <tr key={mh.id} className="hover:bg-slate-50/80 transition-colors">
@@ -436,11 +460,15 @@ export default function TrangQuanLyHocVu() {
               </thead>
               <tbody className="divide-y divide-slate-100">
                 {dangTaiLop ? (
-                  <tr>
-                    <td colSpan={5} className="py-10 text-center text-slate-400">
-                      Đang tải danh sách lớp hành chính...
-                    </td>
-                  </tr>
+                  [1, 2, 3, 4, 5].map((i) => (
+                    <tr key={i}>
+                      <td className="py-3 px-4"><KhungXuong className="h-4 w-16" /></td>
+                      <td className="py-3 px-4"><KhungXuong className="h-4 w-32" /></td>
+                      <td className="py-3 px-4 text-center"><KhungXuong className="h-4 w-16 mx-auto rounded-full" /></td>
+                      <td className="py-3 px-4"><KhungXuong className="h-4 w-36" /></td>
+                      <td className="py-3 px-4 text-center"><KhungXuong className="h-4 w-20 mx-auto rounded-full" /></td>
+                    </tr>
+                  ))
                 ) : ketQuaLopHanhChinh?.duLieu && ketQuaLopHanhChinh.duLieu.length > 0 ? (
                   ketQuaLopHanhChinh.duLieu.map((lop: any) => (
                     <tr key={lop.id} className="hover:bg-slate-50/80 transition-colors">

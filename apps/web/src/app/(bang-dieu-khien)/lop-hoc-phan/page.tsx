@@ -20,6 +20,7 @@ import { mayKhachApi } from '../../../tien-ich/may-khach-api';
 import { thongBao } from '../../../tien-ich/thong-bao';
 import { LopHocPhan, TaoLopHocPhanInput, VaiTro, PayloadJwt } from '@lms/chung';
 import { HopThoai } from '../../../thanh-phan/hop-thoai';
+import { KhungXuongThe } from '../../../thanh-phan/khung-xuong';
 
 export default function TrangLopHocPhan() {
   const queryClient = useQueryClient();
@@ -200,7 +201,7 @@ export default function TrangLopHocPhan() {
 
       {/* Danh sách thẻ lớp học phần */}
       {isLoading ? (
-        <div className="text-center py-16 text-slate-400">Đang tải danh sách lớp học phần...</div>
+        <KhungXuongThe soLuong={6} />
       ) : danhSachLop?.duLieu && danhSachLop.duLieu.length > 0 ? (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           {danhSachLop.duLieu.map((lop: any) => (

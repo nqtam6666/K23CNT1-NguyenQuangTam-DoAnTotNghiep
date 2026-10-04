@@ -21,6 +21,7 @@ import {
 import { taoNguoiDungSchema, TaoNguoiDungDto, VaiTro, DANH_SACH_VAI_TRO, layNhanVaiTro } from '@lms/chung';
 import { mayKhachApi } from '../../../tien-ich/may-khach-api';
 import { thongBao } from '../../../tien-ich/thong-bao';
+import { KhungXuongBang } from '../../../thanh-phan/khung-xuong';
 
 export default function TrangQuanLyNguoiDung() {
   const queryClient = useQueryClient();
@@ -184,10 +185,7 @@ export default function TrangQuanLyNguoiDung() {
       {/* Bảng Dữ liệu người dùng */}
       <div className="bg-white rounded-xl border border-slate-200 shadow-2xs overflow-hidden">
         {isLoading ? (
-          <div className="py-20 text-center">
-            <Loader2 className="w-8 h-8 animate-spin text-blue-600 mx-auto mb-2" />
-            <p className="text-sm text-slate-500">Đang tải danh sách người dùng...</p>
-          </div>
+          <KhungXuongBang soDong={6} soCot={6} />
         ) : isError ? (
           <div className="p-8 text-center text-red-600">
             <AlertCircle className="w-8 h-8 mx-auto mb-2" />

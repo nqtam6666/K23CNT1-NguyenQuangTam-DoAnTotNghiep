@@ -28,6 +28,7 @@ import {
 } from '../../cau-hinh/menu.cau-hinh';
 import { ChiBaoSucKhoe } from '../../thanh-phan/chi-bao-suc-khoe';
 import { TimKiemNhanh } from '../../thanh-phan/tim-kiem-nhanh';
+import { DichNgonNgu } from '../../thanh-phan/dich-ngon-ngu';
 
 const BAN_DO_TIEU_DE_TRANG: Record<string, string> = {
   '/bang-dieu-khien': 'Tổng quan',
@@ -60,7 +61,6 @@ export default function LayoutBangDieuKhien({ children }: { children: ReactNode 
   const [thuGon, setThuGon] = useState(false);
   const [timKiemMo, setTimKiemMo] = useState(false);
   const [cheDoSangToi, setCheDoSangToi] = useState<'sang' | 'toi'>('sang');
-  const [ngonNgu, setNgonNgu] = useState<'vi' | 'en'>('vi');
 
   const { layGiaTri } = useCaiDatHeThong();
   const tenHeThong = layGiaTri('TEN_HE_THONG', 'LMS Trường Học');
@@ -81,6 +81,24 @@ export default function LayoutBangDieuKhien({ children }: { children: ReactNode 
       link.href = urlFavicon;
     }
   }, [urlFavicon]);
+
+  // Đọc trạng thái giao diện Sáng / Tối đã lưu từ localStorage khi tải trang
+  useEffect(() => {
+    try {
+      const trangThaiLuu = localStorage.getItem('lms_theme');
+      const heThongToi = window.matchMedia('(prefers-color-scheme: dark)').matches;
+      const laToi = trangThaiLuu === 'toi' || (!trangThaiLuu && heThongToi);
+      if (laToi) {
+        document.documentElement.classList.add('dark');
+        setCheDoSangToi('toi');
+      } else {
+        document.documentElement.classList.remove('dark');
+        setCheDoSangToi('sang');
+      }
+    } catch {
+      // Bỏ qua nếu môi trường không cho phép truy cập localStorage
+    }
+  }, []);
 
   // Đọc trạng thái thu gọn đã lưu từ localStorage khi tải trang
   useEffect(() => {
@@ -222,38 +240,48 @@ export default function LayoutBangDieuKhien({ children }: { children: ReactNode 
   const thuTuNhom: NhomMenu[] = ['CA_NHAN', 'HOC_TAP', 'QUAN_TRI'];
 
   const batTatSangToi = () => {
-    setCheDoSangToi((prev) => {
-      const tiepTheo = prev === 'sang' ? 'toi' : 'sang';
-      thongBao.thanhCong(
-        tiepTheo === 'toi' ? 'Chế độ tối' : 'Chế độ sáng',
-        'Đã cập nhật giao diện hiển thị',
-      );
-      return tiepTheo;
-    });
-  };
+    const tiepTheo = cheDoSangToi === 'sang' ? 'toi' : 'sang';
 
-  const batTatNgonNgu = () => {
-    setNgonNgu((prev) => {
-      const tiepTheo = prev === 'vi' ? 'en' : 'vi';
-      thongBao.thanhCong(
-        tiepTheo === 'en' ? 'Language: English' : 'Ngôn ngữ: Tiếng Việt',
-        'Đã đổi ngôn ngữ hiển thị',
-      );
-      return tiepTheo;
-    });
+    const thucHienDoiGiaoDien = () => {
+      if (tiepTheo === 'toi') {
+        document.documentElement.classList.add('dark');
+      } else {
+        document.documentElement.classList.remove('dark');
+      }
+      setCheDoSangToi(tiepTheo);
+      try {
+        localStorage.setItem('lms_theme', tiepTheo);
+      } catch {
+        // Bỏ qua lỗi ghi localStorage
+      }
+    };
+
+    // Tích hợp View Transitions API với hiệu ứng circle-blur-top-left chuẩn https://theme-toggle.rdsx.dev/
+    if (typeof document !== 'undefined' && 'startViewTransition' in document) {
+      (document as any).startViewTransition(() => {
+        thucHienDoiGiaoDien();
+      });
+    } else {
+      thucHienDoiGiaoDien();
+    }
+
+    thongBao.thanhCong(
+      tiepTheo === 'toi' ? 'Chế độ tối' : 'Chế độ sáng',
+      'Đã cập nhật giao diện hiển thị',
+    );
   };
 
   return (
-    <div className="flex h-screen bg-slate-50 text-slate-900 overflow-hidden">
+    <div className="flex h-screen bg-slate-50 text-slate-900 overflow-hidden dark:bg-slate-950 dark:text-slate-100">
       {/* 1. Sidebar Desktop */}
       <aside
-        className={`hidden md:flex flex-col bg-white border-r border-slate-200 transition-all duration-300 ease-in-out shrink-0 select-none ${
+        className={`hidden md:flex flex-col bg-white dark:bg-slate-900 border-r border-slate-200 dark:border-slate-800 transition-all duration-300 ease-in-out shrink-0 select-none ${
           thuGon ? 'w-20' : 'w-64'
         }`}
       >
         {/* Header của Sidebar */}
         <div
-          className={`h-16 flex items-center border-b border-slate-200 transition-all duration-300 ${
+          className={`h-16 flex items-center border-b border-slate-200 dark:border-slate-800 transition-all duration-300 ${
             thuGon ? 'justify-center px-2' : 'justify-between px-4'
           }`}
         >
@@ -275,10 +303,10 @@ export default function LayoutBangDieuKhien({ children }: { children: ReactNode 
             </div>
             {!thuGon && (
               <div className="truncate transition-opacity duration-200">
-                <h1 className="font-bold text-slate-900 leading-tight truncate text-sm">
+                <h1 className="font-bold text-slate-900 dark:text-white leading-tight truncate text-sm">
                   {tenHeThong}
                 </h1>
-                <p className="text-[11px] text-slate-500 truncate">{moTaPhu}</p>
+                <p className="text-[11px] text-slate-500 dark:text-slate-400 truncate">{moTaPhu}</p>
               </div>
             )}
           </Link>
@@ -288,7 +316,7 @@ export default function LayoutBangDieuKhien({ children }: { children: ReactNode 
               onClick={batTatThuGon}
               title="Thu gọn thanh bên (Ctrl+B)"
               aria-label="Thu gọn thanh bên"
-              className="p-1.5 text-slate-400 hover:text-slate-700 hover:bg-slate-100 rounded-lg transition-colors cursor-pointer"
+              className="p-1.5 text-slate-400 hover:text-slate-700 dark:hover:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-lg transition-colors cursor-pointer"
             >
               <PanelLeftClose className="w-4 h-4" />
             </button>
@@ -329,7 +357,7 @@ export default function LayoutBangDieuKhien({ children }: { children: ReactNode 
                     </div>
                   )}
 
-                  {thuGon && <div className="h-px bg-slate-100 my-1.5 mx-2" />}
+                  {thuGon && <div className="h-px bg-slate-100 dark:bg-slate-800 my-1.5 mx-2" />}
 
                   {danhSachNhom.map((item) => {
                     const BieuTuong = item.bieuTuong;
@@ -347,21 +375,21 @@ export default function LayoutBangDieuKhien({ children }: { children: ReactNode 
                           thuGon ? 'justify-center p-2.5' : 'gap-3 px-3.5 py-2.5'
                         } ${
                           laTrangHienTai
-                            ? 'bg-blue-50/90 text-blue-700 font-semibold shadow-xs'
-                            : 'text-slate-600 hover:bg-slate-100/80 hover:text-slate-900 hover:translate-x-0.5'
+                            ? 'bg-blue-50/90 text-blue-700 dark:bg-blue-950/60 dark:text-blue-400 font-semibold shadow-xs'
+                            : 'text-slate-600 hover:bg-slate-100/80 hover:text-slate-900 dark:text-slate-400 dark:hover:bg-slate-800/80 dark:hover:text-slate-100 hover:translate-x-0.5'
                         }`}
                       >
                         {laTrangHienTai && (
-                          <span className="absolute left-0 top-2 bottom-2 w-1 bg-blue-600 rounded-r-full shadow-xs shadow-blue-500/50" />
+                          <span className="absolute left-0 top-2 bottom-2 w-1 bg-blue-600 dark:bg-blue-500 rounded-r-full shadow-xs shadow-blue-500/50" />
                         )}
                         <BieuTuong
                           className={`w-5 h-5 shrink-0 transition-transform duration-150 group-hover:scale-110 ${
-                            laTrangHienTai ? 'text-blue-600' : 'text-slate-400 group-hover:text-slate-700'
+                            laTrangHienTai ? 'text-blue-600 dark:text-blue-400' : 'text-slate-400 group-hover:text-slate-700 dark:group-hover:text-slate-200'
                           }`}
                         />
                         {!thuGon && <span className="truncate">{item.tieuDe}</span>}
                         {!thuGon && item.huyHieu && (
-                          <span className="ml-auto px-1.5 py-0.5 text-[10px] font-bold rounded-full bg-blue-100 text-blue-700">
+                          <span className="ml-auto px-1.5 py-0.5 text-[10px] font-bold rounded-full bg-blue-100 text-blue-700 dark:bg-blue-900/60 dark:text-blue-300">
                             {item.huyHieu}
                           </span>
                         )}
@@ -376,7 +404,7 @@ export default function LayoutBangDieuKhien({ children }: { children: ReactNode 
 
         {/* Chân Sidebar: Thông tin người dùng và Đăng xuất */}
         <div
-          className={`p-3 border-t border-slate-200 bg-slate-50/50 transition-all ${
+          className={`p-3 border-t border-slate-200 dark:border-slate-800 bg-slate-50/50 dark:bg-slate-900/50 transition-all ${
             thuGon ? 'flex flex-col items-center gap-2' : ''
           }`}
         >
@@ -386,11 +414,11 @@ export default function LayoutBangDieuKhien({ children }: { children: ReactNode 
                 thuGon ? 'justify-center' : 'flex-1'
               }`}
             >
-              <div className="w-8 h-8 rounded-full bg-slate-200 shrink-0" />
+              <div className="w-8 h-8 rounded-full bg-slate-200 dark:bg-slate-800 shrink-0" />
               {!thuGon && (
                 <div className="space-y-1.5 flex-1 min-w-0">
-                  <div className="h-3 bg-slate-200 rounded w-24" />
-                  <div className="h-2.5 bg-slate-200 rounded w-16" />
+                  <div className="h-3 bg-slate-200 dark:bg-slate-800 rounded w-24" />
+                  <div className="h-2.5 bg-slate-200 dark:bg-slate-800 rounded w-16" />
                 </div>
               )}
             </div>
@@ -398,7 +426,7 @@ export default function LayoutBangDieuKhien({ children }: { children: ReactNode 
             <div className="flex flex-col items-center gap-2.5 py-1">
               <div
                 title={`${nguoiDung.hoTen} (${layNhanVaiTro(nguoiDung.vaiTro)})`}
-                className="w-9 h-9 rounded-full bg-blue-100 text-blue-700 font-semibold flex items-center justify-center text-xs shrink-0 cursor-default ring-2 ring-white shadow-2xs"
+                className="w-9 h-9 rounded-full bg-blue-100 text-blue-700 dark:bg-blue-900/60 dark:text-blue-300 font-semibold flex items-center justify-center text-xs shrink-0 cursor-default ring-2 ring-white dark:ring-slate-800 shadow-2xs"
               >
                 {nguoiDung.hoTen?.charAt(0) || 'U'}
               </div>
@@ -407,7 +435,7 @@ export default function LayoutBangDieuKhien({ children }: { children: ReactNode 
                 disabled={isLoading}
                 title="Đăng xuất"
                 aria-label="Đăng xuất tài khoản"
-                className="p-1.5 text-slate-400 hover:text-red-600 hover:bg-red-50 rounded-lg transition-colors cursor-pointer disabled:opacity-50"
+                className="p-1.5 text-slate-400 hover:text-red-600 hover:bg-red-50 dark:hover:bg-red-950/40 rounded-lg transition-colors cursor-pointer disabled:opacity-50"
               >
                 <LogOut className="w-4 h-4" />
               </button>
@@ -415,14 +443,14 @@ export default function LayoutBangDieuKhien({ children }: { children: ReactNode 
           ) : (
             <div className="flex items-center justify-between">
               <Link href="/ho-so" className="flex items-center gap-2.5 min-w-0 hover:opacity-80 transition-opacity">
-                <div className="w-8 h-8 rounded-full bg-blue-100 text-blue-700 font-semibold flex items-center justify-center text-xs shrink-0">
+                <div className="w-8 h-8 rounded-full bg-blue-100 text-blue-700 dark:bg-blue-900/60 dark:text-blue-300 font-semibold flex items-center justify-center text-xs shrink-0">
                   {nguoiDung.hoTen?.charAt(0) || 'U'}
                 </div>
                 <div className="truncate">
-                  <p className="text-xs font-semibold text-slate-900 truncate">
+                  <p className="text-xs font-semibold text-slate-900 dark:text-white truncate">
                     {nguoiDung.hoTen}
                   </p>
-                  <span className="inline-block px-1.5 py-0.5 text-[10px] rounded bg-blue-100 text-blue-700 font-medium">
+                  <span className="inline-block px-1.5 py-0.5 text-[10px] rounded bg-blue-100 text-blue-700 dark:bg-blue-900/60 dark:text-blue-300 font-medium">
                     {layNhanVaiTro(nguoiDung.vaiTro)}
                   </span>
                 </div>
@@ -432,7 +460,7 @@ export default function LayoutBangDieuKhien({ children }: { children: ReactNode 
                 disabled={isLoading}
                 title="Đăng xuất"
                 aria-label="Đăng xuất tài khoản"
-                className="p-1.5 text-slate-400 hover:text-red-600 hover:bg-red-50 rounded-lg transition-colors cursor-pointer disabled:opacity-50"
+                className="p-1.5 text-slate-400 hover:text-red-600 hover:bg-red-50 dark:hover:bg-red-950/40 rounded-lg transition-colors cursor-pointer disabled:opacity-50"
               >
                 <LogOut className="w-4 h-4" />
               </button>
@@ -566,20 +594,20 @@ export default function LayoutBangDieuKhien({ children }: { children: ReactNode 
               onClick={batTatThuGon}
               title={thuGon ? 'Mở rộng thanh bên (Ctrl+B)' : 'Thu gọn thanh bên (Ctrl+B)'}
               aria-label={thuGon ? 'Mở rộng thanh bên' : 'Thu gọn thanh bên'}
-              className="hidden md:inline-flex items-center justify-center p-2 text-slate-500 hover:text-slate-900 hover:bg-slate-100 active:scale-95 rounded-lg cursor-pointer transition-all"
+              className="hidden md:inline-flex items-center justify-center p-2 text-slate-500 hover:text-slate-900 dark:text-slate-400 dark:hover:text-slate-100 hover:bg-slate-100 dark:hover:bg-slate-800 active:scale-95 rounded-lg cursor-pointer transition-all"
             >
               {thuGon ? (
-                <PanelLeftOpen className="w-5 h-5 text-blue-600" />
+                <PanelLeftOpen className="w-5 h-5 text-blue-600 dark:text-blue-400" />
               ) : (
                 <PanelLeftClose className="w-5 h-5" />
               )}
             </button>
 
             {/* Breadcrumb đường dẫn */}
-            <div className="flex items-center gap-2 text-sm text-slate-500 pl-1">
+            <div className="flex items-center gap-2 text-sm text-slate-500 dark:text-slate-400 pl-1">
               <span>Bảng điều khiển</span>
               <span>/</span>
-              <span className="font-semibold text-slate-800">{layTieuDeTrang(pathname)}</span>
+              <span className="font-semibold text-slate-800 dark:text-slate-100">{layTieuDeTrang(pathname)}</span>
             </div>
           </div>
 
@@ -590,11 +618,11 @@ export default function LayoutBangDieuKhien({ children }: { children: ReactNode 
               onClick={() => setTimKiemMo(true)}
               title="Tìm kiếm nhanh toàn hệ thống (Ctrl+K)"
               aria-label="Tìm kiếm nhanh (Ctrl+K)"
-              className="flex items-center gap-2 px-3 py-1.5 text-xs text-slate-500 bg-slate-50 hover:bg-slate-100 border border-slate-200 rounded-xl transition-colors cursor-pointer"
+              className="flex items-center gap-2 px-3 py-1.5 text-xs text-slate-500 dark:text-slate-400 bg-slate-50 hover:bg-slate-100 dark:bg-slate-800/80 dark:hover:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl transition-colors cursor-pointer"
             >
               <Search className="w-3.5 h-3.5 text-slate-400" />
               <span className="hidden sm:inline">Tìm kiếm...</span>
-              <kbd className="hidden sm:inline-block px-1.5 py-0.5 text-[10px] font-semibold bg-white border border-slate-200 rounded shadow-2xs">
+              <kbd className="hidden sm:inline-block px-1.5 py-0.5 text-[10px] font-semibold bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 text-slate-600 dark:text-slate-400 rounded shadow-2xs">
                 Ctrl+K
               </kbd>
             </button>
@@ -602,34 +630,28 @@ export default function LayoutBangDieuKhien({ children }: { children: ReactNode 
             {/* Chỉ báo sức khỏe hệ thống (CHỈ HIỂN THỊ CHO QUẢN TRỊ VIÊN) */}
             <ChiBaoSucKhoe vaiTroNguoiDung={nguoiDung?.vaiTro} />
 
-            {/* Nút đổi ngôn ngữ */}
-            <button
-              onClick={batTatNgonNgu}
-              title={ngonNgu === 'vi' ? 'Đổi sang English' : 'Chuyển sang Tiếng Việt'}
-              aria-label="Chuyển đổi ngôn ngữ"
-              className="p-2 text-slate-500 hover:text-slate-800 hover:bg-slate-100 rounded-xl transition-colors cursor-pointer text-xs font-bold"
-            >
-              {ngonNgu === 'vi' ? 'VI' : 'EN'}
-            </button>
+            {/* Bộ dịch ngôn ngữ đa quốc gia GTranslate */}
+            <DichNgonNgu />
 
             {/* Nút chế độ Sáng / Tối */}
             <button
               onClick={batTatSangToi}
+              data-testid="nut-che-do-sang-toi"
               title={cheDoSangToi === 'sang' ? 'Chuyển sang Chế độ tối' : 'Chuyển sang Chế độ sáng'}
               aria-label="Chuyển đổi giao diện sáng tối"
-              className="p-2 text-slate-500 hover:text-slate-800 hover:bg-slate-100 rounded-xl transition-colors cursor-pointer"
+              className="p-2 text-slate-500 hover:text-slate-800 dark:text-slate-400 dark:hover:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-xl transition-all cursor-pointer active:scale-90"
             >
               {cheDoSangToi === 'sang' ? (
-                <Moon className="w-4 h-4" />
+                <Moon className="w-4 h-4 text-slate-600 hover:text-indigo-600 transition-colors" />
               ) : (
-                <Sun className="w-4 h-4 text-amber-500" />
+                <Sun className="w-4 h-4 text-amber-400 hover:text-amber-300 transition-colors" />
               )}
             </button>
           </div>
         </header>
 
         {/* Main Content Area */}
-        <main className="flex-1 overflow-y-auto p-4 sm:p-6 lg:p-8 bg-slate-50">
+        <main className="flex-1 overflow-y-auto p-4 sm:p-6 lg:p-8 bg-slate-50 dark:bg-slate-950">
           <div key={pathname} className="max-w-7xl mx-auto hieu-ung-chuyen-trang">
             {children}
           </div>

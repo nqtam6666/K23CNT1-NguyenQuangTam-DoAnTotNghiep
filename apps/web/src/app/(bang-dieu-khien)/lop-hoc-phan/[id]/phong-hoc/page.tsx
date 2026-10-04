@@ -108,22 +108,22 @@ export default function TrangPhongHocTrucTuyen({ params }: { params: Promise<{ i
         <Loader2 className="w-10 h-10 animate-spin text-blue-600" />
         <div className="text-center">
           <p className="text-base font-semibold text-slate-800">
-            Đang khởi tạo kết nối Phòng học trực tuyến LiveKit...
+            Đang khởi tạo kết nối Phòng học trực tuyến...
           </p>
           <p className="text-xs text-slate-500 mt-1">
-            Đang xác thực quyền hạn và cấp Access Token bảo mật chống IDOR
+            Đang xác thực thông tin thành viên và thiết lập đường truyền an toàn...
           </p>
         </div>
       </div>
     );
   }
 
-  // Trạng thái lỗi phân quyền hoặc không thể truy cập (Chống IDOR)
+  // Trạng thái lỗi phân quyền hoặc không thể truy cập
   if (loiLop || loiCapToken || !duLieuToken) {
     const thongDiepLoi =
       (loiCapToken as any)?.response?.data?.thongDiep ||
       (loiLop as any)?.response?.data?.thongDiep ||
-      'Bạn không có quyền tham gia phòng học trực tuyến của lớp này (Kiểm soát chống IDOR).';
+      'Bạn không có quyền tham gia phòng học trực tuyến của lớp này. Vui lòng kiểm tra lại tài khoản hoặc liên hệ giảng viên.';
 
     return (
       <div className="max-w-md mx-auto my-16 p-8 bg-white rounded-2xl shadow-sm border border-slate-200 text-center space-y-5">
@@ -173,7 +173,7 @@ export default function TrangPhongHocTrucTuyen({ params }: { params: Promise<{ i
               </h2>
               <span className="inline-flex items-center gap-1.5 px-2 py-0.5 rounded-full text-[11px] font-semibold bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">
                 <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
-                LiveKit SFU
+                Trực tiếp
               </span>
             </div>
             <p className="text-xs text-slate-400 truncate hidden sm:block">

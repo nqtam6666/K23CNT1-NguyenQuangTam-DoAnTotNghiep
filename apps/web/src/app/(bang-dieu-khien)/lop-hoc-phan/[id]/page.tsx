@@ -253,7 +253,7 @@ export default function TrangChiTietLopHocPhan({ params }: { params: Promise<{ i
         </div>
         <h2 className="text-xl font-bold text-slate-900">Không thể truy cập lớp học phần</h2>
         <p className="text-sm text-slate-500">
-          Bạn không có quyền truy cập lớp học này hoặc lớp học không tồn tại (Kiểm soát chống IDOR).
+          Bạn không có quyền truy cập lớp học này hoặc lớp học không tồn tại. Vui lòng kiểm tra lại liên kết hoặc liên hệ giáo viên phụ trách.
         </p>
         <Link
           href="/lop-hoc-phan"

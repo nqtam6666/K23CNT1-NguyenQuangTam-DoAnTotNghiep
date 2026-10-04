@@ -213,8 +213,7 @@ export default function TrangChu() {
           Đồ án Tốt nghiệp {tenHeThong} - {maLopKhoa} {tacGia} - MSSV: {mssv}
         </p>
         <p className="mt-1">
-          Hệ thống Quản lý Học tập Thế hệ mới trên nền tảng NestJS 10, Next.js 15, PostgreSQL 16 &
-          pgvector
+          Bản quyền © 2026 {tenTruong}. Mọi quyền được bảo lưu.
         </p>
       </footer>
     </div>

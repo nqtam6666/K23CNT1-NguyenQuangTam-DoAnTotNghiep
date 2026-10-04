@@ -144,13 +144,13 @@ export function ChiBaoSucKhoe({ vaiTroNguoiDung }: Props) {
           </div>
 
           <div className="py-3 space-y-2.5">
-            {/* Cơ sở dữ liệu PostgreSQL */}
+            {/* Cơ sở dữ liệu trung tâm */}
             <div className="flex items-center justify-between p-2.5 rounded-xl bg-slate-50 border border-slate-100">
               <div className="flex items-center gap-2.5">
                 <Database className="w-4 h-4 text-slate-600" />
                 <div>
-                  <p className="text-xs font-semibold text-slate-800">Cơ sở dữ liệu PostgreSQL</p>
-                  <p className="text-[11px] text-slate-500">PostgreSQL 16 + pgvector</p>
+                  <p className="text-xs font-semibold text-slate-800">Cơ sở dữ liệu trung tâm</p>
+                  <p className="text-[11px] text-slate-500">Dịch vụ dữ liệu học vụ</p>
                 </div>
               </div>
               {sucKhoe?.dichVu?.coSoDuLieu === 'SAN_SANG' ? (
@@ -166,13 +166,13 @@ export function ChiBaoSucKhoe({ vaiTroNguoiDung }: Props) {
               )}
             </div>
 
-            {/* Bộ nhớ đệm Redis */}
+            {/* Bộ nhớ đệm */}
             <div className="flex items-center justify-between p-2.5 rounded-xl bg-slate-50 border border-slate-100">
               <div className="flex items-center gap-2.5">
                 <Cpu className="w-4 h-4 text-slate-600" />
                 <div>
-                  <p className="text-xs font-semibold text-slate-800">Bộ nhớ đệm Redis</p>
-                  <p className="text-[11px] text-slate-500">Redis 7 Alpine Cache</p>
+                  <p className="text-xs font-semibold text-slate-800">Hệ thống bộ nhớ đệm</p>
+                  <p className="text-[11px] text-slate-500">Dịch vụ tăng tốc truy xuất</p>
                 </div>
               </div>
               {sucKhoe?.dichVu?.boNhoDemRedis === 'SAN_SANG' ? (
@@ -188,13 +188,13 @@ export function ChiBaoSucKhoe({ vaiTroNguoiDung }: Props) {
               )}
             </div>
 
-            {/* Lưu trữ MinIO */}
+            {/* Lưu trữ tệp tin */}
             <div className="flex items-center justify-between p-2.5 rounded-xl bg-slate-50 border border-slate-100">
               <div className="flex items-center gap-2.5">
                 <HardDrive className="w-4 h-4 text-slate-600" />
                 <div>
-                  <p className="text-xs font-semibold text-slate-800">Lưu trữ tệp tin MinIO</p>
-                  <p className="text-[11px] text-slate-500">S3 Storage Service</p>
+                  <p className="text-xs font-semibold text-slate-800">Hệ thống lưu trữ tệp tin</p>
+                  <p className="text-[11px] text-slate-500">Dịch vụ tài liệu học tập</p>
                 </div>
               </div>
               {sucKhoe?.dichVu?.luuTruMinIO === 'SAN_SANG' ? (
@@ -210,13 +210,13 @@ export function ChiBaoSucKhoe({ vaiTroNguoiDung }: Props) {
               )}
             </div>
 
-            {/* Phòng học LiveKit */}
+            {/* Phòng học trực tuyến */}
             <div className="flex items-center justify-between p-2.5 rounded-xl bg-slate-50 border border-slate-100">
               <div className="flex items-center gap-2.5">
                 <Video className="w-4 h-4 text-slate-600" />
                 <div>
-                  <p className="text-xs font-semibold text-slate-800">Phòng học LiveKit SFU</p>
-                  <p className="text-[11px] text-slate-500">WebRTC Streaming Server</p>
+                  <p className="text-xs font-semibold text-slate-800">Hệ thống phòng học trực tuyến</p>
+                  <p className="text-[11px] text-slate-500">Dịch vụ truyền phát âm thanh - hình ảnh</p>
                 </div>
               </div>
               {sucKhoe?.dichVu?.phongHocLiveKit === 'SAN_SANG' ? (

@@ -9,6 +9,7 @@ export interface PayloadJwt {
   email: string;
   vaiTro: VaiTro;
   hoTen: string;
+  anhDaiDien?: string | null;
   iat?: number;
   exp?: number;
 }

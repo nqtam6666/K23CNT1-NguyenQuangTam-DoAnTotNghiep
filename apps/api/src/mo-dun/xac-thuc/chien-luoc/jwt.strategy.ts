@@ -41,6 +41,7 @@ export class ChienLuocJwt extends PassportStrategy(Strategy, 'jwt') {
       email: nguoiDung.email,
       hoTen: nguoiDung.hoTen,
       vaiTro: nguoiDung.vaiTro,
+      anhDaiDien: nguoiDung.anhDaiDien,
     };
   }
 }

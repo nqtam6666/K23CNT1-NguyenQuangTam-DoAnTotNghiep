@@ -27,6 +27,7 @@ import { ChiBaoSucKhoe } from '../../thanh-phan/chi-bao-suc-khoe';
 import { TimKiemNhanh } from '../../thanh-phan/tim-kiem-nhanh';
 import { DichNgonNgu } from '../../thanh-phan/dich-ngon-ngu';
 import { ThemeToggleButton2 } from '../../thanh-phan/nut-chuyen-giao-dien';
+import { AnhDaiDien } from '../../thanh-phan/anh-dai-dien';
 
 const BAN_DO_TIEU_DE_TRANG: Record<string, string> = {
   '/bang-dieu-khien': 'Tổng quan',
@@ -417,12 +418,18 @@ export default function LayoutBangDieuKhien({ children }: { children: ReactNode 
             </div>
           ) : thuGon ? (
             <div className="flex flex-col items-center gap-2.5 py-1">
-              <div
+              <Link
+                href="/ho-so"
                 title={`${nguoiDung.hoTen} (${layNhanVaiTro(nguoiDung.vaiTro)})`}
-                className="w-9 h-9 rounded-full bg-blue-100 text-blue-700 dark:bg-blue-900/60 dark:text-blue-300 font-semibold flex items-center justify-center text-xs shrink-0 cursor-default ring-2 ring-white dark:ring-slate-800 shadow-2xs"
+                className="hover:opacity-85 transition-opacity"
               >
-                {nguoiDung.hoTen?.charAt(0) || 'U'}
-              </div>
+                <AnhDaiDien
+                  url={nguoiDung.anhDaiDien}
+                  hoTen={nguoiDung.hoTen}
+                  kichThuoc="sm"
+                  hienThiVien
+                />
+              </Link>
               <button
                 onClick={dangXuat}
                 disabled={isLoading}
@@ -435,10 +442,13 @@ export default function LayoutBangDieuKhien({ children }: { children: ReactNode 
             </div>
           ) : (
             <div className="flex items-center justify-between">
-              <Link href="/ho-so" className="flex items-center gap-2.5 min-w-0 hover:opacity-80 transition-opacity">
-                <div className="w-8 h-8 rounded-full bg-blue-100 text-blue-700 dark:bg-blue-900/60 dark:text-blue-300 font-semibold flex items-center justify-center text-xs shrink-0">
-                  {nguoiDung.hoTen?.charAt(0) || 'U'}
-                </div>
+              <Link href="/ho-so" className="flex items-center gap-2.5 min-w-0 hover:opacity-85 transition-opacity">
+                <AnhDaiDien
+                  url={nguoiDung.anhDaiDien}
+                  hoTen={nguoiDung.hoTen}
+                  kichThuoc="sm"
+                  hienThiVien
+                />
                 <div className="truncate">
                   <p className="text-xs font-semibold text-slate-900 dark:text-white truncate">
                     {nguoiDung.hoTen}
@@ -538,26 +548,33 @@ export default function LayoutBangDieuKhien({ children }: { children: ReactNode 
               })}
             </nav>
 
-            <div className="p-4 border-t border-slate-200 bg-slate-50/50">
+            <div className="p-4 border-t border-slate-200 dark:border-slate-800 bg-slate-50/50 dark:bg-slate-900/50">
               <div className="flex items-center justify-between">
-                <div className="flex items-center gap-2 min-w-0">
-                  <div className="w-8 h-8 rounded-full bg-blue-100 text-blue-700 font-semibold flex items-center justify-center text-xs shrink-0">
-                    {nguoiDung?.hoTen?.charAt(0) || 'U'}
-                  </div>
+                <Link
+                  href="/ho-so"
+                  onClick={() => setSidebarMo(false)}
+                  className="flex items-center gap-2.5 min-w-0 hover:opacity-85 transition-opacity"
+                >
+                  <AnhDaiDien
+                    url={nguoiDung?.anhDaiDien}
+                    hoTen={nguoiDung?.hoTen}
+                    kichThuoc="sm"
+                    hienThiVien
+                  />
                   <div className="truncate">
-                    <p className="text-xs font-semibold text-slate-900 truncate">
+                    <p className="text-xs font-semibold text-slate-900 dark:text-white truncate">
                       {nguoiDung?.hoTen}
                     </p>
-                    <span className="text-[10px] text-blue-600 font-medium">
+                    <span className="text-[10px] text-blue-600 dark:text-blue-400 font-medium">
                       {layNhanVaiTro(nguoiDung?.vaiTro as VaiTro)}
                     </span>
                   </div>
-                </div>
+                </Link>
                 <button
                   onClick={dangXuat}
                   disabled={isLoading}
                   aria-label="Đăng xuất tài khoản"
-                  className="p-1.5 text-slate-400 hover:text-red-600 hover:bg-red-50 rounded-lg disabled:opacity-50"
+                  className="p-1.5 text-slate-400 hover:text-red-600 hover:bg-red-50 dark:hover:bg-red-950/40 rounded-lg transition-colors cursor-pointer disabled:opacity-50"
                 >
                   <LogOut className="w-4 h-4" />
                 </button>
@@ -631,6 +648,24 @@ export default function LayoutBangDieuKhien({ children }: { children: ReactNode 
               isDark={cheDoSangToi === 'toi'}
               onToggle={batTatSangToi}
             />
+
+            {/* Ảnh đại diện cá nhân trên Top Header */}
+            {nguoiDung && (
+              <Link
+                href="/ho-so"
+                title={`Hồ sơ cá nhân: ${nguoiDung.hoTen} (${layNhanVaiTro(nguoiDung.vaiTro)})`}
+                aria-label="Xem hồ sơ cá nhân"
+                className="flex items-center gap-1.5 pl-1 group cursor-pointer"
+              >
+                <AnhDaiDien
+                  url={nguoiDung.anhDaiDien}
+                  hoTen={nguoiDung.hoTen}
+                  kichThuoc="sm"
+                  hienThiVien
+                  className="group-hover:ring-2 group-hover:ring-blue-500 transition-all"
+                />
+              </Link>
+            )}
           </div>
         </header>
 

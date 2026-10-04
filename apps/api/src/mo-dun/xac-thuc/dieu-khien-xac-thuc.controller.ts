@@ -121,7 +121,8 @@ export class DieuKhienXacThuc {
   @ApiOperation({ summary: 'Lấy thông tin người dùng đang đăng nhập' })
   @ApiResponse({ status: 200, description: 'Trả về thông tin hồ sơ hiện tại' })
   async layHoSoHienTai(@NguoiDungHienTai() nguoiDung: PayloadJwt) {
-    return nguoiDung;
+    const hoSo = await this.dichVuXacThuc.layHoSoHienTai(nguoiDung.id);
+    return hoSo || nguoiDung;
   }
 
   @Post('doi-mat-khau')

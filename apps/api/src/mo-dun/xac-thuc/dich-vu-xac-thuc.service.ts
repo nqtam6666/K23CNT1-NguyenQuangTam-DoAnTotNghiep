@@ -67,6 +67,7 @@ export class DichVuXacThuc {
       nguoiDungMoi.vaiTro as VaiTro,
       thongTinThietBi,
       diaChiIp,
+      nguoiDungMoi.anhDaiDien,
     );
   }
 
@@ -120,6 +121,7 @@ export class DichVuXacThuc {
       nguoiDung.vaiTro as VaiTro,
       thongTinThietBi,
       diaChiIp,
+      nguoiDung.anhDaiDien,
     );
   }
 
@@ -174,6 +176,7 @@ export class DichVuXacThuc {
       nguoiDung.vaiTro as VaiTro,
       thongTinThietBi,
       diaChiIp,
+      nguoiDung.anhDaiDien,
     );
   }
 
@@ -230,6 +233,23 @@ export class DichVuXacThuc {
   }
 
   /**
+   * Lấy thông tin hồ sơ hiện tại mới nhất từ cơ sở dữ liệu
+   */
+  async layHoSoHienTai(idNguoiDung: string) {
+    const nguoiDung = await this.khoNguoiDung.timTheoId(idNguoiDung);
+    if (!nguoiDung) return null;
+    return {
+      id: nguoiDung.id,
+      sub: nguoiDung.id,
+      email: nguoiDung.email,
+      hoTen: nguoiDung.hoTen,
+      vaiTro: nguoiDung.vaiTro as VaiTro,
+      soDienThoai: nguoiDung.soDienThoai,
+      anhDaiDien: nguoiDung.anhDaiDien,
+    };
+  }
+
+  /**
    * Sinh cặp JWT Access Token và Refresh Token
    */
   private async taoCapToken(
@@ -239,6 +259,7 @@ export class DichVuXacThuc {
     vaiTro: VaiTro,
     thongTinThietBi?: string,
     diaChiIp?: string,
+    anhDaiDien?: string | null,
   ): Promise<KetQuaXacThuc> {
     const payload: PayloadJwt = {
       sub: idNguoiDung,
@@ -246,6 +267,7 @@ export class DichVuXacThuc {
       email,
       hoTen,
       vaiTro,
+      anhDaiDien: anhDaiDien ?? null,
     };
 
     const accessToken = this.jwtService.sign(payload, {
@@ -287,6 +309,7 @@ export class DichVuXacThuc {
         email,
         hoTen,
         vaiTro,
+        anhDaiDien: anhDaiDien ?? null,
       },
     };
   }

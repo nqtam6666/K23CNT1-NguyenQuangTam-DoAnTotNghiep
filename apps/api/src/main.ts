@@ -2,6 +2,9 @@ import { NestFactory } from '@nestjs/core';
 import { Logger } from '@nestjs/common';
 import { SwaggerModule, DocumentBuilder } from '@nestjs/swagger';
 import cookieParser from 'cookie-parser';
+import express from 'express';
+import { join } from 'path';
+import { existsSync, mkdirSync } from 'fs';
 import { AppModule } from './app.module';
 
 async function khoiChay() {
@@ -10,6 +13,17 @@ async function khoiChay() {
 
   // 1. Cấu hình Cookie Parser
   app.use(cookieParser());
+
+  // Phục vụ tệp tĩnh tải lên (Uploads)
+  const thuMucTaiLen = join(process.cwd(), 'uploads');
+  if (!existsSync(thuMucTaiLen)) {
+    mkdirSync(thuMucTaiLen, { recursive: true });
+  }
+  const thuMucAnhDaiDien = join(thuMucTaiLen, 'avatars');
+  if (!existsSync(thuMucAnhDaiDien)) {
+    mkdirSync(thuMucAnhDaiDien, { recursive: true });
+  }
+  app.use('/uploads', express.static(thuMucTaiLen));
 
   // 2. Cấu hình CORS an toàn
   const urlFrontend = process.env.URL_UNG_DUNG_WEB || 'http://localhost:3000';

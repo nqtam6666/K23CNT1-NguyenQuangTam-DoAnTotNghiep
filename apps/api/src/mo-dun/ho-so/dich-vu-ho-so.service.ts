@@ -20,6 +20,9 @@ import {
 } from '@lms/chung';
 import { KhoHoSo } from './kho-ho-so.repository';
 import { KhoNguoiDung } from '../nguoi-dung/kho-nguoi-dung.repository';
+import * as fs from 'fs';
+import * as path from 'path';
+import { randomUUID } from 'crypto';
 
 @Injectable()
 export class DichVuHoSo {
@@ -74,14 +77,80 @@ export class DichVuHoSo {
       });
     }
 
-    const capNhat = await this.khoNguoiDung.capNhatNguoiDung(idNguoiDung, {
-      hoTen: duLieu.hoTen,
-      soDienThoai: duLieu.soDienThoai,
-      anhDaiDien: duLieu.anhDaiDien,
-    });
+    const duLieuCapNhat: any = {};
+    if (duLieu.hoTen !== undefined) duLieuCapNhat.hoTen = duLieu.hoTen;
+    if (duLieu.soDienThoai !== undefined) duLieuCapNhat.soDienThoai = duLieu.soDienThoai;
+    if (duLieu.anhDaiDien !== undefined) {
+      duLieuCapNhat.anhDaiDien = duLieu.anhDaiDien === '' ? null : duLieu.anhDaiDien;
+    }
+
+    const capNhat = await this.khoNguoiDung.capNhatNguoiDung(idNguoiDung, duLieuCapNhat);
 
     const { matKhau, ...ketQua } = capNhat;
     return ketQua;
+  }
+
+  /**
+   * Tải lên và cập nhật ảnh đại diện người dùng
+   * Tuân thủ Quy tắc 02 (Bảo mật upload file: whitelist mime, magic bytes, uuid filename, chống path traversal)
+   */
+  async taiLenAnhDaiDien(idNguoiDung: string, tep?: Express.Multer.File) {
+    if (!tep || !tep.buffer) {
+      throw new BadRequestException({
+        thanhCong: false,
+        maLoi: MaLoiNghiepVu.DU_LIEU_KHONG_HOP_LE,
+        thongDiep: 'Vui lòng chọn tập tin hình ảnh để tải lên',
+      });
+    }
+
+    const mimeHopLe = ['image/jpeg', 'image/png', 'image/webp', 'image/gif'];
+    if (!mimeHopLe.includes(tep.mimetype)) {
+      throw new BadRequestException({
+        thanhCong: false,
+        maLoi: MaLoiNghiepVu.DU_LIEU_KHONG_HOP_LE,
+        thongDiep: 'Định dạng ảnh không hợp lệ. Chỉ chấp nhận JPG, PNG, WEBP hoặc GIF',
+      });
+    }
+
+    const buf = tep.buffer;
+    const laJpeg = buf.length >= 3 && buf[0] === 0xff && buf[1] === 0xd8 && buf[2] === 0xff;
+    const laPng = buf.length >= 4 && buf[0] === 0x89 && buf[1] === 0x50 && buf[2] === 0x4e && buf[3] === 0x47;
+    const laGif = buf.length >= 4 && buf[0] === 0x47 && buf[1] === 0x49 && buf[2] === 0x46 && buf[3] === 0x38;
+    const laWebp = buf.length >= 12 && buf.toString('ascii', 0, 4) === 'RIFF' && buf.toString('ascii', 8, 12) === 'WEBP';
+
+    if (!laJpeg && !laPng && !laGif && !laWebp) {
+      throw new BadRequestException({
+        thanhCong: false,
+        maLoi: MaLoiNghiepVu.DU_LIEU_KHONG_HOP_LE,
+        thongDiep: 'Nội dung tập tin không đúng định dạng hình ảnh hợp lệ',
+      });
+    }
+
+    let duoiTep = 'jpg';
+    if (laPng) duoiTep = 'png';
+    else if (laWebp) duoiTep = 'webp';
+    else if (laGif) duoiTep = 'gif';
+
+    const tenTep = `${randomUUID()}.${duoiTep}`;
+    const thuMucLuu = path.join(process.cwd(), 'uploads', 'avatars');
+    if (!fs.existsSync(thuMucLuu)) {
+      fs.mkdirSync(thuMucLuu, { recursive: true });
+    }
+
+    const duongDanDayDu = path.join(thuMucLuu, tenTep);
+    await fs.promises.writeFile(duongDanDayDu, buf);
+
+    const urlAnh = `/uploads/avatars/${tenTep}`;
+
+    await this.khoNguoiDung.capNhatNguoiDung(idNguoiDung, {
+      anhDaiDien: urlAnh,
+    });
+
+    return {
+      thanhCong: true,
+      thongDiep: 'Cập nhật ảnh đại diện thành công',
+      urlAnh,
+    };
   }
 
   // ==================== NGHIỆP VỤ HỌC SINH ====================

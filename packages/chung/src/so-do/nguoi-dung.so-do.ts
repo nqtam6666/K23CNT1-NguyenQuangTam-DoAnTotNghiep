@@ -13,7 +13,19 @@ export const capNhatHoSoSchema = z.object({
     .regex(/^[0-9]{10,11}$/, 'Số điện thoại không đúng định dạng')
     .optional()
     .nullable(),
-  anhDaiDien: z.string().url('Đường dẫn ảnh không hợp lệ').optional().nullable(),
+  anhDaiDien: z
+    .string()
+    .refine(
+      (val) =>
+        !val ||
+        val.startsWith('/') ||
+        val.startsWith('http://') ||
+        val.startsWith('https://') ||
+        val.startsWith('data:image/'),
+      { message: 'Đường dẫn ảnh đại diện không hợp lệ' },
+    )
+    .optional()
+    .nullable(),
 });
 
 /**

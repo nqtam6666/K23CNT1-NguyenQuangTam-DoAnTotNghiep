@@ -14,15 +14,19 @@ import {
   CheckCircle,
   AlertCircle,
   School,
+  Camera,
 } from 'lucide-react';
 import { capNhatHoSoSchema, doiMatKhauSchema, CapNhatHoSoDto, DoiMatKhauDto, layNhanVaiTro } from '@lms/chung';
 import { mayKhachApi } from '../../../tien-ich/may-khach-api';
 import { thongBao } from '../../../tien-ich/thong-bao';
 import { KhungXuongHoSo } from '../../../thanh-phan/khung-xuong';
+import { AnhDaiDien } from '../../../thanh-phan/anh-dai-dien';
+import { HopThoaiDoiAnhDaiDien } from '../../../thanh-phan/hop-thoai-doi-anh-dai-dien';
 
 export default function TrangHoSoCaNhan() {
   const queryClient = useQueryClient();
   const [tabHienTai, setTabHienTai] = useState<'thong-tin' | 'doi-mat-khau'>('thong-tin');
+  const [moModalDoiAnh, setMoModalDoiAnh] = useState(false);
   const [thongBaoThanhCong, setThongBaoThanhCong] = useState<string | null>(null);
   const [thongBaoLoi, setThongBaoLoi] = useState<string | null>(null);
 
@@ -55,6 +59,7 @@ export default function TrangHoSoCaNhan() {
     try {
       await mayKhachApi.patch('/ho-so/ca-nhan', duLieu);
       queryClient.invalidateQueries({ queryKey: ['hoSoCaNhan'] });
+      queryClient.invalidateQueries({ queryKey: ['ho-so-hien-tai'] });
       setThongBaoThanhCong('Cập nhật thông tin thành công!');
       thongBao.thanhCong(
         'Cập nhật hồ sơ thành công',
@@ -124,18 +129,57 @@ export default function TrangHoSoCaNhan() {
       )}
 
       {/* Thẻ Hồ sơ tóm tắt */}
-      <div className="p-6 rounded-2xl bg-white border border-slate-200 shadow-2xs flex flex-col sm:flex-row items-center gap-6">
-        <div className="w-20 h-20 rounded-full bg-blue-100 text-blue-700 font-bold text-2xl flex items-center justify-center border-2 border-blue-200 shadow-xs">
-          {hoSo?.hoTen?.charAt(0) || 'U'}
+      <div className="p-6 rounded-2xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-2xs flex flex-col sm:flex-row items-center gap-6">
+        <div
+          onClick={() => setMoModalDoiAnh(true)}
+          title="Nhấp để thay đổi ảnh đại diện"
+          className="relative group cursor-pointer shrink-0"
+        >
+          <AnhDaiDien
+            url={hoSo?.anhDaiDien}
+            hoTen={hoSo?.hoTen}
+            kichThuoc="xl"
+            className="ring-4 ring-white dark:ring-slate-800 shadow-sm"
+          />
+          <div className="absolute inset-0 rounded-full bg-slate-900/60 backdrop-blur-[1px] opacity-0 group-hover:opacity-100 transition-opacity flex flex-col items-center justify-center text-white text-center p-1">
+            <Camera className="w-5 h-5 mb-0.5" />
+            <span className="text-[10px] font-semibold">Đổi ảnh</span>
+          </div>
+          <button
+            type="button"
+            onClick={(e) => {
+              e.stopPropagation();
+              setMoModalDoiAnh(true);
+            }}
+            title="Đổi ảnh đại diện"
+            className="absolute -bottom-1 -right-1 p-1.5 rounded-full bg-blue-600 hover:bg-blue-700 text-white shadow-sm ring-2 ring-white dark:ring-slate-900 transition-transform active:scale-95 cursor-pointer"
+          >
+            <Camera className="w-3.5 h-3.5" />
+          </button>
         </div>
-        <div className="text-center sm:text-left flex-1">
-          <h3 className="text-xl font-bold text-slate-900">{hoSo?.hoTen}</h3>
-          <p className="text-sm text-slate-500">{hoSo?.email}</p>
-          <div className="mt-2 flex flex-wrap gap-2 justify-center sm:justify-start">
-            <span className="px-2.5 py-0.5 rounded-full text-xs font-semibold bg-blue-100 text-blue-700 border border-blue-200">
+
+        <div className="text-center sm:text-left flex-1 min-w-0">
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+            <div>
+              <h3 className="text-xl font-bold text-slate-900 dark:text-white truncate">
+                {hoSo?.hoTen}
+              </h3>
+              <p className="text-sm text-slate-500 dark:text-slate-400 truncate">{hoSo?.email}</p>
+            </div>
+            <button
+              type="button"
+              onClick={() => setMoModalDoiAnh(true)}
+              className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-semibold text-blue-700 dark:text-blue-300 bg-blue-50 dark:bg-blue-950/60 hover:bg-blue-100 dark:hover:bg-blue-900/60 border border-blue-200 dark:border-blue-800 rounded-xl transition-colors cursor-pointer self-center sm:self-auto"
+            >
+              <Camera className="w-3.5 h-3.5" />
+              Đổi ảnh đại diện
+            </button>
+          </div>
+          <div className="mt-2.5 flex flex-wrap gap-2 justify-center sm:justify-start">
+            <span className="px-2.5 py-0.5 rounded-full text-xs font-semibold bg-blue-100 text-blue-700 dark:bg-blue-900/60 dark:text-blue-300 border border-blue-200 dark:border-blue-800">
               {layNhanVaiTro(hoSo?.vaiTro)}
             </span>
-            <span className="px-2.5 py-0.5 rounded-full text-xs font-semibold bg-emerald-100 text-emerald-700 border border-emerald-200">
+            <span className="px-2.5 py-0.5 rounded-full text-xs font-semibold bg-emerald-100 text-emerald-700 dark:bg-emerald-900/60 dark:text-emerald-300 border border-emerald-200 dark:border-emerald-800">
               Đang hoạt động
             </span>
           </div>
@@ -364,6 +408,14 @@ export default function TrangHoSoCaNhan() {
           </div>
         </form>
       )}
+
+      {/* Hộp thoại thay đổi ảnh đại diện */}
+      <HopThoaiDoiAnhDaiDien
+        mo={moModalDoiAnh}
+        onDong={() => setMoModalDoiAnh(false)}
+        anhDaiDienHienTai={hoSo?.anhDaiDien}
+        hoTen={hoSo?.hoTen}
+      />
     </div>
   );
 }

@@ -10,7 +10,10 @@ import {
   UseGuards,
   HttpCode,
   HttpStatus,
+  UseInterceptors,
+  UploadedFile,
 } from '@nestjs/common';
+import { FileInterceptor } from '@nestjs/platform-express';
 import { ApiTags, ApiOperation, ApiResponse, ApiBearerAuth } from '@nestjs/swagger';
 import { DichVuHoSo } from './dich-vu-ho-so.service';
 import {
@@ -65,6 +68,21 @@ export class DieuKhienHoSo {
     @Body(new ZodValidationPipe(capNhatHoSoSchema)) duLieu: CapNhatHoSoDto,
   ) {
     return this.dichVuHoSo.capNhatHoSoCaNhan(idNguoiDung, duLieu);
+  }
+
+  @Post('anh-dai-dien')
+  @UseInterceptors(
+    FileInterceptor('tep', {
+      limits: { fileSize: 5 * 1024 * 1024 }, // Giới hạn 5MB
+    }),
+  )
+  @ApiOperation({ summary: 'Tải lên và cập nhật ảnh đại diện cá nhân' })
+  @ApiResponse({ status: 200, description: 'Cập nhật ảnh đại diện thành công' })
+  async taiLenAnhDaiDien(
+    @NguoiDungHienTai('id') idNguoiDung: string,
+    @UploadedFile() tep?: Express.Multer.File,
+  ) {
+    return this.dichVuHoSo.taiLenAnhDaiDien(idNguoiDung, tep);
   }
 
   @Get('con-em')

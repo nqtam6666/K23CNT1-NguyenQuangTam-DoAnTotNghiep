@@ -19,6 +19,7 @@ import {
 import { mayKhachApi } from '../../../tien-ich/may-khach-api';
 import { thongBao } from '../../../tien-ich/thong-bao';
 import { LopHocPhan, TaoLopHocPhanInput, VaiTro, PayloadJwt } from '@lms/chung';
+import { HopThoai } from '../../../thanh-phan/hop-thoai';
 
 export default function TrangLopHocPhan() {
   const queryClient = useQueryClient();
@@ -289,183 +290,171 @@ export default function TrangLopHocPhan() {
       )}
 
       {/* MODAL THAM GIA BẰNG MÃ */}
-      {moModalThamGia && (
-        <div className="fixed inset-0 bg-slate-900/50 backdrop-blur-sm z-50 flex items-center justify-center p-4">
-          <div className="bg-white rounded-xl shadow-xl max-w-md w-full p-6 space-y-4">
-            <div className="flex items-center gap-3">
-              <div className="w-10 h-10 rounded-full bg-indigo-50 text-indigo-600 flex items-center justify-center">
-                <KeyRound className="w-5 h-5" />
-              </div>
-              <div>
-                <h3 className="text-lg font-bold text-slate-900">Tham gia bằng mã mời</h3>
-                <p className="text-xs text-slate-500">Nhập mã lớp 6 ký tự được cấp bởi giáo viên</p>
-              </div>
-            </div>
+      <HopThoai
+        mo={moModalThamGia}
+        onDong={() => setMoModalThamGia(false)}
+        tieuDe="Tham gia bằng mã mời"
+        moTa="Nhập mã lớp 6 ký tự được cấp bởi giáo viên bộ môn"
+        kichThuoc="nho"
+      >
+        <div className="space-y-4">
+          <div className="flex items-center gap-3 p-3 bg-indigo-50/60 rounded-xl text-indigo-700">
+            <KeyRound className="w-5 h-5 shrink-0" />
+            <p className="text-xs">Mã mời sẽ tự động phân bạn vào đúng lớp học phần tương ứng.</p>
+          </div>
 
-            {thongBaoLoi && (
-              <div className="p-3 bg-rose-50 text-rose-700 text-xs rounded-lg flex items-center gap-2">
-                <AlertCircle className="w-4 h-4 shrink-0" />
-                <span>{thongBaoLoi}</span>
-              </div>
-            )}
+          <div>
+            <input
+              type="text"
+              maxLength={10}
+              placeholder="VD: 7KZ9A2"
+              value={maThamGia}
+              onChange={(e) => setMaThamGia(e.target.value.toUpperCase())}
+              className="w-full text-center text-2xl font-mono font-bold tracking-widest px-4 py-3 border border-slate-300 rounded-xl focus:ring-2 focus:ring-indigo-500 focus:outline-none uppercase"
+            />
+          </div>
 
+          <div className="flex justify-end gap-3 pt-2">
+            <button
+              type="button"
+              onClick={() => setMoModalThamGia(false)}
+              className="px-4 py-2.5 border border-slate-300 text-slate-700 rounded-xl text-sm font-medium hover:bg-slate-50 cursor-pointer"
+            >
+              Hủy
+            </button>
+            <button
+              type="button"
+              disabled={!maThamGia.trim() || thamGiaMutation.isPending}
+              onClick={() => thamGiaMutation.mutate(maThamGia.trim())}
+              className="px-5 py-2.5 bg-indigo-600 hover:bg-indigo-700 text-white rounded-xl text-sm font-semibold disabled:opacity-50 cursor-pointer shadow-sm shadow-indigo-600/20"
+            >
+              {thamGiaMutation.isPending ? 'Đang xác thực...' : 'Tham gia ngay'}
+            </button>
+          </div>
+        </div>
+      </HopThoai>
+
+      {/* MODAL TẠO LỚP HỌC PHẦN */}
+      <HopThoai
+        mo={moModalTaoLop}
+        onDong={() => setMoModalTaoLop(false)}
+        tieuDe="Tạo Lớp học phần mới"
+        moTa="Điền thông tin môn học, học kỳ và giáo viên phụ trách để mở lớp mới"
+        kichThuoc="vua"
+      >
+        <div className="space-y-4">
+          <div className="space-y-3">
             <div>
+              <label className="block text-xs font-semibold text-slate-700 mb-1">Mã lớp học phần</label>
               <input
                 type="text"
-                maxLength={10}
-                placeholder="VD: 7KZ9A2"
-                value={maThamGia}
-                onChange={(e) => setMaThamGia(e.target.value.toUpperCase())}
-                className="w-full text-center text-2xl font-mono font-bold tracking-widest px-4 py-3 border border-slate-300 rounded-xl focus:ring-2 focus:ring-indigo-500 focus:outline-none uppercase"
+                placeholder="VD: LHP_TOAN_10A1"
+                value={formTaoLop.maLopHocPhan}
+                onChange={(e) =>
+                  setFormTaoLop({ ...formTaoLop, maLopHocPhan: e.target.value.toUpperCase() })
+                }
+                className="w-full px-3.5 py-2.5 border border-slate-300 rounded-xl text-sm font-mono focus:ring-2 focus:ring-indigo-500 uppercase"
               />
             </div>
 
-            <div className="flex justify-end gap-3 pt-3">
-              <button
-                type="button"
-                onClick={() => setMoModalThamGia(false)}
-                className="px-4 py-2 border border-slate-300 text-slate-700 rounded-lg text-sm hover:bg-slate-50"
-              >
-                Hủy
-              </button>
-              <button
-                type="button"
-                disabled={!maThamGia.trim() || thamGiaMutation.isPending}
-                onClick={() => thamGiaMutation.mutate(maThamGia.trim())}
-                className="px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white rounded-lg text-sm font-semibold disabled:opacity-50"
-              >
-                {thamGiaMutation.isPending ? 'Đang xác thực...' : 'Tham gia ngay'}
-              </button>
+            <div>
+              <label className="block text-xs font-semibold text-slate-700 mb-1">Tên lớp học phần</label>
+              <input
+                type="text"
+                placeholder="VD: Toán 10 - Lớp nâng cao A1"
+                value={formTaoLop.tenLopHocPhan}
+                onChange={(e) => setFormTaoLop({ ...formTaoLop, tenLopHocPhan: e.target.value })}
+                className="w-full px-3.5 py-2.5 border border-slate-300 rounded-xl text-sm focus:ring-2 focus:ring-indigo-500"
+              />
             </div>
-          </div>
-        </div>
-      )}
 
-      {/* MODAL TẠO LỚP HỌC PHẦN */}
-      {moModalTaoLop && (
-        <div className="fixed inset-0 bg-slate-900/50 backdrop-blur-sm z-50 flex items-center justify-center p-4">
-          <div className="bg-white rounded-xl shadow-xl max-w-lg w-full p-6 space-y-4 max-h-[90vh] overflow-y-auto">
-            <h3 className="text-lg font-bold text-slate-900">Tạo Lớp học phần mới</h3>
-            {thongBaoLoi && (
-              <div className="p-3 bg-rose-50 text-rose-700 text-xs rounded-lg flex items-center gap-2">
-                <AlertCircle className="w-4 h-4 shrink-0" />
-                <span>{thongBaoLoi}</span>
-              </div>
-            )}
-
-            <div className="space-y-3">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
               <div>
-                <label className="block text-xs font-medium text-slate-700 mb-1">Mã lớp học phần</label>
-                <input
-                  type="text"
-                  placeholder="VD: LHP_TOAN_10A1"
-                  value={formTaoLop.maLopHocPhan}
-                  onChange={(e) =>
-                    setFormTaoLop({ ...formTaoLop, maLopHocPhan: e.target.value.toUpperCase() })
-                  }
-                  className="w-full px-3 py-2 border border-slate-300 rounded-lg text-sm font-mono focus:ring-2 focus:ring-indigo-500 uppercase"
-                />
-              </div>
-
-              <div>
-                <label className="block text-xs font-medium text-slate-700 mb-1">Tên lớp học phần</label>
-                <input
-                  type="text"
-                  placeholder="VD: Toán 10 - Lớp nâng cao A1"
-                  value={formTaoLop.tenLopHocPhan}
-                  onChange={(e) => setFormTaoLop({ ...formTaoLop, tenLopHocPhan: e.target.value })}
-                  className="w-full px-3 py-2 border border-slate-300 rounded-lg text-sm focus:ring-2 focus:ring-indigo-500"
-                />
-              </div>
-
-              <div className="grid grid-cols-2 gap-3">
-                <div>
-                  <label className="block text-xs font-medium text-slate-700 mb-1">Môn học</label>
-                  <select
-                    value={formTaoLop.idMonHoc}
-                    onChange={(e) => setFormTaoLop({ ...formTaoLop, idMonHoc: e.target.value })}
-                    className="w-full px-3 py-2 border border-slate-300 rounded-lg text-sm bg-white focus:ring-2 focus:ring-indigo-500"
-                  >
-                    <option value="">-- Chọn môn học --</option>
-                    {danhSachMonHoc?.map((mh: any) => (
-                      <option key={mh.id} value={mh.id}>
-                        {mh.maMonHoc} - {mh.tenMonHoc}
-                      </option>
-                    ))}
-                  </select>
-                </div>
-
-                <div>
-                  <label className="block text-xs font-medium text-slate-700 mb-1">Học kỳ</label>
-                  <select
-                    value={formTaoLop.idHocKy}
-                    onChange={(e) => setFormTaoLop({ ...formTaoLop, idHocKy: e.target.value })}
-                    className="w-full px-3 py-2 border border-slate-300 rounded-lg text-sm bg-white focus:ring-2 focus:ring-indigo-500"
-                  >
-                    <option value="">-- Chọn học kỳ --</option>
-                    {danhSachHocKy?.map((hk: any) => (
-                      <option key={hk.id} value={hk.id}>
-                        {hk.tenHocKy} ({hk.namHoc?.tenNamHoc})
-                      </option>
-                    ))}
-                  </select>
-                </div>
-              </div>
-
-              <div>
-                <label className="block text-xs font-medium text-slate-700 mb-1">Giáo viên phụ trách</label>
+                <label className="block text-xs font-semibold text-slate-700 mb-1">Môn học</label>
                 <select
-                  value={formTaoLop.idGiaoVien}
-                  onChange={(e) => setFormTaoLop({ ...formTaoLop, idGiaoVien: e.target.value })}
-                  className="w-full px-3 py-2 border border-slate-300 rounded-lg text-sm bg-white focus:ring-2 focus:ring-indigo-500"
+                  value={formTaoLop.idMonHoc}
+                  onChange={(e) => setFormTaoLop({ ...formTaoLop, idMonHoc: e.target.value })}
+                  className="w-full px-3.5 py-2.5 border border-slate-300 rounded-xl text-sm bg-white focus:ring-2 focus:ring-indigo-500 cursor-pointer"
                 >
-                  <option value="">-- Chọn giáo viên --</option>
-                  {danhSachGiaoVien?.map((gv: any) => (
-                    <option key={gv.id} value={gv.id}>
-                      {gv.maGiaoVien} - {gv.nguoiDung.hoTen} ({gv.chuyenMon || 'Giảng dạy'})
+                  <option value="">-- Chọn môn học --</option>
+                  {danhSachMonHoc?.map((mh: any) => (
+                    <option key={mh.id} value={mh.id}>
+                      {mh.maMonHoc} - {mh.tenMonHoc}
                     </option>
                   ))}
                 </select>
               </div>
 
               <div>
-                <label className="block text-xs font-medium text-slate-700 mb-1">Mô tả tóm tắt</label>
-                <textarea
-                  rows={2}
-                  placeholder="Mục tiêu và yêu cầu môn học..."
-                  value={formTaoLop.moTa || ''}
-                  onChange={(e) => setFormTaoLop({ ...formTaoLop, moTa: e.target.value })}
-                  className="w-full px-3 py-2 border border-slate-300 rounded-lg text-sm focus:ring-2 focus:ring-indigo-500"
-                />
+                <label className="block text-xs font-semibold text-slate-700 mb-1">Học kỳ</label>
+                <select
+                  value={formTaoLop.idHocKy}
+                  onChange={(e) => setFormTaoLop({ ...formTaoLop, idHocKy: e.target.value })}
+                  className="w-full px-3.5 py-2.5 border border-slate-300 rounded-xl text-sm bg-white focus:ring-2 focus:ring-indigo-500 cursor-pointer"
+                >
+                  <option value="">-- Chọn học kỳ --</option>
+                  {danhSachHocKy?.map((hk: any) => (
+                    <option key={hk.id} value={hk.id}>
+                      {hk.tenHocKy} ({hk.namHoc?.tenNamHoc})
+                    </option>
+                  ))}
+                </select>
               </div>
             </div>
 
-            <div className="flex justify-end gap-3 pt-3">
-              <button
-                type="button"
-                onClick={() => setMoModalTaoLop(false)}
-                className="px-4 py-2 border border-slate-300 text-slate-700 rounded-lg text-sm hover:bg-slate-50"
+            <div>
+              <label className="block text-xs font-semibold text-slate-700 mb-1">Giáo viên phụ trách</label>
+              <select
+                value={formTaoLop.idGiaoVien}
+                onChange={(e) => setFormTaoLop({ ...formTaoLop, idGiaoVien: e.target.value })}
+                className="w-full px-3.5 py-2.5 border border-slate-300 rounded-xl text-sm bg-white focus:ring-2 focus:ring-indigo-500 cursor-pointer"
               >
-                Hủy
-              </button>
-              <button
-                type="button"
-                disabled={
-                  !formTaoLop.maLopHocPhan ||
-                  !formTaoLop.idMonHoc ||
-                  !formTaoLop.idHocKy ||
-                  !formTaoLop.idGiaoVien ||
-                  taoLopMutation.isPending
-                }
-                onClick={() => taoLopMutation.mutate(formTaoLop)}
-                className="px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white rounded-lg text-sm font-semibold disabled:opacity-50"
-              >
-                {taoLopMutation.isPending ? 'Đang tạo...' : 'Tạo lớp'}
-              </button>
+                <option value="">-- Chọn giáo viên --</option>
+                {danhSachGiaoVien?.map((gv: any) => (
+                  <option key={gv.id} value={gv.id}>
+                    {gv.maGiaoVien} - {gv.nguoiDung.hoTen} ({gv.chuyenMon || 'Giảng dạy'})
+                  </option>
+                ))}
+              </select>
+            </div>
+
+            <div>
+              <label className="block text-xs font-semibold text-slate-700 mb-1">Mô tả tóm tắt</label>
+              <textarea
+                rows={2}
+                placeholder="Mục tiêu và yêu cầu môn học..."
+                value={formTaoLop.moTa || ''}
+                onChange={(e) => setFormTaoLop({ ...formTaoLop, moTa: e.target.value })}
+                className="w-full px-3.5 py-2.5 border border-slate-300 rounded-xl text-sm focus:ring-2 focus:ring-indigo-500"
+              />
             </div>
           </div>
+
+          <div className="flex justify-end gap-3 pt-3 border-t border-slate-100">
+            <button
+              type="button"
+              onClick={() => setMoModalTaoLop(false)}
+              className="px-4 py-2.5 border border-slate-300 text-slate-700 rounded-xl text-sm font-medium hover:bg-slate-50 cursor-pointer"
+            >
+              Hủy
+            </button>
+            <button
+              type="button"
+              disabled={
+                !formTaoLop.maLopHocPhan ||
+                !formTaoLop.idMonHoc ||
+                !formTaoLop.idHocKy ||
+                !formTaoLop.idGiaoVien ||
+                taoLopMutation.isPending
+              }
+              onClick={() => taoLopMutation.mutate(formTaoLop)}
+              className="px-5 py-2.5 bg-indigo-600 hover:bg-indigo-700 text-white rounded-xl text-sm font-semibold disabled:opacity-50 cursor-pointer shadow-sm shadow-indigo-600/20"
+            >
+              {taoLopMutation.isPending ? 'Đang tạo...' : 'Tạo lớp'}
+            </button>
+          </div>
         </div>
-      )}
+      </HopThoai>
     </div>
   );
 }

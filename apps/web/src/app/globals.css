@@ -75,18 +75,17 @@ a[role="button"]:active:not(:disabled),
 
 /* ==========================================================
    HIỆU ỨNG CHUYỂN TRANG MƯỢT MÀ (PAGE TRANSITION ANIMATION)
+   Chỉ sử dụng opacity để không tạo Stacking Context bẫy position: fixed
    ========================================================== */
 @keyframes hieuUngXuatHienTrang {
   0% {
     opacity: 0;
-    transform: translateY(6px);
   }
   100% {
     opacity: 1;
-    transform: translateY(0);
   }
 }
 
 .hieu-ung-chuyen-trang {
-  animation: hieuUngXuatHienTrang 0.2s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+  animation: hieuUngXuatHienTrang 0.18s ease-out;
 }

@@ -77,6 +77,11 @@ export default function TrangPhongHocTrucTuyen({ params }: { params: Promise<{ i
     },
     retry: false,
     enabled: !!lopHocPhan,
+    staleTime: 60 * 60 * 1000,
+    gcTime: 60 * 60 * 1000,
+    refetchOnWindowFocus: false,
+    refetchOnReconnect: false,
+    refetchOnMount: false,
   });
 
   // 4. Lấy danh sách điểm danh buổi học nếu mở bảng nhật ký

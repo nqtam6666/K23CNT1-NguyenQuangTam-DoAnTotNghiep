@@ -1,15 +1,22 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useMemo } from 'react';
 import {
   LiveKitRoom,
   VideoConference,
   RoomAudioRenderer,
   useConnectionState,
 } from '@livekit/components-react';
-import { DisconnectReason, ConnectionState } from 'livekit-client';
+import { DisconnectReason, ConnectionState, VideoPresets, RoomOptions } from 'livekit-client';
 import '@livekit/components-styles';
-import { RefreshCw, LogOut, Loader2, WifiOff } from 'lucide-react';
+import {
+  RefreshCw,
+  LogOut,
+  Loader2,
+  WifiOff,
+  Maximize2,
+  Minimize2,
+} from 'lucide-react';
 import { thongBao } from '../../../../../tien-ich/thong-bao';
 
 interface ThuocTinhThanhPhanPhongHoc {
@@ -44,12 +51,32 @@ export default function ThanhPhanPhongHocLiveKit({
   onReloadToken,
 }: ThuocTinhThanhPhanPhongHoc) {
   const [lyDoMatKetNoi, setLyDoMatKetNoi] = useState<string | null>(null);
+  const [daRoiPhong, setDaRoiPhong] = useState(false);
   const [soLanThuLai, setSoLanThuLai] = useState(0);
+  const [cheDoGocRong, setCheDoGocRong] = useState(true); // true = contain (chuẩn góc rộng 16:9, không zoom gần)
+
+  // Cấu hình phòng học chuẩn HD và tối ưu băng thông
+  const tuyChonPhong = useMemo<RoomOptions>(
+    () => ({
+      adaptiveStream: true,
+      dynacast: true,
+      videoCaptureDefaults: {
+        resolution: VideoPresets.h720.resolution,
+        facingMode: 'user',
+      },
+      publishDefaults: {
+        simulcast: true,
+        videoCodec: 'vp8',
+        videoSimulcastLayers: [VideoPresets.h720, VideoPresets.h360],
+      },
+    }),
+    [],
+  );
 
   const xuLyMatKetNoi = (lyDo?: DisconnectReason) => {
-    // 1. Nếu do người dùng chủ động bấm Rời phòng (Leave)
+    // 1. Nếu do người dùng bấm nút Rời phòng (Leave) trong thanh điều khiển LiveKit
     if (lyDo === DisconnectReason.CLIENT_INITIATED) {
-      onLeaveRoom();
+      setDaRoiPhong(true);
       return;
     }
 
@@ -80,14 +107,91 @@ export default function ThanhPhanPhongHocLiveKit({
 
   const xuLyThuLai = () => {
     setLyDoMatKetNoi(null);
+    setDaRoiPhong(false);
     setSoLanThuLai((truoc) => truoc + 1);
     if (onReloadToken) {
       onReloadToken();
     }
   };
 
+  // Màn hình khi người dùng đã chủ động rời phòng
+  if (daRoiPhong) {
+    return (
+      <div className="h-full w-full bg-slate-950 flex flex-col items-center justify-center p-6 text-center">
+        <div className="w-16 h-16 rounded-full bg-blue-500/10 border border-blue-500/20 flex items-center justify-center text-blue-400 mb-4">
+          <LogOut className="w-8 h-8" />
+        </div>
+        <h3 className="text-lg font-bold text-white mb-2">Bạn đã rời khỏi phòng học</h3>
+        <p className="text-sm text-slate-400 max-w-md mb-6 leading-relaxed">
+          Bạn vừa kết thúc phiên học trực tuyến. Bạn có thể tham gia lại phòng bất cứ lúc nào hoặc quay về trang thông tin lớp học.
+        </p>
+        <div className="flex items-center gap-3">
+          <button
+            onClick={xuLyThuLai}
+            className="px-5 py-2.5 bg-blue-600 hover:bg-blue-700 text-white rounded-xl text-sm font-semibold flex items-center gap-2 transition-all shadow-lg shadow-blue-600/25 active:scale-95"
+          >
+            <RefreshCw className="w-4 h-4" />
+            Tham gia lại
+          </button>
+          <button
+            onClick={onLeaveRoom}
+            className="px-5 py-2.5 bg-slate-800 hover:bg-slate-700 text-slate-300 hover:text-white rounded-xl text-sm font-semibold flex items-center gap-2 transition-all border border-slate-700 active:scale-95"
+          >
+            <LogOut className="w-4 h-4" />
+            Quay lại lớp học
+          </button>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="relative h-full w-full flex flex-col bg-slate-950">
+      {/* TÙY CHỈNH CSS CAMERA GÓC RỘNG VÀ ĐỘ PHÂN GIẢI CHUẨN */}
+      <style>{`
+        .lk-video-conference {
+          background-color: #020617 !important;
+        }
+        .lk-participant-tile video,
+        .lk-video-container video,
+        .lk-focus-layout video {
+          object-fit: ${cheDoGocRong ? 'contain' : 'cover'} !important;
+          background-color: #090d16 !important;
+        }
+        .lk-participant-tile {
+          border-radius: 0.75rem !important;
+          border: 1px solid rgba(51, 65, 85, 0.4) !important;
+        }
+        .lk-control-bar {
+          border-radius: 1rem !important;
+          background-color: rgba(15, 23, 42, 0.9) !important;
+          backdrop-filter: blur(12px) !important;
+          border: 1px solid rgba(51, 65, 85, 0.5) !important;
+        }
+      `}</style>
+
+      {/* NÚT CHUYỂN ĐỔI CHẾ ĐỘ CAMERA GÓC RỘNG / LẤP ĐẦY */}
+      <div className="absolute top-3 right-3 z-30 flex items-center gap-2 bg-slate-900/80 backdrop-blur-md px-3 py-1.5 rounded-xl border border-slate-800 text-xs shadow-lg">
+        <span className="text-slate-400 hidden sm:inline">Khung hình:</span>
+        <button
+          onClick={() => setCheDoGocRong(!cheDoGocRong)}
+          className="inline-flex items-center gap-1.5 font-medium text-blue-400 hover:text-blue-300 transition-colors"
+          title={cheDoGocRong ? 'Đang ở chế độ Góc rộng chuẩn 16:9' : 'Đang ở chế độ Phóng to lấp đầy'}
+        >
+          {cheDoGocRong ? (
+            <>
+              <Minimize2 className="w-3.5 h-3.5" />
+              <span>Góc rộng chuẩn 16:9</span>
+            </>
+          ) : (
+            <>
+              <Maximize2 className="w-3.5 h-3.5" />
+              <span>Phóng to lấp đầy</span>
+            </>
+          )}
+        </button>
+      </div>
+
       {lyDoMatKetNoi ? (
         <div className="absolute inset-0 z-50 bg-slate-950/95 backdrop-blur-md flex flex-col items-center justify-center p-6 text-center">
           <div className="w-16 h-16 rounded-full bg-rose-500/10 border border-rose-500/20 flex items-center justify-center text-rose-400 mb-4 animate-bounce">
@@ -116,12 +220,20 @@ export default function ThanhPhanPhongHocLiveKit({
         </div>
       ) : (
         <LiveKitRoom
-          key={`${token}-${soLanThuLai}`}
+          key={`livekit-phong-${soLanThuLai}`}
           serverUrl={urlMayChuLiveKit}
           token={token}
           connect={true}
-          video={true}
-          audio={true}
+          video={{
+            resolution: VideoPresets.h720.resolution,
+            facingMode: 'user',
+          }}
+          audio={{
+            autoGainControl: true,
+            echoCancellation: true,
+            noiseSuppression: true,
+          }}
+          options={tuyChonPhong}
           data-lk-theme="default"
           onDisconnected={xuLyMatKetNoi}
           onError={xuLyLoiPhong}

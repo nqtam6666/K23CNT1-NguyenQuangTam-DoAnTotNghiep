@@ -161,6 +161,18 @@ body {
   }
 }
 
+/* Tương thích View Transitions cho Magic UI AnimatedThemeToggler */
+[data-magicui-theme-vt="active"]::view-transition-old(root),
+[data-magicui-theme-vt="active"]::view-transition-new(root) {
+  animation: none !important;
+  mix-blend-mode: normal !important;
+  mask: none !important;
+}
+
+[data-magicui-theme-vt="active"]::view-transition-new(root) {
+  clip-path: var(--magicui-theme-vt-clip-from);
+}
+
 /* ==========================================================
    TỐI ƯU HÓA GIAO DIỆN CHẾ ĐỘ TỐI (DARK MODE THEME SURFACES)
    ========================================================== */

@@ -120,6 +120,18 @@ Toàn bộ mã nguồn (Prisma Schema, DTO, Service, Repository, Controller, Rou
 | Action item / Pending task | `ViecCanXuLy` | Khối danh sách các tác vụ cần người dùng xử lý (chấm điểm, duyệt đơn, nộp bài) |
 | Quick search / Command palette | `TimKiemNhanh` | Thanh công cụ tìm kiếm nhanh toàn hệ thống theo phím tắt Ctrl+K |
 
+### 2.10. Báo lỗi & Đóng góp ý kiến (BaoLoiDongGop)
+| Khái niệm tiếng Anh | Tên chuẩn trong Code | Giải thích nghiệp vụ |
+| :--- | :--- | :--- |
+| Bug report / Feedback / Contribution | `BaoLoiDongGop` | Bản ghi báo lỗi hệ thống hoặc đóng góp ý kiến cải tiến tính năng |
+| Feedback type | `loaiPhanHoi` / `LoaiBaoLoiDongGop` | Phân loại: `BAO_LOI`, `DONG_GOP_Y_KIEN`, `HO_TRO_KY_THUAT` |
+| Priority level | `mucDoUuTien` / `MucDoUuTienBaoLoi` | Mức độ ưu tiên: `THAP`, `TRUNG_BINH`, `CAO`, `KHAN_CAP` |
+| Feedback status | `trangThai` / `TrangThaiBaoLoi` | Trạng thái xử lý: `CHO_TIEP_NHAN`, `DANG_XU_LY`, `DA_XU_LY`, `TU_CHOI` |
+| Resolution / Admin response | `phanHoiXuLy` | Lời phản hồi, giải đáp hoặc hướng khắc phục từ Quản trị viên |
+| Resolved by | `idNguoiXuLy` | Mã định danh Quản trị viên tiếp nhận và xử lý |
+| Attachment screenshot | `anhDinhKem` | Đường dẫn ảnh chụp màn hình minh chứng lỗi |
+| Browser / Environment info | `thongTinTrinhDuyet` | Chuỗi thông tin User-Agent, URL, độ phân giải màn hình |
+
 ---
 
 ## 3. DANH MỤC ENUM VÀ TRẠNG THÁI CHUẨN
@@ -171,6 +183,26 @@ enum TrangThaiBuoiHoc {
   DANG_DIEN_RA
   DA_KET_THUC
   DA_HUY
+}
+
+enum LoaiBaoLoiDongGop {
+  BAO_LOI
+  DONG_GOP_Y_KIEN
+  HO_TRO_KY_THUAT
+}
+
+enum MucDoUuTienBaoLoi {
+  THAP
+  TRUNG_BINH
+  CAO
+  KHAN_CAP
+}
+
+enum TrangThaiBaoLoi {
+  CHO_TIEP_NHAN
+  DANG_XU_LY
+  DA_XU_LY
+  TU_CHOI
 }
 ```
 

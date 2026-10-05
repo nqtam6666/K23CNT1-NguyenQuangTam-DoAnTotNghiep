@@ -72,3 +72,23 @@ export enum LoaiThongBao {
   DIEM_DANH = 'DIEM_DANH',
   NHAC_NHO = 'NHAC_NHO',
 }
+
+export enum LoaiBaoLoiDongGop {
+  BAO_LOI = 'BAO_LOI',
+  DONG_GOP_Y_KIEN = 'DONG_GOP_Y_KIEN',
+  HO_TRO_KY_THUAT = 'HO_TRO_KY_THUAT',
+}
+
+export enum MucDoUuTienBaoLoi {
+  THAP = 'THAP',
+  TRUNG_BINH = 'TRUNG_BINH',
+  CAO = 'CAO',
+  KHAN_CAP = 'KHAN_CAP',
+}
+
+export enum TrangThaiBaoLoi {
+  CHO_TIEP_NHAN = 'CHO_TIEP_NHAN',
+  DANG_XU_LY = 'DANG_XU_LY',
+  DA_XU_LY = 'DA_XU_LY',
+  TU_CHOI = 'TU_CHOI',
+}

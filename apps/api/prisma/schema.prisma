@@ -114,6 +114,32 @@ enum LoaiThongBao {
   @@map("loai_thong_bao")
 }
 
+enum LoaiBaoLoiDongGop {
+  BAO_LOI
+  DONG_GOP_Y_KIEN
+  HO_TRO_KY_THUAT
+
+  @@map("loai_bao_loi_dong_gop")
+}
+
+enum MucDoUuTienBaoLoi {
+  THAP
+  TRUNG_BINH
+  CAO
+  KHAN_CAP
+
+  @@map("muc_do_uu_tien_bao_loi")
+}
+
+enum TrangThaiBaoLoi {
+  CHO_TIEP_NHAN
+  DANG_XU_LY
+  DA_XU_LY
+  TU_CHOI
+
+  @@map("trang_thai_bao_loi")
+}
+
 // ==========================================
 // 2. NGƯỜI DÙNG, HỒ SƠ & PHIÊN ĐĂNG NHẬP
 // ==========================================
@@ -144,6 +170,8 @@ model NguoiDung {
   cacNhatKySuDungAI NhatKySuDungAI[]
   cacThongBao       ThongBao[]
   cacNhatKyHeThong  NhatKyHeThong[]
+  cacBaoLoiDaGui    BaoLoiDongGop[]     @relation("NguoiGuiBaoLoi")
+  cacBaoLoiDaXuLy   BaoLoiDongGop[]     @relation("NguoiXuLyBaoLoi")
 
   @@map("nguoi_dung")
   @@index([email])
@@ -664,4 +692,33 @@ model CaiDatHeThong {
 
   @@map("cai_dat_he_thong")
   @@index([nhom])
+}
+
+// ==========================================
+// 10. BÁO LỖI & ĐÓNG GÓP Ý KIẾN
+// ==========================================
+
+model BaoLoiDongGop {
+  id                 String            @id @default(uuid()) @map("id") @db.Uuid
+  idNguoiDung        String            @map("id_nguoi_dung") @db.Uuid
+  loaiPhanHoi        LoaiBaoLoiDongGop @default(BAO_LOI) @map("loai_phan_hoi")
+  mucDoUuTien        MucDoUuTienBaoLoi @default(TRUNG_BINH) @map("muc_do_uu_tien")
+  tieuDe             String            @map("tieu_de") @db.VarChar(200)
+  noiDung            String            @map("noi_dung") @db.Text
+  anhDinhKem         String?           @map("anh_dinh_kem") @db.Text
+  thongTinTrinhDuyet String?           @map("thong_tin_trinh_duyet") @db.VarChar(255)
+  trangThai          TrangThaiBaoLoi   @default(CHO_TIEP_NHAN) @map("trang_thai")
+  phanHoiXuLy        String?           @map("phan_hoi_xu_ly") @db.Text
+  idNguoiXuLy        String?           @map("id_nguoi_xu_ly") @db.Uuid
+  ngayTao            DateTime          @default(now()) @map("ngay_tao") @db.Timestamptz(6)
+  ngayCapNhat        DateTime          @updatedAt @map("ngay_cap_nhat") @db.Timestamptz(6)
+
+  nguoiDung NguoiDung  @relation("NguoiGuiBaoLoi", fields: [idNguoiDung], references: [id], onDelete: Cascade)
+  nguoiXuLy NguoiDung? @relation("NguoiXuLyBaoLoi", fields: [idNguoiXuLy], references: [id], onDelete: SetNull)
+
+  @@map("bao_loi_dong_gop")
+  @@index([idNguoiDung])
+  @@index([trangThai])
+  @@index([loaiPhanHoi])
+  @@index([ngayTao])
 }

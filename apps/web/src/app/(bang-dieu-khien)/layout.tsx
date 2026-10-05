@@ -40,6 +40,7 @@ const BAN_DO_TIEU_DE_TRANG: Record<string, string> = {
   '/cai-dat': 'Cài đặt hệ thống',
   '/phu-huynh/con-em': 'Con em của tôi',
   '/gioi-thieu': 'Giới thiệu hệ thống',
+  '/bao-loi-dong-gop': 'Báo lỗi & Đóng góp',
   '/khong-co-quyen': 'Không có quyền truy cập',
 };
 

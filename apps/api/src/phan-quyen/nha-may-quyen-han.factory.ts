@@ -60,6 +60,7 @@ export class NhaMayQuyenHan {
         DoiTuong.DiemSo,
         DoiTuong.BanNhapAI,
         DoiTuong.PhienTroLy,
+        DoiTuong.BaoLoiDongGop,
       ]);
       can(HanhDong.Tao, [
         DoiTuong.BaiDang,
@@ -69,6 +70,7 @@ export class NhaMayQuyenHan {
         DoiTuong.CotDiem,
         DoiTuong.BanNhapAI,
         DoiTuong.PhienTroLy,
+        DoiTuong.BaoLoiDongGop,
       ]);
       can(HanhDong.Sua, [
         DoiTuong.LopHocPhan,
@@ -86,6 +88,7 @@ export class NhaMayQuyenHan {
         DoiTuong.BaiTap,
         DoiTuong.BanNhapAI,
         DoiTuong.PhienTroLy,
+        DoiTuong.BaoLoiDongGop,
       ]);
       can(HanhDong.ChamDiem, [DoiTuong.BaiNop, DoiTuong.DiemSo]);
       can(HanhDong.DiemDanh, DoiTuong.BanGhiDiemDanh);
@@ -93,7 +96,7 @@ export class NhaMayQuyenHan {
       can(HanhDong.ThamGia, DoiTuong.PhongTrucTuyen);
       can([HanhDong.Doc, HanhDong.Sua], DoiTuong.NguoiDung);
     } else if (nguoiDung.vaiTro === VaiTro.HOC_SINH) {
-      // Học sinh: Tham gia lớp, nộp bài, xem điểm, hỏi trợ lý AI, làm đơn nghỉ, xem hồ sơ
+      // Học sinh: Tham gia lớp, nộp bài, xem điểm, hỏi trợ lý AI, làm đơn nghỉ, xem hồ sơ, báo lỗi
       can(HanhDong.Doc, [
         DoiTuong.NamHoc,
         DoiTuong.HocKy,
@@ -111,6 +114,7 @@ export class NhaMayQuyenHan {
         DoiTuong.DiemSo,
         DoiTuong.HoSoHocSinh,
         DoiTuong.PhienTroLy,
+        DoiTuong.BaoLoiDongGop,
       ]);
       can(HanhDong.Tao, [
         DoiTuong.BaiDang,
@@ -118,13 +122,19 @@ export class NhaMayQuyenHan {
         DoiTuong.BaiNop,
         DoiTuong.DonXinNghi,
         DoiTuong.PhienTroLy,
+        DoiTuong.BaoLoiDongGop,
       ]);
       can(HanhDong.Sua, DoiTuong.BaiNop);
-      can(HanhDong.Xoa, [DoiTuong.BaiDang, DoiTuong.BinhLuan, DoiTuong.PhienTroLy]);
+      can(HanhDong.Xoa, [
+        DoiTuong.BaiDang,
+        DoiTuong.BinhLuan,
+        DoiTuong.PhienTroLy,
+        DoiTuong.BaoLoiDongGop,
+      ]);
       can(HanhDong.ThamGia, [DoiTuong.PhongTrucTuyen, DoiTuong.LopHocPhan]);
       can([HanhDong.Doc, HanhDong.Sua], DoiTuong.NguoiDung);
     } else if (nguoiDung.vaiTro === VaiTro.PHU_HUYNH) {
-      // Phụ huynh: Theo dõi điểm danh, điểm số con em, nộp đơn xin nghỉ, xem hồ sơ con em
+      // Phụ huynh: Theo dõi điểm danh, điểm số con em, nộp đơn xin nghỉ, xem hồ sơ con em, báo lỗi
       can(HanhDong.Doc, [
         DoiTuong.NamHoc,
         DoiTuong.HocKy,
@@ -138,8 +148,10 @@ export class NhaMayQuyenHan {
         DoiTuong.ThongBao,
         DoiTuong.HoSoHocSinh,
         DoiTuong.PhuHuynhHocSinh,
+        DoiTuong.BaoLoiDongGop,
       ]);
-      can(HanhDong.Tao, DoiTuong.DonXinNghi);
+      can(HanhDong.Tao, [DoiTuong.DonXinNghi, DoiTuong.BaoLoiDongGop]);
+      can(HanhDong.Xoa, DoiTuong.BaoLoiDongGop);
       can([HanhDong.Doc, HanhDong.Sua], DoiTuong.NguoiDung);
     }
 

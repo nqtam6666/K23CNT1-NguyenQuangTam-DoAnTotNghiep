@@ -54,7 +54,7 @@ export function DichNgonNgu() {
     // 1. Cấu hình gtranslateSettings trên window theo đúng chuẩn
     window.gtranslateSettings = {
       default_language: 'vi',
-      detect_browser_language: true,
+      detect_browser_language: false,
       languages: [
         'vi',
         'en',

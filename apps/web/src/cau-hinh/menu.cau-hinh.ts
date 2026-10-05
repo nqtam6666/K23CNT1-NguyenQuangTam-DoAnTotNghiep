@@ -9,6 +9,7 @@ import {
   HeartHandshake,
   Info,
   Sparkles,
+  LifeBuoy,
   LucideIcon,
 } from 'lucide-react';
 import { VaiTro, DoiTuong, HanhDong } from '@lms/chung';
@@ -72,6 +73,21 @@ export const DANH_MUC_MENU_CAU_HINH: MucMenuCauHinh[] = [
     tieuDe: 'Giới thiệu hệ thống',
     duongDan: '/gioi-thieu',
     bieuTuong: Info,
+    nhom: 'CA_NHAN',
+    vaiTroChoPhep: [
+      VaiTro.QUAN_TRI_VIEN,
+      VaiTro.BAN_GIAM_HIEU,
+      VaiTro.GIAO_VU,
+      VaiTro.GIAO_VIEN,
+      VaiTro.HOC_SINH,
+      VaiTro.PHU_HUYNH,
+    ],
+  },
+  {
+    id: 'bao-loi-dong-gop',
+    tieuDe: 'Báo lỗi & Đóng góp',
+    duongDan: '/bao-loi-dong-gop',
+    bieuTuong: LifeBuoy,
     nhom: 'CA_NHAN',
     vaiTroChoPhep: [
       VaiTro.QUAN_TRI_VIEN,

@@ -2,7 +2,7 @@
 ## HỆ THỐNG QUẢN LÝ HỌC TẬP LMS TRƯỜNG HỌC
 
 - **Sinh viên thực hiện**: Nguyễn Quang Tâm (MSSV: 2310900093 - Lớp: K23CNT1)
-- **Cập nhật Giai đoạn**: Giai đoạn 6 - Phân hệ Trợ lý AI RAG (Retrieval-Augmented Generation) & Tìm kiếm Ngữ nghĩa pgvector
+- **Cập nhật Giai đoạn**: Giai đoạn 7 - Phân hệ Báo lỗi & Đóng góp ý kiến hệ thống (BaoLoiDongGop)
 
 ---
 
@@ -55,6 +55,12 @@
 | **FR-08.3** | Lọc quyền trước truy hồi (Pre-filtering chống IDOR đa lớp) | `POST /api/v1/tro-ly-ai/hoi-dap` | `/tro-ly-ai` (Phạm vi lớp học) | `DichVuTroLyAi (Pre-filtering)` & E2E Playwright | **ĐẠT (PASS)** |
 | **FR-08.4** | Phòng chống Prompt Injection & Ghi nhật ký kiểm toán AI | `POST /api/v1/tro-ly-ai/hoi-dap` | `/tro-ly-ai` (Cảnh báo an toàn) | `DichVuTroLyAi (Injection Test)` & E2E Playwright | **ĐẠT (PASS)** |
 | **FR-08.5** | Tạo bản nháp gợi ý & Phê duyệt Human-in-the-loop (AI -> Bài tập) | `POST /api/v1/tro-ly-ai/ban-nhap`<br>`PATCH /api/v1/tro-ly-ai/ban-nhap/:id/duyet` | `/tro-ly-ai` (Bảng quản lý bản nháp) | `DichVuTroLyAi.duyetBanNhapAI` & E2E Playwright | **ĐẠT (PASS)** |
+| **FR-09.1** | Gửi báo lỗi hệ thống, đóng góp ý kiến & yêu cầu hỗ trợ kỹ thuật | `POST /api/v1/bao-loi-dong-gop` | `/bao-loi-dong-gop` (Modal Gửi mới) | `DichVuBaoLoiDongGop.service.spec.ts` & Playwright E2E | **ĐẠT (PASS)** |
+| **FR-09.2** | Danh sách phản ánh & Bảo mật Anti-IDOR (Người dùng chỉ xem của mình) | `GET /api/v1/bao-loi-dong-gop` | `/bao-loi-dong-gop` (Danh sách & Bộ lọc) | `DichVuBaoLoiDongGop.service.spec.ts` & Playwright E2E | **ĐẠT (PASS)** |
+| **FR-09.3** | Bảng số liệu thống kê phản ánh theo trạng thái & phân loại | `GET /api/v1/bao-loi-dong-gop/thong-ke` | `/bao-loi-dong-gop` (4 Thẻ thống kê KPI) | `DichVuBaoLoiDongGop.service.spec.ts` & Playwright E2E | **ĐẠT (PASS)** |
+| **FR-09.4** | Xem chi tiết phản ánh & Tự động ghi nhận thông tin thiết bị | `GET /api/v1/bao-loi-dong-gop/:id` | `/bao-loi-dong-gop` (Modal Chi tiết) | `DichVuBaoLoiDongGop.service.spec.ts` & Playwright E2E | **ĐẠT (PASS)** |
+| **FR-09.5** | Xử lý phản ánh, đổi trạng thái & Gửi thông điệp phản hồi (Ban Quản trị) | `PATCH /api/v1/bao-loi-dong-gop/:id/xu-ly` | `/bao-loi-dong-gop` (Modal Xử lý Quản trị) | `DichVuBaoLoiDongGop.service.spec.ts` & Playwright E2E | **ĐẠT (PASS)** |
+| **FR-09.6** | Hủy / Xóa phản ánh đang chờ tiếp nhận (Bảo vệ tính toàn vẹn) | `DELETE /api/v1/bao-loi-dong-gop/:id` | `/bao-loi-dong-gop` (Action Button) | `DichVuBaoLoiDongGop.service.spec.ts` & Playwright E2E | **ĐẠT (PASS)** |
 
 ---
 
@@ -72,7 +78,7 @@
 5. **Tiếp cận & Trải nghiệm (A11y/UI)**:
    - 100% Modal sử dụng React Portal (`createPortal` vào `document.body`) với 3 kênh đóng an toàn (Esc, backdrop, nút X).
    - Phản hồi tức thời với Toast `sonner` / `thongBao`, không tải lại trang làm mất trạng thái.
-6. **Kiểm thử**: Toàn bộ **86/86 unit tests (16/16 test suites)** và **100% kịch bản kiểm thử E2E đa vai trò** (Giáo viên - Học sinh) đều đạt kết quả **ĐẠT (PASS)**.
+8. **Kiểm thử**: Toàn bộ **99/99 unit tests (17/17 test suites)** và **100% kịch bản kiểm thử E2E đa vai trò** (Quản trị viên - Giáo viên - Học sinh) đều đạt kết quả **ĐẠT (PASS)**.
 
 
 

@@ -45,23 +45,30 @@
 | **FR-06.4** | Hộp thoại Tìm kiếm nhanh Command Palette (Ctrl+K) theo quyền | Client-side Portal Dialog | Header Command Palette | `TimKiemNhanh.tsx` | **ĐẠT (PASS)** |
 | **FR-06.5** | Tiện ích biểu đồ trực quan hóa số liệu (Recharts Chuyên cần & Cơ cấu vai trò) | Dữ liệu thời gian thực từ Provider | `/bang-dieu-khien` | `BieuDoChuyenCan` & `BieuDoVaiTro` | **ĐẠT (PASS)** |
 | **FR-06.6** | Giao diện Đáp ứng đa thiết bị (Responsive 375px/768px/1440px) & Tiếp cận WCAG AA | Responsive CSS + Token contrast | Toàn bộ ứng dụng | `@axe-core/playwright: 0 vi phạm nghiêm trọng` | **ĐẠT (PASS)** |
+| **FR-07.1** | Bảng tin & Thảo luận lớp học (Ghim bài, Phản hồi) | `GET/POST /api/v1/bai-dang/lop/:id`<br>`POST /api/v1/bai-dang/:id/binh-luan` | `/lop-hoc-phan/[id]` (Tab Bảng tin) | `DichVuBaiDang.service.spec.ts` & E2E Playwright | **ĐẠT (PASS)** |
+| **FR-07.2** | Kho tài liệu môn học (Bài giảng, Slide, Giáo trình) | `GET/POST /api/v1/tai-lieu/lop/:id`<br>`DELETE /api/v1/tai-lieu/:id` | `/lop-hoc-phan/[id]` (Tab Tài liệu) | `DichVuTaiLieu.service.spec.ts` & E2E Playwright | **ĐẠT (PASS)** |
+| **FR-07.3** | Giao bài tập mới & Quản lý thời hạn nộp | `GET/POST /api/v1/bai-tap/lop/:id`<br>`DELETE /api/v1/bai-tap/:id` | `/lop-hoc-phan/[id]` (Tab Bài tập) | `DichVuBaiTap.service.spec.ts` & E2E Playwright | **ĐẠT (PASS)** |
+| **FR-07.4** | Học sinh nộp bài tập (Văn bản & Tệp tin đính kèm) | `POST /api/v1/bai-tap/:id/nop-bai` | `/lop-hoc-phan/[id]` (Modal Nộp bài) | `DichVuBaiTap.service.spec.ts` & E2E Playwright | **ĐẠT (PASS)** |
+| **FR-07.5** | Giáo viên chấm điểm và nhận xét chi tiết | `GET /api/v1/bai-tap/:id/danh-sach-nop`<br>`POST /api/v1/bai-tap/bai-nop/:id/cham-diem` | `/lop-hoc-phan/[id]` (Modal Chấm điểm) | `DichVuBaiTap.service.spec.ts` & E2E Playwright | **ĐẠT (PASS)** |
 
 ---
 
 ### KẾT LUẬN KIỂM SOÁT BẢO MẬT & KIẾN TRÚC
 1. **Kiến trúc**: 100% tuân thủ mô hình 3 tầng: Controller mỏng → Service dày → Repository cô lập. Monorepo Turborepo + pnpm chia sẻ Zod schema tại `@lms/chung`.
-2. **Quy ước đặt tên**: 100% tiếng Việt không dấu chuẩn theo `docs/thuat-ngu.md` (bao gồm các thuật ngữ mới: `TheThongKe`, `TienIchBangDieuKhien`, `HoatDongGanDay`, `ViecCanXuLy`, `TimKiemNhanh`).
+2. **Quy ước đặt tên**: 100% tiếng Việt không dấu chuẩn theo `docs/thuat-ngu.md` (bao gồm các thực thể `BaiDang`, `BinhLuan`, `TaiLieu`, `BaiTap`, `BaiNop`, `TheThongKe`, `TienIchBangDieuKhien`, `HoatDongGanDay`, `ViecCanXuLy`, `TimKiemNhanh`).
 3. **Chống IDOR & ABAC**:
-   - Học sinh chỉ có thể lấy token phòng học của lớp học phần mình đã ghi danh hợp lệ.
-   - Giáo viên chỉ có quyền chủ trì (HOST / CanPublish) phòng học của lớp mình được phân công giảng dạy.
+   - Học sinh chỉ có thể xem tài liệu, bài đăng, và nộp bài trong các lớp học phần mình đã ghi danh hợp lệ.
+   - Giáo viên chỉ có quyền quản lý, giao bài tập, tải tài liệu và chấm điểm học sinh trong lớp mình được phân công giảng dạy.
+   - Bài nộp của học sinh chỉ chính học sinh đó (hoặc giáo viên lớp / ban giám hiệu) có quyền xem; học sinh không thể xem bài của bạn cùng lớp.
    - Quản trị viên và Ban giám hiệu không có quyền xem thông tin con em cá nhân (`cannot(HanhDong.Doc, DoiTuong.PhuHuynhHocSinh)`), menu "Con em của tôi" được ẩn triệt để.
    - Chặn truy cập URL trái quyền tự động chuyển hướng tới `/khong-co-quyen` (403), không rò rỉ dữ liệu hoặc giao diện.
-4. **Bảng điều khiển theo vai trò**:
-   - Hệ thống mở rộng theo kiến trúc Registry (`SoDangKyTienIch`), cách ly lỗi giữa các tiện ích (`Promise.allSettled`).
-   - Bộ đệm Redis đa tầng với thời gian sống 60 giây theo khóa vai trò và người dùng.
+4. **Bảng tin & Phân hệ Lớp học phần Google Classroom-style**:
+   - Hệ thống tab tích hợp 5 phân hệ: Bảng tin, Bài tập, Tài liệu môn học, Thời khóa biểu, Thành viên lớp.
+   - Phản hồi tức thời với Toast (`sonner` / `thongBao`) và Modal React Portal chuẩn mực (`HopThoai.tsx`).
 5. **Tiếp cận & Trải nghiệm (A11y/UI)**:
    - Đạt chuẩn WCAG 2.1 AA với 0 lỗi nghiêm trọng khi quét bằng axe-core.
    - Độ tương phản chữ và nhãn đạt tỷ lệ ≥ 4.5:1.
    - Hỗ trợ đầy đủ phím tắt bàn phím (`Ctrl+K`, `Escape`, `Tab`) và chế độ giảm hiệu ứng động (`prefers-reduced-motion`).
-6. **Kiểm thử**: Toàn bộ **50/50 kịch bản kiểm thử đơn vị, kiểm thử tích hợp và kiểm thử E2E đa vai trò** đều đạt kết quả **ĐẠT (PASS)**.
+6. **Kiểm thử**: Toàn bộ **71/71 unit tests (14/14 test suites)** và **100% kịch bản kiểm thử E2E đa vai trò** (Giáo viên - Học sinh) đều đạt kết quả **ĐẠT (PASS)**.
+
 

@@ -19,6 +19,9 @@ import { MoDunThoiKhoaBieuModule } from './mo-dun/thoi-khoa-bieu/mo-dun-thoi-kho
 import { MoDunPhongHocTrucTuyenModule } from './mo-dun/phong-hoc-truc-tuyen/mo-dun-phong-hoc-truc-tuyen.module';
 import { MoDunCaiDatModule } from './mo-dun/cai-dat/mo-dun-cai-dat.module';
 import { MoDunBangDieuKhien } from './mo-dun/bang-dieu-khien/mo-dun-bang-dieu-khien.module';
+import { MoDunBaiDangModule } from './mo-dun/bai-dang/mo-dun-bai-dang.module';
+import { MoDunTaiLieuModule } from './mo-dun/tai-lieu/mo-dun-tai-lieu.module';
+import { MoDunBaiTapModule } from './mo-dun/bai-tap/mo-dun-bai-tap.module';
 
 @Module({
   imports: [
@@ -44,6 +47,9 @@ import { MoDunBangDieuKhien } from './mo-dun/bang-dieu-khien/mo-dun-bang-dieu-kh
     MoDunPhongHocTrucTuyenModule,
     MoDunCaiDatModule,
     MoDunBangDieuKhien,
+    MoDunBaiDangModule,
+    MoDunTaiLieuModule,
+    MoDunBaiTapModule,
   ],
   providers: [
     {

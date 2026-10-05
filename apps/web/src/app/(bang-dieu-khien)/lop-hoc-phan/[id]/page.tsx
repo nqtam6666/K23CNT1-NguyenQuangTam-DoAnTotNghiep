@@ -17,10 +17,15 @@ import {
   AlertCircle,
   CheckCircle2,
   UserPlus,
+  MessageSquare,
+  ClipboardCheck,
 } from 'lucide-react';
 import { mayKhachApi } from '../../../../tien-ich/may-khach-api';
 import { thongBao } from '../../../../tien-ich/thong-bao';
 import { HopThoai } from '../../../../thanh-phan/hop-thoai';
+import { TabBangTin } from './thanh-phan/tab-bang-tin';
+import { TabTaiLieu } from './thanh-phan/tab-tai-lieu';
+import { TabBaiTap } from './thanh-phan/tab-bai-tap';
 import {
   LopHocPhan,
   ThoiKhoaBieu,
@@ -34,7 +39,9 @@ import {
 export default function TrangChiTietLopHocPhan({ params }: { params: Promise<{ id: string }> }) {
   const { id } = use(params);
   const queryClient = useQueryClient();
-  const [tabHienTai, setTabHienTai] = useState<'thoi-khoa-bieu' | 'hoc-sinh'>('thoi-khoa-bieu');
+  const [tabHienTai, setTabHienTai] = useState<
+    'bang-tin' | 'bai-tap' | 'tai-lieu' | 'thoi-khoa-bieu' | 'hoc-sinh'
+  >('bang-tin');
 
   // Modals
   const [moModalTkb, setMoModalTkb] = useState(false);
@@ -78,6 +85,12 @@ export default function TrangChiTietLopHocPhan({ params }: { params: Promise<{ i
     },
     retry: false,
   });
+
+  const laGiaoVienLop = Boolean(
+    nguoiDungHienTai?.vaiTro === VaiTro.GIAO_VIEN &&
+      (lopHocPhan?.giaoVien?.nguoiDung?.id === nguoiDungHienTai?.sub ||
+        lopHocPhan?.giaoVien?.nguoiDung?.email === nguoiDungHienTai?.email),
+  );
 
   // Lấy thời khóa biểu lớp
   const { data: danhSachTkb, isLoading: dangTaiTkb } = useQuery<ThoiKhoaBieu[]>({
@@ -347,33 +360,102 @@ export default function TrangChiTietLopHocPhan({ params }: { params: Promise<{ i
         </div>
       </div>
 
-      {/* Tabs */}
-      <div className="flex border-b border-slate-200 dark:border-slate-800">
+      {/* Tabs Điều Hướng */}
+      <div className="flex border-b border-border overflow-x-auto scrollbar-none">
         <button
+          data-tab="bang-tin"
+          onClick={() => setTabHienTai('bang-tin')}
+          className={`flex items-center gap-2 px-5 py-3 text-sm font-medium border-b-2 whitespace-nowrap transition-colors ${
+            tabHienTai === 'bang-tin'
+              ? 'border-primary text-primary'
+              : 'border-transparent text-muted-foreground hover:text-foreground'
+          }`}
+        >
+          <MessageSquare className="w-4 h-4" />
+          Bảng tin
+        </button>
+
+        <button
+          data-tab="bai-tap"
+          onClick={() => setTabHienTai('bai-tap')}
+          className={`flex items-center gap-2 px-5 py-3 text-sm font-medium border-b-2 whitespace-nowrap transition-colors ${
+            tabHienTai === 'bai-tap'
+              ? 'border-primary text-primary'
+              : 'border-transparent text-muted-foreground hover:text-foreground'
+          }`}
+        >
+          <ClipboardCheck className="w-4 h-4" />
+          Bài tập
+        </button>
+
+        <button
+          data-tab="tai-lieu"
+          onClick={() => setTabHienTai('tai-lieu')}
+          className={`flex items-center gap-2 px-5 py-3 text-sm font-medium border-b-2 whitespace-nowrap transition-colors ${
+            tabHienTai === 'tai-lieu'
+              ? 'border-primary text-primary'
+              : 'border-transparent text-muted-foreground hover:text-foreground'
+          }`}
+        >
+          <BookOpen className="w-4 h-4" />
+          Tài liệu môn học
+        </button>
+
+        <button
+          data-tab="thoi-khoa-bieu"
           onClick={() => setTabHienTai('thoi-khoa-bieu')}
-          className={`flex items-center gap-2 px-5 py-3 text-sm font-medium border-b-2 transition-colors ${
+          className={`flex items-center gap-2 px-5 py-3 text-sm font-medium border-b-2 whitespace-nowrap transition-colors ${
             tabHienTai === 'thoi-khoa-bieu'
-              ? 'border-indigo-600 dark:border-indigo-400 text-indigo-600 dark:text-indigo-400'
-              : 'border-transparent text-slate-500 dark:text-slate-400 hover:text-slate-700 dark:hover:text-slate-200'
+              ? 'border-primary text-primary'
+              : 'border-transparent text-muted-foreground hover:text-foreground'
           }`}
         >
           <Clock className="w-4 h-4" />
-          Thời khóa biểu & Lịch học
+          Thời khóa biểu
         </button>
+
         <button
+          data-tab="hoc-sinh"
           onClick={() => setTabHienTai('hoc-sinh')}
-          className={`flex items-center gap-2 px-5 py-3 text-sm font-medium border-b-2 transition-colors ${
+          className={`flex items-center gap-2 px-5 py-3 text-sm font-medium border-b-2 whitespace-nowrap transition-colors ${
             tabHienTai === 'hoc-sinh'
-              ? 'border-indigo-600 dark:border-indigo-400 text-indigo-600 dark:text-indigo-400'
-              : 'border-transparent text-slate-500 dark:text-slate-400 hover:text-slate-700 dark:hover:text-slate-200'
+              ? 'border-primary text-primary'
+              : 'border-transparent text-muted-foreground hover:text-foreground'
           }`}
         >
           <Users className="w-4 h-4" />
-          Danh sách Học sinh ghi danh ({lopHocPhan._count?.danhSachGhiDanh || 0})
+          Thành viên ({lopHocPhan._count?.danhSachGhiDanh || 0})
         </button>
       </div>
 
-      {/* TAB 1: THỜI KHÓA BIỂU & BUỔI HỌC */}
+      {/* TAB 1: BẢNG TIN */}
+      {tabHienTai === 'bang-tin' && (
+        <TabBangTin
+          idLopHocPhan={id}
+          nguoiDung={nguoiDungHienTai}
+          laGiaoVienLop={laGiaoVienLop}
+        />
+      )}
+
+      {/* TAB 2: BÀI TẬP */}
+      {tabHienTai === 'bai-tap' && (
+        <TabBaiTap
+          idLopHocPhan={id}
+          nguoiDung={nguoiDungHienTai}
+          laGiaoVienLop={laGiaoVienLop}
+        />
+      )}
+
+      {/* TAB 3: TÀI LIỆU */}
+      {tabHienTai === 'tai-lieu' && (
+        <TabTaiLieu
+          idLopHocPhan={id}
+          nguoiDung={nguoiDungHienTai}
+          laGiaoVienLop={laGiaoVienLop}
+        />
+      )}
+
+      {/* TAB 4: THỜI KHÓA BIỂU & BUỔI HỌC */}
       {tabHienTai === 'thoi-khoa-bieu' && (
         <div className="space-y-6">
           {/* Lịch tuần định kỳ */}

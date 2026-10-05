@@ -207,7 +207,7 @@ export function HopThoaiDoiAnhDaiDien({
               className="ring-4 ring-white dark:ring-slate-800 shadow-md"
             />
             {urlXemTruoc !== anhDaiDienHienTai && (
-              <span className="absolute -bottom-1 -right-1 px-2 py-0.5 rounded-full text-[10px] font-bold bg-amber-500 text-white shadow-xs">
+              <span className="absolute bottom-0.5 right-0.5 px-2 py-0.5 rounded-full text-[10px] font-bold bg-amber-500 text-white shadow-xs ring-2 ring-white dark:ring-slate-900 select-none">
                 Mới
               </span>
             )}

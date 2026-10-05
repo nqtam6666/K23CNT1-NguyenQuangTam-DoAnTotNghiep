@@ -152,9 +152,9 @@ export default function TrangHoSoCaNhan() {
               setMoModalDoiAnh(true);
             }}
             title="Đổi ảnh đại diện"
-            className="absolute -bottom-1 -right-1 p-1.5 rounded-full bg-blue-600 hover:bg-blue-700 text-white shadow-sm ring-2 ring-white dark:ring-slate-900 transition-transform active:scale-95 cursor-pointer"
+            className="absolute bottom-1 right-1 w-7 h-7 rounded-full bg-blue-600 hover:bg-blue-700 text-white shadow-md ring-2 ring-white dark:ring-slate-900 flex items-center justify-center p-0 transition-all duration-200 active:scale-95 group-hover:opacity-0 group-hover:scale-75 group-hover:pointer-events-none cursor-pointer"
           >
-            <Camera className="w-3.5 h-3.5" />
+            <Camera className="w-3.5 h-3.5 shrink-0" />
           </button>
         </div>
 

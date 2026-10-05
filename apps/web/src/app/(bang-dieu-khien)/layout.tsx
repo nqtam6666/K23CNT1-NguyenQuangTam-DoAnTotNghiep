@@ -1,6 +1,7 @@
 'use client';
 
 import { ReactNode, useState, useEffect, useMemo } from 'react';
+import { flushSync } from 'react-dom';
 import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
 import {
@@ -258,7 +259,9 @@ export default function LayoutBangDieuKhien({ children }: { children: ReactNode 
     // Tích hợp View Transitions API với hiệu ứng circle-blur-top-left chuẩn https://theme-toggle.rdsx.dev/
     if (typeof document !== 'undefined' && 'startViewTransition' in document) {
       (document as any).startViewTransition(() => {
-        thucHienDoiGiaoDien();
+        flushSync(() => {
+          thucHienDoiGiaoDien();
+        });
       });
     } else {
       thucHienDoiGiaoDien();

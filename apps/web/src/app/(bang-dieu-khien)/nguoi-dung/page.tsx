@@ -202,8 +202,8 @@ export default function TrangQuanLyNguoiDung() {
           </div>
         ) : (
           <div className="overflow-x-auto">
-            <table className="w-full text-left text-sm text-slate-600">
-              <thead className="bg-slate-50 border-b border-slate-200 text-xs font-semibold text-slate-500 uppercase tracking-wider">
+            <table className="w-full text-left text-sm text-slate-600 dark:text-slate-300">
+              <thead className="bg-slate-50 dark:bg-slate-800/60 border-b border-slate-200 dark:border-slate-800 text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider">
                 <tr>
                   <th className="py-3.5 px-4">Người dùng</th>
                   <th className="py-3.5 px-4">Số điện thoại</th>
@@ -213,17 +213,17 @@ export default function TrangQuanLyNguoiDung() {
                   <th className="py-3.5 px-4 text-right">Thao tác</th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-slate-200">
+              <tbody className="divide-y divide-slate-200 dark:divide-slate-800">
                 {data?.danhSach?.map((item: any) => (
-                  <tr key={item.id} className="hover:bg-slate-50/70 transition-colors">
+                  <tr key={item.id} className="hover:bg-slate-50/70 dark:hover:bg-slate-800/40 transition-colors">
                     <td className="py-3.5 px-4">
                       <div className="flex items-center gap-3">
                         <div className="w-9 h-9 rounded-full bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 font-semibold flex items-center justify-center text-xs border border-slate-200 dark:border-slate-700">
                           {item.hoTen?.charAt(0) || 'U'}
                         </div>
                         <div>
-                          <p className="font-semibold text-slate-900 leading-tight">{item.hoTen}</p>
-                          <p className="text-xs text-slate-500">{item.email}</p>
+                          <p className="font-semibold text-slate-900 dark:text-slate-100 leading-tight">{item.hoTen}</p>
+                          <p className="text-xs text-slate-500 dark:text-slate-400">{item.email}</p>
                         </div>
                       </div>
                     </td>

@@ -154,18 +154,18 @@ export default function TrangThoiKhoaBieu() {
                 ))}
               </tr>
             </thead>
-            <tbody className="divide-y divide-slate-200">
+            <tbody className="divide-y divide-slate-200 dark:divide-slate-800">
               {isLoading ? (
                 [1, 2, 3, 4, 5, 6].map((i) => (
                   <tr key={i} className="animate-pulse">
-                    <td className="py-3 px-3 border-r border-slate-200 bg-slate-50/80 text-center">
+                    <td className="py-3 px-3 border-r border-slate-200 dark:border-slate-800 bg-slate-50/80 dark:bg-slate-900/80 text-center">
                       <KhungXuong className="h-4 w-12 mx-auto" />
                       <KhungXuong className="h-2.5 w-16 mx-auto mt-1" />
                     </td>
                     {Array.from({ length: 7 }).map((_, c) => (
-                      <td key={c} className="p-2 border-r border-slate-200">
+                      <td key={c} className="p-2 border-r border-slate-200 dark:border-slate-800">
                         {(i + c) % 3 === 0 && (
-                          <div className="p-2.5 rounded-lg bg-indigo-50/70 border border-indigo-100 space-y-1.5">
+                          <div className="p-2.5 rounded-lg bg-indigo-50/70 dark:bg-indigo-950/40 border border-indigo-100 dark:border-indigo-900/50 space-y-1.5">
                             <KhungXuong className="h-3 w-16" />
                             <KhungXuong className="h-3.5 w-24" />
                             <KhungXuong className="h-2.5 w-20" />
@@ -177,11 +177,11 @@ export default function TrangThoiKhoaBieu() {
                 ))
               ) : (
                 cacTiet.map((t) => (
-                  <tr key={t.tiet} className="hover:bg-slate-50/50 transition-colors">
+                  <tr key={t.tiet} className="hover:bg-slate-50/50 dark:hover:bg-slate-800/40 transition-colors">
                     {/* Cột Tiết & Giờ */}
-                    <td className="py-2 px-3 border-r border-slate-200 bg-slate-50/80 text-center font-mono">
-                      <p className="font-bold text-slate-800">Tiết {t.tiet}</p>
-                      <p className="text-[10px] text-slate-400 mt-0.5">{t.gio}</p>
+                    <td className="py-2.5 px-3 border-r border-slate-200 dark:border-slate-800 bg-slate-50/80 dark:bg-slate-900/80 text-center font-mono">
+                      <p className="font-bold text-slate-800 dark:text-slate-200">Tiết {t.tiet}</p>
+                      <p className="text-[10px] text-slate-500 dark:text-slate-400 mt-0.5">{t.gio}</p>
                     </td>
 
                     {/* Cột 7 ngày trong tuần */}

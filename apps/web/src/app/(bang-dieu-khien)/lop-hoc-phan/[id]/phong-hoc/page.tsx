@@ -213,7 +213,8 @@ export default function TrangPhongHocTrucTuyen({ params }: { params: Promise<{ i
           <ThanhPhanPhongHocLiveKit
             urlMayChuLiveKit={duLieuToken.urlMayChuLiveKit}
             token={duLieuToken.token}
-            onDisconnected={xuLyRoiPhong}
+            onLeaveRoom={xuLyRoiPhong}
+            onReloadToken={() => layLaiToken()}
           />
         </div>
 

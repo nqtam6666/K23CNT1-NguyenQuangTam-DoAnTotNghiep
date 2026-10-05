@@ -287,13 +287,27 @@ export default function LayoutBangDieuKhien({ children }: { children: ReactNode 
             className="flex items-center gap-2.5 min-w-0 group"
             title={tenHeThong}
           >
-            <div className="w-9 h-9 rounded-xl bg-blue-600 flex items-center justify-center text-white font-bold shadow-xs shrink-0 group-hover:scale-105 transition-transform overflow-hidden">
+            <div
+              className={`w-9 h-9 rounded-xl flex items-center justify-center shadow-xs shrink-0 group-hover:scale-105 transition-transform overflow-hidden ${
+                urlLogo || (thuGon && urlIcon)
+                  ? 'bg-white dark:bg-slate-800 border border-slate-200/80 dark:border-slate-700/80'
+                  : 'bg-blue-600 text-white'
+              }`}
+            >
               {thuGon && urlIcon ? (
                 // eslint-disable-next-line @next/next/no-img-element
-                <img src={urlIcon} alt="Icon" className="w-full h-full object-contain p-1" />
+                <img
+                  src={urlIcon}
+                  alt="Icon"
+                  className="w-full h-full object-contain rounded-xl p-0.5"
+                />
               ) : urlLogo ? (
                 // eslint-disable-next-line @next/next/no-img-element
-                <img src={urlLogo} alt="Logo" className="w-full h-full object-contain p-1" />
+                <img
+                  src={urlLogo}
+                  alt="Logo"
+                  className="w-full h-full object-cover rounded-xl"
+                />
               ) : (
                 <GraduationCap className="w-5 h-5" />
               )}
@@ -482,20 +496,30 @@ export default function LayoutBangDieuKhien({ children }: { children: ReactNode 
             className="fixed inset-0 bg-slate-900/40 backdrop-blur-xs transition-opacity duration-200"
             onClick={() => setSidebarMo(false)}
           />
-          <aside className="relative flex-1 flex flex-col max-w-xs w-full bg-white z-10 shadow-2xl animate-in slide-in-from-left duration-200">
-            <div className="h-16 flex items-center justify-between px-6 border-b border-slate-200">
+          <aside className="relative flex-1 flex flex-col max-w-xs w-full bg-white dark:bg-slate-900 z-10 shadow-2xl animate-in slide-in-from-left duration-200">
+            <div className="h-16 flex items-center justify-between px-6 border-b border-slate-200 dark:border-slate-800">
               <div className="flex items-center gap-2.5">
-                <div className="w-8 h-8 rounded-lg bg-blue-600 flex items-center justify-center text-white font-bold shadow-xs overflow-hidden">
+                <div
+                  className={`w-8 h-8 rounded-lg flex items-center justify-center shadow-xs overflow-hidden ${
+                    urlLogo
+                      ? 'bg-white dark:bg-slate-800 border border-slate-200/80 dark:border-slate-700/80'
+                      : 'bg-blue-600 text-white'
+                  }`}
+                >
                   {urlLogo ? (
                     // eslint-disable-next-line @next/next/no-img-element
-                    <img src={urlLogo} alt="Logo" className="w-full h-full object-contain p-0.5" />
+                    <img
+                      src={urlLogo}
+                      alt="Logo"
+                      className="w-full h-full object-contain rounded-lg"
+                    />
                   ) : (
                     <GraduationCap className="w-5 h-5" />
                   )}
                 </div>
                 <div>
-                  <h1 className="font-bold text-slate-900 text-sm">{tenHeThong}</h1>
-                  <p className="text-[10px] text-slate-500">{moTaPhu}</p>
+                  <h1 className="font-bold text-slate-900 dark:text-white text-sm">{tenHeThong}</h1>
+                  <p className="text-[10px] text-slate-500 dark:text-slate-400">{moTaPhu}</p>
                 </div>
               </div>
               <button

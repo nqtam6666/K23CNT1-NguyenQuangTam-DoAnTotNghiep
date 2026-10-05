@@ -112,7 +112,7 @@ export default function TrangDangNhap() {
           {urlLogo ? (
             <div className="flex items-center justify-center mb-4">
               {/* eslint-disable-next-line @next/next/no-img-element */}
-              <img src={urlLogo} alt={tenHeThong} className="h-12 w-auto max-w-[200px] object-contain" />
+              <img src={urlLogo} alt={tenHeThong} className="h-14 w-auto max-w-[200px] object-contain rounded-xl" />
             </div>
           ) : (
             <div className="inline-flex items-center justify-center w-12 h-12 rounded-xl bg-blue-600 text-white mb-4 shadow-sm">

@@ -460,11 +460,53 @@ export class DichVuLlmService {
       );
     }
 
-    // 2. Nếu có ngữ cảnh tài liệu học tập được truyền vào
+    // 2. Phản hồi câu hỏi về lập trình, thuật toán hoặc yêu cầu ví dụ code
+    if (
+      chuoiThuong.includes('code') ||
+      chuoiThuong.includes('lập trình') ||
+      chuoiThuong.includes('javascript') ||
+      chuoiThuong.includes('giai thừa') ||
+      chuoiThuong.includes('python') ||
+      chuoiThuong.includes('thuật toán')
+    ) {
+      if (chuoiThuong.includes('giai thừa')) {
+        return (
+          `### Ví dụ: Thuật toán tính Giai thừa trong JavaScript\n\n` +
+          `Giai thừa của một số nguyên dương $n$ (ký hiệu $n!$) là tích của tất cả các số nguyên dương từ 1 đến $n$.\n\n` +
+          `Dưới đây là 2 cách cài đặt phổ biến:\n\n` +
+          `#### 1. Phương pháp Đệ quy (Recursion)\n` +
+          `\`\`\`javascript\n` +
+          `function tinhGiaiThuaDeQuy(n) {\n` +
+          `  if (n < 0) return null; // Không hợp lệ cho số âm\n` +
+          `  if (n === 0 || n === 1) return 1;\n` +
+          `  return n * tinhGiaiThuaDeQuy(n - 1);\n` +
+          `}\n\n` +
+          `console.log(tinhGiaiThuaDeQuy(5)); // Kết quả: 120\n` +
+          `\`\`\`\n\n` +
+          `#### 2. Phương pháp Vòng lặp (Iterative - Khuyên dùng)\n` +
+          `\`\`\`javascript\n` +
+          `function tinhGiaiThuaVongLap(n) {\n` +
+          `  if (n < 0) return null;\n` +
+          `  let ketQua = 1;\n` +
+          `  for (let i = 2; i <= n; i++) {\n` +
+          `    ketQua *= i;\n` +
+          `  }\n` +
+          `  return ketQua;\n` +
+          `}\n\n` +
+          `console.log(tinhGiaiThuaVongLap(6)); // Kết quả: 720\n` +
+          `\`\`\`\n\n` +
+          `> 💡 **Nhận xét**: Phương pháp lặp có độ phức tạp thời gian $\\mathcal{O}(n)$ và bộ nhớ $\\mathcal{O}(1)$, tránh nguy cơ tràn ngăn xếp (*stack overflow*) khi $n$ lớn.`
+        );
+      }
+    }
+
+    // 3. Nếu có ngữ cảnh tài liệu học tập được truyền vào
     if (nguCanh && nguCanh.trim().length > 0) {
       return (
-        `Dựa trên tài liệu học tập của lớp học phần:\n\n${nguCanh.slice(0, 800)}\n\n` +
-        `---\n*Gợi ý*: Để hiểu sâu hơn về nội dung trên, bạn có thể xem lại toàn bộ bài giảng trong mục **Tài liệu** hoặc trao đổi trực tiếp với giáo viên phụ trách nhé!`
+        `### Trích cứu từ tài liệu học tập:\n\n` +
+        `${nguCanh.slice(0, 800)}\n\n` +
+        `---\n` +
+        `> 📚 *Gợi ý*: Để hiểu sâu hơn về nội dung trên, bạn có thể xem lại toàn bộ bài giảng trong mục **Tài liệu** hoặc trao đổi trực tiếp với giáo viên phụ trách nhé!`
       );
     }
 

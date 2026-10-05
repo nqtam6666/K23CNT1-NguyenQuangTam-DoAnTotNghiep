@@ -37,6 +37,7 @@ import { mayKhachApi } from '@/tien-ich/may-khach-api';
 import { thongBao } from '@/tien-ich/thong-bao';
 import { HopThoai } from '@/thanh-phan/hop-thoai';
 import { AnhDaiDien } from '@/thanh-phan/anh-dai-dien';
+import { DinhDangMarkdown } from '@/thanh-phan/dinh-dang-markdown';
 
 export default function TrangTroLyHocTap() {
   const queryClient = useQueryClient();
@@ -426,7 +427,10 @@ export default function TrangTroLyHocTap() {
                           : 'bg-muted/30 text-foreground border border-border/80 rounded-tl-xs'
                       }`}
                     >
-                      <p className="whitespace-pre-line">{tin.noiDung}</p>
+                      <DinhDangMarkdown
+                        noiDung={tin.noiDung}
+                        laNguoiDung={laNguoiDung}
+                      />
 
                       {/* Trích dẫn nguồn tài liệu RAG */}
                       {!laNguoiDung && tin.trichDan && tin.trichDan.length > 0 && (
@@ -611,8 +615,8 @@ export default function TrangTroLyHocTap() {
         moTa={`Độ tương đồng ngữ nghĩa: ${doanXemChiTiet?.doTuongDong}% • Đoạn số ${doanXemChiTiet?.soThuTu}`}
       >
         <div className="space-y-4 text-xs">
-          <div className="rounded-xl bg-muted/40 p-4 border border-border leading-relaxed text-foreground whitespace-pre-line">
-            {doanXemChiTiet?.noiDung}
+          <div className="rounded-xl bg-muted/40 p-4 border border-border leading-relaxed text-foreground max-h-[60vh] overflow-y-auto">
+            <DinhDangMarkdown noiDung={doanXemChiTiet?.noiDung || ''} />
           </div>
           <div className="flex justify-end pt-2">
             <button

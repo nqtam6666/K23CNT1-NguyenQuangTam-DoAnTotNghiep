@@ -587,14 +587,14 @@ export default function LayoutBangDieuKhien({ children }: { children: ReactNode 
       {/* 3. Vùng nội dung chính & Top Header */}
       <div className="flex-1 flex flex-col min-w-0 overflow-hidden">
         {/* Top Header */}
-        <header className="h-16 bg-white border-b border-slate-200 flex items-center justify-between px-4 sm:px-6">
-          <div className="flex items-center gap-2 sm:gap-3">
+        <header className="h-16 bg-white dark:bg-slate-900 border-b border-slate-200 dark:border-slate-800 flex items-center justify-between px-3 sm:px-6 transition-colors">
+          <div className="flex items-center gap-1.5 sm:gap-3 min-w-0 flex-1 mr-2">
             {/* Nút bật/tắt drawer trên Mobile */}
             <button
               onClick={() => setSidebarMo(!sidebarMo)}
               title="Menu điều hướng"
               aria-label="Mở menu điện thoại"
-              className="md:hidden p-2 text-slate-600 hover:bg-slate-100 rounded-lg cursor-pointer transition-colors"
+              className="md:hidden p-2 text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-lg cursor-pointer transition-colors shrink-0"
             >
               <Menu className="w-5 h-5" />
             </button>
@@ -604,7 +604,7 @@ export default function LayoutBangDieuKhien({ children }: { children: ReactNode 
               onClick={batTatThuGon}
               title={thuGon ? 'Mở rộng thanh bên (Ctrl+B)' : 'Thu gọn thanh bên (Ctrl+B)'}
               aria-label={thuGon ? 'Mở rộng thanh bên' : 'Thu gọn thanh bên'}
-              className="hidden md:inline-flex items-center justify-center p-2 text-slate-500 hover:text-slate-900 dark:text-slate-400 dark:hover:text-slate-100 hover:bg-slate-100 dark:hover:bg-slate-800 active:scale-95 rounded-lg cursor-pointer transition-all"
+              className="hidden md:inline-flex items-center justify-center p-2 text-slate-500 hover:text-slate-900 dark:text-slate-400 dark:hover:text-slate-100 hover:bg-slate-100 dark:hover:bg-slate-800 active:scale-95 rounded-lg cursor-pointer transition-all shrink-0"
             >
               {thuGon ? (
                 <PanelLeftOpen className="w-5 h-5 text-blue-600 dark:text-blue-400" />
@@ -614,25 +614,29 @@ export default function LayoutBangDieuKhien({ children }: { children: ReactNode 
             </button>
 
             {/* Breadcrumb đường dẫn */}
-            <div className="flex items-center gap-2 text-sm text-slate-500 dark:text-slate-400 pl-1">
-              <span>Bảng điều khiển</span>
-              <span>/</span>
-              <span className="font-semibold text-slate-800 dark:text-slate-100">{layTieuDeTrang(pathname)}</span>
-            </div>
+            <nav aria-label="Đường dẫn trang" className="flex items-center gap-1.5 text-sm text-slate-500 dark:text-slate-400 pl-0.5 sm:pl-1 min-w-0">
+              <span className="hidden lg:inline whitespace-nowrap hover:text-slate-700 dark:hover:text-slate-200 transition-colors">
+                Bảng điều khiển
+              </span>
+              <span className="hidden lg:inline text-slate-300 dark:text-slate-600 select-none">/</span>
+              <span className="font-semibold text-slate-800 dark:text-slate-100 whitespace-nowrap truncate text-xs sm:text-sm">
+                {layTieuDeTrang(pathname)}
+              </span>
+            </nav>
           </div>
 
           {/* Nhóm công cụ phía phải Header */}
-          <div className="flex items-center gap-2 sm:gap-3">
+          <div className="flex items-center gap-1.5 sm:gap-2 lg:gap-3 shrink-0">
             {/* Nút tìm kiếm nhanh Command Palette (Ctrl+K) */}
             <button
               onClick={() => setTimKiemMo(true)}
               title="Tìm kiếm nhanh toàn hệ thống (Ctrl+K)"
               aria-label="Tìm kiếm nhanh (Ctrl+K)"
-              className="flex items-center gap-2 px-3 py-1.5 text-xs text-slate-500 dark:text-slate-400 bg-slate-50 hover:bg-slate-100 dark:bg-slate-800/80 dark:hover:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl transition-colors cursor-pointer"
+              className="flex items-center gap-2 px-2.5 sm:px-3 py-1.5 text-xs text-slate-500 dark:text-slate-400 bg-slate-50 hover:bg-slate-100 dark:bg-slate-800/80 dark:hover:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl transition-colors cursor-pointer shrink-0"
             >
-              <Search className="w-3.5 h-3.5 text-slate-400" />
-              <span className="hidden sm:inline">Tìm kiếm...</span>
-              <kbd className="hidden sm:inline-block px-1.5 py-0.5 text-[10px] font-semibold bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 text-slate-600 dark:text-slate-400 rounded shadow-2xs">
+              <Search className="w-3.5 h-3.5 text-slate-400 shrink-0" />
+              <span className="hidden lg:inline whitespace-nowrap">Tìm kiếm...</span>
+              <kbd className="hidden xl:inline-block px-1.5 py-0.5 text-[10px] font-semibold bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 text-slate-600 dark:text-slate-400 rounded shadow-2xs whitespace-nowrap">
                 Ctrl+K
               </kbd>
             </button>
@@ -647,6 +651,7 @@ export default function LayoutBangDieuKhien({ children }: { children: ReactNode 
             <ThemeToggleButton2
               isDark={cheDoSangToi === 'toi'}
               onToggle={batTatSangToi}
+              className="shrink-0"
             />
 
             {/* Ảnh đại diện cá nhân trên Top Header */}
@@ -655,14 +660,14 @@ export default function LayoutBangDieuKhien({ children }: { children: ReactNode 
                 href="/ho-so"
                 title={`Hồ sơ cá nhân: ${nguoiDung.hoTen} (${layNhanVaiTro(nguoiDung.vaiTro)})`}
                 aria-label="Xem hồ sơ cá nhân"
-                className="flex items-center gap-1.5 pl-1 group cursor-pointer"
+                className="flex items-center gap-1.5 pl-0.5 sm:pl-1 group cursor-pointer shrink-0"
               >
                 <AnhDaiDien
                   url={nguoiDung.anhDaiDien}
                   hoTen={nguoiDung.hoTen}
                   kichThuoc="sm"
                   hienThiVien
-                  className="group-hover:ring-2 group-hover:ring-blue-500 transition-all"
+                  className="group-hover:ring-2 group-hover:ring-blue-500 transition-all shrink-0"
                 />
               </Link>
             )}

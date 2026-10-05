@@ -89,16 +89,16 @@ export function ChiBaoSucKhoe({ vaiTroNguoiDung }: Props) {
         title="Bấm để xem trạng thái chi tiết của hạ tầng hệ thống"
         aria-label="Trạng thái sức khỏe hệ thống"
         aria-expanded={moPopover}
-        className={`hidden sm:inline-flex items-center gap-2 px-3 py-1.5 rounded-full text-xs font-medium cursor-pointer transition-all border ${
+        className={`hidden sm:inline-flex items-center gap-1.5 sm:gap-2 px-2.5 sm:px-3 py-1.5 rounded-full text-xs font-medium cursor-pointer transition-all border whitespace-nowrap shrink-0 ${
           trangThaiTong === 'HOAT_DONG_TOT'
-            ? 'bg-emerald-50 text-emerald-700 border-emerald-200 hover:bg-emerald-100/70'
+            ? 'bg-emerald-50 dark:bg-emerald-950/60 text-emerald-700 dark:text-emerald-300 border-emerald-200 dark:border-emerald-800 hover:bg-emerald-100/70 dark:hover:bg-emerald-900/60'
             : trangThaiTong === 'CANH_BAO'
-              ? 'bg-amber-50 text-amber-700 border-amber-200 hover:bg-amber-100/70'
-              : 'bg-red-50 text-red-700 border-red-200 hover:bg-red-100/70'
+              ? 'bg-amber-50 dark:bg-amber-950/60 text-amber-700 dark:text-amber-300 border-amber-200 dark:border-amber-800 hover:bg-amber-100/70 dark:hover:bg-amber-900/60'
+              : 'bg-red-50 dark:bg-red-950/60 text-red-700 dark:text-red-300 border-red-200 dark:border-red-800 hover:bg-red-100/70 dark:hover:bg-red-900/60'
         }`}
       >
         <span
-          className={`w-2 h-2 rounded-full ${
+          className={`w-2 h-2 rounded-full shrink-0 ${
             trangThaiTong === 'HOAT_DONG_TOT'
               ? 'bg-emerald-500 animate-pulse'
               : trangThaiTong === 'CANH_BAO'
@@ -106,14 +106,21 @@ export function ChiBaoSucKhoe({ vaiTroNguoiDung }: Props) {
                 : 'bg-red-500'
           }`}
         />
-        <span>
+        <span className="hidden xl:inline whitespace-nowrap">
           {trangThaiTong === 'HOAT_DONG_TOT'
             ? 'Hệ thống: Bình thường'
             : trangThaiTong === 'CANH_BAO'
               ? 'Hệ thống: Cảnh báo'
               : 'Hệ thống: Sự cố'}
         </span>
-        <Activity className="w-3.5 h-3.5 opacity-70" />
+        <span className="hidden md:inline xl:hidden whitespace-nowrap">
+          {trangThaiTong === 'HOAT_DONG_TOT'
+            ? 'Bình thường'
+            : trangThaiTong === 'CANH_BAO'
+              ? 'Cảnh báo'
+              : 'Sự cố'}
+        </span>
+        <Activity className="w-3.5 h-3.5 opacity-70 shrink-0" />
       </button>
 
       {/* Popover chi tiết */}

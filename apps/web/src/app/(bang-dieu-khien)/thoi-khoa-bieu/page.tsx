@@ -90,24 +90,24 @@ export default function TrangThoiKhoaBieu() {
       {/* Header */}
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
         <div>
-          <h1 className="text-2xl font-bold tracking-tight text-slate-900">Thời khóa biểu tuần</h1>
-          <p className="text-sm text-slate-500 mt-1">
+          <h1 className="text-2xl font-bold tracking-tight text-slate-900 dark:text-slate-100">Thời khóa biểu tuần</h1>
+          <p className="text-sm text-slate-500 dark:text-slate-400 mt-1">
             Lịch học tập và giảng dạy hàng tuần được đồng bộ tự động từ hệ thống quản lý học vụ
           </p>
         </div>
 
-        <div className="flex items-center gap-3">
+        <div className="flex flex-wrap items-center gap-2 sm:gap-3">
           {/* Lọc theo học kỳ */}
-          <div className="flex items-center gap-2">
-            <Filter className="w-4 h-4 text-slate-400" />
+          <div className="flex items-center gap-2 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl px-2.5 py-1.5 shadow-2xs">
+            <Filter className="w-3.5 h-3.5 text-slate-400 shrink-0" />
             <select
               value={idHocKyLoc}
               onChange={(e) => setIdHocKyLoc(e.target.value)}
-              className="px-3 py-2 bg-white border border-slate-200 rounded-lg text-xs font-medium focus:ring-2 focus:ring-indigo-500 shadow-sm"
+              className="bg-transparent text-slate-700 dark:text-slate-200 text-xs font-medium focus:outline-none cursor-pointer"
             >
               <option value="">-- Tất cả học kỳ --</option>
               {danhSachHocKy?.map((hk) => (
-                <option key={hk.id} value={hk.id}>
+                <option key={hk.id} value={hk.id} className="dark:bg-slate-900">
                   {hk.tenHocKy} {hk.hienTai ? '(Hiện tại)' : ''}
                 </option>
               ))}
@@ -116,18 +116,29 @@ export default function TrangThoiKhoaBieu() {
 
           <button
             onClick={() => window.print()}
-            className="inline-flex items-center gap-1.5 px-3.5 py-2 bg-white border border-slate-200 hover:bg-slate-50 text-slate-700 text-xs font-semibold rounded-lg transition-colors shadow-sm"
+            className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-white hover:bg-slate-50 dark:bg-slate-900 dark:hover:bg-slate-800 border border-slate-200 dark:border-slate-800 text-slate-700 dark:text-slate-200 text-xs font-semibold rounded-xl transition-colors shadow-2xs cursor-pointer shrink-0"
           >
-            <Printer className="w-4 h-4" />
-            In lịch
+            <Printer className="w-3.5 h-3.5 text-slate-400" />
+            <span>In lịch</span>
           </button>
         </div>
       </div>
 
       {/* Grid Thời khóa biểu dạng Lịch tuần */}
-      <div className="bg-white border border-slate-200 rounded-2xl overflow-hidden shadow-sm">
+      <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl overflow-hidden shadow-sm">
+        {/* Chỉ dẫn cuộn ngang trên tablet / mobile */}
+        <div className="px-4 py-2 bg-slate-50/70 dark:bg-slate-800/40 border-b border-slate-200 dark:border-slate-800 flex items-center justify-between text-[11px] text-slate-500 dark:text-slate-400 xl:hidden">
+          <span className="flex items-center gap-1.5 font-medium">
+            <CalendarIcon className="w-3.5 h-3.5 text-blue-500 shrink-0" />
+            Lịch học 7 ngày trong tuần
+          </span>
+          <span className="text-[10px] text-slate-400 dark:text-slate-500">
+            Cuộn ngang để xem đầy đủ →
+          </span>
+        </div>
+
         <div className="overflow-x-auto">
-          <table className="w-full border-collapse text-left text-xs min-w-[900px]">
+          <table className="w-full border-collapse text-left text-xs min-w-[840px]">
             <thead>
               <tr className="bg-slate-900 text-white">
                 <th className="py-3.5 px-3 border-r border-slate-800 text-center w-24 font-bold">

@@ -20,6 +20,7 @@ export * from './so-do/bang-dieu-khien.so-do';
 export * from './so-do/bai-dang.so-do';
 export * from './so-do/tai-lieu.so-do';
 export * from './so-do/bai-tap.so-do';
+export * from './so-do/tro-ly-ai.so-do';
 
 // KIỂU DỮ LIỆU TYPESCRIPT
 export * from './kieu-du-lieu/phan-hoi.kieu';
@@ -33,3 +34,4 @@ export * from './kieu-du-lieu/bang-dieu-khien.kieu';
 export * from './kieu-du-lieu/bai-dang.kieu';
 export * from './kieu-du-lieu/tai-lieu.kieu';
 export * from './kieu-du-lieu/bai-tap.kieu';
+export * from './kieu-du-lieu/tro-ly-ai.kieu';

@@ -22,6 +22,7 @@ import { MoDunBangDieuKhien } from './mo-dun/bang-dieu-khien/mo-dun-bang-dieu-kh
 import { MoDunBaiDangModule } from './mo-dun/bai-dang/mo-dun-bai-dang.module';
 import { MoDunTaiLieuModule } from './mo-dun/tai-lieu/mo-dun-tai-lieu.module';
 import { MoDunBaiTapModule } from './mo-dun/bai-tap/mo-dun-bai-tap.module';
+import { MoDunTroLyAiModule } from './mo-dun/tro-ly-ai/mo-dun-tro-ly-ai.module';
 
 @Module({
   imports: [
@@ -50,6 +51,7 @@ import { MoDunBaiTapModule } from './mo-dun/bai-tap/mo-dun-bai-tap.module';
     MoDunBaiDangModule,
     MoDunTaiLieuModule,
     MoDunBaiTapModule,
+    MoDunTroLyAiModule,
   ],
   providers: [
     {

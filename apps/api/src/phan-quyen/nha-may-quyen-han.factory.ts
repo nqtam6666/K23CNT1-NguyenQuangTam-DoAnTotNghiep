@@ -59,6 +59,7 @@ export class NhaMayQuyenHan {
         DoiTuong.CotDiem,
         DoiTuong.DiemSo,
         DoiTuong.BanNhapAI,
+        DoiTuong.PhienTroLy,
       ]);
       can(HanhDong.Tao, [
         DoiTuong.BaiDang,
@@ -84,6 +85,7 @@ export class NhaMayQuyenHan {
         DoiTuong.TaiLieu,
         DoiTuong.BaiTap,
         DoiTuong.BanNhapAI,
+        DoiTuong.PhienTroLy,
       ]);
       can(HanhDong.ChamDiem, [DoiTuong.BaiNop, DoiTuong.DiemSo]);
       can(HanhDong.DiemDanh, DoiTuong.BanGhiDiemDanh);
@@ -108,6 +110,7 @@ export class NhaMayQuyenHan {
         DoiTuong.BanGhiDiemDanh,
         DoiTuong.DiemSo,
         DoiTuong.HoSoHocSinh,
+        DoiTuong.PhienTroLy,
       ]);
       can(HanhDong.Tao, [
         DoiTuong.BaiDang,
@@ -117,7 +120,7 @@ export class NhaMayQuyenHan {
         DoiTuong.PhienTroLy,
       ]);
       can(HanhDong.Sua, DoiTuong.BaiNop);
-      can(HanhDong.Xoa, [DoiTuong.BaiDang, DoiTuong.BinhLuan]);
+      can(HanhDong.Xoa, [DoiTuong.BaiDang, DoiTuong.BinhLuan, DoiTuong.PhienTroLy]);
       can(HanhDong.ThamGia, [DoiTuong.PhongTrucTuyen, DoiTuong.LopHocPhan]);
       can([HanhDong.Doc, HanhDong.Sua], DoiTuong.NguoiDung);
     } else if (nguoiDung.vaiTro === VaiTro.PHU_HUYNH) {

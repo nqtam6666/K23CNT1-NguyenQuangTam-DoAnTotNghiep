@@ -8,6 +8,7 @@ import {
   GraduationCap,
   HeartHandshake,
   Info,
+  Sparkles,
   LucideIcon,
 } from 'lucide-react';
 import { VaiTro, DoiTuong, HanhDong } from '@lms/chung';
@@ -111,6 +112,20 @@ export const DANH_MUC_MENU_CAU_HINH: MucMenuCauHinh[] = [
       VaiTro.GIAO_VIEN,
       VaiTro.HOC_SINH,
       VaiTro.PHU_HUYNH,
+    ],
+  },
+  {
+    id: 'tro-ly-ai',
+    tieuDe: 'Trợ lý học tập',
+    duongDan: '/tro-ly-ai',
+    bieuTuong: Sparkles,
+    nhom: 'HOC_TAP',
+    vaiTroChoPhep: [
+      VaiTro.QUAN_TRI_VIEN,
+      VaiTro.BAN_GIAM_HIEU,
+      VaiTro.GIAO_VU,
+      VaiTro.GIAO_VIEN,
+      VaiTro.HOC_SINH,
     ],
   },
   {

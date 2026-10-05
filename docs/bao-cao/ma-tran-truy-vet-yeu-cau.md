@@ -2,7 +2,7 @@
 ## HỆ THỐNG QUẢN LÝ HỌC TẬP LMS TRƯỜNG HỌC
 
 - **Sinh viên thực hiện**: Nguyễn Quang Tâm (MSSV: 2310900093 - Lớp: K23CNT1)
-- **Cập nhật Giai đoạn**: Giai đoạn 2 - Quản lý Học vụ, Lớp học phần, Ghi danh & Thời khóa biểu
+- **Cập nhật Giai đoạn**: Giai đoạn 6 - Phân hệ Trợ lý AI RAG (Retrieval-Augmented Generation) & Tìm kiếm Ngữ nghĩa pgvector
 
 ---
 
@@ -50,25 +50,29 @@
 | **FR-07.3** | Giao bài tập mới & Quản lý thời hạn nộp | `GET/POST /api/v1/bai-tap/lop/:id`<br>`DELETE /api/v1/bai-tap/:id` | `/lop-hoc-phan/[id]` (Tab Bài tập) | `DichVuBaiTap.service.spec.ts` & E2E Playwright | **ĐẠT (PASS)** |
 | **FR-07.4** | Học sinh nộp bài tập (Văn bản & Tệp tin đính kèm) | `POST /api/v1/bai-tap/:id/nop-bai` | `/lop-hoc-phan/[id]` (Modal Nộp bài) | `DichVuBaiTap.service.spec.ts` & E2E Playwright | **ĐẠT (PASS)** |
 | **FR-07.5** | Giáo viên chấm điểm và nhận xét chi tiết | `GET /api/v1/bai-tap/:id/danh-sach-nop`<br>`POST /api/v1/bai-tap/bai-nop/:id/cham-diem` | `/lop-hoc-phan/[id]` (Modal Chấm điểm) | `DichVuBaiTap.service.spec.ts` & E2E Playwright | **ĐẠT (PASS)** |
+| **FR-08.1** | Nạp tài liệu học tập & Vector hóa pgvector (768 chiều, Unit Norm) | `POST /api/v1/tro-ly-ai/nap-tai-lieu/:id` | `/lop-hoc-phan/[id]` / `/tro-ly-ai` | `DichVuEmbedding.service.spec.ts` & E2E Playwright | **ĐẠT (PASS)** |
+| **FR-08.2** | Hỏi đáp RAG Hybrid Search & Trích dẫn tài liệu học tập | `POST /api/v1/tro-ly-ai/hoi-dap` | `/tro-ly-ai` (Khung chat học tập) | `DichVuTroLyAi.service.spec.ts` & E2E Playwright | **ĐẠT (PASS)** |
+| **FR-08.3** | Lọc quyền trước truy hồi (Pre-filtering chống IDOR đa lớp) | `POST /api/v1/tro-ly-ai/hoi-dap` | `/tro-ly-ai` (Phạm vi lớp học) | `DichVuTroLyAi (Pre-filtering)` & E2E Playwright | **ĐẠT (PASS)** |
+| **FR-08.4** | Phòng chống Prompt Injection & Ghi nhật ký kiểm toán AI | `POST /api/v1/tro-ly-ai/hoi-dap` | `/tro-ly-ai` (Cảnh báo an toàn) | `DichVuTroLyAi (Injection Test)` & E2E Playwright | **ĐẠT (PASS)** |
+| **FR-08.5** | Tạo bản nháp gợi ý & Phê duyệt Human-in-the-loop (AI -> Bài tập) | `POST /api/v1/tro-ly-ai/ban-nhap`<br>`PATCH /api/v1/tro-ly-ai/ban-nhap/:id/duyet` | `/tro-ly-ai` (Bảng quản lý bản nháp) | `DichVuTroLyAi.duyetBanNhapAI` & E2E Playwright | **ĐẠT (PASS)** |
 
 ---
 
 ### KẾT LUẬN KIỂM SOÁT BẢO MẬT & KIẾN TRÚC
 1. **Kiến trúc**: 100% tuân thủ mô hình 3 tầng: Controller mỏng → Service dày → Repository cô lập. Monorepo Turborepo + pnpm chia sẻ Zod schema tại `@lms/chung`.
-2. **Quy ước đặt tên**: 100% tiếng Việt không dấu chuẩn theo `docs/thuat-ngu.md` (bao gồm các thực thể `BaiDang`, `BinhLuan`, `TaiLieu`, `BaiTap`, `BaiNop`, `TheThongKe`, `TienIchBangDieuKhien`, `HoatDongGanDay`, `ViecCanXuLy`, `TimKiemNhanh`).
-3. **Chống IDOR & ABAC**:
+2. **Quy ước đặt tên**: 100% tiếng Việt không dấu chuẩn theo `docs/thuat-ngu.md` (bao gồm các thực thể `PhienTroLy`, `TinNhanTroLy`, `DoanTaiLieu`, `BanNhapAI`, `NhatKySuDungAI`, `BaiDang`, `BinhLuan`, `TaiLieu`, `BaiTap`, `BaiNop`, `TheThongKe`, `TienIchBangDieuKhien`, `TimKiemNhanh`).
+3. **Chống IDOR & ABAC (Rule 02 & Rule 04)**:
+   - Áp dụng **Pre-filtering bắt buộc** trong truy vấn pgvector (`WHERE id_lop_hoc_phan = ANY(...)`), triệt tiêu 100% nguy cơ học sinh truy vấn lộ tài liệu của lớp khác.
    - Học sinh chỉ có thể xem tài liệu, bài đăng, và nộp bài trong các lớp học phần mình đã ghi danh hợp lệ.
-   - Giáo viên chỉ có quyền quản lý, giao bài tập, tải tài liệu và chấm điểm học sinh trong lớp mình được phân công giảng dạy.
-   - Bài nộp của học sinh chỉ chính học sinh đó (hoặc giáo viên lớp / ban giám hiệu) có quyền xem; học sinh không thể xem bài của bạn cùng lớp.
-   - Quản trị viên và Ban giám hiệu không có quyền xem thông tin con em cá nhân (`cannot(HanhDong.Doc, DoiTuong.PhuHuynhHocSinh)`), menu "Con em của tôi" được ẩn triệt để.
-   - Chặn truy cập URL trái quyền tự động chuyển hướng tới `/khong-co-quyen` (403), không rò rỉ dữ liệu hoặc giao diện.
-4. **Bảng tin & Phân hệ Lớp học phần Google Classroom-style**:
-   - Hệ thống tab tích hợp 5 phân hệ: Bảng tin, Bài tập, Tài liệu môn học, Thời khóa biểu, Thành viên lớp.
-   - Phản hồi tức thời với Toast (`sonner` / `thongBao`) và Modal React Portal chuẩn mực (`HopThoai.tsx`).
+   - Giáo viên chỉ có quyền quản lý, giao bài tập, tải tài liệu, tạo/duyệt bản nháp AI và chấm điểm học sinh trong lớp mình được phân công giảng dạy.
+4. **Quy tắc an toàn AI (Rule 04 & Rule 08)**:
+   - Mô hình AI hoạt động theo nguyên tắc **Human-in-the-loop**: AI tuyệt đối không tự ý ban hành bài tập, điểm số hay thay đổi dữ liệu chính thức mà chỉ lưu dạng `BanNhapAI`. Dữ liệu chỉ trở thành `BaiTap` chính thức khi có xác nhận phê duyệt tường minh từ Giáo viên hoặc Quản trị viên.
+   - Phát hiện và vô hiệu hóa tức thời các kỹ thuật tấn công Prompt Injection / Jailbreak, ghi nhận mọi hoạt động vào `NhatKySuDungAI`.
+   - Giao diện người dùng sạch sẽ, mang tên "Trợ lý hỗ trợ học tập", không có dấu vết AI hay phô trương công nghệ.
 5. **Tiếp cận & Trải nghiệm (A11y/UI)**:
-   - Đạt chuẩn WCAG 2.1 AA với 0 lỗi nghiêm trọng khi quét bằng axe-core.
-   - Độ tương phản chữ và nhãn đạt tỷ lệ ≥ 4.5:1.
-   - Hỗ trợ đầy đủ phím tắt bàn phím (`Ctrl+K`, `Escape`, `Tab`) và chế độ giảm hiệu ứng động (`prefers-reduced-motion`).
-6. **Kiểm thử**: Toàn bộ **71/71 unit tests (14/14 test suites)** và **100% kịch bản kiểm thử E2E đa vai trò** (Giáo viên - Học sinh) đều đạt kết quả **ĐẠT (PASS)**.
+   - 100% Modal sử dụng React Portal (`createPortal` vào `document.body`) với 3 kênh đóng an toàn (Esc, backdrop, nút X).
+   - Phản hồi tức thời với Toast `sonner` / `thongBao`, không tải lại trang làm mất trạng thái.
+6. **Kiểm thử**: Toàn bộ **86/86 unit tests (16/16 test suites)** và **100% kịch bản kiểm thử E2E đa vai trò** (Giáo viên - Học sinh) đều đạt kết quả **ĐẠT (PASS)**.
+
 
 

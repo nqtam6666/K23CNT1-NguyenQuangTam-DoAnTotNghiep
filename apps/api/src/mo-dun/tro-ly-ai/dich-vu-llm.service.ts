@@ -434,20 +434,29 @@ export class DichVuLlmService {
   private sinhPhanHoiDuPhong(prompt: string, nguCanh?: string, ghiChuLoi?: string): string {
     const chuoiThuong = prompt.trim().toLowerCase();
 
-    // 1. Phản hồi lời chào hỏi
-    if (
+    // 1. Phản hồi lời chào hỏi, làm quen hoặc hỏi về khả năng hỗ trợ (ví dụ: "bạn giúp được gì tôi", "chức năng của bạn")
+    const laChaoHoiHoacHoiKhaNang =
       chuoiThuong.includes('chào') ||
       chuoiThuong.includes('hello') ||
       chuoiThuong.includes('hi') ||
-      chuoiThuong.includes('bạn là ai')
-    ) {
+      chuoiThuong.includes('bạn là ai') ||
+      chuoiThuong.includes('giúp') ||
+      chuoiThuong.includes('hỗ trợ') ||
+      chuoiThuong.includes('làm được gì') ||
+      chuoiThuong.includes('có thể làm') ||
+      chuoiThuong.includes('biết làm gì') ||
+      chuoiThuong.includes('chức năng') ||
+      chuoiThuong.includes('hướng dẫn');
+
+    if (laChaoHoiHoacHoiKhaNang) {
       return (
-        'Xin chào bạn! Tôi là Trợ lý AI học thuật của Hệ thống Quản lý Học tập LMS. 🎓\n\n' +
-        'Tôi sẵn sàng đồng hành và hỗ trợ bạn trong suốt quá trình học tập:\n' +
-        '- 📖 **Giải đáp bài học & tài liệu**: Tóm tắt kiến thức trọng tâm trong bài giảng.\n' +
-        '- 💡 **Ôn tập & kiểm tra**: Hướng dẫn phương pháp làm bài và giải thích các khái niệm môn học.\n' +
-        '- 📝 **Hỗ trợ học vụ**: Hướng dẫn các quy trình nộp bài tập, theo dõi thời khóa biểu và lịch thi.\n\n' +
-        'Bạn hãy chọn một lớp học phần và đặt câu hỏi để tôi hỗ trợ bạn tốt nhất nhé!'
+        'Xin chào bạn! Tôi là **Trợ lý AI học thuật** của Hệ thống Quản lý Học tập LMS. 🎓\n\n' +
+        'Tôi có thể đồng hành và hỗ trợ bạn trong các hoạt động học tập:\n' +
+        '- 📖 **Tra cứu & giải đáp bài học**: Tóm tắt kiến thức trọng tâm, giải thích thuật ngữ, công thức và cú pháp lập trình theo tài liệu môn học.\n' +
+        '- 💡 **Ôn tập & làm bài tập**: Hướng dẫn tư duy giải bài tập, phân tích đề bài và định hướng phương pháp ôn thi hiệu quả.\n' +
+        '- 📝 **Hỗ trợ học vụ**: Cung cấp thông tin về tiến độ lớp học, thời khóa biểu, lịch nộp bài và kết quả học tập.\n' +
+        '- 🔍 **Trích dẫn nguồn tài liệu chuẩn xác**: Tự động liên kết và trích đoạn trực tiếp từ giáo trình/tài liệu của giáo viên để bạn đối chiếu.\n\n' +
+        '*Mẹo*: Bạn hãy chọn một lớp học phần ở thanh công cụ phía trên và đặt câu hỏi cụ thể để tôi hỗ trợ bạn tốt nhất nhé!'
       );
     }
 
@@ -459,14 +468,13 @@ export class DichVuLlmService {
       );
     }
 
-    // 3. Phản hồi chung
+    // 3. Phản hồi câu hỏi học vụ chung khi chưa có tài liệu tương đồng
     return (
-      `Cảm ơn câu hỏi của bạn về: **"${prompt}"**.\n\n` +
-      `Tôi chưa tìm thấy đoạn trích trực tiếp nào về chủ đề này trong tài liệu của lớp học phần hiện tại. ` +
-      `Bạn có thể:\n` +
-      `1. Kiểm tra lại từ khóa tìm kiếm cho sát với nội dung bài học.\n` +
-      `2. Tải thêm tài liệu bài giảng vào hệ thống.\n` +
-      `3. Đặt câu hỏi trực tiếp cho giáo viên phụ trách trong diễn đàn lớp học.`
+      `Đối với câu hỏi của bạn về: **"${prompt}"**\n\n` +
+      `Tôi chưa tìm thấy đoạn trích trực tiếp nào về chủ đề này trong tài liệu của lớp học phần đang chọn. Bạn có thể:\n` +
+      `1. Thử thay đổi từ khóa tìm kiếm (ví dụ: dùng từ khóa chuyên ngành hoặc tên bài học).\n` +
+      `2. Chọn lớp học phần phù hợp ở thanh phạm vi phía trên.\n` +
+      `3. Xem thêm giáo trình bài giảng trong mục **Tài liệu** hoặc trao đổi với giáo viên phụ trách môn học.`
     );
   }
 }

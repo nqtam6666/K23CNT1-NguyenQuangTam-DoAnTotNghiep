@@ -257,11 +257,13 @@ export class DichVuTroLyAiService {
   }
 
   /**
-   * Nhận diện lời chào hỏi và câu hỏi làm quen để phản hồi tự nhiên mà không cần ép tìm tài liệu
+   * Nhận diện lời chào hỏi, câu hỏi làm quen, hỏi về khả năng hoặc chức năng của Trợ lý AI
    */
   private laLoiChaoHoiHoacHoiThoaiChung(noiDung: string): boolean {
     const chuoi = noiDung.trim().toLowerCase();
-    const cacTuKhoa = [
+
+    // 1. Chào hỏi
+    const mauChao = [
       'xin chào',
       'chào bạn',
       'chào thầy',
@@ -269,18 +271,56 @@ export class DichVuTroLyAiService {
       'chào ad',
       'chào bot',
       'chào em',
+      'chào',
       'hello',
       'hi bot',
-      'bạn là ai',
-      'bạn có thể làm gì',
-      'bạn tên là gì',
-      'giúp tôi với',
-      'hướng dẫn sử dụng',
-      'giới thiệu về bạn',
+      'alo',
+      'hey',
     ];
-    if (cacTuKhoa.some((k) => chuoi.includes(k))) return true;
-    if (['chào', 'hi', 'alo', 'hello', 'hey'].includes(chuoi)) return true;
-    return false;
+    if (mauChao.some((k) => chuoi.includes(k))) return true;
+
+    // 2. Hỏi danh tính hoặc giới thiệu
+    if (
+      chuoi.includes('bạn là ai') ||
+      chuoi.includes('bạn tên gì') ||
+      chuoi.includes('bạn tên là gì') ||
+      chuoi.includes('giới thiệu')
+    ) {
+      return true;
+    }
+
+    // 3. Hỏi khả năng hỗ trợ, chức năng: "bạn giúp được gì tôi", "giúp được gì", "làm được gì", "hỗ trợ gì", v.v.
+    const coTuDoiTuong =
+      chuoi.includes('bạn') ||
+      chuoi.includes('bot') ||
+      chuoi.includes('em') ||
+      chuoi.includes('trợ lý');
+    const coTuHanhDong =
+      chuoi.includes('giúp') ||
+      chuoi.includes('hỗ trợ') ||
+      chuoi.includes('làm được') ||
+      chuoi.includes('có thể làm') ||
+      chuoi.includes('chức năng');
+
+    if (coTuDoiTuong && coTuHanhDong) {
+      return true;
+    }
+
+    const cacCumTuKhaNang = [
+      'giúp được gì',
+      'giúp gì',
+      'hỗ trợ gì',
+      'hỗ trợ những gì',
+      'làm được gì',
+      'có thể làm gì',
+      'biết làm gì',
+      'hướng dẫn sử dụng',
+      'hướng dẫn tôi',
+      'giúp tôi với',
+      'hỏi được gì',
+    ];
+
+    return cacCumTuKhaNang.some((k) => chuoi.includes(k));
   }
 
   /**

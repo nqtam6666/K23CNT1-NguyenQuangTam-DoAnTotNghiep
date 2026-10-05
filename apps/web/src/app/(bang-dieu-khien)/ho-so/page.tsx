@@ -139,12 +139,8 @@ export default function TrangHoSoCaNhan() {
             url={hoSo?.anhDaiDien}
             hoTen={hoSo?.hoTen}
             kichThuoc="xl"
-            className="ring-4 ring-white dark:ring-slate-800 shadow-sm"
+            className="ring-4 ring-white dark:ring-slate-800 shadow-sm transition-all duration-200 group-hover:ring-blue-500/40 group-hover:brightness-95"
           />
-          <div className="absolute inset-0 rounded-full bg-slate-900/60 backdrop-blur-[1px] opacity-0 group-hover:opacity-100 transition-opacity flex flex-col items-center justify-center text-white text-center p-1">
-            <Camera className="w-5 h-5 mb-0.5" />
-            <span className="text-[10px] font-semibold">Đổi ảnh</span>
-          </div>
           <button
             type="button"
             onClick={(e) => {
@@ -152,7 +148,7 @@ export default function TrangHoSoCaNhan() {
               setMoModalDoiAnh(true);
             }}
             title="Đổi ảnh đại diện"
-            className="absolute bottom-1 right-1 w-7 h-7 rounded-full bg-blue-600 hover:bg-blue-700 text-white shadow-md ring-2 ring-white dark:ring-slate-900 flex items-center justify-center p-0 transition-all duration-200 active:scale-95 group-hover:opacity-0 group-hover:scale-75 group-hover:pointer-events-none cursor-pointer"
+            className="absolute bottom-0 right-0 w-7 h-7 rounded-full bg-blue-600 hover:bg-blue-500 text-white shadow-md ring-2 ring-white dark:ring-slate-900 flex items-center justify-center p-0 transition-transform duration-200 active:scale-90 group-hover:scale-110 cursor-pointer"
           >
             <Camera className="w-3.5 h-3.5 shrink-0" />
           </button>

@@ -679,6 +679,63 @@ async function main() {
       kieuDuLieu: 'CHUOI',
       congKhai: true,
     },
+    {
+      khoa: 'AI_NHA_CUNG_CAP',
+      giaTri: 'gemini',
+      nhom: 'TRI_TUE_NHAN_TAO',
+      moTa: 'Nhà cung cấp mô hình trí tuệ nhân tạo (gemini, groq, openai, ollama, tuy_chon)',
+      kieuDuLieu: 'CHUOI',
+      congKhai: false,
+    },
+    {
+      khoa: 'AI_API_KEY',
+      giaTri: '',
+      nhom: 'TRI_TUE_NHAN_TAO',
+      moTa: 'Mã khóa API bí mật của nhà cung cấp AI (Google Gemini, OpenAI, Groq)',
+      kieuDuLieu: 'CHUOI',
+      congKhai: false,
+    },
+    {
+      khoa: 'AI_MODEL',
+      giaTri: 'gemini-1.5-flash',
+      nhom: 'TRI_TUE_NHAN_TAO',
+      moTa: 'Tên mô hình ngôn ngữ lớn (ví dụ: gemini-1.5-flash, llama-3.3-70b-versatile, gpt-4o-mini)',
+      kieuDuLieu: 'CHUOI',
+      congKhai: false,
+    },
+    {
+      khoa: 'AI_BASE_URL',
+      giaTri: '',
+      nhom: 'TRI_TUE_NHAN_TAO',
+      moTa: 'Địa chỉ máy chủ API tùy biến (dành cho Ollama hoặc máy chủ tương thích OpenAI)',
+      kieuDuLieu: 'CHUOI',
+      congKhai: false,
+    },
+    {
+      khoa: 'AI_PROMPT_HE_THONG',
+      giaTri:
+        'Bạn là Trợ lý AI học thuật thông minh của Hệ thống LMS Trường học. Nhiệm vụ của bạn là hỗ trợ sinh viên và giáo viên một cách lịch sự, sư phạm, chính xác bằng tiếng Việt. Nếu có tài liệu lớp học được cung cấp, hãy ưu tiên trích dẫn và giải thích kỹ càng theo nội dung đó. Nếu không có tài liệu cụ thể, hãy hướng dẫn kiến thức nền tảng và khuyên người học trao đổi thêm với giáo viên phụ trách.',
+      nhom: 'TRI_TUE_NHAN_TAO',
+      moTa: 'Chỉ dẫn hệ thống cốt lõi (System Instruction) định hình văn phong và vai trò của Trợ lý AI',
+      kieuDuLieu: 'CHUOI',
+      congKhai: false,
+    },
+    {
+      khoa: 'AI_NHIET_DO',
+      giaTri: '0.7',
+      nhom: 'TRI_TUE_NHAN_TAO',
+      moTa: 'Nhiệt độ sáng tạo (Temperature: 0.0 - 1.0)',
+      kieuDuLieu: 'SO',
+      congKhai: false,
+    },
+    {
+      khoa: 'AI_TOKEN_TOI_DA',
+      giaTri: '1024',
+      nhom: 'TRI_TUE_NHAN_TAO',
+      moTa: 'Giới hạn số lượng token tối đa trong phản hồi',
+      kieuDuLieu: 'SO',
+      congKhai: false,
+    },
   ];
 
   for (const cd of danhSachCaiDatMacDinh) {

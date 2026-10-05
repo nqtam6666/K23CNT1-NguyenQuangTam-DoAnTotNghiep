@@ -8,6 +8,7 @@ import {
 import { PrismaService } from '../../cot-loi/csdl/prisma.service';
 import { KhoTroLyAiRepository } from './kho-tro-ly-ai.repository';
 import { DichVuEmbeddingService } from './dich-vu-embedding.service';
+import { DichVuLlmService } from './dich-vu-llm.service';
 import {
   PayloadJwt,
   VaiTro,
@@ -18,6 +19,7 @@ import {
   DuyetBanNhapAIInput,
   NguonTrichDan,
   KetQuaHoiDapAI,
+  CauHinhLlm,
   MaLoiNghiepVu,
 } from '@lms/chung';
 import { join } from 'path';
@@ -30,6 +32,7 @@ export class DichVuTroLyAiService {
   constructor(
     private readonly khoTroLyAi: KhoTroLyAiRepository,
     private readonly dichVuEmbedding: DichVuEmbeddingService,
+    private readonly dichVuLlm: DichVuLlmService,
     private readonly prisma: PrismaService,
   ) {}
 
@@ -254,7 +257,34 @@ export class DichVuTroLyAiService {
   }
 
   /**
-   * Pipeline hỏi đáp Trợ lý AI có lọc quyền (Pre-filtering RAG)
+   * Nhận diện lời chào hỏi và câu hỏi làm quen để phản hồi tự nhiên mà không cần ép tìm tài liệu
+   */
+  private laLoiChaoHoiHoacHoiThoaiChung(noiDung: string): boolean {
+    const chuoi = noiDung.trim().toLowerCase();
+    const cacTuKhoa = [
+      'xin chào',
+      'chào bạn',
+      'chào thầy',
+      'chào cô',
+      'chào ad',
+      'chào bot',
+      'chào em',
+      'hello',
+      'hi bot',
+      'bạn là ai',
+      'bạn có thể làm gì',
+      'bạn tên là gì',
+      'giúp tôi với',
+      'hướng dẫn sử dụng',
+      'giới thiệu về bạn',
+    ];
+    if (cacTuKhoa.some((k) => chuoi.includes(k))) return true;
+    if (['chào', 'hi', 'alo', 'hello', 'hey'].includes(chuoi)) return true;
+    return false;
+  }
+
+  /**
+   * Pipeline hỏi đáp Trợ lý AI có lọc quyền (Pre-filtering RAG kết hợp LLM đa nhà cung cấp)
    */
   async hoiDap(duLieu: GuiTinNhanTroLyInput, nguoiDung: PayloadJwt): Promise<KetQuaHoiDapAI> {
     const thoiDiemBatDau = Date.now();
@@ -305,7 +335,39 @@ export class DichVuTroLyAiService {
       };
     }
 
-    // 4. Lấy danh sách ID lớp người dùng được phép truy cập (Pre-filtering)
+    // 4. Kiểm tra trường hợp Lời chào hỏi hoặc Mở đầu hội thoại
+    if (this.laLoiChaoHoiHoacHoiThoaiChung(duLieu.noiDung)) {
+      const ketQuaLlm = await this.dichVuLlm.sinhVanBan({
+        prompt: duLieu.noiDung,
+        promptHeThong:
+          'Bạn là Trợ lý AI học thuật thông minh của Hệ thống LMS Trường học. ' +
+          'Người học vừa gửi lời chào hỏi hoặc bắt đầu hội thoại. ' +
+          'Hãy chào đón lịch sự, ân cần bằng tiếng Việt, giới thiệu ngắn gọn các khả năng hỗ trợ (hỏi đáp tài liệu môn học, tóm tắt bài giảng, giải thích khái niệm, hướng dẫn ôn tập) và mời người học đặt câu hỏi. Định dạng bằng Markdown đẹp mắt.',
+      });
+
+      const tinNhanTroLy = await this.khoTroLyAi.taoTinNhan({
+        idPhien,
+        vaiTro: 'assistant',
+        noiDung: ketQuaLlm.vanBan,
+        trichDan: [],
+      });
+
+      await this.khoTroLyAi.ghiNhatKy({
+        idNguoiDung: nguoiDung.sub,
+        loaiTacVu: 'RAG_CHAT_GREETING',
+        soLuongToken: ketQuaLlm.soLuongTokenUocTinh,
+        doTreMs: Date.now() - thoiDiemBatDau,
+      });
+
+      return {
+        idPhien,
+        tinNhanNguoiDung: tinNhanNguoiDung as any,
+        tinNhanTroLy: tinNhanTroLy as any,
+        danhSachTrichDan: [],
+      };
+    }
+
+    // 5. Lấy danh sách ID lớp người dùng được phép truy cập (Pre-filtering theo Rule 04)
     const danhSachIdLop = await this.layDanhSachIdLopDuocPhep(
       nguoiDung,
       duLieu.idLopHocPhan,
@@ -313,15 +375,16 @@ export class DichVuTroLyAiService {
 
     let noiDungTraLoi = '';
     const danhSachTrichDan: NguonTrichDan[] = [];
+    let tongToken = 0;
 
     if (danhSachIdLop.length === 0) {
       noiDungTraLoi =
         'Bạn chưa được ghi danh vào bất kỳ lớp học phần nào, hoặc không có tài liệu học tập phù hợp để truy hồi.';
     } else {
-      // 5. Tạo vector embedding cho câu hỏi
+      // 6. Tạo vector embedding cho câu hỏi
       const vectorCauHoi = await this.dichVuEmbedding.taoVectorEmbedding(duLieu.noiDung);
 
-      // 6. Truy hồi ngữ cảnh tương đồng qua pgvector có Pre-filtering
+      // 7. Truy hồi ngữ cảnh tương đồng qua pgvector có Pre-filtering
       const cacDoan = await this.khoTroLyAi.truyHoiDoanTuongDong(
         vectorCauHoi,
         danhSachIdLop,
@@ -355,8 +418,16 @@ export class DichVuTroLyAiService {
       );
 
       if (doanPhuHop.length === 0) {
-        noiDungTraLoi =
-          'Tôi không tìm thấy thông tin này trong tài liệu học tập của lớp học phần. Bạn vui lòng tra cứu thêm giáo trình hoặc trao đổi trực tiếp với giáo viên phụ trách nhé!';
+        // Nếu không tìm thấy trong tài liệu môn học, gọi LLM giải thích kiến thức chung và nhắc nhở
+        const ketQuaLlm = await this.dichVuLlm.sinhVanBan({
+          prompt: duLieu.noiDung,
+          promptHeThong:
+            'Bạn là Trợ lý AI học thuật thông minh của Hệ thống LMS Trường học. ' +
+            'Người học đặt một câu hỏi học vụ nhưng hệ thống chưa tìm thấy đoạn trích phù hợp trong tài liệu của lớp. ' +
+            'Hãy giải thích các kiến thức nền tảng một cách chính xác, sư phạm, có ví dụ minh họa và khuyên người học nên xem thêm giáo trình môn học hoặc trao đổi thêm với giáo viên phụ trách để bám sát chương trình thi. Định dạng bằng Markdown.',
+        });
+        noiDungTraLoi = ketQuaLlm.vanBan;
+        tongToken = ketQuaLlm.soLuongTokenUocTinh;
       } else {
         // Thu thập nguồn trích dẫn
         for (const doan of doanPhuHop) {
@@ -372,20 +443,29 @@ export class DichVuTroLyAiService {
           });
         }
 
-        // Tổng hợp câu trả lời dựa trên ngữ cảnh được trích xuất
-        const doanChinh = doanPhuHop[0];
-        noiDungTraLoi = `Dựa trên tài liệu **"${doanChinh.tieuDeTaiLieu}"** của lớp học:\n\n${doanChinh.noiDung}\n\n`;
+        // Tạo ngữ cảnh tài liệu để cung cấp cho LLM tổng hợp
+        const nguCanhTaiLieu = doanPhuHop
+          .map(
+            (d, idx) =>
+              `[Tài liệu ${idx + 1}: "${d.tieuDeTaiLieu}" - Đoạn ${d.soThuTu}]:\n${d.noiDung}`,
+          )
+          .join('\n\n---\n\n');
 
-        if (doanPhuHop.length > 1) {
-          const doanBoSung = doanPhuHop[1];
-          noiDungTraLoi += `**Thông tin bổ sung:**\n${doanBoSung.noiDung}\n\n`;
-        }
+        const ketQuaLlm = await this.dichVuLlm.sinhVanBan({
+          prompt: duLieu.noiDung,
+          nguCanh: nguCanhTaiLieu,
+          promptHeThong:
+            'Bạn là Trợ lý AI học thuật chuyên sâu của LMS. Dựa vào các đoạn tài liệu học tập được trích xuất, ' +
+            'hãy tổng hợp câu trả lời chi tiết, chính xác, sư phạm và dễ hiểu. ' +
+            'Luôn trích dẫn rõ tên tài liệu môn học khi cung cấp thông tin. Định dạng Markdown rõ ràng có tiêu đề, gạch đầu dòng và khối mã code (nếu liên quan tới lập trình).',
+        });
 
-        noiDungTraLoi += `Hy vọng câu trả lời trên giúp ích cho bạn trong quá trình ôn tập và làm bài!`;
+        noiDungTraLoi = ketQuaLlm.vanBan;
+        tongToken = ketQuaLlm.soLuongTokenUocTinh;
       }
     }
 
-    // 7. Lưu tin nhắn trợ lý kèm trích dẫn
+    // 8. Lưu tin nhắn trợ lý kèm trích dẫn
     const tinNhanTroLy = await this.khoTroLyAi.taoTinNhan({
       idPhien,
       vaiTro: 'assistant',
@@ -393,11 +473,11 @@ export class DichVuTroLyAiService {
       trichDan: danhSachTrichDan,
     });
 
-    // 8. Ghi nhật ký kiểm toán AI
+    // 9. Ghi nhật ký kiểm toán AI (Rule 04)
     await this.khoTroLyAi.ghiNhatKy({
       idNguoiDung: nguoiDung.sub,
       loaiTacVu: 'RAG_CHAT',
-      soLuongToken: Math.round((duLieu.noiDung.length + noiDungTraLoi.length) / 4),
+      soLuongToken: tongToken || Math.round((duLieu.noiDung.length + noiDungTraLoi.length) / 4),
       doTreMs: Date.now() - thoiDiemBatDau,
     });
 
@@ -407,6 +487,13 @@ export class DichVuTroLyAiService {
       tinNhanTroLy: tinNhanTroLy as any,
       danhSachTrichDan,
     };
+  }
+
+  /**
+   * Kiểm tra kết nối tới dịch vụ mô hình AI (dành cho màn hình Cài đặt hệ thống)
+   */
+  async kiemTraKetNoiAI(cauHinh?: CauHinhLlm) {
+    return this.dichVuLlm.kiemTraKetNoi(cauHinh);
   }
 
   // ==========================================

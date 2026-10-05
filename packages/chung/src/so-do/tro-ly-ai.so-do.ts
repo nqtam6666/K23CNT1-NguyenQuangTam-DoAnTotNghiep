@@ -55,3 +55,16 @@ export const napTaiLieuVectorSchema = z.object({
 });
 
 export type NapTaiLieuVectorInput = z.infer<typeof napTaiLieuVectorSchema>;
+
+/**
+ * Schema kiểm tra kết nối tới dịch vụ LLM
+ */
+export const kiemTraKetNoiAISchema = z.object({
+  nhaCungCap: z.enum(['gemini', 'openai', 'groq', 'ollama', 'tuy_chon']).optional(),
+  apiKey: z.string().trim().optional(),
+  model: z.string().trim().optional(),
+  baseUrl: z.string().trim().optional(),
+});
+
+export type KiemTraKetNoiAIInput = z.infer<typeof kiemTraKetNoiAISchema>;
+

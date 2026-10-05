@@ -2,6 +2,7 @@ import { Test, TestingModule } from '@nestjs/testing';
 import { DichVuTroLyAiService } from './dich-vu-tro-ly-ai.service';
 import { KhoTroLyAiRepository } from './kho-tro-ly-ai.repository';
 import { DichVuEmbeddingService } from './dich-vu-embedding.service';
+import { DichVuLlmService } from './dich-vu-llm.service';
 import { PrismaService } from '../../cot-loi/csdl/prisma.service';
 import {
   VaiTro,
@@ -15,6 +16,7 @@ describe('DichVuTroLyAiService', () => {
   let service: DichVuTroLyAiService;
   let khoTroLyAi: jest.Mocked<KhoTroLyAiRepository>;
   let dichVuEmbedding: jest.Mocked<DichVuEmbeddingService>;
+  let dichVuLlm: jest.Mocked<DichVuLlmService>;
   let prisma: jest.Mocked<PrismaService>;
 
   const nguoiDungHocSinh: PayloadJwt = {
@@ -82,11 +84,29 @@ describe('DichVuTroLyAiService', () => {
       },
     };
 
+    const mockDichVuLlm = {
+      sinhVanBan: jest.fn().mockImplementation(async (opts: any) => ({
+        vanBan: opts.nguCanh
+          ? `Dựa trên tài liệu: ${opts.nguCanh}`
+          : 'Xin chào bạn! Tôi là Trợ lý AI học thuật LMS.',
+        nhaCungCap: 'gemini',
+        model: 'gemini-1.5-flash',
+        soLuongTokenUocTinh: 25,
+        doTreMs: 40,
+        dungDuPhong: false,
+      })),
+      kiemTraKetNoi: jest.fn().mockResolvedValue({
+        thanhCong: true,
+        thongDiep: 'Kết nối thành công tới Gemini',
+      }),
+    };
+
     const module: TestingModule = await Test.createTestingModule({
       providers: [
         DichVuTroLyAiService,
         { provide: KhoTroLyAiRepository, useValue: mockKhoTroLyAi },
         { provide: DichVuEmbeddingService, useValue: mockDichVuEmbedding },
+        { provide: DichVuLlmService, useValue: mockDichVuLlm },
         { provide: PrismaService, useValue: mockPrisma },
       ],
     }).compile();
@@ -94,6 +114,7 @@ describe('DichVuTroLyAiService', () => {
     service = module.get<DichVuTroLyAiService>(DichVuTroLyAiService);
     khoTroLyAi = module.get(KhoTroLyAiRepository);
     dichVuEmbedding = module.get(DichVuEmbeddingService);
+    dichVuLlm = module.get(DichVuLlmService);
     prisma = module.get(PrismaService);
   });
 
@@ -190,6 +211,29 @@ describe('DichVuTroLyAiService', () => {
       expect(ketQua.danhSachTrichDan[0].tieuDeTaiLieu).toBe('Giáo trình Python căn bản');
       expect(ketQua.tinNhanTroLy.noiDung).toContain('Giáo trình Python căn bản');
       expect(khoTroLyAi.ghiNhatKy).toHaveBeenCalled();
+    });
+
+    it('phản hồi lời chào hỏi thân thiện thông qua LLM mà không ép tìm tài liệu', async () => {
+      khoTroLyAi.taoPhien.mockResolvedValue({ id: 'phien-chao', idNguoiDung: 'hs-1', tieuDe: 'Chào', ngayTao: new Date() });
+      khoTroLyAi.taoTinNhan.mockImplementation(async (d: any) => ({
+        id: 'msg-chao',
+        ...d,
+        ngayTao: new Date(),
+      }));
+
+      const ketQua = await service.hoiDap({ noiDung: 'Xin chào bạn' }, nguoiDungHocSinh);
+      expect(ketQua.danhSachTrichDan).toHaveLength(0);
+      expect(ketQua.tinNhanTroLy.noiDung).toContain('Trợ lý AI');
+      expect(dichVuLlm.sinhVanBan).toHaveBeenCalled();
+      expect(khoTroLyAi.truyHoiDoanTuongDong).not.toHaveBeenCalled();
+    });
+  });
+
+  describe('kiemTraKetNoiAI', () => {
+    it('ủy quyền kiểm tra kết nối tới DichVuLlmService', async () => {
+      const res = await service.kiemTraKetNoiAI({ nhaCungCap: 'gemini' });
+      expect(res.thanhCong).toBe(true);
+      expect(dichVuLlm.kiemTraKetNoi).toHaveBeenCalledWith({ nhaCungCap: 'gemini' });
     });
   });
 

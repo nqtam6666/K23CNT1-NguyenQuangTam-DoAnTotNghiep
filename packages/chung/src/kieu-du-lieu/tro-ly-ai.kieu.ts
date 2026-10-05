@@ -96,3 +96,33 @@ export interface KetQuaHoiDapAI {
   tinNhanTroLy: TinNhanTroLy;
   danhSachTrichDan: NguonTrichDan[];
 }
+
+/**
+ * Danh sách nhà cung cấp mô hình ngôn ngữ lớn (LLM Provider)
+ */
+export type NhaCungCapLlm = 'gemini' | 'openai' | 'groq' | 'ollama' | 'tuy_chon';
+
+/**
+ * Cấu hình kết nối LLM
+ */
+export interface CauHinhLlm {
+  nhaCungCap?: NhaCungCapLlm;
+  apiKey?: string;
+  model?: string;
+  baseUrl?: string;
+  promptHeThong?: string;
+  nhietDo?: number;
+  tokenToiDa?: number;
+}
+
+/**
+ * Kết quả kiểm tra kết nối tới dịch vụ LLM
+ */
+export interface KetQuaKiemTraKetNoiAI {
+  thanhCong: boolean;
+  thongDiep: string;
+  nhaCungCap?: string;
+  model?: string;
+  doTreMs?: number;
+}
+

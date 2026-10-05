@@ -26,6 +26,8 @@ import {
   TaoBanNhapAIInput,
   duyetBanNhapAISchema,
   DuyetBanNhapAIInput,
+  kiemTraKetNoiAISchema,
+  KiemTraKetNoiAIInput,
 } from '@lms/chung';
 
 @ApiTags('Trợ lý AI & Tìm kiếm tri thức RAG (pgvector)')
@@ -38,6 +40,15 @@ export class DieuKhienTroLyAiController {
   // ==========================================
   // HỎI ĐÁP RAG & PHIÊN TRÒ CHUYỆN
   // ==========================================
+
+  @Post('kiem-tra-ket-noi')
+  @ApiOperation({ summary: 'Kiểm tra kết nối tới nhà cung cấp mô hình AI (Admin)' })
+  @KiemTraQuyen(HanhDong.Sua, DoiTuong.CaiDatHeThong)
+  async kiemTraKetNoi(
+    @Body(new ZodValidationPipe(kiemTraKetNoiAISchema)) duLieu: KiemTraKetNoiAIInput,
+  ) {
+    return this.dichVuTroLyAi.kiemTraKetNoiAI(duLieu);
+  }
 
   @Post('hoi-dap')
   @ApiOperation({ summary: 'Gửi câu hỏi tới Trợ lý AI (Truy hồi tài liệu có lọc quyền Pre-filtering)' })

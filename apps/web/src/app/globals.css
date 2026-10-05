@@ -436,3 +436,14 @@ a[role="button"]:active:not(:disabled),
   --radius-3xl: calc(var(--radius) * 2.2);
   --radius-4xl: calc(var(--radius) * 2.6);
 }
+
+/* Ẩn hoàn toàn biểu tượng Next.js Dev Indicator ở góc màn hình (Tuân thủ Quy tắc 08) */
+nextjs-portal,
+[data-nextjs-dev-indicator],
+[data-nextjs-toast],
+div[data-nextjs-dev-indicator-position] {
+  display: none !important;
+  visibility: hidden !important;
+  opacity: 0 !important;
+  pointer-events: none !important;
+}

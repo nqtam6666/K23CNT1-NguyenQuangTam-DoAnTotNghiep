@@ -23,6 +23,10 @@ async function khoiChay() {
   if (!existsSync(thuMucAnhDaiDien)) {
     mkdirSync(thuMucAnhDaiDien, { recursive: true });
   }
+  const thuMucThuongHieu = join(thuMucTaiLen, 'thuong-hieu');
+  if (!existsSync(thuMucThuongHieu)) {
+    mkdirSync(thuMucThuongHieu, { recursive: true });
+  }
   app.use('/uploads', express.static(thuMucTaiLen));
 
   // 2. Cấu hình CORS an toàn

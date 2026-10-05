@@ -1,5 +1,6 @@
-import { Controller, Get, Put, Patch, Body, Param } from '@nestjs/common';
-import { ApiTags, ApiOperation, ApiResponse, ApiBearerAuth } from '@nestjs/swagger';
+import { Controller, Get, Put, Patch, Post, Body, Param, UseInterceptors, UploadedFile } from '@nestjs/common';
+import { FileInterceptor } from '@nestjs/platform-express';
+import { ApiTags, ApiOperation, ApiResponse, ApiBearerAuth, ApiConsumes } from '@nestjs/swagger';
 import { DichVuCaiDatService } from './dich-vu-cai-dat.service';
 import {
   soDoCapNhatCaiDat,
@@ -65,5 +66,23 @@ export class DieuKhienCaiDatController {
     @Body(new ZodValidationPipe(soDoCapNhatMotCaiDat)) duLieu: CapNhatMotCaiDatInput,
   ) {
     return this.dichVuCaiDat.capNhatMot(khoa, duLieu.giaTri);
+  }
+
+  @Post('tai-len-tep')
+  @ApiBearerAuth('JWT-auth')
+  @KiemTraQuyen(HanhDong.Sua, DoiTuong.CaiDatHeThong)
+  @UseInterceptors(
+    FileInterceptor('tep', {
+      limits: { fileSize: 5 * 1024 * 1024 }, // Giới hạn 5MB
+    }),
+  )
+  @ApiConsumes('multipart/form-data')
+  @ApiOperation({ summary: 'Tải lên hình ảnh thương hiệu (Logo, Favicon, Icon) từ máy tính' })
+  @ApiResponse({ status: 200, description: 'Tải lên tệp thương hiệu thành công' })
+  async taiLenTepThuongHieu(
+    @UploadedFile() tep?: Express.Multer.File,
+    @Body('khoa') khoa?: string,
+  ) {
+    return this.dichVuCaiDat.taiLenTepThuongHieu(tep, khoa);
   }
 }

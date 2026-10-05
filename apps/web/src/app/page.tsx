@@ -34,6 +34,7 @@ export default function TrangChu() {
     'Đồ án tốt nghiệp chuyên ngành Công nghệ Thông tin. Tối ưu hóa trải nghiệm giảng dạy trực tuyến, quản lý học vụ và hỗ trợ học tập thông minh.',
   );
   const thongBaoChung = layGiaTri('THONG_BAO_CHUNG');
+  const urlLogo = layGiaTri('URL_LOGO');
 
   return (
     <div className="flex flex-col min-h-screen bg-slate-50 text-slate-900">
@@ -49,9 +50,16 @@ export default function TrangChu() {
       <header className="sticky top-0 z-50 w-full border-b border-slate-200 bg-white/80 backdrop-blur-md">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
           <div className="flex items-center gap-3">
-            <div className="w-9 h-9 rounded-lg bg-blue-600 flex items-center justify-center text-white font-bold shadow-sm">
-              <BookOpen className="w-5 h-5" />
-            </div>
+            {urlLogo ? (
+              <div className="h-9 w-auto max-w-[150px] flex items-center justify-center">
+                {/* eslint-disable-next-line @next/next/no-img-element */}
+                <img src={urlLogo} alt={tenHeThong} className="h-9 w-auto object-contain" />
+              </div>
+            ) : (
+              <div className="w-9 h-9 rounded-lg bg-blue-600 flex items-center justify-center text-white font-bold shadow-sm">
+                <BookOpen className="w-5 h-5" />
+              </div>
+            )}
             <div>
               <span className="font-bold text-slate-900 text-lg tracking-tight">{tenHeThong}</span>
               {maLopKhoa && (

@@ -53,6 +53,7 @@ export default function TrangDangNhap() {
   const { layGiaTri, choPhepDangKy } = useCaiDatHeThong();
   const tenHeThong = layGiaTri('TEN_HE_THONG', 'LMS Trường Học');
   const khauHieu = layGiaTri('KHAU_HIEU', 'Hệ thống Quản lý Học tập Thế hệ Mới');
+  const urlLogo = layGiaTri('URL_LOGO');
 
   const {
     register,
@@ -108,9 +109,16 @@ export default function TrangDangNhap() {
     <div className="min-h-screen flex items-center justify-center bg-slate-50 px-4 sm:px-6 lg:px-8 py-10">
       <div className="max-w-md w-full space-y-6 bg-white p-8 rounded-2xl shadow-sm border border-slate-200">
         <div className="text-center">
-          <div className="inline-flex items-center justify-center w-12 h-12 rounded-xl bg-blue-600 text-white mb-4 shadow-sm">
-            <BookOpen className="w-6 h-6" />
-          </div>
+          {urlLogo ? (
+            <div className="flex items-center justify-center mb-4">
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img src={urlLogo} alt={tenHeThong} className="h-12 w-auto max-w-[200px] object-contain" />
+            </div>
+          ) : (
+            <div className="inline-flex items-center justify-center w-12 h-12 rounded-xl bg-blue-600 text-white mb-4 shadow-sm">
+              <BookOpen className="w-6 h-6" />
+            </div>
+          )}
           <h2 className="text-2xl font-bold text-slate-900 tracking-tight">
             Đăng nhập {tenHeThong}
           </h2>

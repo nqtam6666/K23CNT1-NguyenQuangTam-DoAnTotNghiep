@@ -18,13 +18,16 @@ import { mayKhachApi } from '../../../tien-ich/may-khach-api';
 import { thongBao } from '../../../tien-ich/thong-bao';
 import { CaiDatHeThong } from '@lms/chung';
 import { KhungXuong } from '../../../thanh-phan/khung-xuong';
+import { ThanhPhanTaiLenAnhCaiDat } from './thanh-phan-tai-len-anh';
 
 interface ThongTinCauHinh {
   nhan: string;
   moTa: string;
   placeholder?: string;
-  kieu: 'text' | 'textarea' | 'boolean' | 'number';
+  kieu: 'text' | 'textarea' | 'boolean' | 'number' | 'file-anh';
   tabId: string;
+  dinhDangChoPhep?: string;
+  khuyenNghi?: string;
 }
 
 const TU_DIEN_CAU_HINH: Record<string, ThongTinCauHinh> = {
@@ -93,24 +96,27 @@ const TU_DIEN_CAU_HINH: Record<string, ThongTinCauHinh> = {
   },
   URL_LOGO: {
     nhan: 'Logo trường học / Hệ thống',
-    moTa: 'Đường dẫn hình ảnh Logo đầy đủ (hiển thị trên thanh bên Sidebar và trang chủ/đăng nhập). Hỗ trợ định dạng .png, .svg, .jpg.',
-    placeholder: 'Ví dụ: /logo.png hoặc https://example.com/logo.png',
-    kieu: 'text',
+    moTa: 'Tải lên hình ảnh Logo chính thức (hiển thị trên thanh bên điều hướng Sidebar, trang chủ và màn hình đăng nhập).',
+    kieu: 'file-anh',
     tabId: 'giao-dien',
+    dinhDangChoPhep: '.png,.jpg,.jpeg,.svg,.webp',
+    khuyenNghi: 'Khuyên dùng hình ảnh nền trong suốt PNG hoặc SVG, tỉ lệ ngang hoặc 240x60px',
   },
   URL_FAVICON: {
-    nhan: 'Biểu tượng trang (Favicon)',
-    moTa: 'Đường dẫn file favicon (.ico, .png, .svg) hiển thị trên tiêu đề tab của trình duyệt web.',
-    placeholder: 'Ví dụ: /favicon.ico hoặc https://example.com/favicon.ico',
-    kieu: 'text',
+    nhan: 'Biểu tượng trang web (Favicon)',
+    moTa: 'Tải lên biểu tượng hiển thị trên thanh tiêu đề tab của trình duyệt web (kích thước chuẩn 32x32 hoặc 48x48).',
+    kieu: 'file-anh',
     tabId: 'giao-dien',
+    dinhDangChoPhep: '.ico,.png,.svg',
+    khuyenNghi: 'Khuyên dùng định dạng ICO hoặc PNG vuông tỉ lệ 1:1 (32x32px)',
   },
   URL_ICON: {
     nhan: 'Biểu tượng thu gọn (App Icon)',
-    moTa: 'Biểu tượng vuông hoặc rút gọn khi thanh bên điều hướng thu gọn sang chế độ thanh biểu tượng (Icon Rail).',
-    placeholder: 'Ví dụ: /icon.png hoặc https://example.com/app-icon.png',
-    kieu: 'text',
+    moTa: 'Tải lên biểu tượng hình vuông thu gọn khi thanh bên điều hướng thu sang chế độ rút gọn (Icon Rail).',
+    kieu: 'file-anh',
     tabId: 'giao-dien',
+    dinhDangChoPhep: '.png,.jpg,.jpeg,.svg,.webp',
+    khuyenNghi: 'Khuyên dùng định dạng PNG hoặc SVG vuông tỉ lệ 1:1 (khuyến nghị 64x64px)',
   },
   EMAIL_LIEN_HE: {
     nhan: 'Hòm thư điện tử liên hệ',
@@ -236,6 +242,32 @@ export default function TrangCaiDatHeThong() {
       } else {
         ketQua['khac'].push(item);
       }
+    });
+
+    const thuTuKhoa: Record<string, number> = {
+      URL_LOGO: 1,
+      URL_FAVICON: 2,
+      URL_ICON: 3,
+      BANNER_TIEU_DE: 10,
+      BANNER_MO_TA: 11,
+      TEN_HE_THONG: 1,
+      TEN_TRUONG: 2,
+      KHAU_HIEU: 3,
+      THONG_BAO_CHUNG: 4,
+      TAC_GIA: 1,
+      MSSV: 2,
+      MA_LOP_KHOA: 3,
+      EMAIL_LIEN_HE: 1,
+      SO_DIEN_THOAI: 2,
+      CHO_PHEP_DANG_KY: 1,
+    };
+
+    Object.keys(ketQua).forEach((key) => {
+      ketQua[key].sort((a, b) => {
+        const thuTuA = thuTuKhoa[a.khoa] ?? 99;
+        const thuTuB = thuTuKhoa[b.khoa] ?? 99;
+        return thuTuA - thuTuB;
+      });
     });
 
     return ketQua;
@@ -379,6 +411,7 @@ export default function TrangCaiDatHeThong() {
           return (
             <button
               key={tab.id}
+              data-tab={tab.id}
               type="button"
               onClick={() => setTabHienTai(tab.id)}
               className={`flex items-center gap-2.5 px-4 py-2.5 rounded-xl text-sm font-semibold transition-all cursor-pointer ${
@@ -464,6 +497,11 @@ export default function TrangCaiDatHeThong() {
                   thongTin?.kieu === 'textarea' ||
                   item.khoa === 'BANNER_MO_TA' ||
                   item.khoa === 'THONG_BAO_CHUNG';
+                const laTepAnh =
+                  thongTin?.kieu === 'file-anh' ||
+                  item.khoa === 'URL_LOGO' ||
+                  item.khoa === 'URL_FAVICON' ||
+                  item.khoa === 'URL_ICON';
 
                 return (
                   <div
@@ -482,9 +520,30 @@ export default function TrangCaiDatHeThong() {
                       </p>
                     </div>
 
-                    {/* Cột Điều khiển Input hoặc Nút Toggle */}
+                    {/* Cột Điều khiển Input hoặc Nút Toggle hoặc Upload Ảnh */}
                     <div className="lg:col-span-7">
-                      {laBoolean ? (
+                      {laTepAnh ? (
+                        /* Giao diện tải ảnh trực tiếp từ máy tính (không sử dụng liên kết) */
+                        <ThanhPhanTaiLenAnhCaiDat
+                          khoa={item.khoa}
+                          nhan={thongTin?.nhan || item.khoa}
+                          moTa={thongTin?.moTa || item.moTa || ''}
+                          giaTriHienTai={giaTriHienTai}
+                          dinhDangChoPhep={thongTin?.dinhDangChoPhep}
+                          khuyenNghi={thongTin?.khuyenNghi}
+                          onCapNhat={(duongDanMoi) => {
+                            thayDoiGiaTri(item.khoa, duongDanMoi);
+                          }}
+                          onXoa={() => {
+                            const giaTriMacDinh = item.khoa === 'URL_FAVICON' ? '/favicon.ico' : '';
+                            thayDoiGiaTri(item.khoa, giaTriMacDinh);
+                            thongBao.thongTin(
+                              'Đã gỡ tệp hình ảnh',
+                              'Vui lòng nhấn "Lưu thay đổi" nếu bạn muốn lưu trạng thái này.',
+                            );
+                          }}
+                        />
+                      ) : laBoolean ? (
                         /* Nút Toggle Switch chuyên nghiệp */
                         <div className="flex items-center gap-3.5 py-1">
                           <button
@@ -539,26 +598,6 @@ export default function TrangCaiDatHeThong() {
                             className="w-full px-3.5 py-2 text-sm border border-slate-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all text-slate-900 bg-white placeholder:text-slate-400 shadow-2xs"
                             placeholder={thongTin?.placeholder || 'Nhập giá trị...'}
                           />
-                          {/* Khung xem trước hình ảnh Logo / Favicon / Icon */}
-                          {giaTriHienTai &&
-                            (item.khoa === 'URL_LOGO' ||
-                              item.khoa === 'URL_FAVICON' ||
-                              item.khoa === 'URL_ICON') && (
-                              <div className="flex items-center gap-3 p-2 bg-slate-50 rounded-lg border border-slate-200 w-fit">
-                                <span className="text-xs text-slate-500 font-medium">
-                                  Xem trước:
-                                </span>
-                                {/* eslint-disable-next-line @next/next/no-img-element */}
-                                <img
-                                  src={giaTriHienTai}
-                                  alt="Xem trước"
-                                  className="h-7 w-auto max-w-[120px] object-contain rounded border border-slate-200 bg-white p-0.5"
-                                  onError={(e) => {
-                                    (e.currentTarget as HTMLElement).style.display = 'none';
-                                  }}
-                                />
-                              </div>
-                            )}
                         </div>
                       )}
                     </div>

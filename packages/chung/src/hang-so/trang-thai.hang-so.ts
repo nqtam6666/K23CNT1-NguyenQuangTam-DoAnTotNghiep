@@ -92,3 +92,21 @@ export enum TrangThaiBaoLoi {
   DA_XU_LY = 'DA_XU_LY',
   TU_CHOI = 'TU_CHOI',
 }
+
+export enum CheDoKiemTra {
+  LUYEN_TAP = 'LUYEN_TAP',
+  THI_THU = 'THI_THU',
+}
+
+export enum TrangThaiBaiKiemTra {
+  BAN_NHAP = 'BAN_NHAP',
+  DANG_MO = 'DANG_MO',
+  DA_DONG = 'DA_DONG',
+}
+
+export enum TrangThaiLuotLam {
+  DANG_LAM = 'DANG_LAM',
+  DA_NOP = 'DA_NOP',
+  DA_CHAM = 'DA_CHAM',
+}
+

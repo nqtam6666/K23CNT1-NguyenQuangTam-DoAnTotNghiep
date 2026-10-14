@@ -12,8 +12,10 @@
 
 | Hạng mục kiểm thử | Công cụ | Số lượng ca kiểm thử | Kết quả | Ghi chú |
 | :--- | :--- | :---: | :---: | :--- |
-| **Unit Test Backend (Service)** | Vitest | 4 ca | **100% ĐẠT** | Bao gồm cách ly lỗi, cache Redis, giới hạn phạm vi quyền |
-| **Unit Test Backend (Controller)** | Vitest | 2 ca | **100% ĐẠT** | Xác thực JWT và định dạng `PhanHoiBangDieuKhien` |
+| **Unit Test Toàn hệ thống (`@lms/api`)** | Jest | 120 ca (20 suites) | **100% ĐẠT** | Bao phủ Xác thực, Học vụ, Điểm danh, Kiểm tra AI, Sổ điểm, RAG |
+| **Unit Test Điểm danh thông minh** | Jest | 10 ca | **100% ĐẠT** | Mã PIN 6 số có thời hạn, đồng bộ LiveKit, chống IDOR ngoài lớp |
+| **Unit Test Luyện tập & Thi thử AI** | Jest | 6 ca | **100% ĐẠT** | Ẩn đáp án trước khi nộp, sinh đề AI Pre-filtering, giới hạn lượt thi |
+| **Unit Test Sổ điểm & Kết quả học phần** | Jest | 5 ca | **100% ĐẠT** | Quy đổi GPA Hệ 10/Hệ 4/Điểm chữ, cô lập dòng học sinh, đồng bộ tự động |
 | **Kiểm tra phân quyền CASL** | CASL & Route Guard | 3 ca | **100% ĐẠT** | Chặn menu 'Con em của tôi' đối với Quản trị viên; chặn URL trực tiếp |
 | **Kiểm thử E2E Đa vai trò** | Playwright Chromium | 6 vai trò | **100% ĐẠT** | Quản trị, BGH, Giáo vụ, Giáo viên, Học sinh, Phụ huynh |
 | **Kiểm tra Accessibility (A11y)** | @axe-core/playwright | Toàn diện | **0 vi phạm nghiêm trọng** | Chuẩn WCAG 2.1 AA |
@@ -37,6 +39,22 @@
 - **Kết quả thực thi**:
   - `goi dung dich vu voi nguoi dung tu JWT`: ĐẠT.
   - `tra ve dung kieu PhanHoiBangDieuKhien`: ĐẠT.
+
+### 2.3. Dịch vụ Luyện tập & Thi thử AI (`DichVuKiemTraService`)
+- **Tập tin kiểm thử**: `apps/api/src/mo-dun/kiem-tra/dich-vu-kiem-tra.service.spec.ts`
+- **Kết quả thực thi**:
+  - Chặn học sinh ngoài lớp và giáo viên không phụ trách truy cập đề kiểm tra (`ForbiddenException`).
+  - Ẩn trường `dapAnDung` và `giaiThich` khi học sinh tải chi tiết đề đang làm bài.
+  - Tiền lọc (`Pre-filtering`) đoạn tài liệu theo đúng `idLopHocPhan` khi biên soạn đề bằng AI, lưu vết `NhatKySuDungAI` và `BanNhapAI`.
+  - Chấm điểm tự động trên thang 10 và kiểm soát giới hạn số lượt làm bài ở chế độ `THI_THU`.
+
+### 2.4. Dịch vụ Quản lý Kết quả Học phần & Sổ điểm (`DichVuSoDiemService`)
+- **Tập tin kiểm thử**: `apps/api/src/mo-dun/so-diem/dich-vu-so-diem.service.spec.ts`
+- **Kết quả thực thi**:
+  - Tính điểm trung bình học phần có trọng số, quy đổi Hệ 4 (`4.0`, `3.5`, `3.0`...) và Điểm chữ (`A`, `B+`, `B`, `C+`, `C`, `D+`, `D`, `F`).
+  - Cô lập dữ liệu bảng điểm: Học sinh chỉ nhận được dòng điểm của chính mình; chặn truy cập trái phép từ người ngoài lớp.
+  - Đồng bộ tự động điểm Chuyên cần, Luyện tập/Bài tập và Thi thử vào Sổ điểm học phần.
+  - Sinh nhận xét học phần bằng AI kèm lưu vết `NhatKySuDungAI` và `BanNhapAI`.
 
 ---
 

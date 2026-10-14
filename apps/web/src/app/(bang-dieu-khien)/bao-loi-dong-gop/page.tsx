@@ -42,19 +42,19 @@ const NHAN_LOAI: Record<LoaiBaoLoiDongGop, { nhan: string; moTa: string; mauSac:
   [LoaiBaoLoiDongGop.BAO_LOI]: {
     nhan: 'Báo lỗi hệ thống',
     moTa: 'Sự cố chức năng, hiển thị sai hoặc lỗi kỹ thuật',
-    mauSac: 'bg-rose-50 text-rose-700 dark:bg-rose-950/40 dark:text-rose-300 border-rose-200 dark:border-rose-800',
+    mauSac: 'bg-danger-soft text-danger border-danger ',
     icon: AlertCircle,
   },
   [LoaiBaoLoiDongGop.DONG_GOP_Y_KIEN]: {
     nhan: 'Đóng góp ý kiến',
     moTa: 'Đề xuất cải tiến trải nghiệm hoặc chức năng mới',
-    mauSac: 'bg-blue-50 text-blue-700 dark:bg-blue-950/40 dark:text-blue-300 border-blue-200 dark:border-blue-800',
+    mauSac: 'bg-accent-soft text-accent border-accent ',
     icon: Sparkles,
   },
   [LoaiBaoLoiDongGop.HO_TRO_KY_THUAT]: {
     nhan: 'Hỗ trợ kỹ thuật',
     moTa: 'Trợ giúp về tài khoản, thao tác sử dụng và thiết bị',
-    mauSac: 'bg-purple-50 text-purple-700 dark:bg-purple-950/40 dark:text-purple-300 border-purple-200 dark:border-purple-800',
+    mauSac: 'bg-accent-soft text-accent border-accent ',
     icon: LifeBuoy,
   },
 };
@@ -62,41 +62,41 @@ const NHAN_LOAI: Record<LoaiBaoLoiDongGop, { nhan: string; moTa: string; mauSac:
 const NHAN_UU_TIEN: Record<MucDoUuTienBaoLoi, { nhan: string; mauSac: string }> = {
   [MucDoUuTienBaoLoi.THAP]: {
     nhan: 'Thấp',
-    mauSac: 'bg-slate-100 text-slate-700 dark:bg-slate-800 dark:text-slate-300 border-slate-300 dark:border-slate-700',
+    mauSac: 'bg-active-bg text-text border-border ',
   },
   [MucDoUuTienBaoLoi.TRUNG_BINH]: {
     nhan: 'Trung bình',
-    mauSac: 'bg-sky-50 text-sky-700 dark:bg-sky-950/40 dark:text-sky-300 border-sky-200 dark:border-sky-800',
+    mauSac: 'bg-info-soft text-info border-info ',
   },
   [MucDoUuTienBaoLoi.CAO]: {
     nhan: 'Cao',
-    mauSac: 'bg-amber-50 text-amber-700 dark:bg-amber-950/40 dark:text-amber-300 border-amber-200 dark:border-amber-800',
+    mauSac: 'bg-accent-soft text-accent border-accent ',
   },
   [MucDoUuTienBaoLoi.KHAN_CAP]: {
     nhan: 'Khẩn cấp',
-    mauSac: 'bg-red-100 text-red-800 dark:bg-red-950/60 dark:text-red-200 border-red-300 dark:border-red-700 font-semibold',
+    mauSac: 'bg-danger-soft text-danger border-danger font-semibold',
   },
 };
 
 const NHAN_TRANG_THAI: Record<TrangThaiBaoLoi, { nhan: string; mauSac: string; icon: any }> = {
   [TrangThaiBaoLoi.CHO_TIEP_NHAN]: {
     nhan: 'Chờ tiếp nhận',
-    mauSac: 'bg-amber-50 text-amber-800 dark:bg-amber-950/40 dark:text-amber-300 border-amber-200 dark:border-amber-800',
+    mauSac: 'bg-accent-soft text-accent border-accent ',
     icon: Clock,
   },
   [TrangThaiBaoLoi.DANG_XU_LY]: {
     nhan: 'Đang xử lý',
-    mauSac: 'bg-blue-50 text-blue-800 dark:bg-blue-950/40 dark:text-blue-300 border-blue-200 dark:border-blue-800',
+    mauSac: 'bg-accent-soft text-accent border-accent ',
     icon: RefreshCw,
   },
   [TrangThaiBaoLoi.DA_XU_LY]: {
     nhan: 'Đã giải quyết',
-    mauSac: 'bg-emerald-50 text-emerald-800 dark:bg-emerald-950/40 dark:text-emerald-300 border-emerald-200 dark:border-emerald-800',
+    mauSac: 'bg-accent-soft text-accent border-accent ',
     icon: CheckCircle2,
   },
   [TrangThaiBaoLoi.TU_CHOI]: {
     nhan: 'Từ chối',
-    mauSac: 'bg-slate-100 text-slate-700 dark:bg-slate-800 dark:text-slate-400 border-slate-200 dark:border-slate-700',
+    mauSac: 'bg-active-bg text-text border-border ',
     icon: XCircle,
   },
 };
@@ -284,13 +284,14 @@ export default function TrangBaoLoiDongGop() {
   return (
     <div className="space-y-6 pb-12">
       {/* 1. Header Trang */}
-      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 border-b border-slate-200 dark:border-slate-800 pb-5">
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 border-b border-[var(--border)] pb-5">
         <div>
-          <h1 className="text-2xl font-bold tracking-tight text-slate-900 dark:text-slate-100 flex items-center gap-2.5">
-            <LifeBuoy className="w-7 h-7 text-blue-600 dark:text-blue-400" />
+          <p className="eyebrow mb-1">Hỗ trợ kỹ thuật</p>
+          <h1 className="text-[22px] font-mono font-bold tracking-tight text-[var(--text)] flex items-center gap-2.5">
+            <LifeBuoy className="w-5 h-5 text-[var(--accent)]" strokeWidth={1.5} />
             Báo lỗi & Đóng góp ý kiến
           </h1>
-          <p className="mt-1 text-sm text-slate-500 dark:text-slate-400">
+          <p className="mt-1 text-[14px] text-[var(--muted)]">
             {laQuanTri
               ? 'Tiếp nhận, xử lý và phản hồi các sự cố kỹ thuật và ý kiến đóng góp từ người dùng.'
               : 'Gửi báo lỗi kỹ thuật, đóng góp ý tưởng cải tiến hoặc yêu cầu hỗ trợ trực tiếp từ ban quản trị.'}
@@ -299,78 +300,78 @@ export default function TrangBaoLoiDongGop() {
 
         <button
           onClick={() => setModalGuiMo(true)}
-          className="inline-flex items-center justify-center gap-2 px-4 py-2.5 rounded-lg bg-blue-600 hover:bg-blue-700 text-white font-medium text-sm shadow-sm transition-colors focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 dark:focus:ring-offset-slate-900"
+          className="inline-flex items-center justify-center gap-2 px-5 py-[11px] rounded-[4px] bg-[var(--accent)] hover:brightness-95 text-white font-semibold text-[13px] shadow-[0_2px_8px_-2px_color-mix(in_srgb,var(--accent)_30%,transparent)] transition-all cursor-pointer"
         >
-          <PlusCircle className="w-4 h-4" />
+          <PlusCircle className="w-[18px] h-[18px]" strokeWidth={1.5} />
           <span>Gửi báo lỗi / Đóng góp mới</span>
         </button>
       </div>
 
       {/* 2. Thẻ số liệu thống kê */}
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
-        <div className="p-4 rounded-xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-sm flex items-center justify-between">
+        <div className="p-4 rounded bg-surface border border-border shadow-sm flex items-center justify-between">
           <div>
-            <p className="text-xs font-medium text-slate-500 dark:text-slate-400 uppercase tracking-wider">
+            <p className="text-xs font-medium text-muted uppercase tracking-wider">
               {laQuanTri ? 'Tổng số yêu cầu' : 'Yêu cầu của bạn'}
             </p>
-            <p className="text-2xl font-bold text-slate-900 dark:text-slate-100 mt-1">
+            <p className="text-2xl font-bold text-text mt-1">
               {thongKe?.tongSo ?? 0}
             </p>
           </div>
-          <div className="w-10 h-10 rounded-lg bg-slate-100 dark:bg-slate-800 flex items-center justify-center text-slate-600 dark:text-slate-300">
+          <div className="w-10 h-10 rounded-lg bg-active-bg flex items-center justify-center text-muted ">
             <MessageSquare className="w-5 h-5" />
           </div>
         </div>
 
-        <div className="p-4 rounded-xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-sm flex items-center justify-between">
+        <div className="p-4 rounded bg-surface border border-border shadow-sm flex items-center justify-between">
           <div>
-            <p className="text-xs font-medium text-amber-600 dark:text-amber-400 uppercase tracking-wider">
+            <p className="text-xs font-medium text-accent uppercase tracking-wider">
               Chờ tiếp nhận
             </p>
-            <p className="text-2xl font-bold text-slate-900 dark:text-slate-100 mt-1">
+            <p className="text-2xl font-bold text-text mt-1">
               {thongKe?.choTiepNhan ?? 0}
             </p>
           </div>
-          <div className="w-10 h-10 rounded-lg bg-amber-50 dark:bg-amber-950/40 flex items-center justify-center text-amber-600 dark:text-amber-400">
+          <div className="w-10 h-10 rounded-lg bg-accent-soft flex items-center justify-center text-accent ">
             <Clock className="w-5 h-5" />
           </div>
         </div>
 
-        <div className="p-4 rounded-xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-sm flex items-center justify-between">
+        <div className="p-4 rounded bg-surface border border-border shadow-sm flex items-center justify-between">
           <div>
-            <p className="text-xs font-medium text-blue-600 dark:text-blue-400 uppercase tracking-wider">
+            <p className="text-xs font-medium text-accent uppercase tracking-wider">
               Đang xử lý
             </p>
-            <p className="text-2xl font-bold text-slate-900 dark:text-slate-100 mt-1">
+            <p className="text-2xl font-bold text-text mt-1">
               {thongKe?.dangXuLy ?? 0}
             </p>
           </div>
-          <div className="w-10 h-10 rounded-lg bg-blue-50 dark:bg-blue-950/40 flex items-center justify-center text-blue-600 dark:text-blue-400">
+          <div className="w-10 h-10 rounded-lg bg-accent-soft flex items-center justify-center text-accent ">
             <RefreshCw className="w-5 h-5" />
           </div>
         </div>
 
-        <div className="p-4 rounded-xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-sm flex items-center justify-between">
+        <div className="p-4 rounded bg-surface border border-border shadow-sm flex items-center justify-between">
           <div>
-            <p className="text-xs font-medium text-emerald-600 dark:text-emerald-400 uppercase tracking-wider">
+            <p className="text-xs font-medium text-accent uppercase tracking-wider">
               Đã giải quyết
             </p>
-            <p className="text-2xl font-bold text-slate-900 dark:text-slate-100 mt-1">
+            <p className="text-2xl font-bold text-text mt-1">
               {thongKe?.daXuLy ?? 0}
             </p>
           </div>
-          <div className="w-10 h-10 rounded-lg bg-emerald-50 dark:bg-emerald-950/40 flex items-center justify-center text-emerald-600 dark:text-emerald-400">
+          <div className="w-10 h-10 rounded-lg bg-accent-soft flex items-center justify-center text-accent ">
             <CheckCircle2 className="w-5 h-5" />
           </div>
         </div>
       </div>
 
       {/* 3. Thanh tìm kiếm và bộ lọc */}
-      <div className="p-4 rounded-xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-sm space-y-3">
+      <div className="p-4 rounded bg-surface border border-border shadow-sm space-y-3">
         <div className="flex flex-col md:flex-row md:items-center gap-3">
           {/* Ô tìm kiếm */}
           <div className="relative flex-1">
-            <Search className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" />
+            <Search className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-muted" />
             <input
               type="text"
               value={tuKhoa}
@@ -379,7 +380,7 @@ export default function TrangBaoLoiDongGop() {
                 setTrangHienTai(1);
               }}
               placeholder="Tìm kiếm theo tiêu đề, nội dung phản ánh..."
-              className="w-full pl-9 pr-4 py-2 text-sm rounded-lg border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800/50 text-slate-900 dark:text-slate-100 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-500"
+              className="w-full pl-9 pr-4 py-2 text-sm rounded-lg border border-border bg-bg text-text placeholder:text-muted focus:outline-none focus:ring-2 focus:ring-accent"
             />
           </div>
 
@@ -390,7 +391,7 @@ export default function TrangBaoLoiDongGop() {
               setBoLocLoai(e.target.value);
               setTrangHienTai(1);
             }}
-            className="px-3 py-2 text-sm rounded-lg border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 text-slate-900 dark:text-slate-100 focus:outline-none focus:ring-2 focus:ring-blue-500"
+            className="px-3 py-2 text-sm rounded-lg border border-border bg-bg text-text focus:outline-none focus:ring-2 focus:ring-accent"
           >
             <option value="">Tất cả phân loại</option>
             <option value={LoaiBaoLoiDongGop.BAO_LOI}>Báo lỗi hệ thống</option>
@@ -405,7 +406,7 @@ export default function TrangBaoLoiDongGop() {
               setBoLocTrangThai(e.target.value);
               setTrangHienTai(1);
             }}
-            className="px-3 py-2 text-sm rounded-lg border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 text-slate-900 dark:text-slate-100 focus:outline-none focus:ring-2 focus:ring-blue-500"
+            className="px-3 py-2 text-sm rounded-lg border border-border bg-bg text-text focus:outline-none focus:ring-2 focus:ring-accent"
           >
             <option value="">Tất cả trạng thái</option>
             <option value={TrangThaiBaoLoi.CHO_TIEP_NHAN}>Chờ tiếp nhận</option>
@@ -421,7 +422,7 @@ export default function TrangBaoLoiDongGop() {
               setBoLocUuTien(e.target.value);
               setTrangHienTai(1);
             }}
-            className="px-3 py-2 text-sm rounded-lg border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 text-slate-900 dark:text-slate-100 focus:outline-none focus:ring-2 focus:ring-blue-500"
+            className="px-3 py-2 text-sm rounded-lg border border-border bg-bg text-text focus:outline-none focus:ring-2 focus:ring-accent"
           >
             <option value="">Tất cả mức ưu tiên</option>
             <option value={MucDoUuTienBaoLoi.THAP}>Thấp</option>
@@ -439,7 +440,7 @@ export default function TrangBaoLoiDongGop() {
                 setBoLocUuTien('');
                 setTrangHienTai(1);
               }}
-              className="px-3 py-2 text-xs font-medium text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-lg transition-colors"
+              className="px-3 py-2 text-xs font-medium text-muted hover:bg-active-bg rounded-lg transition-colors"
             >
               Đặt lại lọc
             </button>
@@ -451,21 +452,21 @@ export default function TrangBaoLoiDongGop() {
       {isLoading ? (
         <KhungXuongBang soCot={5} soDong={5} />
       ) : danhSach.length === 0 ? (
-        <div className="p-12 text-center rounded-2xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-sm">
-          <div className="w-16 h-16 mx-auto rounded-full bg-blue-50 dark:bg-blue-950/40 flex items-center justify-center text-blue-600 dark:text-blue-400 mb-4">
+        <div className="p-12 text-center rounded bg-surface border border-border shadow-sm">
+          <div className="w-16 h-16 mx-auto rounded-full bg-accent-soft flex items-center justify-center text-accent mb-4">
             <LifeBuoy className="w-8 h-8" />
           </div>
-          <h3 className="text-lg font-semibold text-slate-900 dark:text-slate-100">
+          <h3 className="text-lg font-semibold text-text ">
             Chưa có phản ánh hoặc báo lỗi nào
           </h3>
-          <p className="mt-1.5 text-sm text-slate-500 dark:text-slate-400 max-w-md mx-auto">
+          <p className="mt-1.5 text-sm text-muted max-w-md mx-auto">
             {tuKhoa || boLocLoai || boLocTrangThai || boLocUuTien
               ? 'Không tìm thấy kết quả phù hợp với các bộ lọc hiện tại. Thử thay đổi tiêu chí tìm kiếm.'
               : 'Hệ thống đang vận hành ổn định. Nếu gặp bất kỳ vấn đề kỹ thuật nào, hãy gửi phản ánh ngay.'}
           </p>
           <button
             onClick={() => setModalGuiMo(true)}
-            className="mt-5 inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-blue-600 hover:bg-blue-700 text-white font-medium text-sm transition-colors"
+            className="mt-5 inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-accent hover:bg-accent text-white font-medium text-sm transition-colors"
           >
             <PlusCircle className="w-4 h-4" />
             <span>Gửi phản ánh đầu tiên</span>
@@ -484,7 +485,7 @@ export default function TrangBaoLoiDongGop() {
             return (
               <div
                 key={item.id}
-                className="p-5 rounded-xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-sm hover:border-blue-300 dark:hover:border-blue-700 transition-all duration-200"
+                className="p-5 rounded bg-surface border border-border shadow-sm hover:border-accent transition-all duration-200"
               >
                 <div className="flex flex-col lg:flex-row lg:items-start lg:justify-between gap-4">
                   {/* Nội dung chính */}
@@ -519,39 +520,39 @@ export default function TrangBaoLoiDongGop() {
                     <div>
                       <h4
                         onClick={() => setModalChiTietMo(item)}
-                        className="text-base font-semibold text-slate-900 dark:text-slate-100 hover:text-blue-600 dark:hover:text-blue-400 cursor-pointer transition-colors"
+                        className="text-base font-semibold text-text hover:text-accent cursor-pointer transition-colors"
                       >
                         {item.tieuDe}
                       </h4>
-                      <p className="mt-1 text-sm text-slate-600 dark:text-slate-300 line-clamp-2 leading-relaxed">
+                      <p className="mt-1 text-sm text-muted line-clamp-2 leading-relaxed">
                         {item.noiDung}
                       </p>
                     </div>
 
                     {/* Phản hồi từ quản trị nếu có */}
                     {item.phanHoiXuLy && (
-                      <div className="mt-2.5 p-3 rounded-lg bg-emerald-50/70 dark:bg-emerald-950/30 border border-emerald-200/80 dark:border-emerald-900/50">
-                        <div className="flex items-center gap-2 text-xs font-semibold text-emerald-800 dark:text-emerald-300">
+                      <div className="mt-2.5 p-3 rounded-lg bg-accent-soft border border-accent ">
+                        <div className="flex items-center gap-2 text-xs font-semibold text-accent ">
                           <CheckCircle2 className="w-3.5 h-3.5" />
                           <span>Phản hồi từ Ban Quản trị:</span>
                           {item.nguoiXuLy?.hoTen && (
-                            <span className="font-normal text-emerald-700 dark:text-emerald-400">
+                            <span className="font-normal text-accent ">
                               ({item.nguoiXuLy.hoTen})
                             </span>
                           )}
                         </div>
-                        <p className="mt-1 text-xs text-emerald-900 dark:text-emerald-200 leading-relaxed">
+                        <p className="mt-1 text-xs text-accent leading-relaxed">
                           {item.phanHoiXuLy}
                         </p>
                       </div>
                     )}
 
                     {/* Metadata người gửi & thời gian */}
-                    <div className="flex flex-wrap items-center gap-4 text-xs text-slate-400 dark:text-slate-500 pt-1">
+                    <div className="flex flex-wrap items-center gap-4 text-xs text-muted pt-1">
                       <span>Gửi lúc: {dinhDangThoiGian(item.ngayTao)}</span>
 
                       {laQuanTri && item.nguoiDung && (
-                        <span className="flex items-center gap-1.5 font-medium text-slate-600 dark:text-slate-300">
+                        <span className="flex items-center gap-1.5 font-medium text-muted ">
                           <User className="w-3.5 h-3.5" />
                           {item.nguoiDung.hoTen} ({layNhanVaiTro(item.nguoiDung.vaiTro as any)})
                         </span>
@@ -563,7 +564,7 @@ export default function TrangBaoLoiDongGop() {
                   <div className="flex items-center gap-2 pt-2 lg:pt-0 self-end lg:self-start">
                     <button
                       onClick={() => setModalChiTietMo(item)}
-                      className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg border border-slate-200 dark:border-slate-700 hover:bg-slate-100 dark:hover:bg-slate-800 text-xs font-medium text-slate-700 dark:text-slate-200 transition-colors"
+                      className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg border border-border hover:bg-active-bg text-xs font-medium text-text transition-colors"
                       title="Xem chi tiết"
                     >
                       <Eye className="w-3.5 h-3.5" />
@@ -573,7 +574,7 @@ export default function TrangBaoLoiDongGop() {
                     {laQuanTri && (
                       <button
                         onClick={() => xuLyMoModalXuLy(item)}
-                        className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-blue-50 hover:bg-blue-100 dark:bg-blue-950/60 dark:hover:bg-blue-900/80 border border-blue-200 dark:border-blue-800 text-xs font-medium text-blue-700 dark:text-blue-300 transition-colors"
+                        className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-accent-soft hover:bg-accent-soft border border-accent text-xs font-medium text-accent transition-colors"
                         title="Cập nhật xử lý & phản hồi"
                       >
                         <ShieldCheck className="w-3.5 h-3.5" />
@@ -584,7 +585,7 @@ export default function TrangBaoLoiDongGop() {
                     {laChuSoHuu && item.trangThai === TrangThaiBaoLoi.CHO_TIEP_NHAN && (
                       <button
                         onClick={() => xuLyXoa(item.id)}
-                        className="inline-flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg border border-rose-200 dark:border-rose-900 hover:bg-rose-50 dark:hover:bg-rose-950/50 text-xs font-medium text-rose-600 dark:text-rose-400 transition-colors"
+                        className="inline-flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg border border-danger hover:bg-danger-soft text-xs font-medium text-danger transition-colors"
                         title="Hủy phản ánh này"
                       >
                         <Trash2 className="w-3.5 h-3.5" />
@@ -601,22 +602,22 @@ export default function TrangBaoLoiDongGop() {
 
       {/* 5. Điều khiển phân trang */}
       {phanTrang.tongSoTrang > 1 && (
-        <div className="flex items-center justify-between border-t border-slate-200 dark:border-slate-800 pt-4">
-          <p className="text-xs text-slate-500 dark:text-slate-400">
-            Hiển thị trang <span className="font-semibold text-slate-900 dark:text-slate-100">{trangHienTai}</span> / {phanTrang.tongSoTrang} (Tổng số {phanTrang.tongSo} phản ánh)
+        <div className="flex items-center justify-between border-t border-border pt-4">
+          <p className="text-xs text-muted ">
+            Hiển thị trang <span className="font-semibold text-text ">{trangHienTai}</span> / {phanTrang.tongSoTrang} (Tổng số {phanTrang.tongSo} phản ánh)
           </p>
           <div className="flex items-center gap-2">
             <button
               onClick={() => setTrangHienTai((p) => Math.max(1, p - 1))}
               disabled={trangHienTai <= 1}
-              className="p-2 rounded-lg border border-slate-200 dark:border-slate-700 disabled:opacity-40 disabled:cursor-not-allowed hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-700 dark:text-slate-300"
+              className="p-2 rounded-lg border border-border disabled:opacity-40 disabled:cursor-not-allowed hover:bg-active-bg text-text "
             >
               <ChevronLeft className="w-4 h-4" />
             </button>
             <button
               onClick={() => setTrangHienTai((p) => Math.min(phanTrang.tongSoTrang, p + 1))}
               disabled={trangHienTai >= phanTrang.tongSoTrang}
-              className="p-2 rounded-lg border border-slate-200 dark:border-slate-700 disabled:opacity-40 disabled:cursor-not-allowed hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-700 dark:text-slate-300"
+              className="p-2 rounded-lg border border-border disabled:opacity-40 disabled:cursor-not-allowed hover:bg-active-bg text-text "
             >
               <ChevronRight className="w-4 h-4" />
             </button>
@@ -649,7 +650,7 @@ export default function TrangBaoLoiDongGop() {
         >
           {/* Phân loại */}
           <div>
-            <label className="block text-xs font-semibold text-slate-700 dark:text-slate-300 uppercase tracking-wider mb-2">
+            <label className="block text-xs font-semibold text-text uppercase tracking-wider mb-2">
               Phân loại yêu cầu
             </label>
             <div className="grid grid-cols-1 sm:grid-cols-3 gap-2.5">
@@ -664,12 +665,12 @@ export default function TrangBaoLoiDongGop() {
                   onClick={() => setFormGui((f) => ({ ...f, loaiPhanHoi: item.loai }))}
                   className={`p-3 rounded-lg border text-left transition-all ${
                     formGui.loaiPhanHoi === item.loai
-                      ? 'border-blue-600 bg-blue-50/60 dark:bg-blue-950/40 text-blue-900 dark:text-blue-100 ring-2 ring-blue-500/20'
-                      : 'border-slate-200 dark:border-slate-700 hover:border-slate-300 dark:hover:border-slate-600'
+                      ? 'border-accent bg-accent-soft text-accent ring-2 ring-accent'
+                      : 'border-border hover:border-border '
                   }`}
                 >
                   <p className="text-xs font-semibold">{item.label}</p>
-                  <p className="text-[11px] text-slate-500 dark:text-slate-400 mt-0.5">{item.sub}</p>
+                  <p className="text-[11px] text-muted mt-0.5">{item.sub}</p>
                 </button>
               ))}
             </div>
@@ -677,7 +678,7 @@ export default function TrangBaoLoiDongGop() {
 
           {/* Mức độ ưu tiên */}
           <div>
-            <label className="block text-xs font-semibold text-slate-700 dark:text-slate-300 uppercase tracking-wider mb-1.5">
+            <label className="block text-xs font-semibold text-text uppercase tracking-wider mb-1.5">
               Mức độ ưu tiên
             </label>
             <div className="grid grid-cols-4 gap-2">
@@ -693,8 +694,8 @@ export default function TrangBaoLoiDongGop() {
                   onClick={() => setFormGui((f) => ({ ...f, mucDoUuTien: p.u }))}
                   className={`py-2 px-3 rounded-lg border text-center text-xs font-medium transition-all ${
                     formGui.mucDoUuTien === p.u
-                      ? 'border-blue-600 bg-blue-600 text-white'
-                      : 'border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-800'
+                      ? 'border-accent bg-accent text-white'
+                      : 'border-border text-text hover:bg-bg '
                   }`}
                 >
                   {p.label}
@@ -705,8 +706,8 @@ export default function TrangBaoLoiDongGop() {
 
           {/* Tiêu đề */}
           <div>
-            <label className="block text-xs font-semibold text-slate-700 dark:text-slate-300 uppercase tracking-wider mb-1">
-              Tiêu đề phản ánh <span className="text-rose-500">*</span>
+            <label className="block text-xs font-semibold text-text uppercase tracking-wider mb-1">
+              Tiêu đề phản ánh <span className="text-danger">*</span>
             </label>
             <input
               type="text"
@@ -714,14 +715,14 @@ export default function TrangBaoLoiDongGop() {
               value={formGui.tieuDe}
               onChange={(e) => setFormGui((f) => ({ ...f, tieuDe: e.target.value }))}
               placeholder="Tóm tắt ngắn gọn vấn đề (Ví dụ: Không thể tải bài tập PDF môn Toán)"
-              className="w-full px-3.5 py-2.5 text-sm rounded-lg border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-slate-100 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-500"
+              className="w-full px-3.5 py-2.5 text-sm rounded-lg border border-border bg-surface text-text placeholder:text-muted focus:outline-none focus:ring-2 focus:ring-accent"
             />
           </div>
 
           {/* Chi tiết nội dung */}
           <div>
-            <label className="block text-xs font-semibold text-slate-700 dark:text-slate-300 uppercase tracking-wider mb-1">
-              Nội dung chi tiết <span className="text-rose-500">*</span>
+            <label className="block text-xs font-semibold text-text uppercase tracking-wider mb-1">
+              Nội dung chi tiết <span className="text-danger">*</span>
             </label>
             <textarea
               required
@@ -729,40 +730,40 @@ export default function TrangBaoLoiDongGop() {
               value={formGui.noiDung}
               onChange={(e) => setFormGui((f) => ({ ...f, noiDung: e.target.value }))}
               placeholder="Mô tả cụ thể các bước bạn đã làm, thông báo lỗi xuất hiện (nếu có), hoặc đề xuất giải pháp bạn mong muốn..."
-              className="w-full px-3.5 py-2.5 text-sm rounded-lg border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-slate-100 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-500 resize-y"
+              className="w-full px-3.5 py-2.5 text-sm rounded-lg border border-border bg-surface text-text placeholder:text-muted focus:outline-none focus:ring-2 focus:ring-accent resize-y"
             />
-            <p className="mt-1 text-right text-[11px] text-slate-400">
+            <p className="mt-1 text-right text-[11px] text-muted">
               {formGui.noiDung.length}/5000 ký tự (tối thiểu 10 ký tự)
             </p>
           </div>
 
           {/* Đính kèm thông tin thiết bị */}
-          <div className="flex items-center gap-2.5 p-3 rounded-lg bg-slate-50 dark:bg-slate-800/60 border border-slate-200 dark:border-slate-700">
+          <div className="flex items-center gap-2.5 p-3 rounded-lg bg-bg border border-border ">
             <input
               type="checkbox"
               id="kemThongTin"
               checked={formGui.kemThongTinThietBi}
               onChange={(e) => setFormGui((f) => ({ ...f, kemThongTinThietBi: e.target.checked }))}
-              className="w-4 h-4 rounded text-blue-600 focus:ring-blue-500 border-slate-300"
+              className="w-4 h-4 rounded text-accent focus:ring-accent border-border"
             />
-            <label htmlFor="kemThongTin" className="text-xs text-slate-600 dark:text-slate-300 cursor-pointer">
+            <label htmlFor="kemThongTin" className="text-xs text-muted cursor-pointer">
               Tự động gửi thông tin thiết bị để bộ phận kỹ thuật hỗ trợ khắc phục nhanh nhất.
             </label>
           </div>
 
           {/* Nút hành động */}
-          <div className="flex items-center justify-end gap-3 pt-3 border-t border-slate-200 dark:border-slate-800">
+          <div className="flex items-center justify-end gap-3 pt-3 border-t border-border ">
             <button
               type="button"
               onClick={() => setModalGuiMo(false)}
-              className="px-4 py-2 text-sm font-medium rounded-lg text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors"
+              className="px-4 py-2 text-sm font-medium rounded-lg text-text hover:bg-active-bg transition-colors"
             >
               Hủy
             </button>
             <button
               type="submit"
               disabled={mutationGuiMoi.isPending}
-              className="inline-flex items-center gap-2 px-5 py-2 text-sm font-medium rounded-lg bg-blue-600 hover:bg-blue-700 text-white disabled:opacity-50 transition-colors shadow-sm"
+              className="inline-flex items-center gap-2 px-5 py-2 text-sm font-medium rounded-lg bg-accent hover:bg-accent text-white disabled:opacity-50 transition-colors shadow-sm"
             >
               {mutationGuiMoi.isPending ? (
                 <>
@@ -790,7 +791,7 @@ export default function TrangBaoLoiDongGop() {
         >
           <div className="space-y-4">
             {/* Header chi tiết */}
-            <div className="flex flex-wrap items-center gap-2 pb-3 border-b border-slate-200 dark:border-slate-800">
+            <div className="flex flex-wrap items-center gap-2 pb-3 border-b border-border ">
               <span
                 className={`inline-flex items-center gap-1 px-2.5 py-1 rounded text-xs font-medium border ${
                   (NHAN_LOAI[modalChiTietMo.loaiPhanHoi] || NHAN_LOAI[LoaiBaoLoiDongGop.BAO_LOI]).mauSac
@@ -816,19 +817,19 @@ export default function TrangBaoLoiDongGop() {
 
             {/* Tiêu đề & nội dung */}
             <div>
-              <h3 className="text-lg font-bold text-slate-900 dark:text-slate-100">
+              <h3 className="text-lg font-bold text-text ">
                 {modalChiTietMo.tieuDe}
               </h3>
-              <div className="mt-3 p-4 rounded-xl bg-slate-50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-800 text-sm text-slate-800 dark:text-slate-200 whitespace-pre-wrap leading-relaxed">
+              <div className="mt-3 p-4 rounded bg-bg border border-border text-sm text-text whitespace-pre-wrap leading-relaxed">
                 {modalChiTietMo.noiDung}
               </div>
             </div>
 
             {/* Thông tin kỹ thuật đính kèm nếu có */}
             {modalChiTietMo.thongTinTrinhDuyet && (
-              <div className="p-3 rounded-lg bg-slate-100 dark:bg-slate-800/80 text-xs text-slate-600 dark:text-slate-400 space-y-1">
+              <div className="p-3 rounded-lg bg-active-bg text-xs text-muted space-y-1">
                 <p className="flex items-start gap-2">
-                  <Monitor className="w-3.5 h-3.5 text-slate-500 mt-0.5" />
+                  <Monitor className="w-3.5 h-3.5 text-muted mt-0.5" />
                   <span className="font-mono text-[11px] break-all">
                     {modalChiTietMo.thongTinTrinhDuyet}
                   </span>
@@ -838,37 +839,37 @@ export default function TrangBaoLoiDongGop() {
 
             {/* Khối phản hồi từ Ban Quản trị */}
             {modalChiTietMo.phanHoiXuLy ? (
-              <div className="p-4 rounded-xl bg-emerald-50 dark:bg-emerald-950/40 border border-emerald-200 dark:border-emerald-800 space-y-1.5">
+              <div className="p-4 rounded bg-accent-soft border border-accent space-y-1.5">
                 <div className="flex items-center justify-between">
-                  <div className="flex items-center gap-2 text-sm font-semibold text-emerald-800 dark:text-emerald-200">
-                    <CheckCircle2 className="w-4 h-4 text-emerald-600 dark:text-emerald-400" />
+                  <div className="flex items-center gap-2 text-sm font-semibold text-accent ">
+                    <CheckCircle2 className="w-4 h-4 text-accent " />
                     <span>Phản hồi chính thức:</span>
                   </div>
                   {modalChiTietMo.ngayCapNhat && (
-                    <span className="text-xs text-emerald-700 dark:text-emerald-400">
+                    <span className="text-xs text-accent ">
                       {dinhDangThoiGian(modalChiTietMo.ngayCapNhat)}
                     </span>
                   )}
                 </div>
-                <p className="text-sm text-emerald-950 dark:text-emerald-100 whitespace-pre-wrap leading-relaxed">
+                <p className="text-sm text-accent whitespace-pre-wrap leading-relaxed">
                   {modalChiTietMo.phanHoiXuLy}
                 </p>
                 {modalChiTietMo.nguoiXuLy?.hoTen && (
-                  <p className="text-xs text-emerald-700 dark:text-emerald-400 pt-1">
+                  <p className="text-xs text-accent pt-1">
                     Người phụ trách: {modalChiTietMo.nguoiXuLy.hoTen}
                   </p>
                 )}
               </div>
             ) : (
-              <div className="p-3.5 rounded-lg bg-amber-50 dark:bg-amber-950/30 border border-amber-200 dark:border-amber-800 text-xs text-amber-800 dark:text-amber-300 flex items-center gap-2">
+              <div className="p-3.5 rounded-lg bg-accent-soft border border-accent text-xs text-accent flex items-center gap-2">
                 <Clock className="w-4 h-4" />
                 <span>Yêu cầu này đang trong hàng đợi xử lý của ban quản trị.</span>
               </div>
             )}
 
             {/* Chân modal */}
-            <div className="flex items-center justify-between pt-3 border-t border-slate-200 dark:border-slate-800">
-              <span className="text-xs text-slate-400">
+            <div className="flex items-center justify-between pt-3 border-t border-border ">
+              <span className="text-xs text-muted">
                 Tạo lúc: {dinhDangThoiGian(modalChiTietMo.ngayTao)}
               </span>
               <div className="flex items-center gap-2">
@@ -879,7 +880,7 @@ export default function TrangBaoLoiDongGop() {
                       setModalChiTietMo(null);
                       xuLyMoModalXuLy(item);
                     }}
-                    className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-blue-600 hover:bg-blue-700 text-white text-xs font-medium transition-colors"
+                    className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-accent hover:bg-accent text-white text-xs font-medium transition-colors"
                   >
                     <ShieldCheck className="w-3.5 h-3.5" />
                     <span>Cập nhật xử lý</span>
@@ -888,7 +889,7 @@ export default function TrangBaoLoiDongGop() {
                 <button
                   type="button"
                   onClick={() => setModalChiTietMo(null)}
-                  className="px-4 py-1.5 text-xs font-medium rounded-lg text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800"
+                  className="px-4 py-1.5 text-xs font-medium rounded-lg text-text hover:bg-active-bg "
                 >
                   Đóng
                 </button>
@@ -915,27 +916,27 @@ export default function TrangBaoLoiDongGop() {
             className="space-y-4"
           >
             {/* Tóm tắt phản ánh */}
-            <div className="p-3.5 rounded-xl bg-slate-50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700 space-y-1">
-              <p className="text-xs text-slate-500 dark:text-slate-400">Yêu cầu được chọn:</p>
-              <p className="text-sm font-semibold text-slate-900 dark:text-slate-100">
+            <div className="p-3.5 rounded bg-bg border border-border space-y-1">
+              <p className="text-xs text-muted ">Yêu cầu được chọn:</p>
+              <p className="text-sm font-semibold text-text ">
                 {modalXuLyMo.tieuDe}
               </p>
-              <p className="text-xs text-slate-600 dark:text-slate-300 line-clamp-2">
+              <p className="text-xs text-muted line-clamp-2">
                 {modalXuLyMo.noiDung}
               </p>
             </div>
 
             {/* Lựa chọn trạng thái mới */}
             <div>
-              <label className="block text-xs font-semibold text-slate-700 dark:text-slate-300 uppercase tracking-wider mb-2">
-                Trạng thái xử lý <span className="text-rose-500">*</span>
+              <label className="block text-xs font-semibold text-text uppercase tracking-wider mb-2">
+                Trạng thái xử lý <span className="text-danger">*</span>
               </label>
               <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
                 {[
-                  { tt: TrangThaiBaoLoi.CHO_TIEP_NHAN, label: 'Chờ tiếp nhận', color: 'hover:border-amber-500' },
-                  { tt: TrangThaiBaoLoi.DANG_XU_LY, label: 'Đang xử lý', color: 'hover:border-blue-500' },
-                  { tt: TrangThaiBaoLoi.DA_XU_LY, label: 'Đã giải quyết', color: 'hover:border-emerald-500' },
-                  { tt: TrangThaiBaoLoi.TU_CHOI, label: 'Từ chối', color: 'hover:border-slate-500' },
+                  { tt: TrangThaiBaoLoi.CHO_TIEP_NHAN, label: 'Chờ tiếp nhận', color: 'hover:border-accent' },
+                  { tt: TrangThaiBaoLoi.DANG_XU_LY, label: 'Đang xử lý', color: 'hover:border-accent' },
+                  { tt: TrangThaiBaoLoi.DA_XU_LY, label: 'Đã giải quyết', color: 'hover:border-accent' },
+                  { tt: TrangThaiBaoLoi.TU_CHOI, label: 'Từ chối', color: 'hover:border-border' },
                 ].map((item) => (
                   <button
                     type="button"
@@ -943,8 +944,8 @@ export default function TrangBaoLoiDongGop() {
                     onClick={() => setFormXuLy((f) => ({ ...f, trangThai: item.tt }))}
                     className={`py-2 px-3 rounded-lg border text-center text-xs font-medium transition-all ${
                       formXuLy.trangThai === item.tt
-                        ? 'border-blue-600 bg-blue-600 text-white font-semibold'
-                        : `border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-300 ${item.color}`
+                        ? 'border-accent bg-accent text-white font-semibold'
+                        : `border-border text-text ${item.color}`
                     }`}
                   >
                     {item.label}
@@ -955,7 +956,7 @@ export default function TrangBaoLoiDongGop() {
 
             {/* Nội dung phản hồi */}
             <div>
-              <label className="block text-xs font-semibold text-slate-700 dark:text-slate-300 uppercase tracking-wider mb-1">
+              <label className="block text-xs font-semibold text-text uppercase tracking-wider mb-1">
                 Nội dung phản hồi tới người gửi
               </label>
               <textarea
@@ -964,26 +965,26 @@ export default function TrangBaoLoiDongGop() {
                 value={formXuLy.phanHoiXuLy}
                 onChange={(e) => setFormXuLy((f) => ({ ...f, phanHoiXuLy: e.target.value }))}
                 placeholder="Nhập thông điệp trả lời, kết quả khắc phục hoặc hướng dẫn thêm cho người gửi..."
-                className="w-full px-3.5 py-2.5 text-sm rounded-lg border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-slate-100 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                className="w-full px-3.5 py-2.5 text-sm rounded-lg border border-border bg-surface text-text placeholder:text-muted focus:outline-none focus:ring-2 focus:ring-accent"
               />
-              <p className="mt-1 text-[11px] text-slate-400">
+              <p className="mt-1 text-[11px] text-muted">
                 Thông điệp này sẽ hiển thị trực tiếp trong lịch sử phản ánh của người gửi và gửi thông báo chuông tới họ.
               </p>
             </div>
 
             {/* Nút hành động */}
-            <div className="flex items-center justify-end gap-3 pt-3 border-t border-slate-200 dark:border-slate-800">
+            <div className="flex items-center justify-end gap-3 pt-3 border-t border-border ">
               <button
                 type="button"
                 onClick={() => setModalXuLyMo(null)}
-                className="px-4 py-2 text-sm font-medium rounded-lg text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800"
+                className="px-4 py-2 text-sm font-medium rounded-lg text-text hover:bg-active-bg "
               >
                 Hủy
               </button>
               <button
                 type="submit"
                 disabled={mutationXuLy.isPending}
-                className="inline-flex items-center gap-2 px-5 py-2 text-sm font-medium rounded-lg bg-blue-600 hover:bg-blue-700 text-white disabled:opacity-50 transition-colors shadow-sm"
+                className="inline-flex items-center gap-2 px-5 py-2 text-sm font-medium rounded-lg bg-accent hover:bg-accent text-white disabled:opacity-50 transition-colors shadow-sm"
               >
                 {mutationXuLy.isPending ? (
                   <>

@@ -1,17 +1,16 @@
 import type { NextConfig } from 'next';
 
 const nextConfig: NextConfig = {
+  distDir: process.env.NEXT_BUILD_DIR || '.next',
   reactStrictMode: true,
   transpilePackages: ['@lms/chung'],
   devIndicators: false,
-  webpack: (config, { dev }) => {
-    if (dev && config.cache) {
-      config.cache = {
-        type: 'filesystem',
-        maxMemoryGenerations: 1,
-      };
-    }
-    return config;
+  experimental: {
+    optimizePackageImports: ['lucide-react', 'recharts'],
+  },
+  onDemandEntries: {
+    maxInactiveAge: 24 * 60 * 60 * 1000,
+    pagesBufferLength: 100,
   },
   async rewrites() {
     return [

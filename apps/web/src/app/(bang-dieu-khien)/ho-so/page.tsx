@@ -22,6 +22,7 @@ import { thongBao } from '../../../tien-ich/thong-bao';
 import { KhungXuongHoSo } from '../../../thanh-phan/khung-xuong';
 import { AnhDaiDien } from '../../../thanh-phan/anh-dai-dien';
 import { HopThoaiDoiAnhDaiDien } from '../../../thanh-phan/hop-thoai-doi-anh-dai-dien';
+import AnimatedBackground from '@/components/ui/animated-tabs';
 
 export default function TrangHoSoCaNhan() {
   const queryClient = useQueryClient();
@@ -108,28 +109,29 @@ export default function TrangHoSoCaNhan() {
     <div className="max-w-4xl mx-auto space-y-6">
       {/* Tiêu đề */}
       <div>
-        <h2 className="text-2xl font-bold text-slate-900 tracking-tight">Hồ sơ Cá nhân</h2>
-        <p className="text-sm text-slate-500 mt-1">
+        <p className="eyebrow mb-1">Tài khoản & Bảo mật</p>
+        <h2 className="text-[22px] font-mono font-bold text-[var(--text)] tracking-tight">Hồ sơ Cá nhân</h2>
+        <p className="text-[14px] text-[var(--muted)] mt-1">
           Xem và quản lý thông tin tài khoản, thông tin học vụ và bảo mật
         </p>
       </div>
 
       {/* Thông báo kết quả */}
       {thongBaoThanhCong && (
-        <div className="p-3.5 rounded-xl bg-emerald-50 border border-emerald-200 text-emerald-800 text-sm flex items-center gap-2">
-          <CheckCircle className="w-4 h-4 shrink-0 text-emerald-600" />
+        <div className="p-3.5 rounded bg-accent-soft border border-accent text-accent text-sm flex items-center gap-2">
+          <CheckCircle className="w-4 h-4 shrink-0 text-accent" />
           <span>{thongBaoThanhCong}</span>
         </div>
       )}
       {thongBaoLoi && (
-        <div className="p-3.5 rounded-xl bg-red-50 border border-red-200 text-red-800 text-sm flex items-center gap-2">
-          <AlertCircle className="w-4 h-4 shrink-0 text-red-600" />
+        <div className="p-3.5 rounded bg-danger-soft border border-danger text-danger text-sm flex items-center gap-2">
+          <AlertCircle className="w-4 h-4 shrink-0 text-danger" />
           <span>{thongBaoLoi}</span>
         </div>
       )}
 
       {/* Thẻ Hồ sơ tóm tắt */}
-      <div className="p-6 rounded-2xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-2xs flex flex-col sm:flex-row items-center gap-6">
+      <div className="p-6 rounded bg-surface border border-border shadow-2xs flex flex-col sm:flex-row items-center gap-6">
         <div
           onClick={() => setMoModalDoiAnh(true)}
           title="Nhấp để thay đổi ảnh đại diện"
@@ -139,7 +141,7 @@ export default function TrangHoSoCaNhan() {
             url={hoSo?.anhDaiDien}
             hoTen={hoSo?.hoTen}
             kichThuoc="xl"
-            className="ring-4 ring-white dark:ring-slate-800 shadow-sm transition-all duration-200 group-hover:ring-blue-500/40 group-hover:brightness-95"
+            className="ring-4 ring-white shadow-sm transition-all duration-200 group-hover:ring-accent group-hover:brightness-95"
           />
           <button
             type="button"
@@ -148,7 +150,7 @@ export default function TrangHoSoCaNhan() {
               setMoModalDoiAnh(true);
             }}
             title="Đổi ảnh đại diện"
-            className="absolute bottom-0 right-0 w-7 h-7 rounded-full bg-blue-600 hover:bg-blue-500 text-white shadow-md ring-2 ring-white dark:ring-slate-900 flex items-center justify-center p-0 transition-transform duration-200 active:scale-90 group-hover:scale-110 cursor-pointer"
+            className="absolute bottom-0 right-0 w-7 h-7 rounded-full bg-accent hover:bg-accent text-white shadow-md ring-2 ring-white flex items-center justify-center p-0 transition-transform duration-200 active:scale-90 group-hover:scale-110 cursor-pointer"
           >
             <Camera className="w-3.5 h-3.5 shrink-0" />
           </button>
@@ -157,25 +159,25 @@ export default function TrangHoSoCaNhan() {
         <div className="text-center sm:text-left flex-1 min-w-0">
           <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
             <div>
-              <h3 className="text-xl font-bold text-slate-900 dark:text-white truncate">
+              <h3 className="text-xl font-bold text-text truncate">
                 {hoSo?.hoTen}
               </h3>
-              <p className="text-sm text-slate-500 dark:text-slate-400 truncate">{hoSo?.email}</p>
+              <p className="text-sm text-muted truncate">{hoSo?.email}</p>
             </div>
             <button
               type="button"
               onClick={() => setMoModalDoiAnh(true)}
-              className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-semibold text-blue-700 dark:text-blue-300 bg-blue-50 dark:bg-blue-950/60 hover:bg-blue-100 dark:hover:bg-blue-900/60 border border-blue-200 dark:border-blue-800 rounded-xl transition-colors cursor-pointer self-center sm:self-auto"
+              className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-semibold text-accent bg-accent-soft hover:bg-accent-soft border border-accent rounded transition-colors cursor-pointer self-center sm:self-auto"
             >
               <Camera className="w-3.5 h-3.5" />
               Đổi ảnh đại diện
             </button>
           </div>
           <div className="mt-2.5 flex flex-wrap gap-2 justify-center sm:justify-start">
-            <span className="px-2.5 py-0.5 rounded-full text-xs font-semibold bg-blue-100 text-blue-700 dark:bg-blue-900/60 dark:text-blue-300 border border-blue-200 dark:border-blue-800">
+            <span className="px-2.5 py-0.5 rounded-full text-xs font-semibold bg-accent-soft text-accent border border-accent ">
               {layNhanVaiTro(hoSo?.vaiTro)}
             </span>
-            <span className="px-2.5 py-0.5 rounded-full text-xs font-semibold bg-emerald-100 text-emerald-700 dark:bg-emerald-900/60 dark:text-emerald-300 border border-emerald-200 dark:border-emerald-800">
+            <span className="px-2.5 py-0.5 rounded-full text-xs font-semibold bg-accent-soft text-accent border border-accent ">
               Đang hoạt động
             </span>
           </div>
@@ -183,38 +185,55 @@ export default function TrangHoSoCaNhan() {
       </div>
 
       {/* Tabs */}
-      <div className="border-b border-slate-200 flex gap-4">
-        <button
-          onClick={() => {
-            setTabHienTai('thong-tin');
-            setThongBaoThanhCong(null);
-            setThongBaoLoi(null);
+      <div className="border-b border-border flex gap-2 py-1">
+        <AnimatedBackground
+          defaultValue={tabHienTai}
+          onValueChange={(idTab) => {
+            if (idTab) {
+              setTabHienTai(idTab as typeof tabHienTai);
+              setThongBaoThanhCong(null);
+              setThongBaoLoi(null);
+            }
           }}
-          className={`pb-3 text-sm font-semibold border-b-2 transition-colors flex items-center gap-2 ${
-            tabHienTai === 'thong-tin'
-              ? 'border-blue-600 text-blue-600'
-              : 'border-transparent text-slate-500 hover:text-slate-700'
-          }`}
+          className="rounded bg-accent-soft "
+          transition={{ type: 'spring', bounce: 0.2, duration: 0.3 }}
         >
-          <User className="w-4 h-4" />
-          Thông tin cơ bản
-        </button>
+          <button
+            data-id="thong-tin"
+            type="button"
+            onClick={() => {
+              setTabHienTai('thong-tin');
+              setThongBaoThanhCong(null);
+              setThongBaoLoi(null);
+            }}
+            className={`px-4 py-2.5 text-sm font-semibold border-b-2 transition-colors flex items-center gap-2 cursor-pointer ${
+              tabHienTai === 'thong-tin'
+                ? 'border-accent text-accent '
+                : 'border-transparent text-muted hover:text-text '
+            }`}
+          >
+            <User className="w-4 h-4" />
+            Thông tin cơ bản
+          </button>
 
-        <button
-          onClick={() => {
-            setTabHienTai('doi-mat-khau');
-            setThongBaoThanhCong(null);
-            setThongBaoLoi(null);
-          }}
-          className={`pb-3 text-sm font-semibold border-b-2 transition-colors flex items-center gap-2 ${
-            tabHienTai === 'doi-mat-khau'
-              ? 'border-blue-600 text-blue-600'
-              : 'border-transparent text-slate-500 hover:text-slate-700'
-          }`}
-        >
-          <Key className="w-4 h-4" />
-          Đổi mật khẩu
-        </button>
+          <button
+            data-id="doi-mat-khau"
+            type="button"
+            onClick={() => {
+              setTabHienTai('doi-mat-khau');
+              setThongBaoThanhCong(null);
+              setThongBaoLoi(null);
+            }}
+            className={`px-4 py-2.5 text-sm font-semibold border-b-2 transition-colors flex items-center gap-2 cursor-pointer ${
+              tabHienTai === 'doi-mat-khau'
+                ? 'border-accent text-accent '
+                : 'border-transparent text-muted hover:text-text '
+            }`}
+          >
+            <Key className="w-4 h-4" />
+            Đổi mật khẩu
+          </button>
+        </AnimatedBackground>
       </div>
 
       {/* Tab 1: Cập nhật thông tin */}
@@ -222,41 +241,41 @@ export default function TrangHoSoCaNhan() {
         <div className="space-y-6">
           <form
             onSubmit={xuLyCapNhatThongTin(capNhatThongTin)}
-            className="p-6 rounded-2xl bg-white border border-slate-200 shadow-2xs space-y-4"
+            className="p-6 rounded bg-surface border border-border shadow-2xs space-y-4"
           >
-            <h4 className="font-bold text-slate-900 text-base mb-2">Chỉnh sửa thông tin liên hệ</h4>
+            <h4 className="font-bold text-text text-base mb-2">Chỉnh sửa thông tin liên hệ</h4>
 
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <div>
-                <label className="block text-xs font-semibold text-slate-700 mb-1">Họ và tên</label>
+                <label className="block text-xs font-semibold text-text mb-1">Họ và tên</label>
                 <input
                   type="text"
                   {...dangKyThongTin('hoTen')}
-                  className="w-full px-3 py-2 border border-slate-300 rounded-lg text-sm focus:ring-2 focus:ring-blue-500"
+                  className="w-full px-3 py-2 border border-border rounded-lg text-sm focus:ring-2 focus:ring-accent"
                 />
               </div>
 
               <div>
-                <label className="block text-xs font-semibold text-slate-700 mb-1">
+                <label className="block text-xs font-semibold text-text mb-1">
                   Số điện thoại
                 </label>
                 <input
                   type="text"
                   {...dangKyThongTin('soDienThoai')}
-                  className="w-full px-3 py-2 border border-slate-300 rounded-lg text-sm focus:ring-2 focus:ring-blue-500"
+                  className="w-full px-3 py-2 border border-border rounded-lg text-sm focus:ring-2 focus:ring-accent"
                 />
               </div>
             </div>
 
             <div>
-              <label className="block text-xs font-semibold text-slate-700 mb-1">
+              <label className="block text-xs font-semibold text-text mb-1">
                 Địa chỉ Email (Cố định theo tài khoản trường cấp)
               </label>
               <input
                 type="email"
                 disabled
                 value={hoSo?.email || ''}
-                className="w-full px-3 py-2 border border-slate-200 bg-slate-50 text-slate-500 rounded-lg text-sm cursor-not-allowed"
+                className="w-full px-3 py-2 border border-border bg-bg text-muted rounded-lg text-sm cursor-not-allowed"
               />
             </div>
 
@@ -264,7 +283,7 @@ export default function TrangHoSoCaNhan() {
               <button
                 type="submit"
                 disabled={dangLuuThongTin}
-                className="inline-flex items-center gap-2 px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg text-sm font-medium transition-colors shadow-sm disabled:opacity-50"
+                className="inline-flex items-center gap-2 px-4 py-2 bg-accent hover:bg-accent text-white rounded-lg text-sm font-medium transition-colors shadow-sm disabled:opacity-50"
               >
                 {dangLuuThongTin ? (
                   <Loader2 className="w-4 h-4 animate-spin" />
@@ -278,33 +297,33 @@ export default function TrangHoSoCaNhan() {
 
           {/* Thông tin học vụ mở rộng (nếu có) */}
           {hoSo?.hoSoHocSinh && (
-            <div className="p-6 rounded-2xl bg-white border border-slate-200 shadow-2xs">
-              <h4 className="font-bold text-slate-900 text-base mb-4 flex items-center gap-2">
-                <GraduationCap className="w-5 h-5 text-blue-600" />
+            <div className="p-6 rounded bg-surface border border-border shadow-2xs">
+              <h4 className="font-bold text-text text-base mb-4 flex items-center gap-2">
+                <GraduationCap className="w-5 h-5 text-accent" />
                 Hồ sơ Học vụ Học sinh
               </h4>
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 text-sm">
                 <div>
-                  <span className="text-xs text-slate-400">Mã học sinh:</span>
-                  <p className="font-semibold text-slate-900">{hoSo.hoSoHocSinh.maHocSinh}</p>
+                  <span className="text-xs text-muted">Mã học sinh:</span>
+                  <p className="font-semibold text-text">{hoSo.hoSoHocSinh.maHocSinh}</p>
                 </div>
                 <div>
-                  <span className="text-xs text-slate-400">Lớp hành chính:</span>
-                  <p className="font-semibold text-slate-900">
+                  <span className="text-xs text-muted">Lớp hành chính:</span>
+                  <p className="font-semibold text-text">
                     {hoSo.hoSoHocSinh.lopHanhChinh?.tenLop || 'Chưa phân lớp'}
                   </p>
                 </div>
                 <div>
-                  <span className="text-xs text-slate-400">Ngày sinh:</span>
-                  <p className="font-semibold text-slate-900">
+                  <span className="text-xs text-muted">Ngày sinh:</span>
+                  <p className="font-semibold text-text">
                     {hoSo.hoSoHocSinh.ngaySinh
                       ? new Date(hoSo.hoSoHocSinh.ngaySinh).toLocaleDateString('vi-VN')
                       : 'Chưa cập nhật'}
                   </p>
                 </div>
                 <div>
-                  <span className="text-xs text-slate-400">Địa chỉ:</span>
-                  <p className="font-semibold text-slate-900">
+                  <span className="text-xs text-muted">Địa chỉ:</span>
+                  <p className="font-semibold text-text">
                     {hoSo.hoSoHocSinh.diaChi || 'Chưa cập nhật'}
                   </p>
                 </div>
@@ -313,25 +332,25 @@ export default function TrangHoSoCaNhan() {
           )}
 
           {hoSo?.hoSoGiaoVien && (
-            <div className="p-6 rounded-2xl bg-white border border-slate-200 shadow-2xs">
-              <h4 className="font-bold text-slate-900 text-base mb-4 flex items-center gap-2">
-                <School className="w-5 h-5 text-emerald-600" />
+            <div className="p-6 rounded bg-surface border border-border shadow-2xs">
+              <h4 className="font-bold text-text text-base mb-4 flex items-center gap-2">
+                <School className="w-5 h-5 text-accent" />
                 Hồ sơ Chuyên môn Giảng viên
               </h4>
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 text-sm">
                 <div>
-                  <span className="text-xs text-slate-400">Mã giáo viên:</span>
-                  <p className="font-semibold text-slate-900">{hoSo.hoSoGiaoVien.maGiaoVien}</p>
+                  <span className="text-xs text-muted">Mã giáo viên:</span>
+                  <p className="font-semibold text-text">{hoSo.hoSoGiaoVien.maGiaoVien}</p>
                 </div>
                 <div>
-                  <span className="text-xs text-slate-400">Học vị:</span>
-                  <p className="font-semibold text-slate-900">
+                  <span className="text-xs text-muted">Học vị:</span>
+                  <p className="font-semibold text-text">
                     {hoSo.hoSoGiaoVien.hocVi || 'Chưa cập nhật'}
                   </p>
                 </div>
                 <div className="sm:col-span-2">
-                  <span className="text-xs text-slate-400">Bộ môn chuyên môn:</span>
-                  <p className="font-semibold text-slate-900">
+                  <span className="text-xs text-muted">Bộ môn chuyên môn:</span>
+                  <p className="font-semibold text-text">
                     {hoSo.hoSoGiaoVien.chuyenMon || 'Chưa cập nhật'}
                   </p>
                 </div>
@@ -345,50 +364,50 @@ export default function TrangHoSoCaNhan() {
       {tabHienTai === 'doi-mat-khau' && (
         <form
           onSubmit={xuLyDoiMatKhau(doiMatKhau)}
-          className="p-6 rounded-2xl bg-white border border-slate-200 shadow-2xs space-y-4 max-w-lg"
+          className="p-6 rounded bg-surface border border-border shadow-2xs space-y-4 max-w-lg"
         >
-          <h4 className="font-bold text-slate-900 text-base mb-2">Đổi mật khẩu bảo mật</h4>
+          <h4 className="font-bold text-text text-base mb-2">Đổi mật khẩu bảo mật</h4>
 
           <div>
-            <label className="block text-xs font-semibold text-slate-700 mb-1">
+            <label className="block text-xs font-semibold text-text mb-1">
               Mật khẩu hiện tại *
             </label>
             <input
               type="password"
               {...dangKyDoiMatKhau('matKhauHienTai')}
-              className="w-full px-3 py-2 border border-slate-300 rounded-lg text-sm focus:ring-2 focus:ring-blue-500"
+              className="w-full px-3 py-2 border border-border rounded-lg text-sm focus:ring-2 focus:ring-accent"
             />
             {loiDoiMatKhau.matKhauHienTai && (
-              <p className="mt-1 text-xs text-red-600">{loiDoiMatKhau.matKhauHienTai.message}</p>
+              <p className="mt-1 text-xs text-danger">{loiDoiMatKhau.matKhauHienTai.message}</p>
             )}
           </div>
 
           <div>
-            <label className="block text-xs font-semibold text-slate-700 mb-1">
+            <label className="block text-xs font-semibold text-text mb-1">
               Mật khẩu mới *
             </label>
             <input
               type="password"
               {...dangKyDoiMatKhau('matKhauMoi')}
               placeholder="Tối thiểu 8 ký tự"
-              className="w-full px-3 py-2 border border-slate-300 rounded-lg text-sm focus:ring-2 focus:ring-blue-500"
+              className="w-full px-3 py-2 border border-border rounded-lg text-sm focus:ring-2 focus:ring-accent"
             />
             {loiDoiMatKhau.matKhauMoi && (
-              <p className="mt-1 text-xs text-red-600">{loiDoiMatKhau.matKhauMoi.message}</p>
+              <p className="mt-1 text-xs text-danger">{loiDoiMatKhau.matKhauMoi.message}</p>
             )}
           </div>
 
           <div>
-            <label className="block text-xs font-semibold text-slate-700 mb-1">
+            <label className="block text-xs font-semibold text-text mb-1">
               Xác nhận mật khẩu mới *
             </label>
             <input
               type="password"
               {...dangKyDoiMatKhau('xacNhanMatKhauMoi')}
-              className="w-full px-3 py-2 border border-slate-300 rounded-lg text-sm focus:ring-2 focus:ring-blue-500"
+              className="w-full px-3 py-2 border border-border rounded-lg text-sm focus:ring-2 focus:ring-accent"
             />
             {loiDoiMatKhau.xacNhanMatKhauMoi && (
-              <p className="mt-1 text-xs text-red-600">{loiDoiMatKhau.xacNhanMatKhauMoi.message}</p>
+              <p className="mt-1 text-xs text-danger">{loiDoiMatKhau.xacNhanMatKhauMoi.message}</p>
             )}
           </div>
 
@@ -396,7 +415,7 @@ export default function TrangHoSoCaNhan() {
             <button
               type="submit"
               disabled={dangDoiMatKhau}
-              className="inline-flex items-center gap-2 px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white rounded-lg text-sm font-medium transition-colors shadow-sm disabled:opacity-50"
+              className="inline-flex items-center gap-2 px-4 py-2 bg-accent hover:bg-accent text-white rounded-lg text-sm font-medium transition-colors shadow-sm disabled:opacity-50"
             >
               {dangDoiMatKhau && <Loader2 className="w-4 h-4 animate-spin" />}
               Cập nhật mật khẩu

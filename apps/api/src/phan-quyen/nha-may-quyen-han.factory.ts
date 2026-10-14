@@ -31,14 +31,22 @@ export class NhaMayQuyenHan {
         DoiTuong.BuoiHoc,
         DoiTuong.PhongTrucTuyen,
         DoiTuong.NhatKyThamGia,
+        DoiTuong.BanGhiDiemDanh,
+        DoiTuong.DonXinNghi,
         DoiTuong.GhiDanh,
         DoiTuong.HoSoHocSinh,
         DoiTuong.HoSoGiaoVien,
+        DoiTuong.BaiKiemTra,
+        DoiTuong.CauHoi,
+        DoiTuong.LuotLamBai,
+        DoiTuong.CotDiem,
+        DoiTuong.DiemSo,
+        DoiTuong.SoDiem,
       ]);
       can([HanhDong.Doc, HanhDong.Tao, HanhDong.Sua], DoiTuong.NguoiDung);
       can(HanhDong.Doc, DoiTuong.TatCa);
     } else if (nguoiDung.vaiTro === VaiTro.GIAO_VIEN) {
-      // Giáo viên: Quản lý bài tập, bài giảng, điểm danh, chấm điểm, trợ lý AI
+      // Giáo viên: Quản lý bài tập, kiểm tra, bài giảng, điểm danh, chấm điểm, trợ lý AI
       can(HanhDong.Doc, [
         DoiTuong.NamHoc,
         DoiTuong.HocKy,
@@ -48,6 +56,8 @@ export class NhaMayQuyenHan {
         DoiTuong.ThoiKhoaBieu,
         DoiTuong.BuoiHoc,
         DoiTuong.NhatKyThamGia,
+        DoiTuong.BanGhiDiemDanh,
+        DoiTuong.DonXinNghi,
         DoiTuong.GhiDanh,
         DoiTuong.HoSoHocSinh,
         DoiTuong.HoSoGiaoVien,
@@ -56,8 +66,12 @@ export class NhaMayQuyenHan {
         DoiTuong.TaiLieu,
         DoiTuong.BaiTap,
         DoiTuong.BaiNop,
+        DoiTuong.BaiKiemTra,
+        DoiTuong.CauHoi,
+        DoiTuong.LuotLamBai,
         DoiTuong.CotDiem,
         DoiTuong.DiemSo,
+        DoiTuong.SoDiem,
         DoiTuong.BanNhapAI,
         DoiTuong.PhienTroLy,
         DoiTuong.BaoLoiDongGop,
@@ -67,18 +81,30 @@ export class NhaMayQuyenHan {
         DoiTuong.BinhLuan,
         DoiTuong.TaiLieu,
         DoiTuong.BaiTap,
+        DoiTuong.BaiKiemTra,
+        DoiTuong.CauHoi,
         DoiTuong.CotDiem,
+        DoiTuong.DiemSo,
+        DoiTuong.SoDiem,
+        DoiTuong.BanGhiDiemDanh,
         DoiTuong.BanNhapAI,
         DoiTuong.PhienTroLy,
         DoiTuong.BaoLoiDongGop,
       ]);
       can(HanhDong.Sua, [
         DoiTuong.LopHocPhan,
+        DoiTuong.PhongTrucTuyen,
         DoiTuong.BaiDang,
         DoiTuong.BinhLuan,
         DoiTuong.TaiLieu,
         DoiTuong.BaiTap,
+        DoiTuong.BaiKiemTra,
+        DoiTuong.CauHoi,
         DoiTuong.CotDiem,
+        DoiTuong.DiemSo,
+        DoiTuong.SoDiem,
+        DoiTuong.BanGhiDiemDanh,
+        DoiTuong.DonXinNghi,
         DoiTuong.BanNhapAI,
       ]);
       can(HanhDong.Xoa, [
@@ -86,17 +112,26 @@ export class NhaMayQuyenHan {
         DoiTuong.BinhLuan,
         DoiTuong.TaiLieu,
         DoiTuong.BaiTap,
+        DoiTuong.BaiKiemTra,
+        DoiTuong.CauHoi,
+        DoiTuong.CotDiem,
+        DoiTuong.DiemSo,
         DoiTuong.BanNhapAI,
         DoiTuong.PhienTroLy,
         DoiTuong.BaoLoiDongGop,
       ]);
-      can(HanhDong.ChamDiem, [DoiTuong.BaiNop, DoiTuong.DiemSo]);
+      can(HanhDong.ChamDiem, [
+        DoiTuong.BaiNop,
+        DoiTuong.DiemSo,
+        DoiTuong.SoDiem,
+        DoiTuong.LuotLamBai,
+      ]);
       can(HanhDong.DiemDanh, DoiTuong.BanGhiDiemDanh);
       can(HanhDong.Duyet, [DoiTuong.DonXinNghi, DoiTuong.BanNhapAI]);
       can(HanhDong.ThamGia, DoiTuong.PhongTrucTuyen);
       can([HanhDong.Doc, HanhDong.Sua], DoiTuong.NguoiDung);
     } else if (nguoiDung.vaiTro === VaiTro.HOC_SINH) {
-      // Học sinh: Tham gia lớp, nộp bài, xem điểm, hỏi trợ lý AI, làm đơn nghỉ, xem hồ sơ, báo lỗi
+      // Học sinh: Tham gia lớp, nộp bài, làm bài luyện tập/thi thử, điểm danh thông minh, xem điểm
       can(HanhDong.Doc, [
         DoiTuong.NamHoc,
         DoiTuong.HocKy,
@@ -107,11 +142,17 @@ export class NhaMayQuyenHan {
         DoiTuong.BinhLuan,
         DoiTuong.TaiLieu,
         DoiTuong.BaiTap,
+        DoiTuong.BaiKiemTra,
+        DoiTuong.CauHoi,
+        DoiTuong.LuotLamBai,
         DoiTuong.BuoiHoc,
         DoiTuong.NhatKyThamGia,
         DoiTuong.ThongBao,
         DoiTuong.BanGhiDiemDanh,
+        DoiTuong.DonXinNghi,
+        DoiTuong.CotDiem,
         DoiTuong.DiemSo,
+        DoiTuong.SoDiem,
         DoiTuong.HoSoHocSinh,
         DoiTuong.PhienTroLy,
         DoiTuong.BaoLoiDongGop,
@@ -120,11 +161,13 @@ export class NhaMayQuyenHan {
         DoiTuong.BaiDang,
         DoiTuong.BinhLuan,
         DoiTuong.BaiNop,
+        DoiTuong.LuotLamBai,
         DoiTuong.DonXinNghi,
         DoiTuong.PhienTroLy,
         DoiTuong.BaoLoiDongGop,
       ]);
       can(HanhDong.Sua, DoiTuong.BaiNop);
+      can(HanhDong.DiemDanh, DoiTuong.BanGhiDiemDanh);
       can(HanhDong.Xoa, [
         DoiTuong.BaiDang,
         DoiTuong.BinhLuan,
@@ -144,7 +187,12 @@ export class NhaMayQuyenHan {
         DoiTuong.BuoiHoc,
         DoiTuong.NhatKyThamGia,
         DoiTuong.BanGhiDiemDanh,
+        DoiTuong.DonXinNghi,
+        DoiTuong.BaiKiemTra,
+        DoiTuong.LuotLamBai,
+        DoiTuong.CotDiem,
         DoiTuong.DiemSo,
+        DoiTuong.SoDiem,
         DoiTuong.ThongBao,
         DoiTuong.HoSoHocSinh,
         DoiTuong.PhuHuynhHocSinh,

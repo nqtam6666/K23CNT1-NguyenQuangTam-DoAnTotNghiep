@@ -225,14 +225,15 @@ export default function TrangTroLyHocTap() {
   return (
     <div className="space-y-6">
       {/* Banner tiêu đề phân hệ */}
-      <div className="flex flex-wrap items-center justify-between gap-4 bg-card rounded-2xl border border-border/80 p-5 shadow-sm">
-        <div className="flex items-center gap-3">
-          <div className="w-10 h-10 rounded-xl bg-primary/10 flex items-center justify-center text-primary">
-            <Sparkles className="w-5 h-5" />
+      <div className="flex flex-wrap items-center justify-between gap-4 bg-[var(--surface)] rounded-[4px] border border-[var(--border)] p-5">
+        <div className="flex items-center gap-3.5">
+          <div className="w-[44px] h-[44px] rounded-[4px] bg-[var(--bg)] border border-[var(--border)] flex items-center justify-center text-[var(--accent)] shrink-0">
+            <Sparkles className="w-5 h-5" strokeWidth={1.5} />
           </div>
           <div>
-            <h1 className="text-xl font-bold tracking-tight text-foreground">Trợ lý hỗ trợ học tập</h1>
-            <p className="text-xs text-muted-foreground mt-0.5">
+            <p className="eyebrow mb-0.5">Hỏi đáp học liệu</p>
+            <h1 className="text-[20px] font-mono font-bold tracking-tight text-[var(--text)]">Trợ lý hỗ trợ học tập</h1>
+            <p className="text-xs text-[var(--muted)] mt-0.5">
               Tra cứu tri thức, giải đáp bài giảng và trích dẫn tài liệu học tập chính xác
             </p>
           </div>
@@ -245,7 +246,7 @@ export default function TrangTroLyHocTap() {
               setIdLopBanNhap(idLopLoc || danhSachLop[0]?.id || '');
               setMoModalBanNhap(true);
             }}
-            className="inline-flex items-center gap-2 rounded-xl bg-primary px-4 py-2.5 text-xs font-semibold text-primary-foreground shadow-sm hover:bg-primary/90 transition-all"
+            className="inline-flex items-center gap-2 rounded bg-primary px-4 py-2.5 text-xs font-semibold text-primary-foreground shadow-sm hover:bg-primary/90 transition-all"
           >
             <Layers className="w-4 h-4" />
             Tạo bản nháp gợi ý
@@ -256,7 +257,7 @@ export default function TrangTroLyHocTap() {
       {/* Bố cục chính 2 cột: Sidebar phiên trò chuyện & Khung chat */}
       <div className="grid grid-cols-1 lg:grid-cols-4 gap-6 items-start">
         {/* Cột 1: Danh sách phiên hội thoại */}
-        <div className="lg:col-span-1 bg-card rounded-2xl border border-border/80 p-4 shadow-sm space-y-4">
+        <div className="lg:col-span-1 bg-card rounded border border-border/80 p-4 shadow-sm space-y-4">
           <div className="flex items-center justify-between">
             <h2 className="text-xs font-semibold text-foreground uppercase tracking-wider">
               Lịch sử trò chuyện
@@ -278,7 +279,7 @@ export default function TrangTroLyHocTap() {
             {dangTaiPhien ? (
               <div className="space-y-2">
                 {[1, 2, 3].map((i) => (
-                  <div key={i} className="h-12 rounded-xl bg-muted/40 animate-pulse" />
+                  <div key={i} className="h-12 rounded bg-muted/40 animate-pulse" />
                 ))}
               </div>
             ) : danhSachPhien.length === 0 ? (
@@ -293,7 +294,7 @@ export default function TrangTroLyHocTap() {
                   <div
                     key={phien.id}
                     onClick={() => setIdPhienChon(phien.id)}
-                    className={`group relative flex items-center justify-between p-3 rounded-xl cursor-pointer text-xs transition-all ${
+                    className={`group relative flex items-center justify-between p-3 rounded cursor-pointer text-xs transition-all ${
                       laChon
                         ? 'bg-primary text-primary-foreground font-semibold shadow-xs'
                         : 'text-foreground hover:bg-muted/50 border border-transparent hover:border-border/60'
@@ -333,7 +334,7 @@ export default function TrangTroLyHocTap() {
         </div>
 
         {/* Cột 2: Khung làm việc và hội thoại */}
-        <div className="lg:col-span-3 bg-card rounded-2xl border border-border/80 shadow-sm flex flex-col h-[700px]">
+        <div className="lg:col-span-3 bg-card rounded border border-border/80 shadow-sm flex flex-col h-[700px]">
           {/* Header khu vực chat */}
           <div className="flex flex-wrap items-center justify-between gap-3 p-4 border-b border-border/80">
             <div className="flex items-center gap-2">
@@ -354,7 +355,7 @@ export default function TrangTroLyHocTap() {
               <select
                 value={idLopLoc}
                 onChange={(e) => setIdLopLoc(e.target.value)}
-                className="rounded-xl border border-input bg-background px-3 py-1.5 text-xs text-foreground focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary"
+                className="rounded border border-input bg-background px-3 py-1.5 text-xs text-foreground focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary"
               >
                 <option value="">Tất cả các lớp học phần</option>
                 {danhSachLop.map((lop) => (
@@ -374,7 +375,7 @@ export default function TrangTroLyHocTap() {
               </div>
             ) : (!chiTietPhien || chiTietPhien.cacTinNhan?.length === 0) ? (
               <div className="flex flex-col items-center justify-center h-full text-center max-w-md mx-auto space-y-4">
-                <div className="w-14 h-14 rounded-2xl bg-primary/10 flex items-center justify-center text-primary">
+                <div className="w-14 h-14 rounded bg-primary/10 flex items-center justify-center text-primary">
                   <Sparkles className="w-7 h-7" />
                 </div>
                 <div>
@@ -397,7 +398,7 @@ export default function TrangTroLyHocTap() {
                           setCauHoiNhap(cau);
                           mutationHoiDap.mutate(cau);
                         }}
-                        className="text-left p-2.5 rounded-xl border border-border/80 bg-background hover:bg-muted/40 text-xs text-foreground/90 transition-all flex items-center justify-between group"
+                        className="text-left p-2.5 rounded border border-border/80 bg-background hover:bg-muted/40 text-xs text-foreground/90 transition-all flex items-center justify-between group"
                       >
                         <span className="truncate">{cau}</span>
                         <ArrowRight className="w-3.5 h-3.5 text-muted-foreground group-hover:text-primary group-hover:translate-x-0.5 transition-all shrink-0 ml-2" />
@@ -415,13 +416,13 @@ export default function TrangTroLyHocTap() {
                     className={`flex gap-3.5 ${laNguoiDung ? 'justify-end' : 'justify-start'}`}
                   >
                     {!laNguoiDung && (
-                      <div className="w-8 h-8 rounded-xl bg-primary/10 text-primary flex items-center justify-center shrink-0 mt-1">
+                      <div className="w-8 h-8 rounded bg-primary/10 text-primary flex items-center justify-center shrink-0 mt-1">
                         <Bot className="w-4 h-4" />
                       </div>
                     )}
 
                     <div
-                      className={`max-w-[85%] sm:max-w-[75%] rounded-2xl p-4 text-xs leading-relaxed space-y-3 ${
+                      className={`max-w-[85%] sm:max-w-[75%] rounded p-4 text-xs leading-relaxed space-y-3 ${
                         laNguoiDung
                           ? 'bg-primary text-primary-foreground font-medium rounded-tr-xs shadow-xs'
                           : 'bg-muted/30 text-foreground border border-border/80 rounded-tl-xs'
@@ -444,7 +445,7 @@ export default function TrangTroLyHocTap() {
                               <div
                                 key={idx}
                                 onClick={() => setDoanXemChiTiet(tc)}
-                                className="p-2 rounded-xl bg-background border border-border/70 hover:border-primary/50 cursor-pointer transition-all flex items-center justify-between gap-2 shadow-2xs group"
+                                className="p-2 rounded bg-background border border-border/70 hover:border-primary/50 cursor-pointer transition-all flex items-center justify-between gap-2 shadow-2xs group"
                               >
                                 <div className="truncate">
                                   <p className="font-semibold text-foreground truncate text-[11px] group-hover:text-primary transition-colors">
@@ -477,10 +478,10 @@ export default function TrangTroLyHocTap() {
             {/* Trạng thái AI đang truy hồi và sinh câu trả lời */}
             {mutationHoiDap.isPending && (
               <div className="flex gap-3.5 justify-start">
-                <div className="w-8 h-8 rounded-xl bg-primary/10 text-primary flex items-center justify-center shrink-0">
+                <div className="w-8 h-8 rounded bg-primary/10 text-primary flex items-center justify-center shrink-0">
                   <Bot className="w-4 h-4 animate-pulse" />
                 </div>
-                <div className="rounded-2xl rounded-tl-xs p-4 bg-muted/30 border border-border/80 text-xs text-muted-foreground flex items-center gap-2">
+                <div className="rounded rounded-tl-xs p-4 bg-muted/30 border border-border/80 text-xs text-muted-foreground flex items-center gap-2">
                   <Loader2 className="w-3.5 h-3.5 animate-spin text-primary" />
                   Đang tra cứu tài liệu học tập và tổng hợp câu trả lời...
                 </div>
@@ -498,12 +499,12 @@ export default function TrangTroLyHocTap() {
                 value={cauHoiNhap}
                 onChange={(e) => setCauHoiNhap(e.target.value)}
                 placeholder="Đặt câu hỏi về nội dung bài giảng, cú pháp hoặc bài tập..."
-                className="flex-1 rounded-xl border border-input bg-background px-4 py-2.5 text-xs text-foreground placeholder:text-muted-foreground focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary"
+                className="flex-1 rounded border border-input bg-background px-4 py-2.5 text-xs text-foreground placeholder:text-muted-foreground focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary"
               />
               <button
                 type="submit"
                 disabled={!cauHoiNhap.trim() || mutationHoiDap.isPending}
-                className="inline-flex items-center justify-center w-10 h-10 rounded-xl bg-primary text-primary-foreground hover:bg-primary/90 disabled:opacity-50 disabled:cursor-not-allowed transition-all shadow-xs shrink-0"
+                className="inline-flex items-center justify-center w-10 h-10 rounded bg-primary text-primary-foreground hover:bg-primary/90 disabled:opacity-50 disabled:cursor-not-allowed transition-all shadow-xs shrink-0"
               >
                 {mutationHoiDap.isPending ? (
                   <Loader2 className="w-4 h-4 animate-spin" />
@@ -518,7 +519,7 @@ export default function TrangTroLyHocTap() {
 
       {/* Bảng quản lý bản nháp AI (Dành cho Giáo viên & Quản trị viên) */}
       {(laGiaoVien || laQuanTri) && (
-        <div className="bg-card rounded-2xl border border-border/80 p-5 shadow-sm space-y-4">
+        <div className="bg-card rounded border border-border/80 p-5 shadow-sm space-y-4">
           <div className="flex flex-wrap items-center justify-between gap-3">
             <div className="flex items-center gap-2">
               <Layers className="w-5 h-5 text-primary" />
@@ -537,7 +538,7 @@ export default function TrangTroLyHocTap() {
           </div>
 
           {danhSachBanNhap.length === 0 ? (
-            <div className="text-center py-6 text-xs text-muted-foreground bg-muted/20 rounded-xl border border-dashed border-border">
+            <div className="text-center py-6 text-xs text-muted-foreground bg-muted/20 rounded border border-dashed border-border">
               Chưa có bản nháp nào được tạo cho lớp học này. Bấm &quot;Tạo bản nháp gợi ý&quot; để thêm mới.
             </div>
           ) : (
@@ -548,7 +549,7 @@ export default function TrangTroLyHocTap() {
                 return (
                   <div
                     key={bn.id}
-                    className="p-4 rounded-xl border border-border/80 bg-background/60 space-y-3 flex flex-col justify-between"
+                    className="p-4 rounded border border-border/80 bg-background/60 space-y-3 flex flex-col justify-between"
                   >
                     <div className="space-y-1.5">
                       <div className="flex items-center justify-between gap-2">
@@ -558,10 +559,10 @@ export default function TrangTroLyHocTap() {
                         <span
                           className={`text-[10px] font-semibold px-2 py-0.5 rounded-full ${
                             laDaDuyet
-                              ? 'bg-emerald-500/10 text-emerald-600'
+                              ? 'bg-accent/10 text-accent'
                               : laTuChoi
                               ? 'bg-destructive/10 text-destructive'
-                              : 'bg-amber-500/10 text-amber-600'
+                              : 'bg-accent/10 text-accent'
                           }`}
                         >
                           {laDaDuyet ? 'Đã duyệt' : laTuChoi ? 'Đã từ chối' : 'Chờ duyệt'}
@@ -582,7 +583,7 @@ export default function TrangTroLyHocTap() {
                               trangThai: TrangThaiBanNhapAI.DA_DUYET,
                             })
                           }
-                          className="flex-1 py-1.5 px-3 rounded-lg bg-emerald-600 hover:bg-emerald-700 text-white text-[11px] font-semibold transition-colors"
+                          className="flex-1 py-1.5 px-3 rounded-lg bg-accent hover:bg-accent text-white text-[11px] font-semibold transition-colors"
                         >
                           Duyệt & Tạo bài tập
                         </button>
@@ -615,13 +616,13 @@ export default function TrangTroLyHocTap() {
         moTa={`Độ tương đồng ngữ nghĩa: ${doanXemChiTiet?.doTuongDong}% • Đoạn số ${doanXemChiTiet?.soThuTu}`}
       >
         <div className="space-y-4 text-xs">
-          <div className="rounded-xl bg-muted/40 p-4 border border-border leading-relaxed text-foreground max-h-[60vh] overflow-y-auto">
+          <div className="rounded bg-muted/40 p-4 border border-border leading-relaxed text-foreground max-h-[60vh] overflow-y-auto">
             <DinhDangMarkdown noiDung={doanXemChiTiet?.noiDung || ''} />
           </div>
           <div className="flex justify-end pt-2">
             <button
               onClick={() => setDoanXemChiTiet(null)}
-              className="rounded-xl border border-input px-4 py-2 text-xs font-semibold text-muted-foreground hover:text-foreground hover:bg-muted/50 transition-colors"
+              className="rounded border border-input px-4 py-2 text-xs font-semibold text-muted-foreground hover:text-foreground hover:bg-muted/50 transition-colors"
             >
               Đóng
             </button>
@@ -650,7 +651,7 @@ export default function TrangTroLyHocTap() {
               required
               value={idLopBanNhap}
               onChange={(e) => setIdLopBanNhap(e.target.value)}
-              className="mt-1.5 w-full rounded-xl border border-input bg-background px-3.5 py-2 text-sm focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary"
+              className="mt-1.5 w-full rounded border border-input bg-background px-3.5 py-2 text-sm focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary"
             >
               <option value="">Chọn lớp học phần</option>
               {danhSachLop.map((lop) => (
@@ -666,7 +667,7 @@ export default function TrangTroLyHocTap() {
             <select
               value={loaiBanNhap}
               onChange={(e) => setLoaiBanNhap(e.target.value as LoaiBanNhapAI)}
-              className="mt-1.5 w-full rounded-xl border border-input bg-background px-3.5 py-2 text-sm focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary"
+              className="mt-1.5 w-full rounded border border-input bg-background px-3.5 py-2 text-sm focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary"
             >
               <option value={LoaiBanNhapAI.BAI_TAP}>Bài tập về nhà</option>
               <option value={LoaiBanNhapAI.CAU_HOI}>Câu hỏi thảo luận</option>
@@ -682,7 +683,7 @@ export default function TrangTroLyHocTap() {
               value={tieuDeBanNhap}
               onChange={(e) => setTieuDeBanNhap(e.target.value)}
               placeholder="VD: Bài tập luyện tập cấu trúc rẽ nhánh if-else"
-              className="mt-1.5 w-full rounded-xl border border-input bg-background px-3.5 py-2 text-sm focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary"
+              className="mt-1.5 w-full rounded border border-input bg-background px-3.5 py-2 text-sm focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary"
             />
           </div>
 
@@ -694,7 +695,7 @@ export default function TrangTroLyHocTap() {
               value={noiDungBanNhap}
               onChange={(e) => setNoiDungBanNhap(e.target.value)}
               placeholder="Nội dung bài tập hoặc câu hỏi gợi ý cho học sinh..."
-              className="mt-1.5 w-full rounded-xl border border-input bg-background px-3.5 py-2 text-sm focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary resize-none"
+              className="mt-1.5 w-full rounded border border-input bg-background px-3.5 py-2 text-sm focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary resize-none"
             />
           </div>
 
@@ -702,14 +703,14 @@ export default function TrangTroLyHocTap() {
             <button
               type="button"
               onClick={() => setMoModalBanNhap(false)}
-              className="rounded-xl border border-input px-4 py-2 text-xs font-semibold text-muted-foreground hover:text-foreground hover:bg-muted/50 transition-colors"
+              className="rounded border border-input px-4 py-2 text-xs font-semibold text-muted-foreground hover:text-foreground hover:bg-muted/50 transition-colors"
             >
               Hủy
             </button>
             <button
               type="submit"
               disabled={!tieuDeBanNhap.trim() || !idLopBanNhap || mutationTaoBanNhap.isPending}
-              className="inline-flex items-center gap-2 rounded-xl bg-primary px-4 py-2 text-xs font-semibold text-primary-foreground shadow-sm hover:bg-primary/90 disabled:opacity-50 transition-all"
+              className="inline-flex items-center gap-2 rounded bg-primary px-4 py-2 text-xs font-semibold text-primary-foreground shadow-sm hover:bg-primary/90 disabled:opacity-50 transition-all"
             >
               {mutationTaoBanNhap.isPending ? (
                 <>

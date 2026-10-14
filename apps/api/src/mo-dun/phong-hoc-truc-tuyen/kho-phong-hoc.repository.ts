@@ -1,6 +1,10 @@
 import { Injectable } from '@nestjs/common';
 import { PrismaService } from '../../cot-loi/csdl/prisma.service';
-import { TrangThaiBuoiHoc, TrangThaiDiemDanh } from '@lms/chung';
+import {
+  TrangThaiBuoiHoc,
+  TrangThaiDiemDanh,
+  TrangThaiDonXinNghi,
+} from '@lms/chung';
 
 @Injectable()
 export class KhoPhongHoc {
@@ -74,6 +78,22 @@ export class KhoPhongHoc {
   }
 
   /**
+   * Tìm buổi học theo ID
+   */
+  async timBuoiHocTheoId(idBuoiHoc: string) {
+    return this.prisma.buoiHoc.findUnique({
+      where: { id: idBuoiHoc },
+      include: {
+        lopHocPhan: {
+          include: {
+            giaoVien: true,
+          },
+        },
+      },
+    });
+  }
+
+  /**
    * Tìm buổi học đang diễn ra hoặc buổi học của ngày hôm nay
    */
   async timBuoiHocHienTai(idLopHocPhan: string) {
@@ -116,6 +136,24 @@ export class KhoPhongHoc {
     return this.prisma.buoiHoc.update({
       where: { id: idBuoiHoc },
       data: { trangThai },
+    });
+  }
+
+  /**
+   * Cập nhật mã điểm danh thông minh cho buổi học
+   */
+  async capNhatMaDiemDanh(
+    idBuoiHoc: string,
+    maDiemDanh: string | null,
+    hanMaDiemDanh: Date | null,
+  ) {
+    return this.prisma.buoiHoc.update({
+      where: { id: idBuoiHoc },
+      data: {
+        maDiemDanh,
+        hanMaDiemDanh,
+        trangThai: maDiemDanh ? TrangThaiBuoiHoc.DANG_DIEN_RA : undefined,
+      },
     });
   }
 
@@ -229,6 +267,7 @@ export class KhoPhongHoc {
                 hoTen: true,
                 email: true,
                 soDienThoai: true,
+                anhDaiDien: true,
               },
             },
           },
@@ -237,4 +276,129 @@ export class KhoPhongHoc {
       orderBy: { hocSinh: { maHocSinh: 'asc' } },
     });
   }
+
+  /**
+   * Tạo đơn xin nghỉ phép
+   */
+  async taoDonXinNghi(
+    idBuoiHoc: string,
+    idNguoiDung: string,
+    lyDo: string,
+    minhChung?: string,
+  ) {
+    return this.prisma.donXinNghi.create({
+      data: {
+        idBuoiHoc,
+        idNguoiDung,
+        lyDo,
+        minhChung,
+      },
+      include: {
+        buoiHoc: {
+          select: {
+            id: true,
+            chuDe: true,
+            thoiGianBD: true,
+            thoiGianKT: true,
+          },
+        },
+        nguoiGui: {
+          select: {
+            id: true,
+            hoTen: true,
+            email: true,
+            anhDaiDien: true,
+            hoSoHocSinh: {
+              select: {
+                id: true,
+                maHocSinh: true,
+              },
+            },
+          },
+        },
+      },
+    });
+  }
+
+  /**
+   * Lấy danh sách đơn xin nghỉ của lớp học phần
+   */
+  async layDonXinNghiTheoLop(idLopHocPhan: string, idNguoiDungLoc?: string) {
+    return this.prisma.donXinNghi.findMany({
+      where: {
+        buoiHoc: {
+          idLopHocPhan,
+        },
+        ...(idNguoiDungLoc ? { idNguoiDung: idNguoiDungLoc } : {}),
+      },
+      include: {
+        buoiHoc: {
+          select: {
+            id: true,
+            chuDe: true,
+            thoiGianBD: true,
+            thoiGianKT: true,
+          },
+        },
+        nguoiGui: {
+          select: {
+            id: true,
+            hoTen: true,
+            email: true,
+            anhDaiDien: true,
+            hoSoHocSinh: {
+              select: {
+                id: true,
+                maHocSinh: true,
+              },
+            },
+          },
+        },
+      },
+      orderBy: { ngayTao: 'desc' },
+    });
+  }
+
+  /**
+   * Tìm đơn xin nghỉ theo ID
+   */
+  async timDonXinNghiTheoId(idDon: string) {
+    return this.prisma.donXinNghi.findUnique({
+      where: { id: idDon },
+      include: {
+        buoiHoc: {
+          include: {
+            lopHocPhan: {
+              include: {
+                giaoVien: true,
+              },
+            },
+          },
+        },
+        nguoiGui: {
+          include: {
+            hoSoHocSinh: true,
+          },
+        },
+      },
+    });
+  }
+
+  /**
+   * Cập nhật trạng thái duyệt đơn xin nghỉ
+   */
+  async capNhatDonXinNghi(
+    idDon: string,
+    trangThai: TrangThaiDonXinNghi,
+    phanHoi?: string,
+  ) {
+    return this.prisma.donXinNghi.update({
+      where: { id: idDon },
+      data: {
+        trangThai,
+        phanHoi,
+      },
+    });
+  }
 }
+

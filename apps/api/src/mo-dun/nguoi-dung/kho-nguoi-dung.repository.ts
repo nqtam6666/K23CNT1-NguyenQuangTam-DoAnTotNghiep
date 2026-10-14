@@ -147,4 +147,19 @@ export class KhoNguoiDung {
       data: { daThuHoi: true },
     });
   }
+
+  async layThoiGianPhienGiay(): Promise<number> {
+    try {
+      const caiDat = await this.prisma.caiDatHeThong.findUnique({
+        where: { khoa: 'THOI_GIAN_PHIEN_GIAY' },
+      });
+      const soGiay = parseInt(caiDat?.giaTri || '86400', 10);
+      if (Number.isNaN(soGiay) || soGiay < 60) {
+        return 86400;
+      }
+      return Math.min(soGiay, 31536000);
+    } catch {
+      return 86400;
+    }
+  }
 }

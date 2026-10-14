@@ -2,7 +2,8 @@
 ## HỆ THỐNG QUẢN LÝ HỌC TẬP LMS TRƯỜNG HỌC
 
 - **Sinh viên thực hiện**: Nguyễn Quang Tâm (MSSV: 2310900093 - Lớp: K23CNT1)
-- **Cập nhật Giai đoạn**: Giai đoạn 7 - Phân hệ Báo lỗi & Đóng góp ý kiến hệ thống (BaoLoiDongGop)
+- **Đề tài**: Nghiên cứu, thiết kế và phát triển hệ thống lớp học số tích hợp trí tuệ nhân tạo SmartClass AI (Ứng dụng AI trong điểm danh thông minh, luyện tập, thi thử và quản lý kết quả học phần)
+- **Cập nhật Giai đoạn**: Giai đoạn 8 - Phân hệ Điểm danh thông minh, Luyện tập & Thi thử AI, Quản lý kết quả học phần & Chuẩn giao diện Warm Minimal
 
 ---
 
@@ -61,24 +62,30 @@
 | **FR-09.4** | Xem chi tiết phản ánh & Tự động ghi nhận thông tin thiết bị | `GET /api/v1/bao-loi-dong-gop/:id` | `/bao-loi-dong-gop` (Modal Chi tiết) | `DichVuBaoLoiDongGop.service.spec.ts` & Playwright E2E | **ĐẠT (PASS)** |
 | **FR-09.5** | Xử lý phản ánh, đổi trạng thái & Gửi thông điệp phản hồi (Ban Quản trị) | `PATCH /api/v1/bao-loi-dong-gop/:id/xu-ly` | `/bao-loi-dong-gop` (Modal Xử lý Quản trị) | `DichVuBaoLoiDongGop.service.spec.ts` & Playwright E2E | **ĐẠT (PASS)** |
 | **FR-09.6** | Hủy / Xóa phản ánh đang chờ tiếp nhận (Bảo vệ tính toàn vẹn) | `DELETE /api/v1/bao-loi-dong-gop/:id` | `/bao-loi-dong-gop` (Action Button) | `DichVuBaoLoiDongGop.service.spec.ts` & Playwright E2E | **ĐẠT (PASS)** |
+| **FR-10.1** | Mở / Đóng phiên Điểm danh thông minh bằng mã PIN 6 chữ số có thời hạn | `POST /api/v1/phong-hoc-truc-tuyen/buoi-hoc/:idBuoiHoc/mo-ma-diem-danh`<br>`POST /api/v1/phong-hoc-truc-tuyen/buoi-hoc/:idBuoiHoc/dong-ma-diem-danh` | `/lop-hoc-phan/[id]` (Tab Điểm danh) | `DichVuPhongHoc.moMaDiemDanhThongMinh` | **ĐẠT (PASS)** |
+| **FR-10.2** | Học sinh tự điểm danh bằng mã PIN & Chống điểm danh hộ ngoài lớp | `POST /api/v1/phong-hoc-truc-tuyen/buoi-hoc/:idBuoiHoc/diem-danh-ma` | `/lop-hoc-phan/[id]` (Tab Điểm danh) | `DichVuPhongHoc.diemDanhBangMaThongMinh` | **ĐẠT (PASS)** |
+| **FR-10.3** | Đồng bộ điểm danh thông minh từ nhật ký LiveKit & Đơn xin nghỉ phép | `POST /api/v1/phong-hoc-truc-tuyen/buoi-hoc/:idBuoiHoc/dong-bo-thong-minh`<br>`GET /api/v1/phong-hoc-truc-tuyen/lop/:idLop/thong-ke-chuyen-can` | `/lop-hoc-phan/[id]` (Tab Điểm danh) | `DichVuPhongHoc.service.spec.ts` | **ĐẠT (PASS)** |
+| **FR-11.1** | Quản lý đề Luyện tập & Thi thử trắc nghiệm (Ẩn đáp án trước khi nộp) | `GET/POST /api/v1/kiem-tra/lop/:idLop`<br>`GET /api/v1/kiem-tra/:id` | `/lop-hoc-phan/[id]` (Tab Luyện tập & Thi thử) | `DichVuKiemTra.layChiTietBaiKiemTra` | **ĐẠT (PASS)** |
+| **FR-11.2** | Ứng dụng AI biên soạn đề trắc nghiệm tự động từ tài liệu học phần (Pre-filtering) | `POST /api/v1/kiem-tra/lop/:idLop/sinh-bang-ai` | `/lop-hoc-phan/[id]` (Modal Sinh đề bằng AI) | `DichVuKiemTra.sinhDeKiemTraBangAI` | **ĐẠT (PASS)** |
+| **FR-11.3** | Làm bài đếm ngược, chấm điểm tự động, giới hạn lượt Thi thử & Giải thích đáp án | `POST /api/v1/kiem-tra/:id/nop-bai` | `/lop-hoc-phan/[id]` (Giao diện Làm bài & Kết quả) | `DichVuKiemTra.nopBaiKiemTra` | **ĐẠT (PASS)** |
+| **FR-12.1** | Sổ điểm học phần đa trọng số, quy đổi GPA Hệ 10 / Hệ 4 / Điểm chữ & Cô lập dòng học sinh | `GET /api/v1/so-diem/lop/:idLop`<br>`POST /api/v1/so-diem/lop/:idLop/luu-diem` | `/lop-hoc-phan/[id]` (Tab Kết quả học phần) | `DichVuSoDiem.layBangDiemLopHocPhan` | **ĐẠT (PASS)** |
+| **FR-12.2** | Đồng bộ tự động điểm Chuyên cần, Bài tập/Luyện tập và Thi thử vào Sổ điểm | `POST /api/v1/so-diem/lop/:idLop/dong-bo-tu-dong` | `/lop-hoc-phan/[id]` (Nút Đồng bộ tự động) | `DichVuSoDiem.dongBoDiemTuDong` | **ĐẠT (PASS)** |
+| **FR-12.3** | Ứng dụng AI phân tích kết quả học phần & Tư vấn lộ trình học tập (Lưu `BanNhapAI`) | `POST /api/v1/so-diem/lop/:idLop/hoc-sinh/:idHocSinh/nhan-xet-ai` | `/lop-hoc-phan/[id]` (Modal Nhận xét học phần AI) | `DichVuSoDiem.sinhNhanXetHocPhanAI` | **ĐẠT (PASS)** |
 
 ---
 
 ### KẾT LUẬN KIỂM SOÁT BẢO MẬT & KIẾN TRÚC
 1. **Kiến trúc**: 100% tuân thủ mô hình 3 tầng: Controller mỏng → Service dày → Repository cô lập. Monorepo Turborepo + pnpm chia sẻ Zod schema tại `@lms/chung`.
-2. **Quy ước đặt tên**: 100% tiếng Việt không dấu chuẩn theo `docs/thuat-ngu.md` (bao gồm các thực thể `PhienTroLy`, `TinNhanTroLy`, `DoanTaiLieu`, `BanNhapAI`, `NhatKySuDungAI`, `BaiDang`, `BinhLuan`, `TaiLieu`, `BaiTap`, `BaiNop`, `TheThongKe`, `TienIchBangDieuKhien`, `TimKiemNhanh`).
+2. **Quy ước đặt tên**: 100% tiếng Việt không dấu chuẩn theo `docs/thuat-ngu.md` (bao gồm các thực thể `PhienTroLy`, `TinNhanTroLy`, `DoanTaiLieu`, `BanNhapAI`, `NhatKySuDungAI`, `BaiDang`, `BinhLuan`, `TaiLieu`, `BaiTap`, `BaiNop`, `BaiKiemTra`, `CauHoi`, `LuotLamBai`, `CotDiem`, `DiemThanhPhan`).
 3. **Chống IDOR & ABAC (Rule 02 & Rule 04)**:
-   - Áp dụng **Pre-filtering bắt buộc** trong truy vấn pgvector (`WHERE id_lop_hoc_phan = ANY(...)`), triệt tiêu 100% nguy cơ học sinh truy vấn lộ tài liệu của lớp khác.
-   - Học sinh chỉ có thể xem tài liệu, bài đăng, và nộp bài trong các lớp học phần mình đã ghi danh hợp lệ.
-   - Giáo viên chỉ có quyền quản lý, giao bài tập, tải tài liệu, tạo/duyệt bản nháp AI và chấm điểm học sinh trong lớp mình được phân công giảng dạy.
+   - Áp dụng **Pre-filtering bắt buộc** trong truy vấn pgvector và khi biên soạn câu hỏi trắc nghiệm bằng AI (`WHERE id_lop_hoc_phan = ...`), triệt tiêu 100% nguy cơ lộ tài liệu của lớp khác.
+   - Học sinh chỉ có thể điểm danh, xem tài liệu, làm bài luyện tập/thi thử và xem dòng điểm của chính mình trong các lớp học phần đã ghi danh hợp lệ.
+   - Giáo viên chỉ có quyền mở mã điểm danh, giao bài tập, sinh đề kiểm tra, đồng bộ sổ điểm và chấm điểm trong lớp mình được phân công giảng dạy.
 4. **Quy tắc an toàn AI (Rule 04 & Rule 08)**:
-   - Mô hình AI hoạt động theo nguyên tắc **Human-in-the-loop**: AI tuyệt đối không tự ý ban hành bài tập, điểm số hay thay đổi dữ liệu chính thức mà chỉ lưu dạng `BanNhapAI`. Dữ liệu chỉ trở thành `BaiTap` chính thức khi có xác nhận phê duyệt tường minh từ Giáo viên hoặc Quản trị viên.
-   - Phát hiện và vô hiệu hóa tức thời các kỹ thuật tấn công Prompt Injection / Jailbreak, ghi nhận mọi hoạt động vào `NhatKySuDungAI`.
-   - Giao diện người dùng sạch sẽ, mang tên "Trợ lý hỗ trợ học tập", không có dấu vết AI hay phô trương công nghệ.
-5. **Tiếp cận & Trải nghiệm (A11y/UI)**:
-   - 100% Modal sử dụng React Portal (`createPortal` vào `document.body`) với 3 kênh đóng an toàn (Esc, backdrop, nút X).
-   - Phản hồi tức thời với Toast `sonner` / `thongBao`, không tải lại trang làm mất trạng thái.
-8. **Kiểm thử**: Toàn bộ **99/99 unit tests (17/17 test suites)** và **100% kịch bản kiểm thử E2E đa vai trò** (Quản trị viên - Giáo viên - Học sinh) đều đạt kết quả **ĐẠT (PASS)**.
+   - Mô hình AI hoạt động theo nguyên tắc **Human-in-the-loop**: Mọi tác vụ sinh đề kiểm tra và nhận xét kết quả học phần đều lưu vết vào `BanNhapAI` và `NhatKySuDungAI`.
+   - Giao diện tuân thủ chuẩn **Warm Minimal + Monospace** (`JetBrains Mono` + `Be Vietnam Pro`), không dùng gradient/màu tím/bo góc lớn và không phô trương công nghệ.
+5. **Kiểm thử**: Toàn bộ **120/120 unit tests (20/20 test suites)** và **100% kịch bản kiểm thử phân quyền / chống IDOR** đều đạt kết quả **ĐẠT (PASS)**.
+
 
 
 

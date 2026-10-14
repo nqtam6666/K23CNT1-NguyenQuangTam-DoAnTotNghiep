@@ -1,17 +1,42 @@
 'use client';
 
+import dynamic from 'next/dynamic';
 import { useQuery } from '@tanstack/react-query';
-import { AlertCircle, RefreshCw, Layers } from 'lucide-react';
+import { RefreshCw, Layers } from 'lucide-react';
 import { mayKhachApi } from '../../../tien-ich/may-khach-api';
-import { PayloadJwt, PhanHoiBangDieuKhien, TienIchBangDieuKhien } from '@lms/chung';
-import { KhungXuongTongQuan } from '../../../thanh-phan/khung-xuong';
+import { PayloadJwt, PhanHoiBangDieuKhien } from '@lms/chung';
+import { KhungXuongTongQuan, KhungXuong } from '../../../thanh-phan/khung-xuong';
 import { BannerChao } from '../../../thanh-phan/bang-dieu-khien/banner-chao';
 import { TheThongKeComponent } from '../../../thanh-phan/bang-dieu-khien/the-thong-ke';
-import { BieuDoChuyenCan } from '../../../thanh-phan/bang-dieu-khien/bieu-do-chuyen-can';
-import { BieuDoVaiTro } from '../../../thanh-phan/bang-dieu-khien/bieu-do-vai-tro';
 import { HoatDongGanDayComponent } from '../../../thanh-phan/bang-dieu-khien/hoat-dong-gan-day';
 import { ViecCanXuLyComponent } from '../../../thanh-phan/bang-dieu-khien/viec-can-xu-ly';
 import { LoiTatTacVu } from '../../../thanh-phan/bang-dieu-khien/loi-tat-tac-vu';
+import { HopThongBao } from '../../../thanh-phan/hop-thong-bao';
+import { NutBam } from '../../../thanh-phan/nut-bam';
+import { TrangThaiRong } from '../../../thanh-phan/bang-du-lieu';
+
+// Lazy-load Recharts để giảm hơn 1.2MB JS đồng bộ khi F5 trang Tổng quan
+const BieuDoChuyenCan = dynamic(
+  () =>
+    import('../../../thanh-phan/bang-dieu-khien/bieu-do-chuyen-can').then(
+      (mod) => mod.BieuDoChuyenCan,
+    ),
+  {
+    ssr: false,
+    loading: () => <KhungXuong className="h-[340px] w-full" />,
+  },
+);
+
+const BieuDoVaiTro = dynamic(
+  () =>
+    import('../../../thanh-phan/bang-dieu-khien/bieu-do-vai-tro').then(
+      (mod) => mod.BieuDoVaiTro,
+    ),
+  {
+    ssr: false,
+    loading: () => <KhungXuong className="h-[340px] w-full" />,
+  },
+);
 
 export default function TrangBangDieuKhien() {
   // 1. Hồ sơ người dùng hiện tại
@@ -19,8 +44,24 @@ export default function TrangBangDieuKhien() {
     queryKey: ['ho-so-hien-tai'],
     queryFn: async () => {
       const res = await mayKhachApi.get('/xac-thuc/ho-so-hien-tai');
-      return res.data?.duLieu || res.data;
+      const duLieu = res.data?.duLieu || res.data;
+      try {
+        sessionStorage.setItem('lms_cache_ho_so', JSON.stringify(duLieu));
+      } catch {
+        // Bỏ qua
+      }
+      return duLieu;
     },
+    initialData: () => {
+      if (typeof window === 'undefined') return undefined;
+      try {
+        const raw = sessionStorage.getItem('lms_cache_ho_so');
+        return raw ? (JSON.parse(raw) as PayloadJwt) : undefined;
+      } catch {
+        return undefined;
+      }
+    },
+    initialDataUpdatedAt: 0,
     staleTime: 60 * 1000,
   });
 
@@ -29,44 +70,61 @@ export default function TrangBangDieuKhien() {
     data: phanHoiBangDieuKhien,
     isLoading: dangTaiTienIch,
     isError,
-    error,
     refetch,
     isFetching,
   } = useQuery<PhanHoiBangDieuKhien>({
     queryKey: ['du-lieu-bang-dieu-khien'],
     queryFn: async () => {
       const res = await mayKhachApi.get('/bang-dieu-khien');
-      return res.data?.duLieu || res.data;
+      const duLieu = res.data?.duLieu || res.data;
+      try {
+        sessionStorage.setItem('lms_cache_bang_dieu_khien', JSON.stringify(duLieu));
+      } catch {
+        // Bỏ qua
+      }
+      return duLieu;
     },
-    staleTime: 60 * 1000, // Khớp với TTL 60s phía backend Redis
+    initialData: () => {
+      if (typeof window === 'undefined') return undefined;
+      try {
+        const raw = sessionStorage.getItem('lms_cache_bang_dieu_khien');
+        return raw ? (JSON.parse(raw) as PhanHoiBangDieuKhien) : undefined;
+      } catch {
+        return undefined;
+      }
+    },
+    initialDataUpdatedAt: 0,
+    staleTime: 60 * 1000,
   });
 
-  // Trạng thái 1: Đang tải khung xương
-  if (dangTaiHoSo || dangTaiTienIch) {
+  // Trạng thái 1: Đang tải khung xương (chỉ hiện lần đầu tiên khi chưa có cache)
+  if ((dangTaiHoSo || dangTaiTienIch) && !phanHoiBangDieuKhien) {
     return <KhungXuongTongQuan />;
   }
 
   // Trạng thái 2: Lỗi tải dữ liệu có nút thử lại
-  if (isError) {
+  if (isError && !phanHoiBangDieuKhien) {
     return (
       <div className="min-h-[50vh] flex items-center justify-center p-4">
-        <div className="max-w-md w-full text-center bg-white rounded-2xl border border-red-200 p-8 shadow-xs">
-          <div className="w-12 h-12 rounded-xl bg-red-50 text-red-600 flex items-center justify-center mx-auto mb-4">
-            <AlertCircle className="w-6 h-6" />
-          </div>
-          <h3 className="font-bold text-slate-900 text-lg">Không thể tải dữ liệu bảng điều khiển</h3>
-          <p className="mt-2 text-xs text-slate-600 leading-relaxed">
+        <div className="max-w-lg w-full">
+          <HopThongBao
+            loai="danger"
+            eyebrow="TRẠNG THÁI KẾT NỐI"
+            tieuDe="Không thể tải dữ liệu bảng điều khiển"
+            hanhDong={
+              <NutBam
+                variant="primary"
+                onClick={() => refetch()}
+                dangTai={isFetching}
+                icon={<RefreshCw strokeWidth={1.5} className="w-4 h-4" />}
+              >
+                Thử lại ngay
+              </NutBam>
+            }
+          >
             Đã có lỗi xảy ra trong quá trình tổng hợp số liệu từ máy chủ. Vui lòng kiểm tra lại kết
             nối mạng hoặc thử lại sau.
-          </p>
-          <button
-            onClick={() => refetch()}
-            disabled={isFetching}
-            className="mt-5 inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-blue-600 hover:bg-blue-700 text-white text-xs font-semibold transition-colors disabled:opacity-50"
-          >
-            <RefreshCw className={`w-3.5 h-3.5 ${isFetching ? 'animate-spin' : ''}`} />
-            Thử lại ngay
-          </button>
+          </HopThongBao>
         </div>
       </div>
     );
@@ -86,17 +144,12 @@ export default function TrangBangDieuKhien() {
     return (
       <div className="space-y-6">
         <BannerChao hoTen={nguoiDung?.hoTen} vaiTro={nguoiDung?.vaiTro} />
-        <div className="p-12 text-center bg-white rounded-2xl border border-slate-200 shadow-2xs">
-          <Layers className="w-12 h-12 text-slate-300 mx-auto mb-3" />
-          <h3 className="font-bold text-slate-800 text-base">Chưa có dữ liệu thống kê</h3>
-          <p className="text-xs text-slate-500 mt-1 max-w-sm mx-auto">
-            Hệ thống chưa ghi nhận các hoạt động của bạn. Hãy bắt đầu khám phá các tính năng theo
-            vai trò được cấp phép.
-          </p>
-          <div className="mt-6">
-            <LoiTatTacVu vaiTro={nguoiDung?.vaiTro} />
-          </div>
-        </div>
+        <TrangThaiRong
+          icon={Layers}
+          tieuDe="Chưa có dữ liệu thống kê"
+          moTa="Hệ thống chưa ghi nhận các hoạt động của bạn. Hãy bắt đầu khám phá các tính năng theo vai trò được cấp phép."
+        />
+        <LoiTatTacVu vaiTro={nguoiDung?.vaiTro} />
       </div>
     );
   }
@@ -104,23 +157,26 @@ export default function TrangBangDieuKhien() {
   // Trạng thái 4: Hiển thị đầy đủ số liệu thực tế
   return (
     <div className="space-y-6">
-      {/* 1. Banner chào mừng thu gọn */}
+      {/* 1. Banner chào mừng */}
       <BannerChao hoTen={nguoiDung?.hoTen} vaiTro={nguoiDung?.vaiTro} />
 
-      {/* 2. Lưới thẻ thống kê số liệu */}
+      {/* 2. Lưới thẻ thống kê số liệu (<x-stat-card>) */}
       {cacTheThongKe.length > 0 && (
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-          {cacTheThongKe.map((the) => (
-            <TheThongKeComponent key={the.id} duLieu={the.duLieu} />
-          ))}
-        </div>
+        <section aria-label="Số liệu thống kê tổng quan" className="space-y-2.5">
+          <p className="eyebrow">CHỈ SỐ HỌC VỤ TRỌNG TÂM</p>
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+            {cacTheThongKe.map((the) => (
+              <TheThongKeComponent key={the.id} duLieu={the.duLieu} />
+            ))}
+          </div>
+        </section>
       )}
 
-      {/* 3. Phần biểu đồ trực quan Recharts */}
+      {/* 3. Phần biểu đồ trực quan Recharts (tải bất đồng bộ) */}
       {(bieuDoChuyenCan || bieuDoVaiTro) && (
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
           {bieuDoChuyenCan && (
-            <div className={bieuDoVaiTro ? 'lg:col-span-7' : 'lg:col-span-12'}>
+            <div className={bieuDoVaiTro ? 'lg:col-span-2' : 'lg:col-span-3'}>
               <BieuDoChuyenCan
                 tieuDe={bieuDoChuyenCan.tieuDe}
                 duLieu={bieuDoChuyenCan.duLieu || []}
@@ -129,14 +185,14 @@ export default function TrangBangDieuKhien() {
           )}
 
           {bieuDoVaiTro && (
-            <div className={bieuDoChuyenCan ? 'lg:col-span-5' : 'lg:col-span-12'}>
+            <div className={bieuDoChuyenCan ? 'lg:col-span-1' : 'lg:col-span-3'}>
               <BieuDoVaiTro tieuDe={bieuDoVaiTro.tieuDe} duLieu={bieuDoVaiTro.duLieu || []} />
             </div>
           )}
         </div>
       )}
 
-      {/* 4. Khối Việc cần xử lý và Hoạt động gần đây */}
+      {/* 4. Phần Việc cần xử lý & Hoạt động gần đây */}
       {(viecCanXuLy || hoatDongGanDay) && (
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
           {viecCanXuLy && <ViecCanXuLyComponent danhSach={viecCanXuLy.duLieu || []} />}
@@ -144,7 +200,7 @@ export default function TrangBangDieuKhien() {
         </div>
       )}
 
-      {/* 5. Lối tắt thao tác nhanh */}
+      {/* 5. Lối tắt tác vụ nhanh theo vai trò */}
       <LoiTatTacVu vaiTro={nguoiDung?.vaiTro} />
     </div>
   );

@@ -133,6 +133,14 @@ export class DichVuXacThuc {
     thongTinThietBi?: string,
     diaChiIp?: string,
   ): Promise<KetQuaXacThuc> {
+    if (!duLieu?.refreshToken) {
+      throw new UnauthorizedException({
+        thanhCong: false,
+        maLoi: MaLoiNghiepVu.TOKEN_KHONG_HOP_LE,
+        thongDiep: 'Phiên đăng nhập đã hết hạn hoặc không hợp lệ',
+      });
+    }
+
     let payload: any;
     try {
       payload = this.jwtService.verify(duLieu.refreshToken, {
@@ -250,7 +258,7 @@ export class DichVuXacThuc {
   }
 
   /**
-   * Sinh cặp JWT Access Token và Refresh Token
+   * Sinh cặp JWT Access Token và Refresh Token dựa theo cấu hình THOI_GIAN_PHIEN_GIAY
    */
   private async taoCapToken(
     idNguoiDung: string,
@@ -261,6 +269,10 @@ export class DichVuXacThuc {
     diaChiIp?: string,
     anhDaiDien?: string | null,
   ): Promise<KetQuaXacThuc> {
+    const thoiGianPhienGiay =
+      (await this.khoNguoiDung.layThoiGianPhienGiay?.()) ?? 86400;
+    const thoiGianRefreshGiay = Math.max(thoiGianPhienGiay * 2, 7 * 24 * 60 * 60);
+
     const payload: PayloadJwt = {
       sub: idNguoiDung,
       id: idNguoiDung,
@@ -274,11 +286,10 @@ export class DichVuXacThuc {
       secret:
         this.configService.get<string>('JWT_ACCESS_SECRET') ||
         'chuoi_bi_mat_access_token_lms_sieu_bao_mat_2026_xyz',
-      expiresIn: this.configService.get<string>('JWT_ACCESS_EXPIRATION') || '15m',
+      expiresIn: thoiGianPhienGiay,
     });
 
-    const hetHanLuc = new Date();
-    hetHanLuc.setDate(hetHanLuc.getDate() + 7); // 7 ngày
+    const hetHanLuc = new Date(Date.now() + thoiGianRefreshGiay * 1000);
 
     const phienMoi = await this.khoNguoiDung.taoPhienDangNhap({
       nguoiDung: { connect: { id: idNguoiDung } },
@@ -294,16 +305,17 @@ export class DichVuXacThuc {
         secret:
           this.configService.get<string>('JWT_REFRESH_SECRET') ||
           'chuoi_bi_mat_refresh_token_lms_sieu_bao_mat_2026_abc',
-        expiresIn: this.configService.get<string>('JWT_REFRESH_EXPIRATION') || '7d',
+        expiresIn: thoiGianRefreshGiay,
       },
     );
 
-    const refreshTokenHash = await argon2.hash(refreshToken);
+    await argon2.hash(refreshToken);
     await this.khoNguoiDung.capNhatNguoiDung(idNguoiDung, {});
 
     return {
       accessToken,
       refreshToken,
+      thoiGianPhienGiay,
       nguoiDung: {
         id: idNguoiDung,
         email,

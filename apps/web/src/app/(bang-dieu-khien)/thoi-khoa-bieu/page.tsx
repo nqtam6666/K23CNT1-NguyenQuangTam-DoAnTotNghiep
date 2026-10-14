@@ -64,12 +64,12 @@ export default function TrangThoiKhoaBieu() {
 
   // Bảng màu cho các thẻ môn học (Tối ưu độ tương phản cho cả Light và Dark mode)
   const mauThe = [
-    'bg-indigo-50 dark:bg-indigo-950/70 border-indigo-200 dark:border-indigo-800 text-indigo-900 dark:text-indigo-200',
-    'bg-emerald-50 dark:bg-emerald-950/70 border-emerald-200 dark:border-emerald-800 text-emerald-900 dark:text-emerald-200',
-    'bg-amber-50 dark:bg-amber-950/70 border-amber-200 dark:border-amber-800 text-amber-900 dark:text-amber-200',
-    'bg-rose-50 dark:bg-rose-950/70 border-rose-200 dark:border-rose-800 text-rose-900 dark:text-rose-200',
-    'bg-violet-50 dark:bg-violet-950/70 border-violet-200 dark:border-violet-800 text-violet-900 dark:text-violet-200',
-    'bg-sky-50 dark:bg-sky-950/70 border-sky-200 dark:border-sky-800 text-sky-900 dark:text-sky-200',
+    'bg-accent-soft border-accent text-accent ',
+    'bg-accent-soft border-accent text-accent ',
+    'bg-accent-soft border-accent text-accent ',
+    'bg-danger-soft border-danger text-danger ',
+    'bg-accent-soft border-accent text-accent ',
+    'bg-info-soft border-info text-info ',
   ];
 
   // Tìm tiết học bắt đầu tại tiết và thứ cụ thể
@@ -90,24 +90,25 @@ export default function TrangThoiKhoaBieu() {
       {/* Header */}
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
         <div>
-          <h1 className="text-2xl font-bold tracking-tight text-slate-900 dark:text-slate-100">Thời khóa biểu tuần</h1>
-          <p className="text-sm text-slate-500 dark:text-slate-400 mt-1">
+          <p className="eyebrow mb-1">Kế hoạch giảng dạy</p>
+          <h1 className="text-[22px] font-mono font-bold tracking-tight text-[var(--text)]">Thời khóa biểu tuần</h1>
+          <p className="text-[14px] text-[var(--muted)] mt-1">
             Lịch học tập và giảng dạy hàng tuần được đồng bộ tự động từ hệ thống quản lý học vụ
           </p>
         </div>
 
         <div className="flex flex-wrap items-center gap-2 sm:gap-3">
           {/* Lọc theo học kỳ */}
-          <div className="flex items-center gap-2 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl px-2.5 py-1.5 shadow-2xs">
-            <Filter className="w-3.5 h-3.5 text-slate-400 shrink-0" />
+          <div className="flex items-center gap-2 bg-surface border border-border rounded px-2.5 py-1.5 shadow-2xs">
+            <Filter className="w-3.5 h-3.5 text-muted shrink-0" />
             <select
               value={idHocKyLoc}
               onChange={(e) => setIdHocKyLoc(e.target.value)}
-              className="bg-transparent text-slate-700 dark:text-slate-200 text-xs font-medium focus:outline-none cursor-pointer"
+              className="bg-transparent text-text text-xs font-medium focus:outline-none cursor-pointer"
             >
               <option value="">-- Tất cả học kỳ --</option>
               {danhSachHocKy?.map((hk) => (
-                <option key={hk.id} value={hk.id} className="dark:bg-slate-900">
+                <option key={hk.id} value={hk.id} className="">
                   {hk.tenHocKy} {hk.hienTai ? '(Hiện tại)' : ''}
                 </option>
               ))}
@@ -116,23 +117,23 @@ export default function TrangThoiKhoaBieu() {
 
           <button
             onClick={() => window.print()}
-            className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-white hover:bg-slate-50 dark:bg-slate-900 dark:hover:bg-slate-800 border border-slate-200 dark:border-slate-800 text-slate-700 dark:text-slate-200 text-xs font-semibold rounded-xl transition-colors shadow-2xs cursor-pointer shrink-0"
+            className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-surface hover:bg-bg border border-border text-text text-xs font-semibold rounded transition-colors shadow-2xs cursor-pointer shrink-0"
           >
-            <Printer className="w-3.5 h-3.5 text-slate-400" />
+            <Printer className="w-3.5 h-3.5 text-muted" />
             <span>In lịch</span>
           </button>
         </div>
       </div>
 
       {/* Grid Thời khóa biểu dạng Lịch tuần */}
-      <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl overflow-hidden shadow-sm">
+      <div className="bg-surface border border-border rounded overflow-hidden shadow-sm">
         {/* Chỉ dẫn cuộn ngang trên tablet / mobile */}
-        <div className="px-4 py-2 bg-slate-50/70 dark:bg-slate-800/40 border-b border-slate-200 dark:border-slate-800 flex items-center justify-between text-[11px] text-slate-500 dark:text-slate-400 xl:hidden">
+        <div className="px-4 py-2 bg-bg border-b border-border flex items-center justify-between text-[11px] text-muted xl:hidden">
           <span className="flex items-center gap-1.5 font-medium">
-            <CalendarIcon className="w-3.5 h-3.5 text-blue-500 shrink-0" />
+            <CalendarIcon className="w-3.5 h-3.5 text-accent shrink-0" />
             Lịch học 7 ngày trong tuần
           </span>
-          <span className="text-[10px] text-slate-400 dark:text-slate-500">
+          <span className="text-[10px] text-muted ">
             Cuộn ngang để xem đầy đủ →
           </span>
         </div>
@@ -140,32 +141,32 @@ export default function TrangThoiKhoaBieu() {
         <div className="overflow-x-auto">
           <table className="w-full border-collapse text-left text-xs min-w-[840px]">
             <thead>
-              <tr className="bg-slate-900 text-white">
-                <th className="py-3.5 px-3 border-r border-slate-800 text-center w-24 font-bold">
+              <tr className="bg-bg text-text border-b border-border">
+                <th className="py-3.5 px-3 border-r border-border text-center w-24 font-bold">
                   Tiết / Giờ
                 </th>
                 {cacThu.map((thu) => (
                   <th
                     key={thu.ma}
-                    className="py-3.5 px-3 border-r border-slate-800 text-center font-bold"
+                    className="py-3.5 px-3 border-r border-border text-center font-bold"
                   >
                     {thu.ten}
                   </th>
                 ))}
               </tr>
             </thead>
-            <tbody className="divide-y divide-slate-200 dark:divide-slate-800">
+            <tbody className="divide-y divide-border ">
               {isLoading ? (
                 [1, 2, 3, 4, 5, 6].map((i) => (
                   <tr key={i} className="animate-pulse">
-                    <td className="py-3 px-3 border-r border-slate-200 dark:border-slate-800 bg-slate-50/80 dark:bg-slate-900/80 text-center">
+                    <td className="py-3 px-3 border-r border-border bg-bg text-center">
                       <KhungXuong className="h-4 w-12 mx-auto" />
                       <KhungXuong className="h-2.5 w-16 mx-auto mt-1" />
                     </td>
                     {Array.from({ length: 7 }).map((_, c) => (
-                      <td key={c} className="p-2 border-r border-slate-200 dark:border-slate-800">
+                      <td key={c} className="p-2 border-r border-border ">
                         {(i + c) % 3 === 0 && (
-                          <div className="p-2.5 rounded-lg bg-indigo-50/70 dark:bg-indigo-950/40 border border-indigo-100 dark:border-indigo-900/50 space-y-1.5">
+                          <div className="p-2.5 rounded-lg bg-accent-soft border border-accent space-y-1.5">
                             <KhungXuong className="h-3 w-16" />
                             <KhungXuong className="h-3.5 w-24" />
                             <KhungXuong className="h-2.5 w-20" />
@@ -177,11 +178,11 @@ export default function TrangThoiKhoaBieu() {
                 ))
               ) : (
                 cacTiet.map((t) => (
-                  <tr key={t.tiet} className="hover:bg-slate-50/50 dark:hover:bg-slate-800/40 transition-colors">
+                  <tr key={t.tiet} className="hover:bg-bg transition-colors">
                     {/* Cột Tiết & Giờ */}
-                    <td className="py-2.5 px-3 border-r border-slate-200 dark:border-slate-800 bg-slate-50/80 dark:bg-slate-900/80 text-center font-mono">
-                      <p className="font-bold text-slate-800 dark:text-slate-200">Tiết {t.tiet}</p>
-                      <p className="text-[10px] text-slate-500 dark:text-slate-400 mt-0.5">{t.gio}</p>
+                    <td className="py-2.5 px-3 border-r border-border bg-bg text-center font-mono">
+                      <p className="font-bold text-text ">Tiết {t.tiet}</p>
+                      <p className="text-[10px] text-muted mt-0.5">{t.gio}</p>
                     </td>
 
                     {/* Cột 7 ngày trong tuần */}
@@ -201,7 +202,7 @@ export default function TrangThoiKhoaBieu() {
                           <td
                             key={thu.ma}
                             rowSpan={tietHoc.soTiet}
-                            className={`p-2.5 border-r border-slate-200 dark:border-slate-800 align-top transition-all ${classMau} border rounded-lg shadow-sm`}
+                            className={`p-2.5 border-r border-border align-top transition-all ${classMau} border rounded-lg shadow-sm`}
                           >
                             <div className="space-y-1">
                               <span className="font-mono text-[10px] font-bold uppercase tracking-wider block opacity-75">
@@ -234,7 +235,7 @@ export default function TrangThoiKhoaBieu() {
                       return (
                         <td
                           key={thu.ma}
-                          className="p-2 border-r border-slate-200 dark:border-slate-800 text-center text-slate-300 dark:text-slate-600 hover:bg-indigo-50/20 dark:hover:bg-indigo-950/20"
+                          className="p-2 border-r border-border text-center text-muted hover:bg-accent-soft "
                         >
                           —
                         </td>

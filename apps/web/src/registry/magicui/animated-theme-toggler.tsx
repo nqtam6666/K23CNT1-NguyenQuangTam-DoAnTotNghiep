@@ -37,7 +37,7 @@ function polygonCollapsed(point: string, vertexCount: number): string {
 // All coordinates are percentages of the snapshot reference box: Chrome 150
 // renders absolute px clip-path coordinates on ::view-transition-new(root)
 // unscaled on fractional display scales (e.g. Windows 150%) for the first
-// transition after load, so px values land at the wrong position (#989).
+// transition after load, so px values land at the wrong position.
 function getThemeTransitionClipPaths(
   variant: TransitionVariant,
   cx: number,
@@ -333,7 +333,7 @@ export const AnimatedThemeToggler = ({
       ref={buttonRef}
       onClick={toggleTheme}
       className={cn(
-        'relative inline-flex items-center justify-center p-2 rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 hover:bg-slate-100 dark:bg-slate-800/80 dark:hover:bg-slate-800 text-slate-700 dark:text-slate-200 transition-all duration-200 active:scale-95 cursor-pointer shadow-2xs focus:outline-none focus:ring-2 focus:ring-blue-500/20',
+        'relative inline-flex items-center justify-center p-2 rounded border border-border bg-bg hover:bg-active-bg text-text transition-all duration-200 active:scale-95 cursor-pointer shadow-2xs focus:outline-none focus:ring-2 focus:ring-accent',
         className
       )}
       aria-label={isDark ? 'Chuyển sang Chế độ sáng' : 'Chuyển sang Chế độ tối'}
@@ -341,9 +341,9 @@ export const AnimatedThemeToggler = ({
       {...props}
     >
       {isDark ? (
-        <Sun className="w-5 h-5 transition-transform duration-200 hover:rotate-45 text-amber-500" />
+        <Sun className="w-5 h-5 transition-transform duration-200 hover:rotate-45 text-accent" />
       ) : (
-        <Moon className="w-5 h-5 transition-transform duration-200 hover:-rotate-12 text-slate-600 dark:text-slate-300" />
+        <Moon className="w-5 h-5 transition-transform duration-200 hover:-rotate-12 text-muted " />
       )}
       <span className="sr-only">Toggle theme</span>
     </button>

@@ -100,12 +100,8 @@ function ThanhTienTrinhNoiDung() {
       style={{ opacity: dangTai ? 1 : 0 }}
     >
       <div
-        className="h-[3px] bg-gradient-to-r from-blue-600 via-indigo-500 to-sky-400 transition-all duration-150 ease-out shadow-[0_0_12px_rgba(59,130,246,0.8)]"
+        className="h-[2px] bg-[var(--accent)] transition-all duration-150 ease-out"
         style={{ width: `${tienTrinh}%` }}
-      />
-      <div
-        className="absolute top-0 h-[3px] w-20 bg-white/70 blur-[1px] transform -translate-x-full transition-all duration-150"
-        style={{ left: `${tienTrinh}%` }}
       />
     </div>
   );

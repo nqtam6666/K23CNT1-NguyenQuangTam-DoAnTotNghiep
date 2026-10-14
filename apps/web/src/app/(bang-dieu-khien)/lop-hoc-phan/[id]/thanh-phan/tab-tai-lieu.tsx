@@ -31,19 +31,19 @@ interface ThuocTinhTabTaiLieu {
 const nhanLoaiTaiLieu: Record<LoaiTaiLieu, { ten: string; lopCss: string }> = {
   [LoaiTaiLieu.GIAO_TRINH]: {
     ten: 'Giáo trình',
-    lopCss: 'bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border-emerald-500/20',
+    lopCss: 'bg-accent/10 text-accent border-accent',
   },
   [LoaiTaiLieu.BAI_GIANG]: {
     ten: 'Bài giảng',
-    lopCss: 'bg-blue-500/10 text-blue-600 dark:text-blue-400 border-blue-500/20',
+    lopCss: 'bg-accent/10 text-accent border-accent',
   },
   [LoaiTaiLieu.SLIDE]: {
     ten: 'Slide trình chiếu',
-    lopCss: 'bg-orange-500/10 text-orange-600 dark:text-orange-400 border-orange-500/20',
+    lopCss: 'bg-accent/10 text-accent border-accent',
   },
   [LoaiTaiLieu.TAI_LIEU_THAM_KHAO]: {
     ten: 'Tham khảo',
-    lopCss: 'bg-purple-500/10 text-purple-600 dark:text-purple-400 border-purple-500/20',
+    lopCss: 'bg-accent/10 text-accent border-accent',
   },
 };
 
@@ -149,12 +149,12 @@ export function TabTaiLieu({ idLopHocPhan, nguoiDung, laGiaoVienLop }: ThuocTinh
 
   const layBieuTuongTep = (duongDan: string) => {
     const ext = duongDan.split('.').pop()?.toLowerCase();
-    if (ext === 'pdf') return <FileText className="w-6 h-6 text-red-500" />;
-    if (ext === 'ppt' || ext === 'pptx') return <Presentation className="w-6 h-6 text-orange-500" />;
-    if (ext === 'doc' || ext === 'docx') return <FileText className="w-6 h-6 text-blue-500" />;
-    if (ext === 'zip' || ext === 'rar' || ext === '7z') return <FileArchive className="w-6 h-6 text-amber-500" />;
-    if (ext === 'mp4' || ext === 'mkv') return <Film className="w-6 h-6 text-purple-500" />;
-    return <BookOpen className="w-6 h-6 text-emerald-500" />;
+    if (ext === 'pdf') return <FileText className="w-6 h-6 text-danger" />;
+    if (ext === 'ppt' || ext === 'pptx') return <Presentation className="w-6 h-6 text-accent" />;
+    if (ext === 'doc' || ext === 'docx') return <FileText className="w-6 h-6 text-accent" />;
+    if (ext === 'zip' || ext === 'rar' || ext === '7z') return <FileArchive className="w-6 h-6 text-accent" />;
+    if (ext === 'mp4' || ext === 'mkv') return <Film className="w-6 h-6 text-accent" />;
+    return <BookOpen className="w-6 h-6 text-accent" />;
   };
 
   const layUrlDayDu = (duongDan: string) => {
@@ -166,7 +166,7 @@ export function TabTaiLieu({ idLopHocPhan, nguoiDung, laGiaoVienLop }: ThuocTinh
   return (
     <div className="space-y-6">
       {/* Thanh hành động */}
-      <div className="flex flex-wrap items-center justify-between gap-4 bg-card rounded-2xl border border-border/80 p-5 shadow-sm">
+      <div className="flex flex-wrap items-center justify-between gap-4 bg-card rounded border border-border/80 p-5 shadow-sm">
         <div>
           <h3 className="text-base font-semibold text-foreground">Kho tài liệu học tập</h3>
           <p className="text-xs text-muted-foreground mt-0.5">
@@ -177,7 +177,7 @@ export function TabTaiLieu({ idLopHocPhan, nguoiDung, laGiaoVienLop }: ThuocTinh
         {coQuyenQuanLy && (
           <button
             onClick={() => setMoModalThem(true)}
-            className="inline-flex items-center gap-2 rounded-xl bg-primary px-4 py-2.5 text-xs font-semibold text-primary-foreground shadow-sm hover:bg-primary/90 transition-all"
+            className="inline-flex items-center gap-2 rounded bg-primary px-4 py-2.5 text-xs font-semibold text-primary-foreground shadow-sm hover:bg-primary/90 transition-all"
           >
             <Plus className="w-4 h-4" />
             Tải lên tài liệu
@@ -189,11 +189,11 @@ export function TabTaiLieu({ idLopHocPhan, nguoiDung, laGiaoVienLop }: ThuocTinh
       {dangTai ? (
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           {[1, 2, 3, 4].map((i) => (
-            <div key={i} className="h-28 rounded-2xl bg-muted/40 animate-pulse" />
+            <div key={i} className="h-28 rounded bg-muted/40 animate-pulse" />
           ))}
         </div>
       ) : danhSachTaiLieu.length === 0 ? (
-        <div className="rounded-2xl border border-dashed border-border/80 p-12 text-center bg-card/40">
+        <div className="rounded border border-dashed border-border/80 p-12 text-center bg-card/40">
           <BookOpen className="w-12 h-12 text-muted-foreground/40 mx-auto mb-3" />
           <h4 className="text-base font-semibold text-foreground">Chưa có tài liệu nào</h4>
           <p className="text-sm text-muted-foreground mt-1 max-w-sm mx-auto">
@@ -210,12 +210,12 @@ export function TabTaiLieu({ idLopHocPhan, nguoiDung, laGiaoVienLop }: ThuocTinh
             return (
               <div
                 key={tl.id}
-                className="bg-card text-card-foreground rounded-2xl border border-border/80 p-5 shadow-sm hover:border-border transition-all flex flex-col justify-between group"
+                className="bg-card text-card-foreground rounded border border-border/80 p-5 shadow-sm hover:border-border transition-all flex flex-col justify-between group"
               >
                 <div>
                   <div className="flex items-start justify-between gap-3">
                     <div className="flex items-start gap-3">
-                      <div className="p-2.5 rounded-xl bg-muted/50 border border-border/60">
+                      <div className="p-2.5 rounded bg-muted/50 border border-border/60">
                         {layBieuTuongTep(tl.duongDanTep)}
                       </div>
                       <div>
@@ -292,7 +292,7 @@ export function TabTaiLieu({ idLopHocPhan, nguoiDung, laGiaoVienLop }: ThuocTinh
               value={tieuDe}
               onChange={(e) => setTieuDe(e.target.value)}
               placeholder="VD: Slide bài giảng Chương 1 - Nhập môn công nghệ"
-              className="mt-1.5 w-full rounded-xl border border-input bg-background px-3.5 py-2 text-sm focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary"
+              className="mt-1.5 w-full rounded border border-input bg-background px-3.5 py-2 text-sm focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary"
             />
           </div>
 
@@ -301,7 +301,7 @@ export function TabTaiLieu({ idLopHocPhan, nguoiDung, laGiaoVienLop }: ThuocTinh
             <select
               value={loaiTaiLieu}
               onChange={(e) => setLoaiTaiLieu(e.target.value as LoaiTaiLieu)}
-              className="mt-1.5 w-full rounded-xl border border-input bg-background px-3.5 py-2 text-sm focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary"
+              className="mt-1.5 w-full rounded border border-input bg-background px-3.5 py-2 text-sm focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary"
             >
               <option value={LoaiTaiLieu.BAI_GIANG}>Bài giảng</option>
               <option value={LoaiTaiLieu.SLIDE}>Slide trình chiếu</option>
@@ -317,7 +317,7 @@ export function TabTaiLieu({ idLopHocPhan, nguoiDung, laGiaoVienLop }: ThuocTinh
               value={moTa}
               onChange={(e) => setMoTa(e.target.value)}
               placeholder="Ghi chú nội dung chính của tài liệu..."
-              className="mt-1.5 w-full rounded-xl border border-input bg-background px-3.5 py-2 text-sm focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary resize-none"
+              className="mt-1.5 w-full rounded border border-input bg-background px-3.5 py-2 text-sm focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary resize-none"
             />
           </div>
 
@@ -325,7 +325,7 @@ export function TabTaiLieu({ idLopHocPhan, nguoiDung, laGiaoVienLop }: ThuocTinh
             <label className="text-xs font-semibold text-foreground">Chọn tệp tin đính kèm *</label>
             <div
               onClick={() => inputTepRef.current?.click()}
-              className="mt-1.5 border-2 border-dashed border-border/80 hover:border-primary/50 rounded-2xl p-6 text-center cursor-pointer transition-all bg-muted/20 hover:bg-muted/40"
+              className="mt-1.5 border-2 border-dashed border-border/80 hover:border-primary/50 rounded p-6 text-center cursor-pointer transition-all bg-muted/20 hover:bg-muted/40"
             >
               <input
                 ref={inputTepRef}
@@ -361,14 +361,14 @@ export function TabTaiLieu({ idLopHocPhan, nguoiDung, laGiaoVienLop }: ThuocTinh
             <button
               type="button"
               onClick={() => setMoModalThem(false)}
-              className="rounded-xl border border-input px-4 py-2 text-xs font-semibold text-muted-foreground hover:text-foreground hover:bg-muted/50 transition-colors"
+              className="rounded border border-input px-4 py-2 text-xs font-semibold text-muted-foreground hover:text-foreground hover:bg-muted/50 transition-colors"
             >
               Hủy
             </button>
             <button
               type="submit"
               disabled={!tieuDe.trim() || !tepChon || mutationTaiLen.isPending}
-              className="inline-flex items-center gap-2 rounded-xl bg-primary px-4 py-2 text-xs font-semibold text-primary-foreground shadow-sm hover:bg-primary/90 disabled:opacity-50 disabled:cursor-not-allowed transition-all"
+              className="inline-flex items-center gap-2 rounded bg-primary px-4 py-2 text-xs font-semibold text-primary-foreground shadow-sm hover:bg-primary/90 disabled:opacity-50 disabled:cursor-not-allowed transition-all"
             >
               {mutationTaiLen.isPending ? (
                 <>

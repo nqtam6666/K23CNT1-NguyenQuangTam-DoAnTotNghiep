@@ -208,4 +208,59 @@ describe('DichVuPhongHoc (Kiểm thử Lớp học trực tuyến LiveKit & Ch�
       );
     });
   });
+
+  describe('diemDanhThongMinh (Mã PIN 6 số & Đồng bộ tự động)', () => {
+    it('9. Giáo viên phụ trách mở được mã điểm danh 6 chữ số có thời hạn, chặn giáo viên lạ (Anti-IDOR)', async () => {
+      khoPhongHoc.timBuoiHocTheoId = jest.fn().mockResolvedValue({
+        id: 'buoi-1',
+        idLopHocPhan: 'lop-1',
+        lopHocPhan: mockClassSection,
+      });
+      khoPhongHoc.capNhatMaDiemDanh = jest.fn().mockImplementation(async (id, ma, han) => ({
+        id,
+        maDiemDanh: ma,
+        hanMaDiemDanh: han,
+      }));
+
+      await expect(
+        service.moMaDiemDanhThongMinh('buoi-1', 5, mockOtherTeacherPayload),
+      ).rejects.toThrow(ForbiddenException);
+
+      const ketQua = await service.moMaDiemDanhThongMinh('buoi-1', 5, mockTeacherPayload);
+      expect(ketQua.maDiemDanh).toMatch(/^\d{6}$/);
+      expect(ketQua.hanMaDiemDanh).toBeInstanceOf(Date);
+    });
+
+    it('10. Học sinh trong lớp tự điểm danh thành công bằng mã PIN còn hạn, chặn học sinh ngoài lớp', async () => {
+      khoPhongHoc.timBuoiHocTheoId = jest.fn().mockResolvedValue({
+        id: 'buoi-1',
+        idLopHocPhan: 'lop-1',
+        maDiemDanh: '654321',
+        hanMaDiemDanh: new Date(Date.now() + 5 * 60 * 1000),
+      });
+      prisma.hoSoHocSinh.findUnique.mockResolvedValue({ id: 'hs-profile-1' });
+      prisma.ghiDanh.findUnique.mockResolvedValueOnce(null);
+
+      await expect(
+        service.diemDanhBangMaThongMinh('buoi-1', '654321', mockOtherStudentPayload),
+      ).rejects.toThrow(ForbiddenException);
+
+      prisma.ghiDanh.findUnique.mockResolvedValueOnce({
+        idLopHocPhan: 'lop-1',
+        idHocSinh: 'hs-profile-1',
+      });
+      khoPhongHoc.diemDanhHocSinh.mockResolvedValue({
+        idBuoiHoc: 'buoi-1',
+        idHocSinh: 'hs-profile-1',
+        trangThai: 'CO_MAT',
+      });
+
+      const ketQua = await service.diemDanhBangMaThongMinh(
+        'buoi-1',
+        '654321',
+        mockStudentPayload,
+      );
+      expect(ketQua.trangThai).toBe('CO_MAT');
+    });
+  });
 });

@@ -147,10 +147,11 @@ export default function TrangLopHocPhan() {
       {/* Header */}
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
         <div>
-          <h1 className="text-2xl font-bold tracking-tight text-slate-900">
+          <p className="eyebrow mb-1">Không gian học tập</p>
+          <h1 className="text-[22px] font-mono font-bold tracking-tight text-[var(--text)]">
             Không gian Lớp học phần
           </h1>
-          <p className="text-sm text-slate-500 mt-1">
+          <p className="text-[14px] text-[var(--muted)] mt-1">
             Không gian học tập trực tuyến tích hợp phòng LiveKit SFU, tài liệu và thời khóa biểu
           </p>
         </div>
@@ -163,9 +164,9 @@ export default function TrangLopHocPhan() {
                 setThongBaoLoi(null);
                 setMoModalThamGia(true);
               }}
-              className="inline-flex items-center gap-2 px-4 py-2 border border-indigo-200 bg-indigo-50 hover:bg-indigo-100 text-indigo-700 text-sm font-semibold rounded-lg transition-colors shadow-sm"
+              className="inline-flex items-center gap-2 px-4 py-[11px] border border-[var(--border)] bg-[var(--surface)] hover:brightness-95 text-[var(--text)] text-[13px] font-semibold rounded-[4px] transition-all cursor-pointer"
             >
-              <KeyRound className="w-4 h-4" />
+              <KeyRound className="w-[18px] h-[18px] text-[var(--accent)]" strokeWidth={1.5} />
               Tham gia bằng mã
             </button>
           )}
@@ -176,9 +177,9 @@ export default function TrangLopHocPhan() {
                 setThongBaoLoi(null);
                 setMoModalTaoLop(true);
               }}
-              className="inline-flex items-center gap-2 px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white text-sm font-semibold rounded-lg transition-colors shadow-sm"
+              className="inline-flex items-center gap-2 px-5 py-[11px] bg-[var(--accent)] hover:brightness-95 text-white text-[13px] font-semibold rounded-[4px] transition-all shadow-[0_2px_8px_-2px_color-mix(in_srgb,var(--accent)_30%,transparent)] cursor-pointer"
             >
-              <Plus className="w-4 h-4" />
+              <Plus className="w-[18px] h-[18px]" strokeWidth={1.5} />
               Tạo Lớp học phần
             </button>
           )}
@@ -188,13 +189,13 @@ export default function TrangLopHocPhan() {
       {/* Tìm kiếm */}
       <div className="flex items-center gap-3">
         <div className="relative w-full sm:w-96">
-          <Search className="w-4 h-4 text-slate-400 dark:text-slate-500 absolute left-3 top-1/2 -translate-y-1/2" />
+          <Search className="w-4 h-4 text-[var(--muted)] absolute left-3 top-1/2 -translate-y-1/2" strokeWidth={1.5} />
           <input
             type="text"
             placeholder="Tìm theo mã hoặc tên lớp học phần..."
             value={tuKhoa}
             onChange={(e) => setTuKhoa(e.target.value)}
-            className="w-full pl-9 pr-4 py-2 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 text-slate-900 dark:text-slate-100 placeholder-slate-400 dark:placeholder-slate-500 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 shadow-sm transition-colors"
+            className="w-full pl-9 pr-4 py-2 bg-[var(--surface)] border border-[var(--border)] text-[var(--text)] placeholder-[var(--muted)] rounded-[4px] text-sm focus:outline-none focus:ring-2 focus:ring-[var(--accent)] transition-colors"
           />
         </div>
       </div>
@@ -203,69 +204,69 @@ export default function TrangLopHocPhan() {
       {isLoading ? (
         <KhungXuongThe soLuong={6} />
       ) : danhSachLop?.duLieu && danhSachLop.duLieu.length > 0 ? (
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
           {danhSachLop.duLieu.map((lop: any) => (
             <div
               key={lop.id}
-              className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl overflow-hidden shadow-sm hover:shadow-md hover:border-indigo-400/50 transition-all flex flex-col group"
+              className="bg-[var(--surface)] border border-[var(--border)] rounded-[4px] overflow-hidden hover:border-[var(--accent)] transition-colors flex flex-col group"
             >
               {/* Card Banner */}
-              <div className="bg-gradient-to-r from-indigo-600 to-violet-600 p-5 text-white">
-                <div className="flex items-start justify-between">
-                  <span className="px-2.5 py-1 bg-white/20 backdrop-blur-sm rounded-md text-xs font-mono font-bold tracking-wider uppercase">
+              <div className="bg-[var(--bg)] border-b border-[var(--border)] p-5">
+                <div className="flex items-start justify-between gap-2">
+                  <span className="px-2 py-0.5 bg-[var(--surface)] border border-[var(--border)] rounded-[4px] text-[11px] font-mono font-bold tracking-wider uppercase text-[var(--accent)]">
                     {lop.maLopHocPhan}
                   </span>
-                  <span className="inline-flex items-center gap-1 text-xs bg-emerald-500/20 text-emerald-100 border border-emerald-400/30 px-2 py-0.5 rounded-full">
-                    <span className="w-1.5 h-1.5 rounded-full bg-emerald-300 animate-pulse"></span>
+                  <span className="inline-flex items-center gap-1.5 text-[11px] font-mono font-semibold bg-[var(--accent-soft)] text-[var(--accent)] border border-[var(--border)] px-2 py-0.5 rounded-[4px]">
+                    <span className="w-1.5 h-1.5 rounded-full bg-[var(--accent)]"></span>
                     Sẵn sàng
                   </span>
                 </div>
-                <h3 className="font-bold text-lg mt-3 line-clamp-1 group-hover:text-indigo-100 transition-colors">
+                <h3 className="font-mono font-bold text-[16px] text-[var(--text)] mt-3 line-clamp-1 group-hover:text-[var(--accent)] transition-colors">
                   {lop.tenLopHocPhan}
                 </h3>
-                <p className="text-xs text-indigo-100/90 mt-1 flex items-center gap-1.5">
-                  <BookOpen className="w-3.5 h-3.5 shrink-0" />
+                <p className="text-xs text-[var(--muted)] mt-1 flex items-center gap-1.5">
+                  <BookOpen className="w-3.5 h-3.5 shrink-0 text-[var(--accent)]" strokeWidth={1.5} />
                   <span>{lop.monHoc?.tenMonHoc || 'Chưa gắn môn'}</span>
                 </p>
               </div>
 
               {/* Card Body */}
               <div className="p-5 flex-1 flex flex-col justify-between space-y-4">
-                <div className="space-y-3 text-xs text-slate-600 dark:text-slate-400">
+                <div className="space-y-3 text-xs text-[var(--muted)]">
                   <div className="flex items-center justify-between">
-                    <span className="text-slate-400 dark:text-slate-500 flex items-center gap-1">
-                      <Calendar className="w-3.5 h-3.5" /> Học kỳ:
+                    <span className="text-[var(--muted)] flex items-center gap-1.5">
+                      <Calendar className="w-3.5 h-3.5" strokeWidth={1.5} /> Học kỳ:
                     </span>
-                    <span className="font-medium text-slate-800 dark:text-slate-200">{lop.hocKy?.tenHocKy || '—'}</span>
+                    <span className="font-mono font-medium text-[var(--text)]">{lop.hocKy?.tenHocKy || '—'}</span>
                   </div>
 
                   <div className="flex items-center justify-between">
-                    <span className="text-slate-400 dark:text-slate-500 flex items-center gap-1">
-                      <Users className="w-3.5 h-3.5" /> Sĩ số:
+                    <span className="text-[var(--muted)] flex items-center gap-1.5">
+                      <Users className="w-3.5 h-3.5" strokeWidth={1.5} /> Sĩ số:
                     </span>
-                    <span className="font-semibold text-slate-800 dark:text-slate-200 bg-slate-100 dark:bg-slate-800/90 px-2 py-0.5 rounded border border-transparent dark:border-slate-700">
+                    <span className="font-mono font-semibold text-[var(--text)] bg-[var(--bg)] px-2 py-0.5 rounded-[4px] border border-[var(--border)]">
                       {lop._count?.danhSachGhiDanh || 0} học sinh
                     </span>
                   </div>
 
                   {lop.giaoVien && (
-                    <div className="pt-2 border-t border-slate-100 dark:border-slate-800 flex items-center gap-2.5">
-                      <div className="w-7 h-7 rounded-full bg-indigo-100 dark:bg-indigo-950/80 text-indigo-700 dark:text-indigo-300 border border-indigo-200/50 dark:border-indigo-800/60 font-bold flex items-center justify-center text-xs">
+                    <div className="pt-2.5 border-t border-[var(--border)] flex items-center gap-2.5">
+                      <div className="w-7 h-7 rounded-[4px] bg-[var(--accent-soft)] text-[var(--accent)] border border-[var(--border)] font-mono font-bold flex items-center justify-center text-xs">
                         {lop.giaoVien.nguoiDung.hoTen.charAt(0)}
                       </div>
                       <div className="truncate">
-                        <p className="font-medium text-slate-900 dark:text-slate-100 truncate">
+                        <p className="font-medium text-[var(--text)] truncate">
                           {lop.giaoVien.nguoiDung.hoTen}
                         </p>
-                        <p className="text-[11px] text-slate-400 dark:text-slate-500">Giáo viên phụ trách</p>
+                        <p className="text-[11px] font-mono text-[var(--muted)]">Giáo viên phụ trách</p>
                       </div>
                     </div>
                   )}
 
                   {laAdminHoacGiaoVu && lop.maThamGia && (
-                    <div className="p-2 bg-slate-50 dark:bg-slate-800/60 rounded-lg border border-slate-100 dark:border-slate-800 flex items-center justify-between">
-                      <span className="text-slate-500 dark:text-slate-400 font-mono text-[11px]">Mã mời:</span>
-                      <span className="font-mono font-bold text-indigo-600 dark:text-indigo-300 bg-white dark:bg-slate-900 px-2 py-0.5 rounded border border-slate-200 dark:border-slate-700">
+                    <div className="p-2 bg-[var(--bg)] rounded-[4px] border border-[var(--border)] flex items-center justify-between">
+                      <span className="text-[var(--muted)] font-mono text-[11px]">Mã mời:</span>
+                      <span className="font-mono font-bold text-[var(--accent)] bg-[var(--surface)] px-2 py-0.5 rounded-[4px] border border-[var(--border)]">
                         {lop.maThamGia}
                       </span>
                     </div>
@@ -275,20 +276,20 @@ export default function TrangLopHocPhan() {
                 {/* Action button */}
                 <Link
                   href={`/lop-hoc-phan/${lop.id}`}
-                  className="w-full inline-flex items-center justify-center gap-2 py-2 px-4 bg-slate-900 hover:bg-indigo-600 dark:bg-indigo-600 dark:hover:bg-indigo-500 text-white text-xs font-semibold rounded-lg transition-colors shadow-xs"
+                  className="w-full inline-flex items-center justify-center gap-2 py-[11px] px-4 bg-[var(--accent)] hover:brightness-95 text-white text-[13px] font-semibold rounded-[4px] transition-all shadow-[0_2px_8px_-2px_color-mix(in_srgb,var(--accent)_30%,transparent)]"
                 >
                   <span>Truy cập Lớp học</span>
-                  <ArrowRight className="w-3.5 h-3.5" />
+                  <ArrowRight className="w-4 h-4" strokeWidth={1.5} />
                 </Link>
               </div>
             </div>
           ))}
         </div>
       ) : (
-        <div className="text-center py-16 bg-white border border-dashed border-slate-200 rounded-2xl">
-          <Video className="w-12 h-12 text-slate-300 mx-auto mb-3" />
-          <h3 className="font-semibold text-slate-800 text-base">Chưa có lớp học phần nào</h3>
-          <p className="text-sm text-slate-400 mt-1 max-w-sm mx-auto">
+        <div className="text-center py-14 bg-[var(--surface)] border border-dashed border-[var(--border)] rounded-[4px]">
+          <Video className="w-10 h-10 text-[var(--muted)] mx-auto mb-3" strokeWidth={1.5} />
+          <h3 className="font-mono font-bold text-[var(--text)] text-[15px]">Chưa có lớp học phần nào</h3>
+          <p className="text-[13px] text-[var(--muted)] mt-1 max-w-sm mx-auto">
             {laHocSinh
               ? 'Bạn chưa được ghi danh vào lớp học phần nào. Nhấn "Tham gia bằng mã" nếu có mã mời từ giáo viên.'
               : 'Hãy bắt đầu tạo lớp học phần để phân công giảng dạy và xếp thời khóa biểu.'}
@@ -305,7 +306,7 @@ export default function TrangLopHocPhan() {
         kichThuoc="nho"
       >
         <div className="space-y-4">
-          <div className="flex items-center gap-3 p-3 bg-indigo-50/60 rounded-xl text-indigo-700">
+          <div className="flex items-center gap-3 p-3 bg-accent-soft rounded text-accent">
             <KeyRound className="w-5 h-5 shrink-0" />
             <p className="text-xs">Mã mời sẽ tự động phân bạn vào đúng lớp học phần tương ứng.</p>
           </div>
@@ -317,7 +318,7 @@ export default function TrangLopHocPhan() {
               placeholder="VD: 7KZ9A2"
               value={maThamGia}
               onChange={(e) => setMaThamGia(e.target.value.toUpperCase())}
-              className="w-full text-center text-2xl font-mono font-bold tracking-widest px-4 py-3 border border-slate-300 rounded-xl focus:ring-2 focus:ring-indigo-500 focus:outline-none uppercase"
+              className="w-full text-center text-2xl font-mono font-bold tracking-widest px-4 py-3 border border-border rounded focus:ring-2 focus:ring-accent focus:outline-none uppercase"
             />
           </div>
 
@@ -325,7 +326,7 @@ export default function TrangLopHocPhan() {
             <button
               type="button"
               onClick={() => setMoModalThamGia(false)}
-              className="px-4 py-2.5 border border-slate-300 text-slate-700 rounded-xl text-sm font-medium hover:bg-slate-50 cursor-pointer"
+              className="px-4 py-2.5 border border-border text-text rounded text-sm font-medium hover:bg-bg cursor-pointer"
             >
               Hủy
             </button>
@@ -333,7 +334,7 @@ export default function TrangLopHocPhan() {
               type="button"
               disabled={!maThamGia.trim() || thamGiaMutation.isPending}
               onClick={() => thamGiaMutation.mutate(maThamGia.trim())}
-              className="px-5 py-2.5 bg-indigo-600 hover:bg-indigo-700 text-white rounded-xl text-sm font-semibold disabled:opacity-50 cursor-pointer shadow-sm shadow-indigo-600/20"
+              className="px-5 py-2.5 bg-accent hover:bg-accent text-white rounded text-sm font-semibold disabled:opacity-50 cursor-pointer shadow-sm shadow-emerald-600/20"
             >
               {thamGiaMutation.isPending ? 'Đang xác thực...' : 'Tham gia ngay'}
             </button>
@@ -352,7 +353,7 @@ export default function TrangLopHocPhan() {
         <div className="space-y-4">
           <div className="space-y-3">
             <div>
-              <label className="block text-xs font-semibold text-slate-700 mb-1">
+              <label className="block text-xs font-semibold text-text mb-1">
                 Mã lớp học phần
               </label>
               <input
@@ -362,12 +363,12 @@ export default function TrangLopHocPhan() {
                 onChange={(e) =>
                   setFormTaoLop({ ...formTaoLop, maLopHocPhan: e.target.value.toUpperCase() })
                 }
-                className="w-full px-3.5 py-2.5 border border-slate-300 rounded-xl text-sm font-mono focus:ring-2 focus:ring-indigo-500 uppercase"
+                className="w-full px-3.5 py-2.5 border border-border rounded text-sm font-mono focus:ring-2 focus:ring-accent uppercase"
               />
             </div>
 
             <div>
-              <label className="block text-xs font-semibold text-slate-700 mb-1">
+              <label className="block text-xs font-semibold text-text mb-1">
                 Tên lớp học phần
               </label>
               <input
@@ -375,17 +376,17 @@ export default function TrangLopHocPhan() {
                 placeholder="VD: Toán 10 - Lớp nâng cao A1"
                 value={formTaoLop.tenLopHocPhan}
                 onChange={(e) => setFormTaoLop({ ...formTaoLop, tenLopHocPhan: e.target.value })}
-                className="w-full px-3.5 py-2.5 border border-slate-300 rounded-xl text-sm focus:ring-2 focus:ring-indigo-500"
+                className="w-full px-3.5 py-2.5 border border-border rounded text-sm focus:ring-2 focus:ring-accent"
               />
             </div>
 
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
               <div>
-                <label className="block text-xs font-semibold text-slate-700 mb-1">Môn học</label>
+                <label className="block text-xs font-semibold text-text mb-1">Môn học</label>
                 <select
                   value={formTaoLop.idMonHoc}
                   onChange={(e) => setFormTaoLop({ ...formTaoLop, idMonHoc: e.target.value })}
-                  className="w-full px-3.5 py-2.5 border border-slate-300 rounded-xl text-sm bg-white focus:ring-2 focus:ring-indigo-500 cursor-pointer"
+                  className="w-full px-3.5 py-2.5 border border-border rounded text-sm bg-surface focus:ring-2 focus:ring-accent cursor-pointer"
                 >
                   <option value="">-- Chọn môn học --</option>
                   {danhSachMonHoc?.map((mh: any) => (
@@ -397,11 +398,11 @@ export default function TrangLopHocPhan() {
               </div>
 
               <div>
-                <label className="block text-xs font-semibold text-slate-700 mb-1">Học kỳ</label>
+                <label className="block text-xs font-semibold text-text mb-1">Học kỳ</label>
                 <select
                   value={formTaoLop.idHocKy}
                   onChange={(e) => setFormTaoLop({ ...formTaoLop, idHocKy: e.target.value })}
-                  className="w-full px-3.5 py-2.5 border border-slate-300 rounded-xl text-sm bg-white focus:ring-2 focus:ring-indigo-500 cursor-pointer"
+                  className="w-full px-3.5 py-2.5 border border-border rounded text-sm bg-surface focus:ring-2 focus:ring-accent cursor-pointer"
                 >
                   <option value="">-- Chọn học kỳ --</option>
                   {danhSachHocKy?.map((hk: any) => (
@@ -414,13 +415,13 @@ export default function TrangLopHocPhan() {
             </div>
 
             <div>
-              <label className="block text-xs font-semibold text-slate-700 mb-1">
+              <label className="block text-xs font-semibold text-text mb-1">
                 Giáo viên phụ trách
               </label>
               <select
                 value={formTaoLop.idGiaoVien}
                 onChange={(e) => setFormTaoLop({ ...formTaoLop, idGiaoVien: e.target.value })}
-                className="w-full px-3.5 py-2.5 border border-slate-300 rounded-xl text-sm bg-white focus:ring-2 focus:ring-indigo-500 cursor-pointer"
+                className="w-full px-3.5 py-2.5 border border-border rounded text-sm bg-surface focus:ring-2 focus:ring-accent cursor-pointer"
               >
                 <option value="">-- Chọn giáo viên --</option>
                 {danhSachGiaoVien?.map((gv: any) => (
@@ -432,7 +433,7 @@ export default function TrangLopHocPhan() {
             </div>
 
             <div>
-              <label className="block text-xs font-semibold text-slate-700 mb-1">
+              <label className="block text-xs font-semibold text-text mb-1">
                 Mô tả tóm tắt
               </label>
               <textarea
@@ -440,16 +441,16 @@ export default function TrangLopHocPhan() {
                 placeholder="Mục tiêu và yêu cầu môn học..."
                 value={formTaoLop.moTa || ''}
                 onChange={(e) => setFormTaoLop({ ...formTaoLop, moTa: e.target.value })}
-                className="w-full px-3.5 py-2.5 border border-slate-300 rounded-xl text-sm focus:ring-2 focus:ring-indigo-500"
+                className="w-full px-3.5 py-2.5 border border-border rounded text-sm focus:ring-2 focus:ring-accent"
               />
             </div>
           </div>
 
-          <div className="flex justify-end gap-3 pt-3 border-t border-slate-100">
+          <div className="flex justify-end gap-3 pt-3 border-t border-border">
             <button
               type="button"
               onClick={() => setMoModalTaoLop(false)}
-              className="px-4 py-2.5 border border-slate-300 text-slate-700 rounded-xl text-sm font-medium hover:bg-slate-50 cursor-pointer"
+              className="px-4 py-2.5 border border-border text-text rounded text-sm font-medium hover:bg-bg cursor-pointer"
             >
               Hủy
             </button>
@@ -463,7 +464,7 @@ export default function TrangLopHocPhan() {
                 taoLopMutation.isPending
               }
               onClick={() => taoLopMutation.mutate(formTaoLop)}
-              className="px-5 py-2.5 bg-indigo-600 hover:bg-indigo-700 text-white rounded-xl text-sm font-semibold disabled:opacity-50 cursor-pointer shadow-sm shadow-indigo-600/20"
+              className="px-5 py-2.5 bg-accent hover:bg-accent text-white rounded text-sm font-semibold disabled:opacity-50 cursor-pointer shadow-sm shadow-emerald-600/20"
             >
               {taoLopMutation.isPending ? 'Đang tạo...' : 'Tạo lớp'}
             </button>

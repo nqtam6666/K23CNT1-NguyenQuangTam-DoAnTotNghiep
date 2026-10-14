@@ -38,6 +38,11 @@ export enum DoiTuong {
   PhuHuynhHocSinh = 'PhuHuynhHocSinh',
   TienIchBangDieuKhien = 'TienIchBangDieuKhien',
   BaoLoiDongGop = 'BaoLoiDongGop',
+  BaiKiemTra = 'BaiKiemTra',
+  CauHoi = 'CauHoi',
+  LuotLamBai = 'LuotLamBai',
+  SoDiem = 'SoDiem',
 }
 
 export type LoaiDoiTuong = `${DoiTuong}`;
+

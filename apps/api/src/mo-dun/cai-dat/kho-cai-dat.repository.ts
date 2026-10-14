@@ -7,9 +7,26 @@ export class KhoCaiDatRepository {
   constructor(private readonly prisma: PrismaService) {}
 
   async layDanhSach(): Promise<CaiDatHeThong[]> {
-    return this.prisma.caiDatHeThong.findMany({
+    const danhSach = await this.prisma.caiDatHeThong.findMany({
       orderBy: [{ nhom: 'asc' }, { khoa: 'asc' }],
     });
+    const daCoThoiGianPhien = danhSach.some((item) => item.khoa === 'THOI_GIAN_PHIEN_GIAY');
+    if (!daCoThoiGianPhien) {
+      const moi = await this.prisma.caiDatHeThong.upsert({
+        where: { khoa: 'THOI_GIAN_PHIEN_GIAY' },
+        update: {},
+        create: {
+          khoa: 'THOI_GIAN_PHIEN_GIAY',
+          giaTri: '86400',
+          nhom: 'HOC_VU',
+          moTa: 'Thời gian duy trì phiên đăng nhập tính bằng giây',
+          kieuDuLieu: 'SO',
+          congKhai: true,
+        },
+      });
+      danhSach.push(moi);
+    }
+    return danhSach;
   }
 
   async layDanhSachCongKhai(): Promise<CaiDatHeThong[]> {

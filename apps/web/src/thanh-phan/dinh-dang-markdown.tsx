@@ -148,7 +148,7 @@ export function DinhDangMarkdown({
           thead: ({ node: _node, ...props }) => (
             <thead
               className={cn(
-                laNguoiDung ? 'bg-white/10' : 'bg-muted/70 text-foreground'
+                laNguoiDung ? 'bg-surface text-text' : 'bg-muted/70 text-foreground'
               )}
               {...props}
             />
@@ -173,7 +173,7 @@ export function DinhDangMarkdown({
                 className={cn(
                   'rounded px-1.5 py-0.5 font-mono text-[11px]',
                   laNguoiDung
-                    ? 'bg-white/20 text-white border border-white/20'
+                    ? 'bg-surface text-accent border border-border'
                     : 'bg-muted/80 text-foreground border border-border/50'
                 )}
                 {...props}
@@ -215,20 +215,20 @@ function KhoiMaNguon({
   };
 
   return (
-    <div className="relative my-2.5 rounded-xl bg-neutral-900 border border-neutral-800 text-neutral-100 overflow-hidden shadow-xs">
-      <div className="flex items-center justify-between px-3 py-1.5 bg-neutral-950/70 border-b border-neutral-800/80 text-[10px] text-neutral-400 font-mono">
+    <div className="relative my-2.5 rounded bg-surface border border-border text-text overflow-hidden shadow-xs">
+      <div className="flex items-center justify-between px-3 py-1.5 bg-surface border-b border-border text-[10px] text-muted font-mono">
         <span className="uppercase font-semibold tracking-wider">
           {ngonNgu || 'code'}
         </span>
         <button
           type="button"
           onClick={saoChep}
-          className="flex items-center gap-1 hover:text-neutral-200 transition-colors px-1.5 py-0.5 rounded hover:bg-neutral-800/60"
+          className="flex items-center gap-1 hover:text-text transition-colors px-1.5 py-0.5 rounded hover:bg-surface"
         >
           {daChep ? (
             <>
-              <Check className="w-3 h-3 text-emerald-400" />
-              <span className="text-emerald-400">Đã chép</span>
+              <Check className="w-3 h-3 text-accent" />
+              <span className="text-accent">Đã chép</span>
             </>
           ) : (
             <>

@@ -3,22 +3,21 @@
 import Link from 'next/link';
 import {
   BookOpen,
-  Video,
-  Bot,
   ArrowRight,
-  Sparkles,
   Mail,
   Phone,
   School,
   BellRing,
+  Terminal,
 } from 'lucide-react';
 import { useCaiDatHeThong } from '../tien-ich/use-cai-dat';
+import { ToggleTheme } from '@/components/ui/toggle-theme';
 
 export default function TrangChu() {
   const { layGiaTri, choPhepDangKy } = useCaiDatHeThong();
 
   const tenHeThong = layGiaTri('TEN_HE_THONG', 'LMS Trường Học');
-  const khauHieu = layGiaTri('KHAU_HIEU', 'Hệ thống Quản lý Học tập Thế hệ Mới');
+  const khauHieu = layGiaTri('KHAU_HIEU', 'Hệ thống Quản lý Học tập');
   const tenTruong = layGiaTri('TEN_TRUONG', 'Trường Đại học Nguyễn Trãi');
   const tacGia = layGiaTri('TAC_GIA', 'Nguyễn Quang Tâm');
   const maLopKhoa = layGiaTri('MA_LOP_KHOA', 'K23CNT1');
@@ -27,188 +26,236 @@ export default function TrangChu() {
   const soDienThoai = layGiaTri('SO_DIEN_THOAI', '0987654321');
   const bannerTieuDe = layGiaTri(
     'BANNER_TIEU_DE',
-    'Nền tảng Học tập Toàn diện Tích hợp Phòng học LiveKit & Trợ lý AI',
+    'Cổng Quản lý Học vụ & Lớp học Trực tuyến',
   );
   const bannerMoTa = layGiaTri(
     'BANNER_MO_TA',
-    'Đồ án tốt nghiệp chuyên ngành Công nghệ Thông tin. Tối ưu hóa trải nghiệm giảng dạy trực tuyến, quản lý học vụ và hỗ trợ học tập thông minh.',
+    'Hệ thống quản lý lớp học phần, thời khóa biểu, điểm danh trực tuyến, kiểm tra đánh giá và tra cứu học liệu dành cho giảng viên và sinh viên.',
   );
   const thongBaoChung = layGiaTri('THONG_BAO_CHUNG');
   const urlLogo = layGiaTri('URL_LOGO');
 
+  const danhMucPhanHe = [
+    {
+      ma: 'MOD-01',
+      ten: 'Quản lý Học vụ & Đào tạo',
+      phamVi: 'Năm học, học kỳ, môn học, lớp hành chính, phân công giảng dạy',
+      trangThai: 'Đang vận hành',
+    },
+    {
+      ma: 'MOD-02',
+      ten: 'Không gian Lớp học phần',
+      phamVi: 'Bảng tin, bài tập, kiểm tra trắc nghiệm, sổ điểm thành phần',
+      trangThai: 'Đang vận hành',
+    },
+    {
+      ma: 'MOD-03',
+      ten: 'Phòng học Trực tuyến & Điểm danh',
+      phamVi: 'Phòng học âm thanh/hình ảnh, điểm danh mã PIN 6 số, đơn xin nghỉ phép',
+      trangThai: 'Đang vận hành',
+    },
+    {
+      ma: 'MOD-04',
+      ten: 'Tra cứu Học liệu',
+      phamVi: 'Hỏi đáp giáo trình theo ngữ cảnh lớp học kèm trích dẫn nguồn tài liệu',
+      trangThai: 'Đang vận hành',
+    },
+  ];
+
   return (
-    <div className="flex flex-col min-h-screen bg-slate-50 text-slate-900">
-      {/* Banner thông báo chung của hệ thống từ Cài đặt nếu có */}
+    <div className="flex flex-col min-h-screen bg-bg text-text">
+      {/* Thông báo hệ thống từ Cài đặt nếu có */}
       {thongBaoChung && (
-        <div className="bg-gradient-to-r from-blue-600 to-indigo-600 text-white text-xs font-medium py-2 px-4 text-center flex items-center justify-center gap-2 shadow-inner">
-          <BellRing className="w-3.5 h-3.5 shrink-0 animate-pulse" />
-          <span>{thongBaoChung}</span>
+        <div className="bg-accent-soft border-b border-border text-accent text-xs font-mono py-2 px-4 flex items-center justify-between max-w-6xl mx-auto w-full">
+          <div className="flex items-center gap-2">
+            <BellRing className="w-3.5 h-3.5 shrink-0" strokeWidth={1.5} />
+            <span>{thongBaoChung}</span>
+          </div>
+          <span className="eyebrow">THÔNG BÁO HỆ THỐNG</span>
         </div>
       )}
 
       {/* Header Điều hướng */}
-      <header className="sticky top-0 z-50 w-full border-b border-slate-200 bg-white/80 backdrop-blur-md">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
+      <header className="sticky top-0 z-50 w-full border-b border-border bg-surface">
+        <div className="max-w-6xl mx-auto px-4 sm:px-6 h-14 flex items-center justify-between">
           <div className="flex items-center gap-3">
             {urlLogo ? (
-              <div className="h-9 w-auto max-w-[150px] flex items-center justify-center">
+              <div className="h-8 w-auto max-w-[140px] flex items-center justify-center">
                 {/* eslint-disable-next-line @next/next/no-img-element */}
-                <img src={urlLogo} alt={tenHeThong} className="h-9 w-auto object-contain rounded-xl" />
+                <img src={urlLogo} alt={tenHeThong} className="h-8 w-auto object-contain rounded" />
               </div>
             ) : (
-              <div className="w-9 h-9 rounded-lg bg-blue-600 flex items-center justify-center text-white font-bold shadow-sm">
-                <BookOpen className="w-5 h-5" />
+              <div className="w-8 h-8 rounded bg-accent flex items-center justify-center text-white font-mono font-bold">
+                <BookOpen className="w-4 h-4" strokeWidth={1.5} />
               </div>
             )}
-            <div>
-              <span className="font-bold text-slate-900 text-lg tracking-tight">{tenHeThong}</span>
+            <div className="flex items-center gap-2">
+              <span className="font-mono font-bold text-text text-[15px] tracking-tight">
+                {tenHeThong}
+              </span>
               {maLopKhoa && (
-                <span className="hidden sm:inline-block ml-2 text-xs px-2 py-0.5 rounded-full bg-blue-50 text-blue-700 font-medium border border-blue-200">
+                <span className="hidden sm:inline-block text-[11px] font-mono px-2 py-0.5 rounded bg-accent-soft text-accent border border-border">
                   {maLopKhoa}
                 </span>
               )}
             </div>
           </div>
-          <div className="flex items-center gap-3">
+          <div className="flex items-center gap-2.5">
+            <ToggleTheme />
             <Link
               href="/dang-nhap"
-              className="px-4 py-2 text-sm font-medium text-slate-700 hover:text-blue-600 transition-colors"
+              className="px-3.5 py-2 text-[13px] font-semibold text-muted hover:text-text transition-colors"
             >
               Đăng nhập
             </Link>
             {choPhepDangKy && (
               <Link
                 href="/dang-ky"
-                className="px-4 py-2 text-sm font-medium text-white bg-blue-600 rounded-lg hover:bg-blue-700 transition-colors shadow-sm"
+                className="px-4 py-2 text-[13px] font-semibold text-white bg-accent rounded hover:brightness-95 transition-colors shadow-accent"
               >
-                Bắt đầu ngay
+                Đăng ký tài khoản
               </Link>
             )}
           </div>
         </div>
       </header>
 
-      {/* Hero Section */}
-      <main className="flex-1">
-        <section className="py-20 px-4 sm:px-6 lg:px-8 max-w-5xl mx-auto text-center">
-          {khauHieu && (
-            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-blue-50 text-blue-700 border border-blue-200 text-xs font-semibold mb-6">
-              <Sparkles className="w-3.5 h-3.5 text-blue-600" />
-              {khauHieu}
-            </div>
-          )}
-          <h1 className="text-4xl sm:text-5xl font-extrabold text-slate-900 tracking-tight leading-tight">
-            {bannerTieuDe}
-          </h1>
-          <p className="mt-6 text-lg text-slate-600 max-w-3xl mx-auto leading-relaxed">
-            {bannerMoTa}
-          </p>
-
-          <div className="mt-10 flex flex-wrap justify-center gap-4">
-            <Link
-              href="/dang-nhap"
-              className="inline-flex items-center gap-2 px-6 py-3 rounded-lg text-white bg-blue-600 font-medium hover:bg-blue-700 transition-all shadow-md"
-            >
-              Truy cập Hệ thống <ArrowRight className="w-4 h-4" />
-            </Link>
-            <a
-              href="http://localhost:4000/api/tai-lieu"
-              target="_blank"
-              rel="noreferrer"
-              className="inline-flex items-center gap-2 px-6 py-3 rounded-lg text-slate-700 bg-white border border-slate-200 font-medium hover:bg-slate-50 transition-all shadow-sm"
-            >
-              Tài liệu API Swagger
-            </a>
-          </div>
-        </section>
-
-        {/* Tính năng cốt lõi */}
-        <section className="py-16 bg-white border-t border-slate-200">
-          <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div className="text-center mb-12">
-              <h2 className="text-2xl font-bold text-slate-900">Tính năng Trọng tâm</h2>
-              <p className="text-slate-600 mt-2 text-sm">
-                Ba trụ cột công nghệ chính được tích hợp liền mạch
+      {/* Vùng nội dung chính căn trái kiểu cổng kỹ thuật */}
+      <main className="flex-1 max-w-6xl w-full mx-auto px-4 sm:px-6 py-10 space-y-8">
+        {/* Khối định danh hệ thống */}
+        <section className="bg-surface border border-border rounded p-6 sm:p-8">
+          <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
+            <div className="lg:col-span-8 space-y-3">
+              <p className="eyebrow">{khauHieu}</p>
+              <h1 className="text-[22px] sm:text-[24px] font-mono font-bold text-text tracking-tight">
+                {bannerTieuDe}
+              </h1>
+              <p className="text-[14px] text-muted leading-[1.65] max-w-2xl">
+                {bannerMoTa}
               </p>
+              <div className="pt-3 flex flex-wrap items-center gap-3">
+                <Link
+                  href="/dang-nhap"
+                  className="inline-flex items-center gap-2 px-5 py-[11px] rounded text-[13px] text-white bg-accent font-semibold hover:brightness-95 transition-colors shadow-accent"
+                >
+                  Truy cập Bảng điều khiển
+                  <ArrowRight className="w-4 h-4" strokeWidth={1.5} />
+                </Link>
+                <a
+                  href="http://localhost:4000/api/tai-lieu"
+                  target="_blank"
+                  rel="noreferrer"
+                  className="inline-flex items-center gap-2 px-5 py-[11px] rounded text-[13px] text-muted hover:text-text bg-bg border border-border font-semibold transition-colors"
+                >
+                  <Terminal className="w-4 h-4 text-accent" strokeWidth={1.5} />
+                  Tài liệu API
+                </a>
+              </div>
             </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-              {/* Thẻ 1: Quản lý học vụ */}
-              <div className="p-6 rounded-xl border border-slate-200 bg-slate-50/50 hover:shadow-md transition-shadow">
-                <div className="w-12 h-12 rounded-lg bg-blue-100 text-blue-600 flex items-center justify-center mb-4">
-                  <BookOpen className="w-6 h-6" />
+            <div className="lg:col-span-4 bg-bg border border-border rounded p-4 space-y-3">
+              <p className="eyebrow">THÔNG TIN ĐỊNH DANH</p>
+              <dl className="space-y-2 text-[13px]">
+                <div className="flex items-center justify-between gap-2 border-b border-border pb-2">
+                  <dt className="text-muted">Đơn vị</dt>
+                  <dd className="font-mono font-medium text-text text-right">{tenTruong}</dd>
                 </div>
-                <h3 className="text-lg font-semibold text-slate-900">Quản lý Học vụ Chuẩn mực</h3>
-                <p className="text-slate-600 text-sm mt-2 leading-relaxed">
-                  Quản lý lớp học phần, thời khóa biểu, giao bài tập, nộp bài, chấm điểm với tiêu
-                  chí rõ ràng và sổ điểm tự động.
-                </p>
-              </div>
-
-              {/* Thẻ 2: LiveKit SFU */}
-              <div className="p-6 rounded-xl border border-slate-200 bg-slate-50/50 hover:shadow-md transition-shadow">
-                <div className="w-12 h-12 rounded-lg bg-emerald-100 text-emerald-600 flex items-center justify-center mb-4">
-                  <Video className="w-6 h-6" />
+                <div className="flex items-center justify-between gap-2 border-b border-border pb-2">
+                  <dt className="text-muted">Tác giả</dt>
+                  <dd className="font-mono font-medium text-text text-right">{tacGia}</dd>
                 </div>
-                <h3 className="text-lg font-semibold text-slate-900">Lớp học Trực tuyến LiveKit</h3>
-                <p className="text-slate-600 text-sm mt-2 leading-relaxed">
-                  Phòng học ảo độ trễ thấp, chia sẻ màn hình, bảng trắng tương tác, tự động điểm
-                  danh theo thời gian thực.
-                </p>
-              </div>
-
-              {/* Thẻ 3: RAG AI */}
-              <div className="p-6 rounded-xl border border-slate-200 bg-slate-50/50 hover:shadow-md transition-shadow">
-                <div className="w-12 h-12 rounded-lg bg-indigo-100 text-indigo-600 flex items-center justify-center mb-4">
-                  <Bot className="w-6 h-6" />
+                <div className="flex items-center justify-between gap-2 border-b border-border pb-2">
+                  <dt className="text-muted">Lớp / Khóa</dt>
+                  <dd className="font-mono font-medium text-text text-right tabular-nums">{maLopKhoa}</dd>
                 </div>
-                <h3 className="text-lg font-semibold text-slate-900">Trợ lý AI Thông minh (RAG)</h3>
-                <p className="text-slate-600 text-sm mt-2 leading-relaxed">
-                  Hỏi đáp ngữ nghĩa dựa trên giáo trình bài giảng, hỗ trợ sinh đề thi, trích dẫn
-                  chính xác nguồn tài liệu lớp học.
-                </p>
-              </div>
+                <div className="flex items-center justify-between gap-2">
+                  <dt className="text-muted">Mã sinh viên</dt>
+                  <dd className="font-mono font-bold text-accent text-right tabular-nums">{mssv}</dd>
+                </div>
+              </dl>
             </div>
           </div>
         </section>
 
-        {/* Thông tin liên hệ & Đơn vị đào tạo */}
-        <section className="py-12 bg-slate-50 border-t border-slate-200">
-          <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-6 text-center md:text-left">
-              <div className="flex items-center gap-3 p-4 rounded-xl bg-white border border-slate-200">
-                <div className="w-10 h-10 rounded-lg bg-blue-50 text-blue-600 flex items-center justify-center shrink-0">
-                  <School className="w-5 h-5" />
-                </div>
-                <div className="text-left">
-                  <p className="text-xs text-slate-500 font-medium">Đơn vị đào tạo</p>
-                  <p className="text-sm font-semibold text-slate-800">{tenTruong}</p>
-                </div>
-              </div>
+        {/* Bảng danh mục phân hệ nghiệp vụ */}
+        <section className="bg-surface border border-border rounded overflow-hidden">
+          <div className="px-5 py-4 border-b border-border flex items-center justify-between gap-4">
+            <div>
+              <p className="eyebrow">CẤU TRÚC HỆ THỐNG</p>
+              <h2 className="text-[17px] font-mono font-bold text-text mt-0.5">
+                Danh mục Phân hệ Nghiệp vụ
+              </h2>
+            </div>
+            <span className="font-mono text-xs text-muted tabular-nums">
+              {danhMucPhanHe.length} phân hệ
+            </span>
+          </div>
 
-              <div className="flex items-center gap-3 p-4 rounded-xl bg-white border border-slate-200">
-                <div className="w-10 h-10 rounded-lg bg-emerald-50 text-emerald-600 flex items-center justify-center shrink-0">
-                  <Mail className="w-5 h-5" />
-                </div>
-                <div className="text-left">
-                  <p className="text-xs text-slate-500 font-medium">Hòm thư hỗ trợ</p>
-                  <a
-                    href={`mailto:${emailLienHe}`}
-                    className="text-sm font-semibold text-blue-600 hover:underline"
-                  >
-                    {emailLienHe}
-                  </a>
-                </div>
-              </div>
+          <div className="overflow-x-auto">
+            <table className="w-full text-left border-collapse">
+              <thead>
+                <tr>
+                  <th className="py-3 px-4 w-28">Mã</th>
+                  <th className="py-3 px-4">Tên phân hệ</th>
+                  <th className="py-3 px-4">Phạm vi chức năng</th>
+                  <th className="py-3 px-4 text-right w-40">Trạng thái</th>
+                </tr>
+              </thead>
+              <tbody>
+                {danhMucPhanHe.map((ph) => (
+                  <tr key={ph.ma}>
+                    <td className="py-3 px-4 font-mono text-xs text-accent font-medium tabular-nums">
+                      {ph.ma}
+                    </td>
+                    <td className="py-3 px-4 font-mono text-[13px] font-bold text-text">
+                      {ph.ten}
+                    </td>
+                    <td className="py-3 px-4 text-[13px] text-muted">
+                      {ph.phamVi}
+                    </td>
+                    <td className="py-3 px-4 text-right">
+                      <span className="inline-flex items-center gap-1.5 px-2 py-0.5 rounded bg-accent-soft text-accent font-mono text-[11px] font-medium">
+                        <span className="w-1.5 h-1.5 rounded-full bg-accent" />
+                        {ph.trangThai}
+                      </span>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        </section>
 
-              <div className="flex items-center gap-3 p-4 rounded-xl bg-white border border-slate-200">
-                <div className="w-10 h-10 rounded-lg bg-indigo-50 text-indigo-600 flex items-center justify-center shrink-0">
-                  <Phone className="w-5 h-5" />
-                </div>
-                <div className="text-left">
-                  <p className="text-xs text-slate-500 font-medium">Đường dây nóng</p>
-                  <p className="text-sm font-semibold text-slate-800">{soDienThoai}</p>
-                </div>
+        {/* Thông tin liên hệ */}
+        <section className="bg-surface border border-border rounded p-5">
+          <p className="eyebrow mb-3">LIÊN HỆ TRỰC BAN HỌC VỤ</p>
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4 text-[13px]">
+            <div className="flex items-center gap-3 p-3 rounded bg-bg border border-border">
+              <School className="w-[18px] h-[18px] text-accent shrink-0" strokeWidth={1.5} />
+              <div className="min-w-0">
+                <p className="text-xs text-muted">Cơ sở đào tạo</p>
+                <p className="font-mono font-medium text-text truncate">{tenTruong}</p>
+              </div>
+            </div>
+
+            <div className="flex items-center gap-3 p-3 rounded bg-bg border border-border">
+              <Mail className="w-[18px] h-[18px] text-accent shrink-0" strokeWidth={1.5} />
+              <div className="min-w-0">
+                <p className="text-xs text-muted">Thư điện tử hỗ trợ</p>
+                <a
+                  href={`mailto:${emailLienHe}`}
+                  className="font-mono font-medium text-accent hover:underline truncate block"
+                >
+                  {emailLienHe}
+                </a>
+              </div>
+            </div>
+
+            <div className="flex items-center gap-3 p-3 rounded bg-bg border border-border">
+              <Phone className="w-[18px] h-[18px] text-accent shrink-0" strokeWidth={1.5} />
+              <div className="min-w-0">
+                <p className="text-xs text-muted">Điện thoại trực ban</p>
+                <p className="font-mono font-medium text-text tabular-nums">{soDienThoai}</p>
               </div>
             </div>
           </div>
@@ -216,13 +263,13 @@ export default function TrangChu() {
       </main>
 
       {/* Footer */}
-      <footer className="border-t border-slate-200 bg-white py-8 text-center text-xs text-slate-500">
-        <p className="font-medium text-slate-700">
-          Đồ án Tốt nghiệp {tenHeThong} - {maLopKhoa} {tacGia} - MSSV: {mssv}
-        </p>
-        <p className="mt-1">
-          Bản quyền © 2026 {tenTruong}. Mọi quyền được bảo lưu.
-        </p>
+      <footer className="border-t border-border bg-surface py-5 px-4 text-xs text-muted">
+        <div className="max-w-6xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-2">
+          <p className="font-mono text-text">
+            {tenHeThong} — {maLopKhoa} — {tacGia} ({mssv})
+          </p>
+          <p>Bản quyền © 2026 {tenTruong}.</p>
+        </div>
       </footer>
     </div>
   );

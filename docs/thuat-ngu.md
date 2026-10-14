@@ -204,6 +204,23 @@ enum TrangThaiBaoLoi {
   DA_XU_LY
   TU_CHOI
 }
+
+enum CheDoKiemTra {
+  LUYEN_TAP
+  THI_THU
+}
+
+enum TrangThaiBaiKiemTra {
+  BAN_NHAP
+  DANG_MO
+  DA_DONG
+}
+
+enum TrangThaiLuotLam {
+  DANG_LAM
+  DA_NOP
+  DA_CHAM
+}
 ```
 
 ---

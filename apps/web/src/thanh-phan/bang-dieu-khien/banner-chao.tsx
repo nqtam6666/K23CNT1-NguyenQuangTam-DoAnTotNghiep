@@ -1,9 +1,10 @@
 'use client';
 
 import { useMemo } from 'react';
-import { Calendar, Sparkles } from 'lucide-react';
+import { Calendar, Terminal } from 'lucide-react';
 import { layNhanVaiTro, VaiTro } from '@lms/chung';
 import { useCaiDatHeThong } from '../../tien-ich/use-cai-dat';
+import { HuyHieu } from '../huy-hieu';
 
 interface Props {
   hoTen?: string;
@@ -36,38 +37,40 @@ export function BannerChao({ hoTen, vaiTro }: Props) {
   }, []);
 
   return (
-    <div className="relative overflow-hidden rounded-2xl bg-gradient-to-r from-blue-700 via-indigo-700 to-slate-900 text-white p-6 sm:p-7 shadow-xs">
-      {/* Nền hiệu ứng đồ họa tinh tế */}
-      <div className="absolute right-0 top-0 bottom-0 w-1/3 bg-radial from-white/10 to-transparent pointer-events-none" />
-
-      <div className="relative z-10 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-        <div className="space-y-1.5">
-          <div className="flex items-center gap-2">
-            <span className="text-xl sm:text-2xl font-bold tracking-tight">
-              {loiChao}, {hoTen || 'Thành viên'} 👋
-            </span>
+    <section className="rounded-[var(--radius)] bg-[var(--surface)] border border-[var(--border)] p-5 sm:p-6">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+        <div className="flex items-start gap-4 min-w-0">
+          <div className="w-[44px] h-[44px] rounded-[var(--radius)] border border-[var(--border)] bg-[var(--bg)] text-[var(--accent)] flex items-center justify-center shrink-0 mt-0.5">
+            <Terminal strokeWidth={1.5} className="w-[20px] h-[20px]" />
           </div>
 
-          <p className="text-xs sm:text-sm text-blue-100 max-w-xl leading-relaxed">
-            Chào mừng bạn đến với {tenHeThong}. Bạn đang truy cập với vai trò{' '}
-            <span className="inline-flex items-center px-2 py-0.5 rounded-md bg-white/15 text-white font-medium text-xs backdrop-blur-xs">
-              {layNhanVaiTro(vaiTro as VaiTro) || 'Người dùng'}
-            </span>
-            .
-          </p>
+          <div className="space-y-1 min-w-0">
+            <p className="eyebrow">TỔNG QUAN HỆ THỐNG</p>
+            <h1 className="font-mono text-[20px] sm:text-[22px] font-bold text-[var(--text)] tracking-tight truncate">
+              {loiChao}, {hoTen || 'Thành viên'}
+            </h1>
+            <p className="text-sm text-[var(--muted)] max-w-2xl leading-relaxed">
+              Không gian làm việc {tenHeThong}. Phân quyền hiện tại:{' '}
+              <HuyHieu loai="accent" className="ml-1">
+                {layNhanVaiTro(vaiTro as VaiTro) || 'Người dùng'}
+              </HuyHieu>
+            </p>
+          </div>
         </div>
 
         {/* Thông tin thời gian và học kỳ */}
-        <div className="flex items-center gap-3 shrink-0 self-start sm:self-auto pt-2 sm:pt-0">
-          <div className="flex items-center gap-2 px-3 py-2 rounded-xl bg-white/10 border border-white/10 backdrop-blur-xs text-xs text-blue-50">
-            <Calendar className="w-4 h-4 text-blue-200" />
-            <div className="text-right sm:text-left">
-              <p className="font-semibold capitalize text-white">{ngayHienTai}</p>
-              <p className="text-[11px] text-blue-200">Học kỳ 1 (2025-2026)</p>
+        <div className="flex items-center gap-3 shrink-0 self-start sm:self-auto">
+          <div className="flex items-center gap-3 px-3.5 py-2.5 rounded-[var(--radius)] bg-[var(--bg)] border border-[var(--border)]">
+            <Calendar strokeWidth={1.5} className="w-[18px] h-[18px] text-[var(--accent)] shrink-0" />
+            <div className="text-left">
+              <p className="font-mono text-xs font-semibold capitalize text-[var(--text)]">
+                {ngayHienTai}
+              </p>
+              <p className="font-mono text-[11px] text-[var(--muted)]">Học kỳ 1 · 2025-2026</p>
             </div>
           </div>
         </div>
       </div>
-    </div>
+    </section>
   );
 }

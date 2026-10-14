@@ -20,6 +20,7 @@ import { mayKhachApi } from '../../../tien-ich/may-khach-api';
 import { thongBao } from '../../../tien-ich/thong-bao';
 import { KhungXuong } from '../../../thanh-phan/khung-xuong';
 import { HopThoai } from '../../../thanh-phan/hop-thoai';
+import AnimatedBackground from '@/components/ui/animated-tabs';
 import {
   NamHoc,
   HocKy,
@@ -168,59 +169,78 @@ export default function TrangQuanLyHocVu() {
       {/* Header */}
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
         <div>
-          <h1 className="text-2xl font-bold tracking-tight text-slate-900">
+          <p className="eyebrow mb-1">Phân hệ đào tạo</p>
+          <h1 className="text-[22px] font-mono font-bold tracking-tight text-[var(--text)]">
             Quản lý Học vụ & Đào tạo
           </h1>
-          <p className="text-sm text-slate-500 mt-1">
+          <p className="text-[14px] text-[var(--muted)] mt-1">
             Thiết lập danh mục năm học, học kỳ, môn học và lớp hành chính của nhà trường
           </p>
         </div>
       </div>
 
       {/* Tabs */}
-      <div className="flex border-b border-slate-200">
-        <button
-          onClick={() => {
-            setTabHienTai('nam-hoc');
-            setThongBaoLoi(null);
+      <div className="flex border-b border-border gap-1 py-1">
+        <AnimatedBackground
+          defaultValue={tabHienTai}
+          onValueChange={(idTab) => {
+            if (idTab) {
+              setTabHienTai(idTab as typeof tabHienTai);
+              setThongBaoLoi(null);
+            }
           }}
-          className={`flex items-center gap-2 px-5 py-3 text-sm font-medium border-b-2 transition-colors ${
-            tabHienTai === 'nam-hoc'
-              ? 'border-indigo-600 text-indigo-600'
-              : 'border-transparent text-slate-500 hover:text-slate-700'
-          }`}
+          className="rounded bg-accent-soft "
+          transition={{ type: 'spring', bounce: 0.2, duration: 0.3 }}
         >
-          <Calendar className="w-4 h-4" />
-          Năm học & Học kỳ
-        </button>
-        <button
-          onClick={() => {
-            setTabHienTai('mon-hoc');
-            setThongBaoLoi(null);
-          }}
-          className={`flex items-center gap-2 px-5 py-3 text-sm font-medium border-b-2 transition-colors ${
-            tabHienTai === 'mon-hoc'
-              ? 'border-indigo-600 text-indigo-600'
-              : 'border-transparent text-slate-500 hover:text-slate-700'
-          }`}
-        >
-          <BookOpen className="w-4 h-4" />
-          Danh mục Môn học
-        </button>
-        <button
-          onClick={() => {
-            setTabHienTai('lop-hanh-chinh');
-            setThongBaoLoi(null);
-          }}
-          className={`flex items-center gap-2 px-5 py-3 text-sm font-medium border-b-2 transition-colors ${
-            tabHienTai === 'lop-hanh-chinh'
-              ? 'border-indigo-600 text-indigo-600'
-              : 'border-transparent text-slate-500 hover:text-slate-700'
-          }`}
-        >
-          <School className="w-4 h-4" />
-          Lớp hành chính
-        </button>
+          <button
+            data-id="nam-hoc"
+            type="button"
+            onClick={() => {
+              setTabHienTai('nam-hoc');
+              setThongBaoLoi(null);
+            }}
+            className={`flex items-center gap-2 px-5 py-2.5 text-sm font-medium border-b-2 transition-colors cursor-pointer ${
+              tabHienTai === 'nam-hoc'
+                ? 'border-accent text-accent '
+                : 'border-transparent text-muted hover:text-text '
+            }`}
+          >
+            <Calendar className="w-4 h-4" />
+            Năm học & Học kỳ
+          </button>
+          <button
+            data-id="mon-hoc"
+            type="button"
+            onClick={() => {
+              setTabHienTai('mon-hoc');
+              setThongBaoLoi(null);
+            }}
+            className={`flex items-center gap-2 px-5 py-2.5 text-sm font-medium border-b-2 transition-colors cursor-pointer ${
+              tabHienTai === 'mon-hoc'
+                ? 'border-accent text-accent '
+                : 'border-transparent text-muted hover:text-text '
+            }`}
+          >
+            <BookOpen className="w-4 h-4" />
+            Danh mục Môn học
+          </button>
+          <button
+            data-id="lop-hanh-chinh"
+            type="button"
+            onClick={() => {
+              setTabHienTai('lop-hanh-chinh');
+              setThongBaoLoi(null);
+            }}
+            className={`flex items-center gap-2 px-5 py-2.5 text-sm font-medium border-b-2 transition-colors cursor-pointer ${
+              tabHienTai === 'lop-hanh-chinh'
+                ? 'border-accent text-accent '
+                : 'border-transparent text-muted hover:text-text '
+            }`}
+          >
+            <School className="w-4 h-4" />
+            Lớp hành chính
+          </button>
+        </AnimatedBackground>
       </div>
 
       {/* TAB 1: NĂM HỌC & HỌC KỲ */}
@@ -233,7 +253,7 @@ export default function TrangQuanLyHocVu() {
                 setThongBaoLoi(null);
                 setMoModalNamHoc(true);
               }}
-              className="inline-flex items-center gap-2 px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white text-sm font-medium rounded-lg transition-colors shadow-sm"
+              className="inline-flex items-center gap-2 px-4 py-2 bg-accent hover:bg-accent text-white text-sm font-medium rounded-lg transition-colors shadow-sm"
             >
               <Plus className="w-4 h-4" />
               Thêm Năm học mới
@@ -245,9 +265,9 @@ export default function TrangQuanLyHocVu() {
               [1, 2, 3, 4].map((i) => (
                 <div
                   key={i}
-                  className="bg-white border border-slate-200 rounded-xl p-5 shadow-2xs space-y-4"
+                  className="bg-surface border border-border rounded p-5 shadow-2xs space-y-4"
                 >
-                  <div className="flex items-center justify-between pb-3 border-b border-slate-100">
+                  <div className="flex items-center justify-between pb-3 border-b border-border">
                     <div className="flex items-center gap-3">
                       <KhungXuong className="w-10 h-10 rounded-lg" />
                       <div className="space-y-1.5">
@@ -268,25 +288,25 @@ export default function TrangQuanLyHocVu() {
               danhSachNamHoc.map((nh: any) => (
                 <div
                   key={nh.id}
-                  className={`bg-white border rounded-xl p-5 shadow-sm transition-all ${
-                    nh.hienTai ? 'border-indigo-400 ring-2 ring-indigo-50' : 'border-slate-200'
+                  className={`bg-surface border rounded p-5 shadow-sm transition-all ${
+                    nh.hienTai ? 'border-accent ring-2 ring-accent' : 'border-border'
                   }`}
                 >
-                  <div className="flex items-center justify-between pb-3 border-b border-slate-100">
+                  <div className="flex items-center justify-between pb-3 border-b border-border">
                     <div className="flex items-center gap-3">
-                      <div className="w-10 h-10 rounded-lg bg-indigo-50 flex items-center justify-center text-indigo-600">
+                      <div className="w-10 h-10 rounded-lg bg-accent-soft flex items-center justify-center text-accent">
                         <Calendar className="w-5 h-5" />
                       </div>
                       <div>
-                        <h3 className="font-semibold text-slate-800 text-base">
+                        <h3 className="font-semibold text-text text-base">
                           Năm học {nh.tenNamHoc}
                         </h3>
                         {nh.hienTai ? (
-                          <span className="inline-flex items-center gap-1 text-xs text-emerald-600 font-medium mt-0.5">
+                          <span className="inline-flex items-center gap-1 text-xs text-accent font-medium mt-0.5">
                             <CheckCircle2 className="w-3.5 h-3.5" /> Năm học hiện tại
                           </span>
                         ) : (
-                          <span className="text-xs text-slate-400">Đã lưu trữ</span>
+                          <span className="text-xs text-muted">Đã lưu trữ</span>
                         )}
                       </div>
                     </div>
@@ -303,7 +323,7 @@ export default function TrangQuanLyHocVu() {
                         setThongBaoLoi(null);
                         setMoModalHocKy(true);
                       }}
-                      className="text-xs text-indigo-600 hover:text-indigo-800 font-medium px-2.5 py-1.5 bg-indigo-50 hover:bg-indigo-100 rounded-md transition-colors"
+                      className="text-xs text-accent hover:text-accent font-medium px-2.5 py-1.5 bg-accent-soft hover:bg-accent-soft rounded-md transition-colors"
                     >
                       + Thêm học kỳ
                     </button>
@@ -311,31 +331,31 @@ export default function TrangQuanLyHocVu() {
 
                   {/* Danh sách học kỳ */}
                   <div className="mt-4 space-y-2">
-                    <p className="text-xs font-semibold uppercase tracking-wider text-slate-400">
+                    <p className="text-xs font-semibold uppercase tracking-wider text-muted">
                       Danh sách học kỳ:
                     </p>
                     {nh.cacHocKy && nh.cacHocKy.length > 0 ? (
                       nh.cacHocKy.map((hk: any) => (
                         <div
                           key={hk.id}
-                          className="flex items-center justify-between p-2.5 bg-slate-50 rounded-lg border border-slate-100 text-sm"
+                          className="flex items-center justify-between p-2.5 bg-bg rounded-lg border border-border text-sm"
                         >
                           <div>
-                            <span className="font-medium text-slate-700">{hk.tenHocKy}</span>
-                            <span className="text-xs text-slate-400 ml-2">
+                            <span className="font-medium text-text">{hk.tenHocKy}</span>
+                            <span className="text-xs text-muted ml-2">
                               ({new Date(hk.ngayBatDau).toLocaleDateString('vi-VN')} -{' '}
                               {new Date(hk.ngayKetThuc).toLocaleDateString('vi-VN')})
                             </span>
                           </div>
                           {hk.hienTai && (
-                            <span className="px-2 py-0.5 text-xs bg-emerald-100 text-emerald-700 font-medium rounded-full">
+                            <span className="px-2 py-0.5 text-xs bg-accent-soft text-accent font-medium rounded-full">
                               Đang diễn ra
                             </span>
                           )}
                         </div>
                       ))
                     ) : (
-                      <p className="text-xs text-slate-400 italic">
+                      <p className="text-xs text-muted italic">
                         Chưa có học kỳ nào được cấu hình
                       </p>
                     )}
@@ -343,7 +363,7 @@ export default function TrangQuanLyHocVu() {
                 </div>
               ))
             ) : (
-              <div className="col-span-2 text-center py-12 text-slate-400">
+              <div className="col-span-2 text-center py-12 text-muted">
                 Chưa có năm học nào. Hãy nhấn &quot;Thêm Năm học mới&quot; để bắt đầu.
               </div>
             )}
@@ -356,13 +376,13 @@ export default function TrangQuanLyHocVu() {
         <div className="space-y-4">
           <div className="flex flex-col sm:flex-row items-center justify-between gap-3">
             <div className="relative w-full sm:w-80">
-              <Search className="w-4 h-4 text-slate-400 dark:text-slate-500 absolute left-3 top-1/2 -translate-y-1/2" />
+              <Search className="w-4 h-4 text-muted absolute left-3 top-1/2 -translate-y-1/2" />
               <input
                 type="text"
                 placeholder="Tìm mã hoặc tên môn học..."
                 value={tuKhoaMonHoc}
                 onChange={(e) => setTuKhoaMonHoc(e.target.value)}
-                className="w-full pl-9 pr-4 py-2 border border-slate-200 dark:border-slate-800 rounded-lg text-sm text-slate-900 dark:text-slate-100 placeholder-slate-400 dark:placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-indigo-500 bg-white dark:bg-slate-900 shadow-sm"
+                className="w-full pl-9 pr-4 py-2 border border-border rounded-lg text-sm text-text placeholder:text-muted focus:outline-none focus:ring-2 focus:ring-accent bg-surface shadow-sm"
               />
             </div>
             <button
@@ -371,16 +391,16 @@ export default function TrangQuanLyHocVu() {
                 setThongBaoLoi(null);
                 setMoModalMonHoc(true);
               }}
-              className="inline-flex items-center gap-2 px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white text-sm font-medium rounded-lg transition-colors shadow-sm"
+              className="inline-flex items-center gap-2 px-4 py-2 bg-accent hover:bg-accent text-white text-sm font-medium rounded-lg transition-colors shadow-sm"
             >
               <Plus className="w-4 h-4" />
               Thêm Môn học
             </button>
           </div>
 
-          <div className="bg-white border border-slate-200 rounded-xl overflow-hidden shadow-sm">
-            <table className="w-full text-left text-sm text-slate-600">
-              <thead className="bg-slate-50 border-b border-slate-200 text-slate-700 font-semibold">
+          <div className="bg-surface border border-border rounded overflow-hidden shadow-sm">
+            <table className="w-full text-left text-sm text-muted">
+              <thead className="bg-bg border-b border-border text-text font-semibold">
                 <tr>
                   <th className="py-3 px-4">Mã môn</th>
                   <th className="py-3 px-4">Tên môn học</th>
@@ -389,7 +409,7 @@ export default function TrangQuanLyHocVu() {
                   <th className="py-3 px-4">Mô tả</th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-slate-100">
+              <tbody className="divide-y divide-border">
                 {dangTaiMonHoc ? (
                   [1, 2, 3, 4, 5].map((i) => (
                     <tr key={i}>
@@ -402,25 +422,25 @@ export default function TrangQuanLyHocVu() {
                   ))
                 ) : ketQuaMonHoc?.duLieu && ketQuaMonHoc.duLieu.length > 0 ? (
                   ketQuaMonHoc.duLieu.map((mh: any) => (
-                    <tr key={mh.id} className="hover:bg-slate-50/80 transition-colors">
-                      <td className="py-3 px-4 font-mono font-semibold text-indigo-600 dark:text-indigo-400">
+                    <tr key={mh.id} className="hover:bg-bg transition-colors">
+                      <td className="py-3 px-4 font-mono font-semibold text-accent ">
                         {mh.maMonHoc}
                       </td>
-                      <td className="py-3 px-4 font-medium text-slate-900 dark:text-slate-100">{mh.tenMonHoc}</td>
+                      <td className="py-3 px-4 font-medium text-text ">{mh.tenMonHoc}</td>
                       <td className="py-3 px-4 text-center">{mh.soTinChi}</td>
                       <td className="py-3 px-4 text-center">
-                        <span className="px-2 py-0.5 bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 rounded text-xs font-medium border border-transparent dark:border-slate-700">
+                        <span className="px-2 py-0.5 bg-active-bg text-text rounded text-xs font-medium border border-transparent ">
                           {mh._count?.cacLopHocPhan || 0} lớp
                         </span>
                       </td>
-                      <td className="py-3 px-4 text-xs text-slate-500 max-w-xs truncate">
+                      <td className="py-3 px-4 text-xs text-muted max-w-xs truncate">
                         {mh.moTa || '—'}
                       </td>
                     </tr>
                   ))
                 ) : (
                   <tr>
-                    <td colSpan={5} className="py-10 text-center text-slate-400">
+                    <td colSpan={5} className="py-10 text-center text-muted">
                       Không tìm thấy môn học nào
                     </td>
                   </tr>
@@ -441,16 +461,16 @@ export default function TrangQuanLyHocVu() {
                 setThongBaoLoi(null);
                 setMoModalLopHanhChinh(true);
               }}
-              className="inline-flex items-center gap-2 px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white text-sm font-medium rounded-lg transition-colors shadow-sm"
+              className="inline-flex items-center gap-2 px-4 py-2 bg-accent hover:bg-accent text-white text-sm font-medium rounded-lg transition-colors shadow-sm"
             >
               <Plus className="w-4 h-4" />
               Thêm Lớp hành chính
             </button>
           </div>
 
-          <div className="bg-white border border-slate-200 rounded-xl overflow-hidden shadow-sm">
-            <table className="w-full text-left text-sm text-slate-600">
-              <thead className="bg-slate-50 border-b border-slate-200 text-slate-700 font-semibold">
+          <div className="bg-surface border border-border rounded overflow-hidden shadow-sm">
+            <table className="w-full text-left text-sm text-muted">
+              <thead className="bg-bg border-b border-border text-text font-semibold">
                 <tr>
                   <th className="py-3 px-4">Mã lớp</th>
                   <th className="py-3 px-4">Tên lớp</th>
@@ -459,7 +479,7 @@ export default function TrangQuanLyHocVu() {
                   <th className="py-3 px-4 text-center">Sĩ số học sinh</th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-slate-100">
+              <tbody className="divide-y divide-border">
                 {dangTaiLop ? (
                   [1, 2, 3, 4, 5].map((i) => (
                     <tr key={i}>
@@ -472,32 +492,32 @@ export default function TrangQuanLyHocVu() {
                   ))
                 ) : ketQuaLopHanhChinh?.duLieu && ketQuaLopHanhChinh.duLieu.length > 0 ? (
                   ketQuaLopHanhChinh.duLieu.map((lop: any) => (
-                    <tr key={lop.id} className="hover:bg-slate-50/80 transition-colors">
-                      <td className="py-3 px-4 font-mono font-semibold text-indigo-600">
+                    <tr key={lop.id} className="hover:bg-bg transition-colors">
+                      <td className="py-3 px-4 font-mono font-semibold text-accent">
                         {lop.maLop}
                       </td>
-                      <td className="py-3 px-4 font-medium text-slate-900">{lop.tenLop}</td>
+                      <td className="py-3 px-4 font-medium text-text">{lop.tenLop}</td>
                       <td className="py-3 px-4 text-center">
-                        <span className="px-2 py-0.5 bg-indigo-50 text-indigo-700 rounded text-xs font-semibold">
+                        <span className="px-2 py-0.5 bg-accent-soft text-accent rounded text-xs font-semibold">
                           Khối {lop.khoiLop}
                         </span>
                       </td>
                       <td className="py-3 px-4">
                         {lop.giaoVienChuNhiem ? (
                           <div>
-                            <p className="font-medium text-slate-800">
+                            <p className="font-medium text-text">
                               {lop.giaoVienChuNhiem.nguoiDung.hoTen}
                             </p>
-                            <p className="text-xs text-slate-400">
+                            <p className="text-xs text-muted">
                               {lop.giaoVienChuNhiem.nguoiDung.email}
                             </p>
                           </div>
                         ) : (
-                          <span className="text-xs text-slate-400 italic">Chưa phân công</span>
+                          <span className="text-xs text-muted italic">Chưa phân công</span>
                         )}
                       </td>
                       <td className="py-3 px-4 text-center">
-                        <span className="px-2.5 py-1 bg-emerald-50 text-emerald-700 rounded-full text-xs font-semibold">
+                        <span className="px-2.5 py-1 bg-accent-soft text-accent rounded-full text-xs font-semibold">
                           {lop._count?.danhSachHocSinh || 0} học sinh
                         </span>
                       </td>
@@ -505,7 +525,7 @@ export default function TrangQuanLyHocVu() {
                   ))
                 ) : (
                   <tr>
-                    <td colSpan={5} className="py-10 text-center text-slate-400">
+                    <td colSpan={5} className="py-10 text-center text-muted">
                       Chưa có lớp hành chính nào được tạo
                     </td>
                   </tr>
@@ -527,7 +547,7 @@ export default function TrangQuanLyHocVu() {
         <div className="space-y-4">
           <div className="space-y-3">
             <div>
-              <label className="block text-xs font-medium text-slate-700 mb-1">
+              <label className="block text-xs font-medium text-text mb-1">
                 Tên năm học (Định dạng YYYY-YYYY)
               </label>
               <input
@@ -535,7 +555,7 @@ export default function TrangQuanLyHocVu() {
                 placeholder="Ví dụ: 2026-2027"
                 value={formNamHoc.tenNamHoc}
                 onChange={(e) => setFormNamHoc({ ...formNamHoc, tenNamHoc: e.target.value })}
-                className="w-full px-3 py-2 border border-slate-300 rounded-lg text-sm focus:ring-2 focus:ring-indigo-500 focus:outline-none"
+                className="w-full px-3 py-2 border border-border rounded-lg text-sm focus:ring-2 focus:ring-accent focus:outline-none"
               />
             </div>
             <div className="flex items-center gap-2">
@@ -544,18 +564,18 @@ export default function TrangQuanLyHocVu() {
                 id="namHienTai"
                 checked={formNamHoc.hienTai}
                 onChange={(e) => setFormNamHoc({ ...formNamHoc, hienTai: e.target.checked })}
-                className="rounded text-indigo-600 focus:ring-indigo-500 h-4 w-4"
+                className="rounded text-accent focus:ring-accent h-4 w-4"
               />
-              <label htmlFor="namHienTai" className="text-sm text-slate-700 cursor-pointer">
+              <label htmlFor="namHienTai" className="text-sm text-text cursor-pointer">
                 Đặt làm năm học hiện tại
               </label>
             </div>
           </div>
-          <div className="flex justify-end gap-3 pt-3 border-t border-slate-100">
+          <div className="flex justify-end gap-3 pt-3 border-t border-border">
             <button
               type="button"
               onClick={() => setMoModalNamHoc(false)}
-              className="px-4 py-2 border border-slate-300 text-slate-700 rounded-lg text-sm hover:bg-slate-50 cursor-pointer"
+              className="px-4 py-2 border border-border text-text rounded-lg text-sm hover:bg-bg cursor-pointer"
             >
               Hủy
             </button>
@@ -563,7 +583,7 @@ export default function TrangQuanLyHocVu() {
               type="button"
               disabled={taoNamHocMutation.isPending}
               onClick={() => taoNamHocMutation.mutate(formNamHoc)}
-              className="px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white rounded-lg text-sm font-medium disabled:opacity-50 cursor-pointer"
+              className="px-4 py-2 bg-accent hover:bg-accent text-white rounded-lg text-sm font-medium disabled:opacity-50 cursor-pointer"
             >
               {taoNamHocMutation.isPending ? 'Đang lưu...' : 'Tạo Năm học'}
             </button>
@@ -582,36 +602,36 @@ export default function TrangQuanLyHocVu() {
         <div className="space-y-4">
           <div className="space-y-3">
             <div>
-              <label className="block text-xs font-medium text-slate-700 mb-1">Tên học kỳ</label>
+              <label className="block text-xs font-medium text-text mb-1">Tên học kỳ</label>
               <input
                 type="text"
                 placeholder="Ví dụ: Học kỳ 1"
                 value={formHocKy.tenHocKy}
                 onChange={(e) => setFormHocKy({ ...formHocKy, tenHocKy: e.target.value })}
-                className="w-full px-3 py-2 border border-slate-300 rounded-lg text-sm focus:ring-2 focus:ring-indigo-500 focus:outline-none"
+                className="w-full px-3 py-2 border border-border rounded-lg text-sm focus:ring-2 focus:ring-accent focus:outline-none"
               />
             </div>
             <div className="grid grid-cols-2 gap-3">
               <div>
-                <label className="block text-xs font-medium text-slate-700 mb-1">
+                <label className="block text-xs font-medium text-text mb-1">
                   Ngày bắt đầu
                 </label>
                 <input
                   type="date"
                   value={formHocKy.ngayBatDau}
                   onChange={(e) => setFormHocKy({ ...formHocKy, ngayBatDau: e.target.value })}
-                  className="w-full px-3 py-2 border border-slate-300 rounded-lg text-sm focus:ring-2 focus:ring-indigo-500 focus:outline-none"
+                  className="w-full px-3 py-2 border border-border rounded-lg text-sm focus:ring-2 focus:ring-accent focus:outline-none"
                 />
               </div>
               <div>
-                <label className="block text-xs font-medium text-slate-700 mb-1">
+                <label className="block text-xs font-medium text-text mb-1">
                   Ngày kết thúc
                 </label>
                 <input
                   type="date"
                   value={formHocKy.ngayKetThuc}
                   onChange={(e) => setFormHocKy({ ...formHocKy, ngayKetThuc: e.target.value })}
-                  className="w-full px-3 py-2 border border-slate-300 rounded-lg text-sm focus:ring-2 focus:ring-indigo-500 focus:outline-none"
+                  className="w-full px-3 py-2 border border-border rounded-lg text-sm focus:ring-2 focus:ring-accent focus:outline-none"
                 />
               </div>
             </div>
@@ -621,18 +641,18 @@ export default function TrangQuanLyHocVu() {
                 id="hkHienTai"
                 checked={formHocKy.hienTai}
                 onChange={(e) => setFormHocKy({ ...formHocKy, hienTai: e.target.checked })}
-                className="rounded text-indigo-600 focus:ring-indigo-500 h-4 w-4"
+                className="rounded text-accent focus:ring-accent h-4 w-4"
               />
-              <label htmlFor="hkHienTai" className="text-sm text-slate-700 cursor-pointer">
+              <label htmlFor="hkHienTai" className="text-sm text-text cursor-pointer">
                 Đang diễn ra (Học kỳ hiện tại)
               </label>
             </div>
           </div>
-          <div className="flex justify-end gap-3 pt-3 border-t border-slate-100">
+          <div className="flex justify-end gap-3 pt-3 border-t border-border">
             <button
               type="button"
               onClick={() => setMoModalHocKy(false)}
-              className="px-4 py-2 border border-slate-300 text-slate-700 rounded-lg text-sm hover:bg-slate-50 cursor-pointer"
+              className="px-4 py-2 border border-border text-text rounded-lg text-sm hover:bg-bg cursor-pointer"
             >
               Hủy
             </button>
@@ -640,7 +660,7 @@ export default function TrangQuanLyHocVu() {
               type="button"
               disabled={taoHocKyMutation.isPending}
               onClick={() => taoHocKyMutation.mutate(formHocKy)}
-              className="px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white rounded-lg text-sm font-medium disabled:opacity-50 cursor-pointer"
+              className="px-4 py-2 bg-accent hover:bg-accent text-white rounded-lg text-sm font-medium disabled:opacity-50 cursor-pointer"
             >
               {taoHocKyMutation.isPending ? 'Đang lưu...' : 'Tạo Học kỳ'}
             </button>
@@ -659,7 +679,7 @@ export default function TrangQuanLyHocVu() {
         <div className="space-y-4">
           <div className="space-y-3">
             <div>
-              <label className="block text-xs font-medium text-slate-700 mb-1">Mã môn học</label>
+              <label className="block text-xs font-medium text-text mb-1">Mã môn học</label>
               <input
                 type="text"
                 placeholder="Ví dụ: TOAN10, TINHOC11"
@@ -667,21 +687,21 @@ export default function TrangQuanLyHocVu() {
                 onChange={(e) =>
                   setFormMonHoc({ ...formMonHoc, maMonHoc: e.target.value.toUpperCase() })
                 }
-                className="w-full px-3 py-2 border border-slate-300 rounded-lg text-sm font-mono focus:ring-2 focus:ring-indigo-500 focus:outline-none uppercase"
+                className="w-full px-3 py-2 border border-border rounded-lg text-sm font-mono focus:ring-2 focus:ring-accent focus:outline-none uppercase"
               />
             </div>
             <div>
-              <label className="block text-xs font-medium text-slate-700 mb-1">Tên môn học</label>
+              <label className="block text-xs font-medium text-text mb-1">Tên môn học</label>
               <input
                 type="text"
                 placeholder="Ví dụ: Toán học 10"
                 value={formMonHoc.tenMonHoc}
                 onChange={(e) => setFormMonHoc({ ...formMonHoc, tenMonHoc: e.target.value })}
-                className="w-full px-3 py-2 border border-slate-300 rounded-lg text-sm focus:ring-2 focus:ring-indigo-500 focus:outline-none"
+                className="w-full px-3 py-2 border border-border rounded-lg text-sm focus:ring-2 focus:ring-accent focus:outline-none"
               />
             </div>
             <div>
-              <label className="block text-xs font-medium text-slate-700 mb-1">
+              <label className="block text-xs font-medium text-text mb-1">
                 Số tín chỉ / Số tiết quy đổi
               </label>
               <input
@@ -692,11 +712,11 @@ export default function TrangQuanLyHocVu() {
                 onChange={(e) =>
                   setFormMonHoc({ ...formMonHoc, soTinChi: parseInt(e.target.value) || 1 })
                 }
-                className="w-full px-3 py-2 border border-slate-300 rounded-lg text-sm focus:ring-2 focus:ring-indigo-500 focus:outline-none"
+                className="w-full px-3 py-2 border border-border rounded-lg text-sm focus:ring-2 focus:ring-accent focus:outline-none"
               />
             </div>
             <div>
-              <label className="block text-xs font-medium text-slate-700 mb-1">
+              <label className="block text-xs font-medium text-text mb-1">
                 Mô tả môn học
               </label>
               <textarea
@@ -704,15 +724,15 @@ export default function TrangQuanLyHocVu() {
                 placeholder="Mô tả tóm tắt nội dung môn học..."
                 value={formMonHoc.moTa || ''}
                 onChange={(e) => setFormMonHoc({ ...formMonHoc, moTa: e.target.value })}
-                className="w-full px-3 py-2 border border-slate-300 rounded-lg text-sm focus:ring-2 focus:ring-indigo-500 focus:outline-none"
+                className="w-full px-3 py-2 border border-border rounded-lg text-sm focus:ring-2 focus:ring-accent focus:outline-none"
               />
             </div>
           </div>
-          <div className="flex justify-end gap-3 pt-3 border-t border-slate-100">
+          <div className="flex justify-end gap-3 pt-3 border-t border-border">
             <button
               type="button"
               onClick={() => setMoModalMonHoc(false)}
-              className="px-4 py-2 border border-slate-300 text-slate-700 rounded-lg text-sm hover:bg-slate-50 cursor-pointer"
+              className="px-4 py-2 border border-border text-text rounded-lg text-sm hover:bg-bg cursor-pointer"
             >
               Hủy
             </button>
@@ -720,7 +740,7 @@ export default function TrangQuanLyHocVu() {
               type="button"
               disabled={taoMonHocMutation.isPending}
               onClick={() => taoMonHocMutation.mutate(formMonHoc)}
-              className="px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white rounded-lg text-sm font-medium disabled:opacity-50 cursor-pointer"
+              className="px-4 py-2 bg-accent hover:bg-accent text-white rounded-lg text-sm font-medium disabled:opacity-50 cursor-pointer"
             >
               {taoMonHocMutation.isPending ? 'Đang lưu...' : 'Tạo Môn học'}
             </button>
@@ -739,7 +759,7 @@ export default function TrangQuanLyHocVu() {
         <div className="space-y-4">
           <div className="space-y-3">
             <div>
-              <label className="block text-xs font-medium text-slate-700 mb-1">Mã lớp</label>
+              <label className="block text-xs font-medium text-text mb-1">Mã lớp</label>
               <input
                 type="text"
                 placeholder="Ví dụ: 10A1, 11B2"
@@ -750,11 +770,11 @@ export default function TrangQuanLyHocVu() {
                     maLop: e.target.value.toUpperCase(),
                   })
                 }
-                className="w-full px-3 py-2 border border-slate-300 rounded-lg text-sm font-mono focus:ring-2 focus:ring-indigo-500 focus:outline-none uppercase"
+                className="w-full px-3 py-2 border border-border rounded-lg text-sm font-mono focus:ring-2 focus:ring-accent focus:outline-none uppercase"
               />
             </div>
             <div>
-              <label className="block text-xs font-medium text-slate-700 mb-1">Tên lớp</label>
+              <label className="block text-xs font-medium text-text mb-1">Tên lớp</label>
               <input
                 type="text"
                 placeholder="Ví dụ: Lớp 10A1 Chuyên Toán"
@@ -762,11 +782,11 @@ export default function TrangQuanLyHocVu() {
                 onChange={(e) =>
                   setFormLopHanhChinh({ ...formLopHanhChinh, tenLop: e.target.value })
                 }
-                className="w-full px-3 py-2 border border-slate-300 rounded-lg text-sm focus:ring-2 focus:ring-indigo-500 focus:outline-none"
+                className="w-full px-3 py-2 border border-border rounded-lg text-sm focus:ring-2 focus:ring-accent focus:outline-none"
               />
             </div>
             <div>
-              <label className="block text-xs font-medium text-slate-700 mb-1">Khối lớp</label>
+              <label className="block text-xs font-medium text-text mb-1">Khối lớp</label>
               <select
                 value={formLopHanhChinh.khoiLop}
                 onChange={(e) =>
@@ -775,7 +795,7 @@ export default function TrangQuanLyHocVu() {
                     khoiLop: parseInt(e.target.value) || 10,
                   })
                 }
-                className="w-full px-3 py-2 border border-slate-300 rounded-lg text-sm focus:ring-2 focus:ring-indigo-500 focus:outline-none bg-white"
+                className="w-full px-3 py-2 border border-border rounded-lg text-sm focus:ring-2 focus:ring-accent focus:outline-none bg-surface"
               >
                 <option value={10}>Khối 10</option>
                 <option value={11}>Khối 11</option>
@@ -783,11 +803,11 @@ export default function TrangQuanLyHocVu() {
               </select>
             </div>
           </div>
-          <div className="flex justify-end gap-3 pt-3 border-t border-slate-100">
+          <div className="flex justify-end gap-3 pt-3 border-t border-border">
             <button
               type="button"
               onClick={() => setMoModalLopHanhChinh(false)}
-              className="px-4 py-2 border border-slate-300 text-slate-700 rounded-lg text-sm hover:bg-slate-50 cursor-pointer"
+              className="px-4 py-2 border border-border text-text rounded-lg text-sm hover:bg-bg cursor-pointer"
             >
               Hủy
             </button>
@@ -795,7 +815,7 @@ export default function TrangQuanLyHocVu() {
               type="button"
               disabled={taoLopMutation.isPending}
               onClick={() => taoLopMutation.mutate(formLopHanhChinh)}
-              className="px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white rounded-lg text-sm font-medium disabled:opacity-50 cursor-pointer"
+              className="px-4 py-2 bg-accent hover:bg-accent text-white rounded-lg text-sm font-medium disabled:opacity-50 cursor-pointer"
             >
               {taoLopMutation.isPending ? 'Đang lưu...' : 'Tạo Lớp'}
             </button>

@@ -1,37 +1,66 @@
 'use client';
 
-import { motion } from 'framer-motion';
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
+import { Sun, Moon } from 'lucide-react';
 import { cn } from '../lib/utils';
 
 interface ThuocTinhNutChuyenGiaoDien {
   isDark?: boolean;
   onToggle?: () => void;
   className?: string;
+  hienThiNhan?: boolean;
   title?: string;
   'aria-label'?: string;
 }
 
 /**
- * Nút chuyển đổi Chế độ Sáng / Tối (ThemeToggleButton2)
- * Sử dụng Framer Motion biến đổi mượt mà giữa Mặt trời (các tia sáng xoay & thu nhỏ)
- * và Mặt trăng lưỡi liềm (dùng clipPath SVG dịch chuyển tạo vết khuyết).
+ * Thành phần <x-theme-toggle> (Chế độ Sáng / Tối)
+ * - Lưu lựa chọn vào localStorage bọc try/catch
+ * - Mặc định theo hệ thống (prefers-color-scheme: dark)
+ * - Hỗ trợ cả tự quản lý state hoặc truyền qua props từ Layout
  */
 export const ThemeToggleButton2 = ({
   isDark: isDarkProp,
   onToggle,
   className = '',
+  hienThiNhan = false,
   title,
   'aria-label': ariaLabel = 'Chuyển đổi giao diện sáng tối',
 }: ThuocTinhNutChuyenGiaoDien) => {
   const [internalDark, setInternalDark] = useState(false);
+
+  useEffect(() => {
+    if (isDarkProp !== undefined) return;
+    try {
+      const luuTru = localStorage.getItem('lms_theme');
+      const heThongToi = window.matchMedia('(prefers-color-scheme: dark)').matches;
+      const laToi = luuTru === 'toi' || luuTru === 'dark' || (!luuTru && heThongToi);
+      setInternalDark(laToi);
+    } catch {
+      // Bỏ qua lỗi truy cập localStorage
+    }
+  }, [isDarkProp]);
+
   const isDark = isDarkProp !== undefined ? isDarkProp : internalDark;
 
   const handleClick = () => {
     if (onToggle) {
       onToggle();
+      return;
+    }
+    const tiepTheo = !internalDark;
+    setInternalDark(tiepTheo);
+    if (tiepTheo) {
+      document.documentElement.classList.add('dark');
+      document.documentElement.setAttribute('data-theme', 'dark');
     } else {
-      setInternalDark(!internalDark);
+      document.documentElement.classList.remove('dark');
+      document.documentElement.setAttribute('data-theme', 'light');
+    }
+    try {
+      localStorage.setItem('lms_theme', tiepTheo ? 'toi' : 'sang');
+    } catch {
+      // Bỏ qua lỗi ghi localStorage
     }
   };
 
@@ -39,60 +68,20 @@ export const ThemeToggleButton2 = ({
     <button
       type="button"
       data-testid="nut-che-do-sang-toi"
-      title={
-        title ||
-        (isDark ? 'Chuyển sang Chế độ sáng' : 'Chuyển sang Chế độ tối')
-      }
+      title={title || (isDark ? 'Chuyển sang giao diện Sáng' : 'Chuyển sang giao diện Tối')}
       aria-label={ariaLabel}
+      onClick={handleClick}
       className={cn(
-        'group relative flex items-center justify-center p-2 rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 hover:bg-slate-100 dark:bg-slate-800/80 dark:hover:bg-slate-800 text-slate-700 dark:text-slate-200 transition-all duration-300 active:scale-90 cursor-pointer shadow-2xs focus:outline-none focus:ring-2 focus:ring-blue-500/20',
+        'inline-flex items-center justify-center gap-2 px-2.5 py-1.5 rounded-[var(--radius)] border border-[var(--border)] bg-[var(--surface)] hover:bg-[var(--active-bg)] text-[var(--muted)] hover:text-[var(--text)] font-mono text-xs transition-colors cursor-pointer',
         className,
       )}
-      onClick={handleClick}
     >
-      <svg
-        xmlns="http://www.w3.org/2000/svg"
-        aria-hidden="true"
-        fill="currentColor"
-        strokeLinecap="round"
-        viewBox="0 0 32 32"
-        className="w-4 h-4 transition-colors group-hover:text-indigo-600 dark:group-hover:text-amber-400"
-      >
-        <clipPath id="skiper-btn-2">
-          <motion.path
-            animate={{ y: isDark ? 10 : 0, x: isDark ? -12 : 0 }}
-            transition={{ ease: 'easeInOut', duration: 0.35 }}
-            d="M0-5h30a1 1 0 0 0 9 13v24H0Z"
-          />
-        </clipPath>
-        <g clipPath="url(#skiper-btn-2)">
-          <motion.circle
-            animate={{ r: isDark ? 10 : 8 }}
-            transition={{ ease: 'easeInOut', duration: 0.35 }}
-            cx="16"
-            cy="16"
-          />
-          <motion.g
-            animate={{
-              rotate: isDark ? -100 : 0,
-              scale: isDark ? 0.5 : 1,
-              opacity: isDark ? 0 : 1,
-            }}
-            transition={{ ease: 'easeInOut', duration: 0.35 }}
-            stroke="currentColor"
-            strokeWidth="1.5"
-          >
-            <path d="M16 5.5v-4" />
-            <path d="M16 30.5v-4" />
-            <path d="M1.5 16h4" />
-            <path d="M26.5 16h4" />
-            <path d="m23.4 8.6 2.8-2.8" />
-            <path d="m5.7 26.3 2.9-2.9" />
-            <path d="m5.8 5.8 2.8 2.8" />
-            <path d="m23.4 23.4 2.9 2.9" />
-          </motion.g>
-        </g>
-      </svg>
+      {isDark ? (
+        <Moon className="w-[18px] h-[18px] stroke-[1.5] text-[var(--accent)] shrink-0" />
+      ) : (
+        <Sun className="w-[18px] h-[18px] stroke-[1.5] text-[var(--accent)] shrink-0" />
+      )}
+      {hienThiNhan && <span>{isDark ? 'Tối' : 'Sáng'}</span>}
     </button>
   );
 };
@@ -103,3 +92,5 @@ export {
   AnimatedThemeToggler,
   AnimatedThemeTogglerDemo,
 } from '@/registry/magicui/animated-theme-toggler';
+
+export { ToggleTheme } from '@/components/ui/toggle-theme';

@@ -9,8 +9,8 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 const ThanhPhanPhongHocLiveKit = dynamic(() => import('./thanh-phan-phong-hoc'), {
   ssr: false,
   loading: () => (
-    <div className="h-full w-full flex flex-col items-center justify-center space-y-3 bg-slate-950 text-slate-400">
-      <Loader2 className="w-8 h-8 animate-spin text-blue-500" />
+    <div className="h-full w-full flex flex-col items-center justify-center space-y-3 bg-surface text-muted">
+      <Loader2 className="w-8 h-8 animate-spin text-accent" />
       <p className="text-sm font-medium">Đang tải giao diện phòng học LiveKit...</p>
     </div>
   ),
@@ -110,12 +110,12 @@ export default function TrangPhongHocTrucTuyen({ params }: { params: Promise<{ i
   if (dangTaiLop || dangCapToken) {
     return (
       <div className="min-h-[80vh] flex flex-col items-center justify-center space-y-4">
-        <Loader2 className="w-10 h-10 animate-spin text-blue-600" />
+        <Loader2 className="w-10 h-10 animate-spin text-accent" />
         <div className="text-center">
-          <p className="text-base font-semibold text-slate-800">
+          <p className="text-base font-semibold text-text">
             Đang khởi tạo kết nối Phòng học trực tuyến...
           </p>
-          <p className="text-xs text-slate-500 mt-1">
+          <p className="text-xs text-muted mt-1">
             Đang xác thực thông tin thành viên và thiết lập đường truyền an toàn...
           </p>
         </div>
@@ -131,24 +131,24 @@ export default function TrangPhongHocTrucTuyen({ params }: { params: Promise<{ i
       'Bạn không có quyền tham gia phòng học trực tuyến của lớp này. Vui lòng kiểm tra lại tài khoản hoặc liên hệ giảng viên.';
 
     return (
-      <div className="max-w-md mx-auto my-16 p-8 bg-white rounded-2xl shadow-sm border border-slate-200 text-center space-y-5">
-        <div className="w-16 h-16 bg-rose-50 text-rose-600 rounded-full flex items-center justify-center mx-auto">
+      <div className="max-w-md mx-auto my-16 p-8 bg-surface rounded shadow-sm border border-border text-center space-y-5">
+        <div className="w-16 h-16 bg-danger-soft text-danger rounded-full flex items-center justify-center mx-auto">
           <ShieldAlert className="w-8 h-8" />
         </div>
         <div>
-          <h3 className="text-lg font-bold text-slate-900">Truy cập phòng học bị từ chối</h3>
-          <p className="text-sm text-slate-600 mt-2 leading-relaxed">{thongDiepLoi}</p>
+          <h3 className="text-lg font-bold text-text">Truy cập phòng học bị từ chối</h3>
+          <p className="text-sm text-muted mt-2 leading-relaxed">{thongDiepLoi}</p>
         </div>
         <div className="pt-2 flex flex-col gap-2">
           <button
             onClick={() => layLaiToken()}
-            className="w-full px-4 py-2.5 bg-blue-600 hover:bg-blue-700 text-white rounded-xl text-sm font-semibold transition-colors shadow-sm"
+            className="w-full px-4 py-2.5 bg-accent hover:bg-accent text-white rounded text-sm font-semibold transition-colors shadow-sm"
           >
             Thử lại kết nối
           </button>
           <Link
             href={`/lop-hoc-phan/${id}`}
-            className="w-full px-4 py-2.5 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-xl text-sm font-medium transition-colors"
+            className="w-full px-4 py-2.5 bg-active-bg hover:bg-active-bg text-text rounded text-sm font-medium transition-colors"
           >
             Quay lại thông tin lớp học
           </Link>
@@ -158,13 +158,13 @@ export default function TrangPhongHocTrucTuyen({ params }: { params: Promise<{ i
   }
 
   return (
-    <div className="flex flex-col h-[calc(100vh-5rem)] bg-slate-950 text-slate-100 rounded-2xl overflow-hidden shadow-2xl border border-slate-800">
+    <div className="flex flex-col h-[calc(100vh-5rem)] bg-surface text-text rounded overflow-hidden border border-border">
       {/* THANH ĐIỀU KHIỂN ĐẦU PHÒNG HỌC */}
-      <header className="px-5 py-3 bg-slate-900/90 border-b border-slate-800 flex items-center justify-between gap-4 backdrop-blur-md z-20">
+      <header className="px-5 py-3 bg-surface border-b border-border flex items-center justify-between gap-4 z-20">
         <div className="flex items-center gap-3 min-w-0">
           <button
             onClick={xuLyRoiPhong}
-            className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-slate-800 hover:bg-slate-700 text-slate-300 hover:text-white rounded-lg text-xs font-medium transition-colors"
+            className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-surface hover:bg-active-bg text-muted hover:text-text rounded-lg text-xs font-medium transition-colors"
             title="Quay lại lớp học"
           >
             <ArrowLeft className="w-4 h-4" />
@@ -173,16 +173,16 @@ export default function TrangPhongHocTrucTuyen({ params }: { params: Promise<{ i
 
           <div className="min-w-0">
             <div className="flex items-center gap-2">
-              <h2 className="font-bold text-sm sm:text-base text-white truncate">
+              <h2 className="font-bold text-sm sm:text-base text-text truncate">
                 {lopHocPhan?.tenLopHocPhan || 'Lớp học phần'}
               </h2>
-              <span className="inline-flex items-center gap-1.5 px-2 py-0.5 rounded-full text-[11px] font-semibold bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">
-                <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
+              <span className="inline-flex items-center gap-1.5 px-2 py-0.5 rounded-full text-[11px] font-semibold bg-accent/10 text-accent border border-accent">
+                <span className="w-2 h-2 rounded-full bg-accent-soft animate-pulse" />
                 Trực tiếp
               </span>
             </div>
-            <p className="text-xs text-slate-400 truncate hidden sm:block">
-              Mã phòng: <span className="font-mono text-slate-300">{duLieuToken.tenPhong}</span>
+            <p className="text-xs text-muted truncate hidden sm:block">
+              Mã phòng: <span className="font-mono text-muted">{duLieuToken.tenPhong}</span>
             </p>
           </div>
         </div>
@@ -190,10 +190,10 @@ export default function TrangPhongHocTrucTuyen({ params }: { params: Promise<{ i
         {/* Thông tin vai trò & Tiện ích */}
         <div className="flex items-center gap-2 sm:gap-3 shrink-0">
           <div className="text-right hidden md:block">
-            <span className="text-xs text-slate-400">Tham gia với vai trò:</span>
-            <p className="text-xs font-semibold text-blue-400">
+            <span className="text-xs text-muted">Tham gia với vai trò:</span>
+            <p className="text-xs font-semibold text-accent">
               {duLieuToken.vaiTroTrongPhong === 'CHU_TRI'
-                ? '⭐ Chủ trì (Host / Giáo viên)'
+                ? 'Chủ trì (Giáo viên)'
                 : 'Học sinh (Thành viên)'}
             </p>
           </div>
@@ -202,8 +202,8 @@ export default function TrangPhongHocTrucTuyen({ params }: { params: Promise<{ i
             onClick={() => setMoNhatKy(!moNhatKy)}
             className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold transition-colors border ${
               moNhatKy
-                ? 'bg-blue-600 text-white border-blue-500'
-                : 'bg-slate-800 text-slate-300 border-slate-700 hover:bg-slate-700'
+                ? 'bg-accent text-white border-accent'
+                : 'bg-surface text-muted border-border hover:bg-active-bg hover:text-text'
             }`}
           >
             <Users className="w-4 h-4" />
@@ -225,15 +225,15 @@ export default function TrangPhongHocTrucTuyen({ params }: { params: Promise<{ i
 
         {/* SIDEBAR NHẬT KÝ ĐIỂM DANH */}
         {moNhatKy && (
-          <aside className="w-80 sm:w-96 bg-slate-900 border-l border-slate-800 flex flex-col h-full z-10">
-            <div className="p-4 border-b border-slate-800 flex items-center justify-between">
-              <h3 className="font-bold text-sm text-white flex items-center gap-2">
-                <Users className="w-4 h-4 text-blue-400" />
+          <aside className="w-80 sm:w-96 bg-surface border-l border-border flex flex-col h-full z-10">
+            <div className="p-4 border-b border-border flex items-center justify-between">
+              <h3 className="font-bold text-sm text-text flex items-center gap-2">
+                <Users className="w-4 h-4 text-accent" />
                 Nhật ký có mặt & Điểm danh
               </h3>
               <button
                 onClick={() => setMoNhatKy(false)}
-                className="text-slate-400 hover:text-white text-xs"
+                className="text-muted hover:text-text text-xs"
               >
                 Đóng
               </button>
@@ -241,62 +241,62 @@ export default function TrangPhongHocTrucTuyen({ params }: { params: Promise<{ i
 
             <div className="flex-1 overflow-y-auto p-4 space-y-4 text-xs">
               <div>
-                <p className="text-slate-400 font-medium mb-2">Thành viên có mặt gần nhất:</p>
+                <p className="text-muted font-medium mb-2">Thành viên có mặt gần nhất:</p>
                 {baoCaoDiemDanh?.danhSachNhatKy && baoCaoDiemDanh.danhSachNhatKy.length > 0 ? (
                   <div className="space-y-2">
                     {baoCaoDiemDanh.danhSachNhatKy.map((nk: any) => (
                       <div
                         key={nk.id}
-                        className="p-2.5 rounded-lg bg-slate-800/60 border border-slate-700/60 flex items-center justify-between"
+                        className="p-2.5 rounded-lg bg-surface border border-border flex items-center justify-between"
                       >
                         <div>
-                          <p className="font-semibold text-slate-200">
+                          <p className="font-semibold text-text">
                             {nk.idNguoiDung === nguoiDungHienTai?.id
                               ? `${nguoiDungHienTai?.hoTen} (Bạn)`
                               : nk.idNguoiDung}
                           </p>
-                          <span className="text-[11px] text-slate-400">
+                          <span className="text-[11px] text-muted">
                             Vào lúc: {new Date(nk.thoiGianVao).toLocaleTimeString('vi-VN')}
                           </span>
                         </div>
-                        <span className="px-2 py-0.5 rounded text-[10px] font-semibold bg-emerald-500/20 text-emerald-400 border border-emerald-500/30">
+                        <span className="px-2 py-0.5 rounded text-[10px] font-semibold bg-accent/20 text-accent border border-accent">
                           {nk.thoiGianRa ? 'Đã rời' : 'Đang trong phòng'}
                         </span>
                       </div>
                     ))}
                   </div>
                 ) : (
-                  <div className="p-4 rounded-lg bg-slate-800/40 border border-slate-800 text-center text-slate-400">
+                  <div className="p-4 rounded-lg bg-surface border border-border text-center text-muted">
                     Chưa có nhật ký tham gia được ghi nhận
                   </div>
                 )}
               </div>
 
               <div>
-                <p className="text-slate-400 font-medium mb-2">Danh sách điểm danh tự động:</p>
+                <p className="text-muted font-medium mb-2">Danh sách điểm danh tự động:</p>
                 {baoCaoDiemDanh?.danhSachDiemDanh && baoCaoDiemDanh.danhSachDiemDanh.length > 0 ? (
                   <div className="space-y-2">
                     {baoCaoDiemDanh.danhSachDiemDanh.map((dd: any) => (
                       <div
                         key={dd.id}
-                        className="p-2.5 rounded-lg bg-slate-800/60 border border-slate-700/60 flex items-center justify-between"
+                        className="p-2.5 rounded-lg bg-surface border border-border flex items-center justify-between"
                       >
                         <div>
-                          <p className="font-semibold text-slate-200">
+                          <p className="font-semibold text-text">
                             {dd.hocSinh?.nguoiDung?.hoTen || 'Học sinh'}
                           </p>
-                          <p className="text-[11px] text-slate-400 font-mono">
+                          <p className="text-[11px] text-muted font-mono">
                             {dd.hocSinh?.maHocSinh}
                           </p>
                         </div>
-                        <span className="px-2 py-0.5 rounded text-[10px] font-semibold bg-blue-500/20 text-blue-400 border border-blue-500/30">
+                        <span className="px-2 py-0.5 rounded text-[10px] font-semibold bg-accent/20 text-accent border border-accent">
                           {dd.trangThai === 'CO_MAT' ? 'Có mặt' : dd.trangThai}
                         </span>
                       </div>
                     ))}
                   </div>
                 ) : (
-                  <p className="text-slate-500 text-center py-2">Chưa có bản ghi điểm danh</p>
+                  <p className="text-muted text-center py-2">Chưa có bản ghi điểm danh</p>
                 )}
               </div>
             </div>

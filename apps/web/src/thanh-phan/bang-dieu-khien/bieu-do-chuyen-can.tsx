@@ -9,6 +9,9 @@ import {
   CartesianGrid,
   Tooltip,
 } from 'recharts';
+import { TrendingUp } from 'lucide-react';
+import { TheKhung } from '../the-khung';
+import { HuyHieu } from '../huy-hieu';
 
 interface Props {
   tieuDe?: string;
@@ -21,39 +24,33 @@ export function BieuDoChuyenCan({ tieuDe = 'Tỷ lệ chuyên cần 7 ngày gầ
   }
 
   return (
-    <div className="p-5 sm:p-6 rounded-2xl bg-white border border-slate-200/80 shadow-2xs">
-      <div className="flex items-center justify-between mb-4">
-        <div>
-          <h3 className="font-bold text-slate-900 text-sm sm:text-base">{tieuDe}</h3>
-          <p className="text-xs text-slate-500 mt-0.5">Theo dõi tỷ lệ sinh viên có mặt theo ngày</p>
-        </div>
-        <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-medium bg-emerald-50 text-emerald-700 border border-emerald-100">
-          <span className="w-1.5 h-1.5 rounded-full bg-emerald-500" />
-          Dữ liệu thời gian thực
-        </span>
-      </div>
-
+    <TheKhung
+      icon={TrendingUp}
+      eyebrow="THỐNG KÊ CHUYÊN CẦN"
+      tieuDe={tieuDe}
+      moTa="Theo dõi tỷ lệ sinh viên có mặt theo ngày"
+      hanhDong={
+        <HuyHieu loai="accent">
+          <span className="w-1.5 h-1.5 rounded-full bg-[var(--accent)]" />
+          Thời gian thực
+        </HuyHieu>
+      }
+    >
       <div className="h-64 sm:h-72 w-full">
         <ResponsiveContainer width="100%" height="100%">
           <AreaChart data={duLieu} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
-            <defs>
-              <linearGradient id="gradientChuyenCan" x1="0" y1="0" x2="0" y2="1">
-                <stop offset="5%" stopColor="#2563eb" stopOpacity={0.25} />
-                <stop offset="95%" stopColor="#2563eb" stopOpacity={0.0} />
-              </linearGradient>
-            </defs>
-            <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#f1f5f9" />
+            <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="var(--border)" />
             <XAxis
               dataKey="ngay"
               tickLine={false}
               axisLine={false}
-              tick={{ fontSize: 12, fill: '#64748b' }}
+              tick={{ fontSize: 11, fill: 'var(--muted)', fontFamily: 'var(--font-mono)' }}
             />
             <YAxis
               domain={[0, 100]}
               tickLine={false}
               axisLine={false}
-              tick={{ fontSize: 12, fill: '#64748b' }}
+              tick={{ fontSize: 11, fill: 'var(--muted)', fontFamily: 'var(--font-mono)' }}
               tickFormatter={(val) => `${val}%`}
             />
             <Tooltip
@@ -61,13 +58,13 @@ export function BieuDoChuyenCan({ tieuDe = 'Tỷ lệ chuyên cần 7 ngày gầ
                 if (active && payload && payload.length) {
                   const item = payload[0].payload;
                   return (
-                    <div className="bg-slate-900 text-white text-xs rounded-xl p-3 shadow-xl">
-                      <p className="font-semibold text-slate-200">Ngày {item.ngay}</p>
-                      <p className="mt-1 text-blue-300 font-bold text-sm">
+                    <div className="bg-[var(--surface)] text-[var(--text)] border border-[var(--border)] rounded-[var(--radius)] p-3 text-xs">
+                      <p className="font-mono font-semibold text-[var(--muted)]">Ngày {item.ngay}</p>
+                      <p className="mt-1 font-mono text-[var(--accent)] font-bold text-sm">
                         Tỷ lệ: {item.tyLe}%
                       </p>
                       {item.tongSo !== undefined && (
-                        <p className="text-[11px] text-slate-300">
+                        <p className="font-mono text-[11px] text-[var(--muted)] mt-0.5">
                           Có mặt: {item.coMat}/{item.tongSo} sinh viên
                         </p>
                       )}
@@ -80,16 +77,16 @@ export function BieuDoChuyenCan({ tieuDe = 'Tỷ lệ chuyên cần 7 ngày gầ
             <Area
               type="monotone"
               dataKey="tyLe"
-              stroke="#2563eb"
-              strokeWidth={2.5}
+              stroke="var(--accent)"
+              strokeWidth={2}
               fillOpacity={1}
-              fill="url(#gradientChuyenCan)"
-              dot={{ r: 3, fill: '#2563eb', strokeWidth: 2, stroke: '#fff' }}
-              activeDot={{ r: 5, fill: '#1d4ed8' }}
+              fill="var(--accent-soft)"
+              dot={{ r: 3, fill: 'var(--accent)', strokeWidth: 1.5, stroke: 'var(--surface)' }}
+              activeDot={{ r: 5, fill: 'var(--accent)' }}
             />
           </AreaChart>
         </ResponsiveContainer>
       </div>
-    </div>
+    </TheKhung>
   );
 }

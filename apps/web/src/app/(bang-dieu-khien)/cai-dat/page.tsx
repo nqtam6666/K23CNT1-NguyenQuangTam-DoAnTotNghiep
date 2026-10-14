@@ -26,6 +26,7 @@ import { thongBao } from '../../../tien-ich/thong-bao';
 import { CaiDatHeThong } from '@lms/chung';
 import { KhungXuong } from '../../../thanh-phan/khung-xuong';
 import { ThanhPhanTaiLenAnhCaiDat } from './thanh-phan-tai-len-anh';
+import AnimatedBackground from '@/components/ui/animated-tabs';
 
 interface ThongTinCauHinh {
   nhan: string;
@@ -143,6 +144,13 @@ const TU_DIEN_CAU_HINH: Record<string, ThongTinCauHinh> = {
     nhan: 'Mở cổng đăng ký tài khoản tự do',
     moTa: 'Bật tính năng này để cho phép người dùng tự tạo tài khoản học viên tại trang đăng nhập/đăng ký. Khi tắt, chỉ Quản trị viên mới được tạo tài khoản.',
     kieu: 'boolean',
+    tabId: 'van-hanh',
+  },
+  THOI_GIAN_PHIEN_GIAY: {
+    nhan: 'Thời gian duy trì phiên đăng nhập (giây)',
+    moTa: 'Thời hạn hiệu lực của phiên làm việc tính bằng giây trước khi tự động gia hạn hoặc yêu cầu xác thực lại (tối thiểu 60 giây). Có thể nhập trực tiếp số giây hoặc bấm nút điền nhanh.',
+    placeholder: 'Ví dụ: 86400',
+    kieu: 'number',
     tabId: 'van-hanh',
   },
   AI_NHA_CUNG_CAP: {
@@ -274,7 +282,9 @@ export default function TrangCaiDatHeThong() {
   // Khởi tạo giá trị form khi dữ liệu API tải về
   useEffect(() => {
     if (danhSachCaiDat.length > 0) {
-      const banDo: Record<string, string> = {};
+      const banDo: Record<string, string> = {
+        THOI_GIAN_PHIEN_GIAY: '86400',
+      };
       danhSachCaiDat.forEach((item) => {
         banDo[item.khoa] = item.giaTri;
       });
@@ -317,6 +327,18 @@ export default function TrangCaiDatHeThong() {
       }
     });
 
+    if (!ketQua['van-hanh'].some((item) => item.khoa === 'THOI_GIAN_PHIEN_GIAY')) {
+      ketQua['van-hanh'].push({
+        id: 'mac-dinh-thoi-gian-phien',
+        khoa: 'THOI_GIAN_PHIEN_GIAY',
+        giaTri: '86400',
+        nhom: 'HOC_VU',
+        moTa: 'Thời gian duy trì phiên đăng nhập tính bằng giây',
+        kieuDuLieu: 'SO',
+        congKhai: true,
+      } as CaiDatHeThong);
+    }
+
     const thuTuKhoa: Record<string, number> = {
       URL_LOGO: 1,
       URL_FAVICON: 2,
@@ -340,6 +362,7 @@ export default function TrangCaiDatHeThong() {
       EMAIL_LIEN_HE: 1,
       SO_DIEN_THOAI: 2,
       CHO_PHEP_DANG_KY: 1,
+      THOI_GIAN_PHIEN_GIAY: 2,
     };
 
     Object.keys(ketQua).forEach((key) => {
@@ -458,14 +481,15 @@ export default function TrangCaiDatHeThong() {
   return (
     <div className="p-4 sm:p-6 max-w-5xl mx-auto space-y-6">
       {/* Tiêu đề trang & Nút hành động */}
-      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 pb-4 border-b border-slate-200">
-        <div className="flex items-center gap-3">
-          <div className="w-10 h-10 rounded-xl bg-blue-100 text-blue-700 flex items-center justify-center shadow-xs shrink-0">
-            <Settings className="w-5 h-5" />
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 pb-4 border-b border-[var(--border)]">
+        <div className="flex items-center gap-3.5">
+          <div className="w-[44px] h-[44px] rounded-[4px] bg-[var(--surface)] border border-[var(--border)] text-[var(--accent)] flex items-center justify-center shrink-0">
+            <Settings className="w-5 h-5" strokeWidth={1.5} />
           </div>
           <div>
-            <h1 className="text-2xl font-bold tracking-tight text-slate-900">Cài đặt Hệ thống</h1>
-            <p className="text-sm text-slate-500">
+            <p className="eyebrow mb-0.5">Cấu hình vận hành</p>
+            <h1 className="text-[22px] font-mono font-bold tracking-tight text-[var(--text)]">Cài đặt Hệ thống</h1>
+            <p className="text-[14px] text-[var(--muted)]">
               Tùy chỉnh thông số toàn hệ thống, tự động áp dụng cho giao diện khách, đăng nhập và bảng điều khiển
             </p>
           </div>
@@ -476,7 +500,7 @@ export default function TrangCaiDatHeThong() {
             type="button"
             onClick={() => refetch()}
             disabled={isLoading || isRefetching}
-            className="inline-flex items-center gap-2 px-3.5 py-2 text-sm font-medium text-slate-700 bg-white border border-slate-300 rounded-xl hover:bg-slate-50 active:scale-95 transition-all shadow-xs disabled:opacity-60 cursor-pointer"
+            className="inline-flex items-center gap-2 px-3.5 py-2 text-sm font-medium text-text bg-surface border border-border rounded hover:bg-bg active:scale-95 transition-all shadow-xs disabled:opacity-60 cursor-pointer"
           >
             <RefreshCw className={`w-4 h-4 ${isRefetching ? 'animate-spin' : ''}`} />
             <span>Làm mới</span>
@@ -487,7 +511,7 @@ export default function TrangCaiDatHeThong() {
               type="button"
               onClick={xuLyDatLai}
               disabled={dotCapNhat.isPending}
-              className="px-3.5 py-2 text-sm font-medium text-slate-600 bg-slate-100 hover:bg-slate-200 rounded-xl transition-all cursor-pointer"
+              className="px-3.5 py-2 text-sm font-medium text-muted bg-active-bg hover:bg-active-bg rounded transition-all cursor-pointer"
             >
               Hủy thay đổi
             </button>
@@ -497,7 +521,7 @@ export default function TrangCaiDatHeThong() {
             type="button"
             onClick={xuLyLuuTatCa}
             disabled={!dangThayDoi || dotCapNhat.isPending}
-            className="inline-flex items-center gap-2 px-5 py-2 text-sm font-medium text-white bg-blue-600 rounded-xl hover:bg-blue-700 active:scale-95 transition-all shadow-sm disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer"
+            className="inline-flex items-center gap-2 px-5 py-2 text-sm font-medium text-white bg-accent rounded hover:bg-accent active:scale-95 transition-all shadow-sm disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer"
           >
             {dotCapNhat.isPending ? (
               <RefreshCw className="w-4 h-4 animate-spin" />
@@ -511,9 +535,9 @@ export default function TrangCaiDatHeThong() {
 
       {/* Thanh cảnh báo có thay đổi chưa lưu */}
       {dangThayDoi && (
-        <div className="p-3.5 rounded-xl bg-amber-50 border border-amber-200 text-amber-900 text-sm flex items-center justify-between animate-in fade-in duration-200 shadow-xs">
+        <div className="p-3.5 rounded bg-accent-soft border border-accent text-accent text-sm flex items-center justify-between animate-in fade-in duration-200 shadow-xs">
           <div className="flex items-center gap-2">
-            <span className="w-2.5 h-2.5 rounded-full bg-amber-500 animate-pulse" />
+            <span className="w-2.5 h-2.5 rounded-full bg-accent animate-pulse" />
             <span className="font-medium">
               Bạn có các thay đổi chưa lưu. Hãy nhấn &quot;Lưu thay đổi&quot; để áp dụng lên toàn hệ thống.
             </span>
@@ -521,7 +545,7 @@ export default function TrangCaiDatHeThong() {
           <button
             onClick={xuLyLuuTatCa}
             disabled={dotCapNhat.isPending}
-            className="text-xs font-semibold px-3 py-1.5 bg-amber-600 hover:bg-amber-700 text-white rounded-lg transition-colors cursor-pointer"
+            className="text-xs font-semibold px-3 py-1.5 bg-accent hover:bg-accent text-white rounded-lg transition-colors cursor-pointer"
           >
             Lưu ngay
           </button>
@@ -529,52 +553,66 @@ export default function TrangCaiDatHeThong() {
       )}
 
       {/* Thanh chuyển đổi Tab nhóm cài đặt */}
-      <div className="flex flex-wrap gap-2 border-b border-slate-200 pb-3">
-        {DANH_SACH_TAB.map((tab) => {
-          const dangChon = tabHienTai === tab.id;
-          const soLuong = danhSachTheoTab[tab.id]?.length || 0;
-          const BieuTuong = tab.bieuTuong;
-          return (
-            <button
-              key={tab.id}
-              data-tab={tab.id}
-              type="button"
-              onClick={() => setTabHienTai(tab.id)}
-              className={`flex items-center gap-2.5 px-4 py-2.5 rounded-xl text-sm font-semibold transition-all cursor-pointer ${
-                dangChon
-                  ? 'bg-blue-600 text-white shadow-sm shadow-blue-500/25 ring-1 ring-blue-600'
-                  : 'bg-white dark:bg-slate-900 text-slate-600 dark:text-slate-400 hover:bg-slate-100/80 dark:hover:bg-slate-800 hover:text-slate-900 dark:hover:text-slate-100 border border-slate-200/80 dark:border-slate-800'
-              }`}
-            >
-              <BieuTuong className="w-4 h-4" />
-              <span>{tab.ten}</span>
-              <span
-                className={`text-xs px-2 py-0.5 rounded-full font-bold ${
+      <div className="flex flex-wrap gap-2 border-b border-border pb-3">
+        <AnimatedBackground
+          defaultValue={tabHienTai}
+          onValueChange={(idTab) => idTab && setTabHienTai(idTab)}
+          className="rounded bg-accent shadow-sm ring-1 ring-accent"
+          transition={{ type: 'spring', bounce: 0.2, duration: 0.3 }}
+        >
+          {DANH_SACH_TAB.map((tab) => {
+            const dangChon = tabHienTai === tab.id;
+            const soLuong = danhSachTheoTab[tab.id]?.length || 0;
+            const BieuTuong = tab.bieuTuong;
+            return (
+              <button
+                key={tab.id}
+                data-id={tab.id}
+                data-tab={tab.id}
+                type="button"
+                onClick={() => setTabHienTai(tab.id)}
+                className={`flex items-center gap-2.5 px-4 py-2.5 rounded text-sm font-semibold transition-colors cursor-pointer ${
                   dangChon
-                    ? 'bg-white/20 text-white'
-                    : 'bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300'
+                    ? 'text-white'
+                    : 'bg-surface text-muted hover:bg-active-bg hover:text-text border border-border '
                 }`}
               >
-                {soLuong}
-              </span>
-            </button>
-          );
-        })}
+                <BieuTuong className="w-4 h-4" />
+                <span>{tab.ten}</span>
+                <span
+                  className={`text-xs px-2 py-0.5 rounded-full font-bold tabular-nums ${
+                    dangChon
+                      ? 'bg-surface text-accent'
+                      : 'bg-active-bg text-muted '
+                  }`}
+                >
+                  {soLuong}
+                </span>
+              </button>
+            );
+          })}
+        </AnimatedBackground>
 
         {/* Tab dự phòng nếu có cấu hình chưa được ánh xạ */}
         {danhSachTheoTab['khac'] && danhSachTheoTab['khac'].length > 0 && (
           <button
             type="button"
             onClick={() => setTabHienTai('khac')}
-            className={`flex items-center gap-2 px-4 py-2.5 rounded-xl text-sm font-semibold transition-all cursor-pointer ${
+            className={`flex items-center gap-2 px-4 py-2.5 rounded text-sm font-semibold transition-all cursor-pointer ${
               tabHienTai === 'khac'
-                ? 'bg-blue-600 text-white shadow-sm'
-                : 'bg-white dark:bg-slate-900 text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 border border-slate-200 dark:border-slate-800'
+                ? 'bg-accent text-white shadow-sm'
+                : 'bg-surface text-muted hover:bg-active-bg border border-border '
             }`}
           >
             <Layers className="w-4 h-4" />
             <span>Cấu hình khác</span>
-            <span className="text-xs px-2 py-0.5 rounded-full font-bold bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300">
+            <span
+              className={`text-xs px-2 py-0.5 rounded-full font-bold tabular-nums ${
+                tabHienTai === 'khac'
+                  ? 'bg-surface text-accent'
+                  : 'bg-active-bg text-muted '
+              }`}
+            >
               {danhSachTheoTab['khac'].length}
             </span>
           </button>
@@ -583,9 +621,9 @@ export default function TrangCaiDatHeThong() {
 
       {/* Hiển thị Khung xương Skeleton khi đang tải */}
       {isLoading ? (
-        <div className="bg-white rounded-2xl border border-slate-200 p-6 space-y-6 shadow-2xs">
+        <div className="bg-surface rounded border border-border p-6 space-y-6 shadow-2xs">
           {[1, 2, 3, 4].map((i) => (
-            <div key={i} className="space-y-3 pb-5 border-b border-slate-100 last:border-0">
+            <div key={i} className="space-y-3 pb-5 border-b border-border last:border-0">
               <KhungXuong className="h-4 w-48" />
               <KhungXuong className="h-3 w-80" />
               <KhungXuong className="h-10 w-full rounded-lg" />
@@ -594,12 +632,12 @@ export default function TrangCaiDatHeThong() {
         </div>
       ) : (
         /* Thẻ nội dung của Tab đang chọn */
-        <div className="bg-white rounded-2xl border border-slate-200 shadow-2xs overflow-hidden">
+        <div className="bg-surface rounded border border-border shadow-2xs overflow-hidden">
           {/* Header tab */}
-          <div className="p-5 border-b border-slate-100 bg-slate-50/70 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
+          <div className="p-5 border-b border-border bg-bg flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
             <div>
-              <h2 className="font-bold text-slate-800 text-base">{tabHienTaiData.ten}</h2>
-              <p className="text-xs text-slate-500 mt-0.5">{tabHienTaiData.moTa}</p>
+              <h2 className="font-bold text-text text-base">{tabHienTaiData.ten}</h2>
+              <p className="text-xs text-muted mt-0.5">{tabHienTaiData.moTa}</p>
             </div>
 
             {/* Nút kiểm tra kết nối AI đặc thù khi ở Tab Trí tuệ nhân tạo */}
@@ -608,12 +646,12 @@ export default function TrangCaiDatHeThong() {
                 type="button"
                 onClick={xuLyKiemTraKetNoiAI}
                 disabled={dangKiemTraKetNoi}
-                className="inline-flex items-center gap-2 px-4 py-2 text-xs font-semibold text-white bg-indigo-600 hover:bg-indigo-700 active:scale-95 rounded-xl shadow-xs transition-all disabled:opacity-50 cursor-pointer self-start sm:self-auto shrink-0"
+                className="inline-flex items-center gap-2 px-4 py-2 text-xs font-semibold text-white bg-accent hover:bg-accent active:scale-95 rounded shadow-xs transition-all disabled:opacity-50 cursor-pointer self-start sm:self-auto shrink-0"
               >
                 {dangKiemTraKetNoi ? (
                   <RefreshCw className="w-3.5 h-3.5 animate-spin" />
                 ) : (
-                  <Zap className="w-3.5 h-3.5 text-amber-300" />
+                  <Zap className="w-3.5 h-3.5 text-accent" />
                 )}
                 <span>{dangKiemTraKetNoi ? 'Đang kiểm tra kết nối...' : 'Kiểm tra kết nối AI'}</span>
               </button>
@@ -625,14 +663,14 @@ export default function TrangCaiDatHeThong() {
             <div
               className={`p-4 border-b flex items-start gap-3 transition-all ${
                 ketQuaKiemTra.thanhCong
-                  ? 'bg-emerald-50 border-emerald-200 text-emerald-900'
-                  : 'bg-rose-50 border-rose-200 text-rose-900'
+                  ? 'bg-accent-soft border-accent text-accent'
+                  : 'bg-danger-soft border-danger text-danger'
               }`}
             >
               {ketQuaKiemTra.thanhCong ? (
-                <CheckCircle2 className="w-5 h-5 text-emerald-600 shrink-0 mt-0.5" />
+                <CheckCircle2 className="w-5 h-5 text-accent shrink-0 mt-0.5" />
               ) : (
-                <XCircle className="w-5 h-5 text-rose-600 shrink-0 mt-0.5" />
+                <XCircle className="w-5 h-5 text-danger shrink-0 mt-0.5" />
               )}
               <div className="flex-1 text-xs">
                 <div className="flex items-center gap-2">
@@ -640,7 +678,7 @@ export default function TrangCaiDatHeThong() {
                     {ketQuaKiemTra.thanhCong ? 'Kết nối thành công!' : 'Kết nối thất bại:'}
                   </span>
                   {ketQuaKiemTra.doTreMs !== undefined && (
-                    <span className="px-2 py-0.5 text-[10px] font-bold rounded-full bg-emerald-200 text-emerald-800">
+                    <span className="px-2 py-0.5 text-[10px] font-bold rounded-full bg-accent-soft text-accent">
                       {ketQuaKiemTra.doTreMs}ms
                     </span>
                   )}
@@ -652,9 +690,9 @@ export default function TrangCaiDatHeThong() {
 
           {/* Hướng dẫn nhận mã khóa API miễn phí khi ở tab AI */}
           {tabHienTai === 'tri-tue-nhan-tao' && (
-            <div className="p-4 bg-indigo-50/50 border-b border-indigo-100/60 text-xs text-slate-700 flex flex-col md:flex-row items-start md:items-center justify-between gap-3">
+            <div className="p-4 bg-accent-soft border-b border-accent text-xs text-text flex flex-col md:flex-row items-start md:items-center justify-between gap-3">
               <div className="flex items-center gap-2">
-                <Bot className="w-4 h-4 text-indigo-600 shrink-0" />
+                <Bot className="w-4 h-4 text-accent shrink-0" />
                 <span>
                   Hệ thống hỗ trợ cả API miễn phí (Google Gemini, Groq Cloud, Ollama) và API trả phí (OpenAI).
                 </span>
@@ -664,7 +702,7 @@ export default function TrangCaiDatHeThong() {
                   href="https://aistudio.google.com/app/apikey"
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="inline-flex items-center gap-1 font-semibold text-indigo-600 hover:text-indigo-800 underline"
+                  className="inline-flex items-center gap-1 font-semibold text-accent hover:text-accent underline"
                 >
                   Lấy Gemini API Key miễn phí <ExternalLink className="w-3 h-3" />
                 </a>
@@ -673,7 +711,7 @@ export default function TrangCaiDatHeThong() {
                   href="https://console.groq.com/keys"
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="inline-flex items-center gap-1 font-semibold text-emerald-600 hover:text-emerald-800 underline"
+                  className="inline-flex items-center gap-1 font-semibold text-accent hover:text-accent underline"
                 >
                   Lấy Groq API Key siêu tốc <ExternalLink className="w-3 h-3" />
                 </a>
@@ -682,10 +720,10 @@ export default function TrangCaiDatHeThong() {
           )}
 
           {/* Danh sách các trường cài đặt trong tab */}
-          <div className="p-6 space-y-6 divide-y divide-slate-100">
+          <div className="p-6 space-y-6 divide-y divide-border">
             {danhSachItemHienTai.length === 0 ? (
-              <div className="py-12 text-center text-slate-400">
-                <AlertCircle className="w-8 h-8 mx-auto mb-2 text-slate-300" />
+              <div className="py-12 text-center text-muted">
+                <AlertCircle className="w-8 h-8 mx-auto mb-2 text-muted" />
                 <p className="text-sm font-medium">Chưa có thông số nào thuộc nhóm này.</p>
               </div>
             ) : (
@@ -712,6 +750,22 @@ export default function TrangCaiDatHeThong() {
                 const laSelectNhaCungCap = item.khoa === 'AI_NHA_CUNG_CAP';
                 const laMatKhauApiKey = item.khoa === 'AI_API_KEY';
                 const laModelAI = item.khoa === 'AI_MODEL';
+                const laThoiGianPhien = item.khoa === 'THOI_GIAN_PHIEN_GIAY';
+
+                const doiGiaySangChuoi = (raw: string) => {
+                  const s = parseInt(raw, 10);
+                  if (Number.isNaN(s) || s < 60) return 'Tối thiểu 60 giây';
+                  const ngay = Math.floor(s / 86400);
+                  const gio = Math.floor((s % 86400) / 3600);
+                  const phut = Math.floor((s % 3600) / 60);
+                  const giayLe = s % 60;
+                  const phan: string[] = [];
+                  if (ngay > 0) phan.push(`${ngay} ngày`);
+                  if (gio > 0) phan.push(`${gio} giờ`);
+                  if (phut > 0) phan.push(`${phut} phút`);
+                  if (giayLe > 0) phan.push(`${giayLe} giây`);
+                  return phan.join(' ') || `${s} giây`;
+                };
 
                 return (
                   <div
@@ -721,11 +775,11 @@ export default function TrangCaiDatHeThong() {
                     {/* Cột thông tin: Tên Việt hoá + mô tả */}
                     <div className="lg:col-span-5 space-y-1.5">
                       <div className="flex items-center gap-2 flex-wrap">
-                        <label className="text-sm font-bold text-slate-900">
+                        <label className="text-sm font-bold text-text">
                           {thongTin?.nhan || item.khoa}
                         </label>
                       </div>
-                      <p className="text-xs text-slate-500 leading-relaxed">
+                      <p className="text-xs text-muted leading-relaxed">
                         {thongTin?.moTa || item.moTa || 'Cấu hình tham số của hệ thống.'}
                       </p>
                     </div>
@@ -775,7 +829,7 @@ export default function TrangCaiDatHeThong() {
                                 thayDoiGiaTri('AI_BASE_URL', 'http://localhost:11434');
                               }
                             }}
-                            className="w-full px-3.5 py-2.5 text-sm border border-slate-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all text-slate-900 bg-white font-medium shadow-2xs cursor-pointer"
+                            className="w-full px-3.5 py-2.5 text-sm border border-border rounded focus:outline-none focus:ring-2 focus:ring-accent focus:border-accent transition-all text-text bg-surface font-medium shadow-2xs cursor-pointer"
                           >
                             <option value="gemini">Google Gemini (Miễn phí 15 RPM / Khuyên dùng)</option>
                             <option value="groq">Groq Cloud (Miễn phí 14,400 RPD / Siêu tốc)</option>
@@ -792,13 +846,13 @@ export default function TrangCaiDatHeThong() {
                               type={hienThiMatKhauApiKey ? 'text' : 'password'}
                               value={giaTriHienTai}
                               onChange={(e) => thayDoiGiaTri(item.khoa, e.target.value)}
-                              className="w-full pl-3.5 pr-10 py-2.5 text-sm border border-slate-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all text-slate-900 bg-white placeholder:text-slate-400 font-mono shadow-2xs"
+                              className="w-full pl-3.5 pr-10 py-2.5 text-sm border border-border rounded focus:outline-none focus:ring-2 focus:ring-accent focus:border-accent transition-all text-text bg-surface placeholder:text-muted font-mono shadow-2xs"
                               placeholder={thongTin?.placeholder || 'Nhập API Key...'}
                             />
                             <button
                               type="button"
                               onClick={() => setHienThiMatKhauApiKey(!hienThiMatKhauApiKey)}
-                              className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 p-1 cursor-pointer"
+                              className="absolute right-3 top-1/2 -translate-y-1/2 text-muted hover:text-muted p-1 cursor-pointer"
                               title={hienThiMatKhauApiKey ? 'Ẩn mã khóa' : 'Hiện mã khóa'}
                             >
                               {hienThiMatKhauApiKey ? (
@@ -808,7 +862,7 @@ export default function TrangCaiDatHeThong() {
                               )}
                             </button>
                           </div>
-                          <p className="text-[11px] text-slate-400">
+                          <p className="text-[11px] text-muted">
                             Để trống nếu bạn muốn hệ thống tự đọc biến môi trường GEMINI_API_KEY trong file .env máy chủ.
                           </p>
                         </div>
@@ -819,11 +873,11 @@ export default function TrangCaiDatHeThong() {
                             type="text"
                             value={giaTriHienTai}
                             onChange={(e) => thayDoiGiaTri(item.khoa, e.target.value)}
-                            className="w-full px-3.5 py-2 text-sm border border-slate-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all text-slate-900 bg-white placeholder:text-slate-400 font-mono shadow-2xs"
+                            className="w-full px-3.5 py-2 text-sm border border-border rounded focus:outline-none focus:ring-2 focus:ring-accent focus:border-accent transition-all text-text bg-surface placeholder:text-muted font-mono shadow-2xs"
                             placeholder={thongTin?.placeholder || 'Ví dụ: gemini-1.5-flash'}
                           />
                           <div className="flex flex-wrap items-center gap-1.5 text-xs">
-                            <span className="text-slate-400 text-[11px]">Chọn nhanh:</span>
+                            <span className="text-muted text-[11px]">Chọn nhanh:</span>
                             {[
                               'gemini-1.5-flash',
                               'gemini-2.0-flash',
@@ -835,13 +889,67 @@ export default function TrangCaiDatHeThong() {
                                 key={m}
                                 type="button"
                                 onClick={() => thayDoiGiaTri('AI_MODEL', m)}
-                                className={`px-2 py-0.5 rounded-md text-[11px] font-mono transition-colors cursor-pointer border ${
+                                className={`px-2 py-0.5 rounded text-[11px] font-mono transition-colors cursor-pointer border ${
                                   giaTriHienTai === m
-                                    ? 'bg-blue-50 text-blue-700 border-blue-300 font-bold'
-                                    : 'bg-slate-100 hover:bg-slate-200 text-slate-700 border-slate-200'
+                                    ? 'bg-accent-soft text-accent border-accent font-bold'
+                                    : 'bg-active-bg hover:bg-surface text-text border-border'
                                 }`}
                               >
                                 {m}
+                              </button>
+                            ))}
+                          </div>
+                        </div>
+                      ) : laThoiGianPhien ? (
+                        /* Textbox số giây phiên đăng nhập kèm nút điền nhanh */
+                        <div className="space-y-2.5">
+                          <div className="flex flex-col sm:flex-row sm:items-center gap-2.5">
+                            <div className="relative flex-1">
+                              <input
+                                type="number"
+                                min={60}
+                                max={31536000}
+                                step={60}
+                                value={giaTriHienTai}
+                                onChange={(e) =>
+                                  thayDoiGiaTri('THOI_GIAN_PHIEN_GIAY', e.target.value.replace(/[^0-9]/g, ''))
+                                }
+                                className="w-full pl-3.5 pr-16 py-2 text-sm border border-border rounded focus:outline-none focus:ring-2 focus:ring-accent focus:border-accent transition-colors text-text bg-surface placeholder:text-muted font-mono tabular-nums"
+                                placeholder="Nhập số giây (ví dụ: 86400)"
+                              />
+                              <span className="absolute right-3 top-1/2 -translate-y-1/2 font-mono text-[11px] text-muted pointer-events-none">
+                                giây
+                              </span>
+                            </div>
+                            <div className="px-3 py-2 rounded border border-border bg-active-bg font-mono text-xs text-accent font-semibold tabular-nums shrink-0">
+                              ≈ {doiGiaySangChuoi(giaTriHienTai)}
+                            </div>
+                          </div>
+
+                          <div className="flex flex-wrap items-center gap-1.5 text-xs">
+                            <span className="text-muted text-[11px] font-mono">Điền nhanh:</span>
+                            {[
+                              { giay: '900', nhan: '900s (15 phút)' },
+                              { giay: '1800', nhan: '1800s (30 phút)' },
+                              { giay: '3600', nhan: '3600s (1 giờ)' },
+                              { giay: '14400', nhan: '14400s (4 giờ)' },
+                              { giay: '43200', nhan: '43200s (12 giờ)' },
+                              { giay: '86400', nhan: '86400s (1 ngày)' },
+                              { giay: '259200', nhan: '259200s (3 ngày)' },
+                              { giay: '604800', nhan: '604800s (7 ngày)' },
+                              { giay: '2592000', nhan: '2592000s (30 ngày)' },
+                            ].map((muc) => (
+                              <button
+                                key={muc.giay}
+                                type="button"
+                                onClick={() => thayDoiGiaTri('THOI_GIAN_PHIEN_GIAY', muc.giay)}
+                                className={`px-2.5 py-1 rounded text-[11px] font-mono tabular-nums transition-colors cursor-pointer border ${
+                                  giaTriHienTai === muc.giay
+                                    ? 'bg-accent-soft text-accent border-accent font-bold'
+                                    : 'bg-surface hover:bg-active-bg text-text border-border'
+                                }`}
+                              >
+                                {muc.nhan}
                               </button>
                             ))}
                           </div>
@@ -856,13 +964,13 @@ export default function TrangCaiDatHeThong() {
                             onClick={() =>
                               thayDoiGiaTri(item.khoa, giaTriHienTai === 'true' ? 'false' : 'true')
                             }
-                            className={`relative inline-flex h-7 w-12 shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none focus:ring-2 focus:ring-blue-600 focus:ring-offset-2 ${
-                              giaTriHienTai === 'true' ? 'bg-blue-600' : 'bg-slate-300'
+                            className={`relative inline-flex h-7 w-12 shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none focus:ring-2 focus:ring-accent focus:ring-offset-2 ${
+                              giaTriHienTai === 'true' ? 'bg-accent' : 'bg-active-bg'
                             }`}
                           >
                             <span
                               aria-hidden="true"
-                              className={`pointer-events-none inline-block h-6 w-6 transform rounded-full bg-white shadow-md ring-0 transition duration-200 ease-in-out ${
+                              className={`pointer-events-none inline-block h-6 w-6 transform rounded-full bg-surface shadow-md ring-0 transition duration-200 ease-in-out ${
                                 giaTriHienTai === 'true' ? 'translate-x-5' : 'translate-x-0'
                               }`}
                             />
@@ -870,14 +978,14 @@ export default function TrangCaiDatHeThong() {
                           <div className="flex flex-col select-none">
                             <span
                               className={`text-sm font-semibold transition-colors ${
-                                giaTriHienTai === 'true' ? 'text-blue-700' : 'text-slate-500'
+                                giaTriHienTai === 'true' ? 'text-accent' : 'text-muted'
                               }`}
                             >
                               {giaTriHienTai === 'true'
                                 ? 'Đang mở (Cho phép tự đăng ký)'
                                 : 'Đang đóng (Chỉ quản trị viên mới tạo được)'}
                             </span>
-                            <span className="text-[11px] text-slate-400">
+                            <span className="text-[11px] text-muted">
                               Bấm vào nút để {giaTriHienTai === 'true' ? 'đóng lại' : 'mở cổng'}
                             </span>
                           </div>
@@ -888,7 +996,7 @@ export default function TrangCaiDatHeThong() {
                           rows={item.khoa === 'AI_PROMPT_HE_THONG' ? 4 : 3}
                           value={giaTriHienTai}
                           onChange={(e) => thayDoiGiaTri(item.khoa, e.target.value)}
-                          className="w-full px-3.5 py-2.5 text-sm border border-slate-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all text-slate-900 bg-white placeholder:text-slate-400 leading-relaxed shadow-2xs"
+                          className="w-full px-3.5 py-2.5 text-sm border border-border rounded focus:outline-none focus:ring-2 focus:ring-accent focus:border-accent transition-all text-text bg-surface placeholder:text-muted leading-relaxed shadow-2xs"
                           placeholder={thongTin?.placeholder || 'Nhập nội dung văn bản...'}
                         />
                       ) : (
@@ -898,7 +1006,7 @@ export default function TrangCaiDatHeThong() {
                             type="text"
                             value={giaTriHienTai}
                             onChange={(e) => thayDoiGiaTri(item.khoa, e.target.value)}
-                            className="w-full px-3.5 py-2 text-sm border border-slate-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all text-slate-900 bg-white placeholder:text-slate-400 shadow-2xs"
+                            className="w-full px-3.5 py-2 text-sm border border-border rounded focus:outline-none focus:ring-2 focus:ring-accent focus:border-accent transition-all text-text bg-surface placeholder:text-muted shadow-2xs"
                             placeholder={thongTin?.placeholder || 'Nhập giá trị...'}
                           />
                         </div>

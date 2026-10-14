@@ -49,7 +49,12 @@ export class DieuKhienXacThuc {
     const diaChiIp = yeuCau.ip;
 
     const ketQua = await this.dichVuXacThuc.dangKy(duLieu, thongTinThietBi, diaChiIp);
-    this.datCookieToken(phanHoi, ketQua.accessToken, ketQua.refreshToken);
+    this.datCookieToken(
+      phanHoi,
+      ketQua.accessToken,
+      ketQua.refreshToken,
+      ketQua.thoiGianPhienGiay,
+    );
     return ketQua;
   }
 
@@ -67,7 +72,12 @@ export class DieuKhienXacThuc {
     const diaChiIp = yeuCau.ip;
 
     const ketQua = await this.dichVuXacThuc.dangNhap(duLieu, thongTinThietBi, diaChiIp);
-    this.datCookieToken(phanHoi, ketQua.accessToken, ketQua.refreshToken);
+    this.datCookieToken(
+      phanHoi,
+      ketQua.accessToken,
+      ketQua.refreshToken,
+      ketQua.thoiGianPhienGiay,
+    );
     return ketQua;
   }
 
@@ -83,9 +93,20 @@ export class DieuKhienXacThuc {
   ) {
     const thongTinThietBi = yeuCau.headers['user-agent'];
     const diaChiIp = yeuCau.ip;
+    const refreshToken =
+      duLieu?.refreshToken || (yeuCau as any).cookies?.['refresh_token'] || '';
 
-    const ketQua = await this.dichVuXacThuc.lamMoiToken(duLieu, thongTinThietBi, diaChiIp);
-    this.datCookieToken(phanHoi, ketQua.accessToken, ketQua.refreshToken);
+    const ketQua = await this.dichVuXacThuc.lamMoiToken(
+      { refreshToken },
+      thongTinThietBi,
+      diaChiIp,
+    );
+    this.datCookieToken(
+      phanHoi,
+      ketQua.accessToken,
+      ketQua.refreshToken,
+      ketQua.thoiGianPhienGiay,
+    );
     return ketQua;
   }
 
@@ -138,21 +159,30 @@ export class DieuKhienXacThuc {
     return { thongDiep: 'Đổi mật khẩu thành công' };
   }
 
-  private datCookieToken(phanHoi: Response, accessToken: string, refreshToken: string) {
+  private datCookieToken(
+    phanHoi: Response,
+    accessToken: string,
+    refreshToken: string,
+    thoiGianPhienGiay = 86400,
+  ) {
     const laMoiTruongProduction = process.env.NODE_ENV === 'production';
+    const soGiayAccess = Math.max(60, thoiGianPhienGiay || 86400);
+    const soGiayRefresh = Math.max(soGiayAccess * 2, 7 * 24 * 60 * 60);
 
     phanHoi.cookie('access_token', accessToken, {
       httpOnly: true,
       secure: laMoiTruongProduction,
       sameSite: 'lax',
-      maxAge: 15 * 60 * 1000, // 15 phút
+      path: '/',
+      maxAge: soGiayAccess * 1000,
     });
 
     phanHoi.cookie('refresh_token', refreshToken, {
       httpOnly: true,
       secure: laMoiTruongProduction,
       sameSite: 'lax',
-      maxAge: 7 * 24 * 60 * 60 * 1000, // 7 ngày
+      path: '/',
+      maxAge: soGiayRefresh * 1000,
     });
   }
 }

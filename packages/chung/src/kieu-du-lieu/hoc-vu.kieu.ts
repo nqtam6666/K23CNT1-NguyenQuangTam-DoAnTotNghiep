@@ -121,6 +121,9 @@ export interface BuoiHoc {
   thoiGianBD: string | Date;
   thoiGianKT: string | Date;
   trangThai: TrangThaiBuoiHoc;
+  maDiemDanh?: string | null;
+  hanMaDiemDanh?: string | Date | null;
   ngayTao: string | Date;
   lopHocPhan?: LopHocPhan;
 }
+

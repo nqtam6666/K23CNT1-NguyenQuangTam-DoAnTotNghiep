@@ -13,13 +13,13 @@ export default function NguoiDungLoading() {
       </div>
 
       {/* Tìm kiếm & Lọc */}
-      <div className="p-4 rounded-xl bg-white border border-slate-200 shadow-2xs flex flex-col sm:flex-row items-center gap-4">
+      <div className="p-4 rounded bg-surface border border-border shadow-2xs flex flex-col sm:flex-row items-center gap-4">
         <KhungXuong className="h-10 flex-1 w-full rounded-lg" />
         <KhungXuong className="h-10 w-full sm:w-60 rounded-lg" />
       </div>
 
       {/* Bảng dữ liệu */}
-      <div className="bg-white rounded-xl border border-slate-200 shadow-2xs overflow-hidden">
+      <div className="bg-surface rounded border border-border shadow-2xs overflow-hidden">
         <KhungXuongBang soDong={6} soCot={5} />
       </div>
     </div>

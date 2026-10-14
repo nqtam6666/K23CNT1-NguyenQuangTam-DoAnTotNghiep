@@ -3,23 +3,8 @@
 import { useState, useEffect, useRef, useMemo } from 'react';
 import { createPortal } from 'react-dom';
 import { useRouter } from 'next/navigation';
-import {
-  Search,
-  BookOpen,
-  Users,
-  UserCheck,
-  GraduationCap,
-  Calendar,
-  Video,
-  Settings,
-  HeartHandshake,
-  Info,
-  ArrowRight,
-  X,
-  Command,
-} from 'lucide-react';
+import { Search, ArrowRight, X } from 'lucide-react';
 import { locMenuTheoVaiTro } from '../cau-hinh/menu.cau-hinh';
-import { VaiTro } from '@lms/chung';
 
 interface Props {
   vaiTroNguoiDung?: string;
@@ -40,13 +25,11 @@ export function TimKiemNhanh({ vaiTroNguoiDung, dangMo, onDong }: Props) {
     setDaMount(true);
   }, []);
 
-  // Lấy các mục menu người dùng có quyền
   const danhSachMenuChoPhep = useMemo(() => {
     if (!vaiTroNguoiDung) return [];
     return locMenuTheoVaiTro(vaiTroNguoiDung);
   }, [vaiTroNguoiDung]);
 
-  // Lọc theo từ khóa tìm kiếm
   const ketQuaTimKiem = useMemo(() => {
     if (!tuKhoa.trim()) {
       return danhSachMenuChoPhep;
@@ -59,7 +42,6 @@ export function TimKiemNhanh({ vaiTroNguoiDung, dangMo, onDong }: Props) {
     );
   }, [danhSachMenuChoPhep, tuKhoa]);
 
-  // Tự động focus vào ô tìm kiếm khi mở
   useEffect(() => {
     if (dangMo) {
       setTuKhoa('');
@@ -70,7 +52,6 @@ export function TimKiemNhanh({ vaiTroNguoiDung, dangMo, onDong }: Props) {
     }
   }, [dangMo]);
 
-  // Điều hướng bằng bàn phím
   useEffect(() => {
     if (!dangMo) return;
 
@@ -97,7 +78,6 @@ export function TimKiemNhanh({ vaiTroNguoiDung, dangMo, onDong }: Props) {
     return () => window.removeEventListener('keydown', xuLyPhim);
   }, [dangMo, ketQuaTimKiem, viTriChon, router, onDong]);
 
-  // Xử lý click ngoài chuẩn Rule 07 (chống vô tình thoát khi bôi đen chuột kéo ra ngoài)
   const xuLyMouseDown = (e: React.MouseEvent) => {
     if (hopThoaiRef.current && hopThoaiRef.current.contains(e.target as Node)) {
       chuotNhanTrongHopThoaiRef.current = true;
@@ -121,7 +101,7 @@ export function TimKiemNhanh({ vaiTroNguoiDung, dangMo, onDong }: Props) {
 
   return createPortal(
     <div
-      className="fixed inset-0 z-50 flex items-start justify-center pt-20 px-4 bg-slate-900/50 backdrop-blur-xs animate-in fade-in duration-150"
+      className="fixed inset-0 z-[99999] flex items-start justify-center pt-20 px-4 bg-black/55 animate-in fade-in duration-150"
       onMouseDown={xuLyMouseDown}
       onClick={xuLyBackdropClick}
     >
@@ -130,11 +110,11 @@ export function TimKiemNhanh({ vaiTroNguoiDung, dangMo, onDong }: Props) {
         role="dialog"
         aria-modal="true"
         aria-label="Thanh tìm kiếm nhanh và điều hướng"
-        className="w-full max-w-xl bg-white dark:bg-slate-900 rounded-2xl shadow-2xl border border-slate-200 dark:border-slate-800 overflow-hidden animate-in zoom-in-95 duration-150"
+        className="w-full max-w-xl bg-[var(--surface)] text-[var(--text)] rounded-[var(--radius)] border border-[var(--border)] overflow-hidden animate-in zoom-in-95 duration-150"
       >
         {/* Ô nhập liệu tìm kiếm */}
-        <div className="flex items-center px-4 py-3.5 border-b border-slate-100 dark:border-slate-800 gap-3">
-          <Search className="w-5 h-5 text-slate-400 dark:text-slate-500 shrink-0" />
+        <div className="flex items-center px-4 py-3 border-b border-[var(--border)] gap-3">
+          <Search strokeWidth={1.5} className="w-[18px] h-[18px] text-[var(--muted)] shrink-0" />
           <input
             ref={inputRef}
             type="text"
@@ -144,17 +124,19 @@ export function TimKiemNhanh({ vaiTroNguoiDung, dangMo, onDong }: Props) {
               setViTriChon(0);
             }}
             placeholder="Tìm kiếm trang, chức năng hoặc tài liệu (Ctrl+K)..."
-            className="flex-1 bg-transparent text-slate-900 dark:text-slate-100 text-sm placeholder-slate-400 dark:placeholder-slate-500 focus:outline-none"
+            className="flex-1 bg-transparent text-[var(--text)] text-sm placeholder:text-[var(--muted)]/75 border-none focus:outline-none focus:ring-0"
           />
           {tuKhoa && (
             <button
+              type="button"
               onClick={() => setTuKhoa('')}
-              className="p-1 text-slate-400 hover:text-slate-600 dark:text-slate-500 dark:hover:text-slate-300 rounded-md"
+              aria-label="Xóa từ khóa"
+              className="p-1 text-[var(--muted)] hover:text-[var(--text)] rounded-[var(--radius)]"
             >
-              <X className="w-4 h-4" />
+              <X strokeWidth={1.5} className="w-4 h-4" />
             </button>
           )}
-          <kbd className="hidden sm:inline-block px-2 py-0.5 text-[10px] font-semibold text-slate-500 dark:text-slate-400 bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-md">
+          <kbd className="hidden sm:inline-block px-2 py-0.5 font-mono text-[10px] font-semibold text-[var(--muted)] bg-[var(--bg)] border border-[var(--border)] rounded-[var(--radius)]">
             ESC
           </kbd>
         </div>
@@ -162,7 +144,7 @@ export function TimKiemNhanh({ vaiTroNguoiDung, dangMo, onDong }: Props) {
         {/* Danh sách kết quả */}
         <div className="max-h-80 overflow-y-auto p-2 space-y-1">
           {ketQuaTimKiem.length === 0 ? (
-            <div className="py-8 text-center text-slate-500 dark:text-slate-400 text-sm">
+            <div className="py-8 text-center text-[var(--muted)] text-sm">
               Không tìm thấy mục nào khớp với &quot;{tuKhoa}&quot;
             </div>
           ) : (
@@ -178,31 +160,34 @@ export function TimKiemNhanh({ vaiTroNguoiDung, dangMo, onDong }: Props) {
                     onDong();
                   }}
                   onMouseEnter={() => setViTriChon(index)}
-                  className={`flex items-center justify-between px-3.5 py-2.5 rounded-xl cursor-pointer transition-colors ${
+                  className={`flex items-center justify-between px-3.5 py-2.5 rounded-[var(--radius)] cursor-pointer transition-colors ${
                     dangChon
-                      ? 'bg-blue-50 dark:bg-blue-950/70 text-blue-700 dark:text-blue-300 font-semibold'
-                      : 'text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-800/60'
+                      ? 'bg-[var(--accent-soft)] text-[var(--accent)] font-semibold'
+                      : 'text-[var(--text)] hover:bg-[var(--active-bg)]'
                   }`}
                 >
                   <div className="flex items-center gap-3">
                     <div
-                      className={`p-1.5 rounded-lg ${
+                      className={`p-1.5 rounded-[var(--radius)] border ${
                         dangChon
-                          ? 'bg-blue-600 text-white'
-                          : 'bg-slate-100 dark:bg-slate-800 text-slate-500 dark:text-slate-400'
+                          ? 'bg-[var(--accent)] text-white border-[var(--accent)]'
+                          : 'bg-[var(--bg)] text-[var(--muted)] border-[var(--border)]'
                       }`}
                     >
-                      <BieuTuong className="w-4 h-4" />
+                      <BieuTuong strokeWidth={1.5} className="w-4 h-4" />
                     </div>
                     <div>
-                      <p className="text-sm font-medium text-slate-900 dark:text-slate-100">{item.tieuDe}</p>
-                      <p className="text-[11px] text-slate-400 dark:text-slate-500">{item.duongDan}</p>
+                      <p className="font-mono text-xs font-semibold text-[var(--text)]">
+                        {item.tieuDe}
+                      </p>
+                      <p className="font-mono text-[11px] text-[var(--muted)]">{item.duongDan}</p>
                     </div>
                   </div>
 
                   <ArrowRight
+                    strokeWidth={1.5}
                     className={`w-4 h-4 transition-transform ${
-                      dangChon ? 'text-blue-600 dark:text-blue-400 translate-x-0.5' : 'text-slate-300 dark:text-slate-600'
+                      dangChon ? 'text-[var(--accent)] translate-x-0.5' : 'text-[var(--muted)]'
                     }`}
                   />
                 </div>
@@ -212,15 +197,21 @@ export function TimKiemNhanh({ vaiTroNguoiDung, dangMo, onDong }: Props) {
         </div>
 
         {/* Chân hộp thoại */}
-        <div className="px-4 py-2.5 bg-slate-50 dark:bg-slate-950/80 border-t border-slate-100 dark:border-slate-800 flex items-center justify-between text-[11px] text-slate-500 dark:text-slate-400">
-          <div className="flex items-center gap-2">
+        <div className="px-4 py-2.5 bg-[var(--bg)] border-t border-[var(--border)] flex items-center justify-between font-mono text-[11px] text-[var(--muted)]">
+          <div className="flex items-center gap-1.5">
             <span>Dùng</span>
-            <kbd className="px-1.5 py-0.5 bg-white dark:bg-slate-800 text-slate-700 dark:text-slate-300 border border-slate-200 dark:border-slate-700 rounded">↑</kbd>
-            <kbd className="px-1.5 py-0.5 bg-white dark:bg-slate-800 text-slate-700 dark:text-slate-300 border border-slate-200 dark:border-slate-700 rounded">↓</kbd>
+            <kbd className="px-1.5 py-0.5 bg-[var(--surface)] text-[var(--text)] border border-[var(--border)] rounded-[var(--radius)]">
+              ↑
+            </kbd>
+            <kbd className="px-1.5 py-0.5 bg-[var(--surface)] text-[var(--text)] border border-[var(--border)] rounded-[var(--radius)]">
+              ↓
+            </kbd>
             <span>để di chuyển</span>
           </div>
           <div className="flex items-center gap-1.5">
-            <kbd className="px-1.5 py-0.5 bg-white dark:bg-slate-800 text-slate-700 dark:text-slate-300 border border-slate-200 dark:border-slate-700 rounded">↵</kbd>
+            <kbd className="px-1.5 py-0.5 bg-[var(--surface)] text-[var(--text)] border border-[var(--border)] rounded-[var(--radius)]">
+              ↵
+            </kbd>
             <span>để mở</span>
           </div>
         </div>

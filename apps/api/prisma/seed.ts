@@ -560,7 +560,7 @@ async function main() {
   const danhSachCaiDatMacDinh = [
     {
       khoa: 'TEN_HE_THONG',
-      giaTri: 'LMS Trường Học',
+      giaTri: 'SmartClass AI',
       nhom: 'CHUNG',
       moTa: 'Tên hiển thị thương hiệu của toàn hệ thống',
       kieuDuLieu: 'CHUOI',
@@ -568,7 +568,7 @@ async function main() {
     },
     {
       khoa: 'KHAU_HIEU',
-      giaTri: 'Hệ thống Quản lý Học tập Thế hệ Mới',
+      giaTri: 'Hệ thống Lớp học số tích hợp Trí tuệ nhân tạo',
       nhom: 'CHUNG',
       moTa: 'Khẩu hiệu / Slogan hiển thị ở đầu trang và banner',
       kieuDuLieu: 'CHUOI',
@@ -624,7 +624,7 @@ async function main() {
     },
     {
       khoa: 'BANNER_TIEU_DE',
-      giaTri: 'Nền tảng Học tập Toàn diện Tích hợp Phòng học LiveKit & Trợ lý AI',
+      giaTri: 'SmartClass AI – Hệ thống Lớp học số tích hợp Trí tuệ nhân tạo',
       nhom: 'GIAO_DIEN',
       moTa: 'Tiêu đề chính trên trang bìa (Landing page)',
       kieuDuLieu: 'CHUOI',
@@ -633,7 +633,7 @@ async function main() {
     {
       khoa: 'BANNER_MO_TA',
       giaTri:
-        'Đồ án tốt nghiệp chuyên ngành Công nghệ Thông tin (K23CNT1 - Sinh viên Nguyễn Quang Tâm). Tối ưu hóa trải nghiệm giảng dạy trực tuyến, quản lý học vụ và hỗ trợ học tập thông minh.',
+        'Nghiên cứu, thiết kế và phát triển hệ thống lớp học số tích hợp trí tuệ nhân tạo SmartClass AI: Điểm danh thông minh, luyện tập, thi thử và quản lý kết quả học phần (K23CNT1 - Nguyễn Quang Tâm).',
       nhom: 'GIAO_DIEN',
       moTa: 'Đoạn giới thiệu tóm tắt bên dưới tiêu đề trang chủ',
       kieuDuLieu: 'CHUOI',
@@ -649,7 +649,7 @@ async function main() {
     },
     {
       khoa: 'URL_FAVICON',
-      giaTri: '/favicon.ico',
+      giaTri: '',
       nhom: 'GIAO_DIEN',
       moTa: 'Đường dẫn Favicon trình duyệt',
       kieuDuLieu: 'CHUOI',
@@ -673,7 +673,7 @@ async function main() {
     },
     {
       khoa: 'THONG_BAO_CHUNG',
-      giaTri: 'Chào mừng bạn đến với Hệ thống Quản lý Học tập LMS Trường học!',
+      giaTri: 'Chào mừng bạn đến với Hệ thống Lớp học số tích hợp Trí tuệ nhân tạo SmartClass AI!',
       nhom: 'CHUNG',
       moTa: 'Thông báo ghim trên toàn hệ thống',
       kieuDuLieu: 'CHUOI',
@@ -714,7 +714,7 @@ async function main() {
     {
       khoa: 'AI_PROMPT_HE_THONG',
       giaTri:
-        'Bạn là Trợ lý AI học thuật thông minh của Hệ thống LMS Trường học. Nhiệm vụ của bạn là hỗ trợ sinh viên và giáo viên một cách lịch sự, sư phạm, chính xác bằng tiếng Việt. Nếu có tài liệu lớp học được cung cấp, hãy ưu tiên trích dẫn và giải thích kỹ càng theo nội dung đó. Nếu không có tài liệu cụ thể, hãy hướng dẫn kiến thức nền tảng và khuyên người học trao đổi thêm với giáo viên phụ trách.',
+        'Bạn là Trợ lý AI học thuật thông minh của Hệ thống Lớp học số SmartClass AI. Nhiệm vụ của bạn là hỗ trợ sinh viên và giáo viên một cách lịch sự, sư phạm, chính xác bằng tiếng Việt. Nếu có tài liệu lớp học được cung cấp, hãy ưu tiên trích dẫn và giải thích kỹ càng theo nội dung đó. Nếu không có tài liệu cụ thể, hãy hướng dẫn kiến thức nền tảng và khuyên người học trao đổi thêm với giáo viên phụ trách.',
       nhom: 'TRI_TUE_NHAN_TAO',
       moTa: 'Chỉ dẫn hệ thống cốt lõi (System Instruction) định hình văn phong và vai trò của Trợ lý AI',
       kieuDuLieu: 'CHUOI',
@@ -738,11 +738,16 @@ async function main() {
     },
   ];
 
+  const khoaKhongGhiDeNeuDaCo = new Set(['URL_LOGO', 'URL_FAVICON', 'URL_ICON', 'AI_API_KEY', 'AI_BASE_URL']);
   for (const cd of danhSachCaiDatMacDinh) {
+    const hienTai = await prisma.caiDatHeThong.findUnique({ where: { khoa: cd.khoa } });
+    const giuNguyenGiaTri =
+      hienTai && khoaKhongGhiDeNeuDaCo.has(cd.khoa) && hienTai.giaTri && hienTai.giaTri.trim() !== '';
+
     await prisma.caiDatHeThong.upsert({
       where: { khoa: cd.khoa },
       update: {
-        giaTri: cd.giaTri,
+        ...(giuNguyenGiaTri ? {} : { giaTri: cd.giaTri }),
         nhom: cd.nhom,
         moTa: cd.moTa,
         kieuDuLieu: cd.kieuDuLieu,
@@ -752,6 +757,239 @@ async function main() {
     });
   }
   console.log(`✓ Đã nạp ${danhSachCaiDatMacDinh.length} thiết lập cài đặt hệ thống mẫu.`);
+
+  // 18. Dữ liệu Luyện tập & Thi thử (SmartClass AI)
+  const deLuyenTapToan = await prisma.baiKiemTra.upsert({
+    where: { id: '00000000-0000-0000-0000-000000000081' },
+    update: {
+      tieuDe: 'Luyện tập Chương 2: Hàm số bậc hai và Đồ thị Parabol',
+      trangThai: 'DANG_MO',
+      thoiGianLamPhut: 15,
+    },
+    create: {
+      id: '00000000-0000-0000-0000-000000000081',
+      idLopHocPhan: lopHocPhanToan.id,
+      tieuDe: 'Luyện tập Chương 2: Hàm số bậc hai và Đồ thị Parabol',
+      moTa: 'Bộ câu hỏi ôn tập củng cố kiến thức về đỉnh parabol, trục đối xứng và xét dấu tam thức bậc hai.',
+      cheDo: 'LUYEN_TAP',
+      thoiGianLamPhut: 15,
+      soLuotToiDa: 10,
+      diemToiDa: 10,
+      trangThai: 'DANG_MO',
+    },
+  });
+
+  const deThiThuToan = await prisma.baiKiemTra.upsert({
+    where: { id: '00000000-0000-0000-0000-000000000082' },
+    update: {
+      tieuDe: 'Đề Thi thử Giữa học kỳ 1 - Đại số & Hình học 10',
+      trangThai: 'DANG_MO',
+      thoiGianLamPhut: 30,
+    },
+    create: {
+      id: '00000000-0000-0000-0000-000000000082',
+      idLopHocPhan: lopHocPhanToan.id,
+      tieuDe: 'Đề Thi thử Giữa học kỳ 1 - Đại số & Hình học 10',
+      moTa: 'Đề thi thử đánh giá năng lực giữa học kỳ có tính điểm thành phần.',
+      cheDo: 'THI_THU',
+      thoiGianLamPhut: 30,
+      soLuotToiDa: 1,
+      diemToiDa: 10,
+      trangThai: 'DANG_MO',
+    },
+  });
+
+  const cacCauHoiMau = [
+    {
+      id: '00000000-0000-0000-0000-000000000801',
+      idBaiKiemTra: deLuyenTapToan.id,
+      noiDung: 'Cho hàm số bậc hai y = x² - 4x + 3. Tọa độ đỉnh I của đồ thị Parabol là:',
+      cacPhuongAn: [
+        { ma: 'A', noiDung: 'I(2; -1)' },
+        { ma: 'B', noiDung: 'I(-2; 15)' },
+        { ma: 'C', noiDung: 'I(4; 3)' },
+        { ma: 'D', noiDung: 'I(2; 1)' },
+      ],
+      dapAnDung: 'A',
+      giaiThich: 'Hoành độ đỉnh x = -b/(2a) = 4/2 = 2. Tung độ đỉnh y = 2² - 4(2) + 3 = -1. Vậy I(2; -1).',
+      thuTu: 1,
+    },
+    {
+      id: '00000000-0000-0000-0000-000000000802',
+      idBaiKiemTra: deLuyenTapToan.id,
+      noiDung: 'Trục đối xứng của đồ thị hàm số y = 2x² + 6x - 5 là đường thẳng nào sau đây?',
+      cacPhuongAn: [
+        { ma: 'A', noiDung: 'x = -3/2' },
+        { ma: 'B', noiDung: 'x = 3/2' },
+        { ma: 'C', noiDung: 'x = -3' },
+        { ma: 'D', noiDung: 'y = -3/2' },
+      ],
+      dapAnDung: 'A',
+      giaiThich: 'Trục đối xứng của parabol y = ax² + bx + c là đường thẳng x = -b/(2a) = -6/(2*2) = -3/2.',
+      thuTu: 2,
+    },
+    {
+      id: '00000000-0000-0000-0000-000000000803',
+      idBaiKiemTra: deLuyenTapToan.id,
+      noiDung: 'Tam thức bậc hai f(x) = x² - 5x + 6 nhận giá trị âm trong khoảng nào?',
+      cacPhuongAn: [
+        { ma: 'A', noiDung: '(2; 3)' },
+        { ma: 'B', noiDung: '(-∞; 2)' },
+        { ma: 'C', noiDung: '(3; +∞)' },
+        { ma: 'D', noiDung: '(-3; -2)' },
+      ],
+      dapAnDung: 'A',
+      giaiThich: 'Phương trình x² - 5x + 6 = 0 có 2 nghiệm x = 2 và x = 3. Do hệ số a = 1 > 0 nên f(x) < 0 trong khoảng (2; 3).',
+      thuTu: 3,
+    },
+    {
+      id: '00000000-0000-0000-0000-000000000811',
+      idBaiKiemTra: deThiThuToan.id,
+      noiDung: 'Điều kiện cần và đủ để phương trình bậc hai ax² + bx + c = 0 (a ≠ 0) có hai nghiệm phân biệt là:',
+      cacPhuongAn: [
+        { ma: 'A', noiDung: 'Δ = b² - 4ac > 0' },
+        { ma: 'B', noiDung: 'Δ = b² - 4ac ≥ 0' },
+        { ma: 'C', noiDung: 'Δ = b² - 4ac = 0' },
+        { ma: 'D', noiDung: 'Δ = b² - 4ac < 0' },
+      ],
+      dapAnDung: 'A',
+      giaiThich: 'Phương trình bậc hai có hai nghiệm thực phân biệt khi và chỉ khi biệt thức Δ = b² - 4ac > 0.',
+      thuTu: 1,
+    },
+    {
+      id: '00000000-0000-0000-0000-000000000812',
+      idBaiKiemTra: deThiThuToan.id,
+      noiDung: 'Theo định lý Vi-ét, nếu phương trình x² - 7x + 10 = 0 có hai nghiệm x₁, x₂ thì tổng x₁ + x₂ bằng:',
+      cacPhuongAn: [
+        { ma: 'A', noiDung: '7' },
+        { ma: 'B', noiDung: '-7' },
+        { ma: 'C', noiDung: '10' },
+        { ma: 'D', noiDung: '-10' },
+      ],
+      dapAnDung: 'A',
+      giaiThich: 'Theo hệ thức Vi-ét: x₁ + x₂ = -b/a = 7/1 = 7 và x₁.x₂ = c/a = 10.',
+      thuTu: 2,
+    },
+  ];
+
+  for (const ch of cacCauHoiMau) {
+    await prisma.cauHoi.upsert({
+      where: { id: ch.id },
+      update: {
+        noiDung: ch.noiDung,
+        cacPhuongAn: ch.cacPhuongAn,
+        dapAnDung: ch.dapAnDung,
+        giaiThich: ch.giaiThich,
+        thuTu: ch.thuTu,
+      },
+      create: ch,
+    });
+  }
+
+  await prisma.luotLamBai.upsert({
+    where: { id: '00000000-0000-0000-0000-000000000850' },
+    update: {
+      diemSo: 8.5,
+      soCauDung: 2,
+      tongSoCau: 2,
+      trangThai: 'DA_CHAM',
+    },
+    create: {
+      id: '00000000-0000-0000-0000-000000000850',
+      idBaiKiemTra: deThiThuToan.id,
+      idHocSinh: hoSoHocSinh.id,
+      thoiGianNop: new Date(),
+      thoiLuongGiay: 480,
+      chiTietTraLoi: [
+        {
+          idCauHoi: '00000000-0000-0000-0000-000000000811',
+          thuTu: 1,
+          noiDungCauHoi: 'Điều kiện cần và đủ để phương trình bậc hai ax² + bx + c = 0 (a ≠ 0) có hai nghiệm phân biệt là:',
+          dapAnChon: 'A',
+          dapAnDung: 'A',
+          dungHaySai: true,
+          diemDatDuoc: 5,
+        },
+        {
+          idCauHoi: '00000000-0000-0000-0000-000000000812',
+          thuTu: 2,
+          noiDungCauHoi: 'Theo định lý Vi-ét, nếu phương trình x² - 7x + 10 = 0 có hai nghiệm x₁, x₂ thì tổng x₁ + x₂ bằng:',
+          dapAnChon: 'A',
+          dapAnDung: 'A',
+          dungHaySai: true,
+          diemDatDuoc: 5,
+        },
+      ],
+      soCauDung: 2,
+      tongSoCau: 2,
+      diemSo: 8.5,
+      nhanXetAI:
+        'Kết quả bài làm rất tốt! Bạn nắm vững định lý Vi-ét và điều kiện nghiệm của phương trình bậc hai. Hãy tiếp tục rèn luyện thêm các bài toán chứa tham số m.',
+      trangThai: 'DA_CHAM',
+    },
+  });
+  console.log('✓ Dữ liệu Luyện tập & Thi thử mẫu (SmartClass AI)');
+
+  // 19. Dữ liệu Quản lý kết quả học phần (CotDiem & DiemSo)
+  const cacCotDiemMau = [
+    {
+      id: '00000000-0000-0000-0000-000000000901',
+      idLopHocPhan: lopHocPhanToan.id,
+      tenCotDiem: 'Chuyên cần',
+      heSo: 1,
+      giaTriMau: 9.2,
+    },
+    {
+      id: '00000000-0000-0000-0000-000000000902',
+      idLopHocPhan: lopHocPhanToan.id,
+      tenCotDiem: 'Luyện tập & Bài tập',
+      heSo: 2,
+      giaTriMau: 8.5,
+    },
+    {
+      id: '00000000-0000-0000-0000-000000000903',
+      idLopHocPhan: lopHocPhanToan.id,
+      tenCotDiem: 'Giữa kỳ (Thi thử)',
+      heSo: 3,
+      giaTriMau: 8.5,
+    },
+    {
+      id: '00000000-0000-0000-0000-000000000904',
+      idLopHocPhan: lopHocPhanToan.id,
+      tenCotDiem: 'Cuối kỳ',
+      heSo: 4,
+      giaTriMau: 9.0,
+    },
+  ];
+
+  for (const cd of cacCotDiemMau) {
+    const cot = await prisma.cotDiem.upsert({
+      where: { id: cd.id },
+      update: { tenCotDiem: cd.tenCotDiem, heSo: cd.heSo },
+      create: {
+        id: cd.id,
+        idLopHocPhan: cd.idLopHocPhan,
+        tenCotDiem: cd.tenCotDiem,
+        heSo: cd.heSo,
+      },
+    });
+
+    await prisma.diemSo.upsert({
+      where: {
+        idCotDiem_idHocSinh: {
+          idCotDiem: cot.id,
+          idHocSinh: hoSoHocSinh.id,
+        },
+      },
+      update: { giaTri: cd.giaTriMau },
+      create: {
+        idCotDiem: cot.id,
+        idHocSinh: hoSoHocSinh.id,
+        giaTri: cd.giaTriMau,
+      },
+    });
+  }
+  console.log('✓ Dữ liệu Sổ điểm & Quản lý kết quả học phần mẫu (SmartClass AI)');
 
   console.log('--- Hoàn thành gieo mầm dữ liệu chuẩn mực ---');
 }

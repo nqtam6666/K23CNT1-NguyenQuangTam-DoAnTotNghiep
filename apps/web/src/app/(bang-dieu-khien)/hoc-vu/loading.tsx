@@ -13,7 +13,7 @@ export default function HocVuLoading() {
       </div>
 
       {/* Tabs */}
-      <div className="border-b border-slate-200 flex gap-4">
+      <div className="border-b border-border flex gap-4">
         <KhungXuong className="h-9 w-28 rounded-t" />
         <KhungXuong className="h-9 w-28 rounded-t" />
         <KhungXuong className="h-9 w-28 rounded-t" />
@@ -24,9 +24,9 @@ export default function HocVuLoading() {
         {[1, 2, 3, 4].map((i) => (
           <div
             key={i}
-            className="p-5 rounded-xl bg-white border border-slate-200 shadow-2xs space-y-4"
+            className="p-5 rounded bg-surface border border-border shadow-2xs space-y-4"
           >
-            <div className="flex items-center justify-between pb-3 border-b border-slate-100">
+            <div className="flex items-center justify-between pb-3 border-b border-border">
               <div className="flex items-center gap-3">
                 <KhungXuong className="w-10 h-10 rounded-lg" />
                 <div className="space-y-1.5">

@@ -46,7 +46,7 @@ export const dangKySchema = z.object({
  * Schema Zod làm mới token (Refresh Token)
  */
 export const lamMoiTokenSchema = z.object({
-  refreshToken: z.string({ required_error: 'Refresh token không được để trống' }).min(1),
+  refreshToken: z.string().min(1).optional(),
 });
 
 /**

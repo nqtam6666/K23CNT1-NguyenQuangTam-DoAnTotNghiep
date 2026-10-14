@@ -16,10 +16,10 @@ export class TienIchGiaoVuProvider implements NhaCungCapTienIch {
   async cungCapTienIch(_nguoiDung: PayloadJwt): Promise<TienIchBangDieuKhien[]> {
     const ketQua: TienIchBangDieuKhien[] = [];
 
-    // 1. Thẻ lớp học phần chưa phân công giáo viên
+    // 1. Thẻ lớp chưa phân công giáo viên chủ nhiệm
     const [soLopChuaPhanCong, tongSoLop] = await Promise.all([
-      this.prisma.lopHocPhan.count({
-        where: { idGiaoVien: { equals: '' } },
+      this.prisma.lopHanhChinh.count({
+        where: { idGiaoVienCN: null },
       }),
       this.prisma.lopHocPhan.count(),
     ]);

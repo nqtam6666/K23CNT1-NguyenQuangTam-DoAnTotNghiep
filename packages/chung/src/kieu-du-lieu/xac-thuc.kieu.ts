@@ -20,6 +20,7 @@ export interface PayloadJwt {
 export interface KetQuaXacThuc {
   accessToken: string;
   refreshToken: string;
+  thoiGianPhienGiay?: number;
   nguoiDung: ThongTinNguoiDungTomTat;
 }
 

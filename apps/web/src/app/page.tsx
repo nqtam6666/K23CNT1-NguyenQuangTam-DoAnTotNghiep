@@ -1,5 +1,6 @@
 'use client';
 
+import { useEffect, useState } from 'react';
 import Link from 'next/link';
 import {
   BookOpen,
@@ -9,12 +10,30 @@ import {
   School,
   BellRing,
   Terminal,
+  Settings,
+  LayoutDashboard,
 } from 'lucide-react';
+import { PayloadJwt, VaiTro } from '@lms/chung';
 import { useCaiDatHeThong } from '../tien-ich/use-cai-dat';
 import { ToggleTheme } from '@/components/ui/toggle-theme';
 
 export default function TrangChu() {
   const { layGiaTri, choPhepDangKy } = useCaiDatHeThong();
+  const [nguoiDungHienTai, setNguoiDungHienTai] = useState<PayloadJwt | null>(null);
+
+  useEffect(() => {
+    try {
+      const raw = sessionStorage.getItem('lms_cache_ho_so');
+      if (raw) {
+        const parsed = JSON.parse(raw) as PayloadJwt;
+        if (parsed && parsed.email) {
+          setNguoiDungHienTai(parsed);
+        }
+      }
+    } catch {
+      // Bỏ qua lỗi đọc sessionStorage
+    }
+  }, []);
 
   const tenHeThong = layGiaTri('TEN_HE_THONG', 'LMS Trường Học');
   const khauHieu = layGiaTri('KHAU_HIEU', 'Hệ thống Quản lý Học tập');
@@ -102,19 +121,42 @@ export default function TrangChu() {
           </div>
           <div className="flex items-center gap-2.5">
             <ToggleTheme />
-            <Link
-              href="/dang-nhap"
-              className="px-3.5 py-2 text-[13px] font-semibold text-muted hover:text-text transition-colors"
-            >
-              Đăng nhập
-            </Link>
-            {choPhepDangKy && (
-              <Link
-                href="/dang-ky"
-                className="px-4 py-2 text-[13px] font-semibold text-white bg-accent rounded hover:brightness-95 transition-colors shadow-accent"
-              >
-                Đăng ký tài khoản
-              </Link>
+            {nguoiDungHienTai ? (
+              <>
+                {nguoiDungHienTai.vaiTro === VaiTro.QUAN_TRI_VIEN && (
+                  <Link
+                    href="/cai-dat"
+                    className="hidden sm:inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-semibold text-text bg-bg border border-border rounded hover:bg-active-bg transition-colors"
+                  >
+                    <Settings className="w-3.5 h-3.5 text-accent" strokeWidth={1.5} />
+                    <span>Cài đặt hệ thống</span>
+                  </Link>
+                )}
+                <Link
+                  href="/bang-dieu-khien"
+                  className="inline-flex items-center gap-1.5 px-3.5 py-2 text-[13px] font-semibold text-white bg-accent rounded hover:brightness-95 transition-colors shadow-accent"
+                >
+                  <LayoutDashboard className="w-4 h-4" strokeWidth={1.5} />
+                  <span>Về Bảng điều khiển</span>
+                </Link>
+              </>
+            ) : (
+              <>
+                <Link
+                  href="/dang-nhap"
+                  className="px-3.5 py-2 text-[13px] font-semibold text-muted hover:text-text transition-colors"
+                >
+                  Đăng nhập
+                </Link>
+                {choPhepDangKy && (
+                  <Link
+                    href="/dang-ky"
+                    className="px-4 py-2 text-[13px] font-semibold text-white bg-accent rounded hover:brightness-95 transition-colors shadow-accent"
+                  >
+                    Đăng ký tài khoản
+                  </Link>
+                )}
+              </>
             )}
           </div>
         </div>
@@ -135,10 +177,10 @@ export default function TrangChu() {
               </p>
               <div className="pt-3 flex flex-wrap items-center gap-3">
                 <Link
-                  href="/dang-nhap"
+                  href={nguoiDungHienTai ? '/bang-dieu-khien' : '/dang-nhap'}
                   className="inline-flex items-center gap-2 px-5 py-[11px] rounded text-[13px] text-white bg-accent font-semibold hover:brightness-95 transition-colors shadow-accent"
                 >
-                  Truy cập Bảng điều khiển
+                  {nguoiDungHienTai ? 'Về Bảng điều khiển' : 'Truy cập Bảng điều khiển'}
                   <ArrowRight className="w-4 h-4" strokeWidth={1.5} />
                 </Link>
                 <a

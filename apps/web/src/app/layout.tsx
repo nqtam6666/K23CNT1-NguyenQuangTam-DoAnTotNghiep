@@ -50,21 +50,34 @@ export default function RootLayout({
           dangerouslySetInnerHTML={{
             __html: `
               try {
+                var rawUi = localStorage.getItem('lms_ui_config');
+                var uiCfg = rawUi ? JSON.parse(rawUi) : null;
+                var rootEl = document.documentElement;
+                if (uiCfg) {
+                  if (uiCfg.accentLight) rootEl.style.setProperty('--custom-accent-light', uiCfg.accentLight);
+                  if (uiCfg.accentDark) rootEl.style.setProperty('--custom-accent-dark', uiCfg.accentDark);
+                  if (uiCfg.accentSoftLight) rootEl.style.setProperty('--custom-accent-soft-light', uiCfg.accentSoftLight);
+                  if (uiCfg.accentSoftDark) rootEl.style.setProperty('--custom-accent-soft-dark', uiCfg.accentSoftDark);
+                  if (uiCfg.radius) rootEl.style.setProperty('--radius', uiCfg.radius);
+                  if (uiCfg.selectionStyle) rootEl.setAttribute('data-selection-style', uiCfg.selectionStyle);
+                  if (uiCfg.density) rootEl.setAttribute('data-density', uiCfg.density);
+                  if (uiCfg.topProgress) rootEl.setAttribute('data-top-progress', uiCfg.topProgress);
+                }
                 var theme = localStorage.getItem('lms_theme');
                 var isDark = theme === 'toi' || theme === 'dark' || (!theme && window.matchMedia('(prefers-color-scheme: dark)').matches);
                 if (isDark) {
-                  document.documentElement.classList.add('dark');
-                  document.documentElement.setAttribute('data-theme', 'dark');
+                  rootEl.classList.add('dark');
+                  rootEl.setAttribute('data-theme', 'dark');
                 } else {
-                  document.documentElement.classList.remove('dark');
-                  document.documentElement.setAttribute('data-theme', 'light');
+                  rootEl.classList.remove('dark');
+                  rootEl.setAttribute('data-theme', 'light');
                 }
                 var savedFavicon = localStorage.getItem('lms_favicon');
                 if (savedFavicon) {
-                  var link = document.querySelector("link[rel='icon']") || document.createElement('link');
-                  link.setAttribute('rel', 'icon');
-                  link.setAttribute('href', savedFavicon);
-                  if (!link.parentNode) document.head.appendChild(link);
+                  var link = document.querySelector("link[rel*='icon']");
+                  if (link) {
+                    link.setAttribute('href', savedFavicon);
+                  }
                 }
               } catch (e) {}
             `,

@@ -4,11 +4,13 @@ import {
   ForbiddenException,
   BadRequestException,
   Logger,
+  Optional,
 } from '@nestjs/common';
 import { PrismaService } from '../../cot-loi/csdl/prisma.service';
 import { KhoTroLyAiRepository } from './kho-tro-ly-ai.repository';
 import { DichVuEmbeddingService } from './dich-vu-embedding.service';
 import { DichVuLlmService } from './dich-vu-llm.service';
+import { DichVuCaiDatService } from '../cai-dat/dich-vu-cai-dat.service';
 import {
   PayloadJwt,
   VaiTro,
@@ -34,6 +36,7 @@ export class DichVuTroLyAiService {
     private readonly dichVuEmbedding: DichVuEmbeddingService,
     private readonly dichVuLlm: DichVuLlmService,
     private readonly prisma: PrismaService,
+    @Optional() private readonly dichVuCaiDat?: DichVuCaiDatService,
   ) {}
 
   // ==========================================
@@ -60,6 +63,15 @@ export class DichVuTroLyAiService {
     await this.layChiTietPhien(idPhien, nguoiDung);
     await this.khoTroLyAi.xoaPhien(idPhien, nguoiDung.sub);
     return { thanhCong: true, thongDiep: 'Đã xóa phiên trò chuyện' };
+  }
+
+  async xoaTatCaPhien(nguoiDung: PayloadJwt) {
+    const ketQua = await this.khoTroLyAi.xoaTatCaPhienCuaNguoiDung?.(nguoiDung.sub);
+    return {
+      thanhCong: true,
+      soLuongXoa: ketQua?.count ?? 0,
+      thongDiep: 'Đã xóa toàn bộ lịch sử hội thoại với Trợ lý AI',
+    };
   }
 
   // ==========================================
@@ -329,6 +341,44 @@ export class DichVuTroLyAiService {
   async hoiDap(duLieu: GuiTinNhanTroLyInput, nguoiDung: PayloadJwt): Promise<KetQuaHoiDapAI> {
     const thoiDiemBatDau = Date.now();
 
+    // 0. Kiểm tra công tắc kích hoạt Trợ lý AI toàn trường và hạn mức lượt hỏi mỗi ngày
+    const kichHoatAi =
+      (await this.dichVuCaiDat?.layGiaTriBoolean('tro_ly_ai.kich_hoat', true)) ?? true;
+    if (!kichHoatAi) {
+      throw new ForbiddenException({
+        thanhCong: false,
+        maLoi: MaLoiNghiepVu.KHONG_CO_QUYEN_TRUY_CAP,
+        thongDiep: 'Tính năng Trợ lý AI học thuật hiện đang tạm đóng theo cấu hình của nhà trường.',
+      });
+    }
+
+    const laQuanTri =
+      nguoiDung.vaiTro === VaiTro.QUAN_TRI_VIEN ||
+      nguoiDung.vaiTro === VaiTro.BAN_GIAM_HIEU ||
+      nguoiDung.vaiTro === VaiTro.GIAO_VU;
+
+    if (!laQuanTri && this.khoTroLyAi.demSoLuotHoiTrongNgay) {
+      const gioiHanNgay =
+        nguoiDung.vaiTro === VaiTro.GIAO_VIEN
+          ? ((await this.dichVuCaiDat?.layGiaTriSo(
+              'tro_ly_ai.gioi_han_luot_hoi_ngay_giao_vien',
+              100,
+            )) ?? 100)
+          : ((await this.dichVuCaiDat?.layGiaTriSo(
+              'tro_ly_ai.gioi_han_luot_hoi_ngay_hoc_sinh',
+              30,
+            )) ?? 30);
+
+      const daDungHomNay = await this.khoTroLyAi.demSoLuotHoiTrongNgay(nguoiDung.sub);
+      if (daDungHomNay >= gioiHanNgay) {
+        throw new BadRequestException({
+          thanhCong: false,
+          maLoi: MaLoiNghiepVu.YEU_CAU_KHONG_HOP_LE,
+          thongDiep: `Bạn đã sử dụng hết hạn mức ${gioiHanNgay} lượt hỏi Trợ lý AI trong ngày hôm nay. Hạn mức sẽ tự động làm mới vào ngày mai.`,
+        });
+      }
+    }
+
     // 1. Quản lý phiên hội thoại
     let idPhien = duLieu.idPhien;
     if (!idPhien) {
@@ -424,11 +474,14 @@ export class DichVuTroLyAiService {
       // 6. Tạo vector embedding cho câu hỏi
       const vectorCauHoi = await this.dichVuEmbedding.taoVectorEmbedding(duLieu.noiDung);
 
+      const soDoanRag =
+        (await this.dichVuCaiDat?.layGiaTriSo('tro_ly_ai.so_doan_tai_lieu_truy_hoi_rag', 4)) ?? 4;
+
       // 7. Truy hồi ngữ cảnh tương đồng qua pgvector có Pre-filtering
       const cacDoan = await this.khoTroLyAi.truyHoiDoanTuongDong(
         vectorCauHoi,
         danhSachIdLop,
-        4,
+        Math.max(1, Math.min(10, soDoanRag)),
       );
 
       // Tính điểm Hybrid (Cosine pgvector + Trùng khớp từ khóa ngữ nghĩa)

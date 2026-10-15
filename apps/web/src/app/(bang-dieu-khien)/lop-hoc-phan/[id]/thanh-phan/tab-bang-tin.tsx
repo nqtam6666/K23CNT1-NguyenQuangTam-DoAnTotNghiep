@@ -16,6 +16,7 @@ import { mayKhachApi } from '../../../../../tien-ich/may-khach-api';
 import { thongBao } from '../../../../../tien-ich/thong-bao';
 import { BaiDang, BinhLuan, PayloadJwt, VaiTro } from '@lms/chung';
 import { AnhDaiDien } from '../../../../../thanh-phan/anh-dai-dien';
+import { CongTac } from '../../../../../thanh-phan/cong-tac';
 
 interface ThuocTinhTabBangTin {
   idLopHocPhan: string;
@@ -172,16 +173,20 @@ export function TabBangTin({ idLopHocPhan, nguoiDung, laGiaoVienLop }: ThuocTinh
 
           <div className="flex flex-wrap items-center justify-between gap-3 pt-1">
             {(laGiaoVienLop || laQuanTri) && (
-              <label className="flex items-center gap-2 text-xs font-medium text-muted-foreground hover:text-foreground cursor-pointer select-none">
-                <input
-                  type="checkbox"
+              <div className="flex items-center gap-2.5">
+                <CongTac
+                  id="ghimDauTrang"
                   checked={ghimDauTrang}
-                  onChange={(e) => setGhimDauTrang(e.target.checked)}
-                  className="rounded border-input text-primary focus:ring-primary h-4 w-4"
+                  onChange={(checked) => setGhimDauTrang(checked)}
                 />
-                <Pin className="w-3.5 h-3.5 text-accent" />
-                Ghim bài đăng lên đầu trang
-              </label>
+                <label
+                  htmlFor="ghimDauTrang"
+                  className="flex items-center gap-1.5 text-xs font-medium text-muted-foreground hover:text-foreground cursor-pointer select-none"
+                >
+                  <Pin className="w-3.5 h-3.5 text-accent" />
+                  Ghim bài đăng lên đầu trang
+                </label>
+              </div>
             )}
 
             <button

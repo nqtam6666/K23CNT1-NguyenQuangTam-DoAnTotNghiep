@@ -25,6 +25,7 @@ import {
   capNhatHoSoGiaoVienSchema,
   thietLapLienKetPhuHuynhSchema,
   truyVanPhanTrangSchema,
+  soDoTuyChonCaNhan,
   CapNhatHoSoDto,
   TaoHoSoHocSinhDto,
   CapNhatHoSoHocSinhDto,
@@ -33,6 +34,7 @@ import {
   CapNhatHoSoGiaoVienDto,
   ThietLapLienKetPhuHuynhDto,
   TruyVanPhanTrangDto,
+  TuyChonCaNhan,
   HanhDong,
   DoiTuong,
   PayloadJwt,
@@ -68,6 +70,23 @@ export class DieuKhienHoSo {
     @Body(new ZodValidationPipe(capNhatHoSoSchema)) duLieu: CapNhatHoSoDto,
   ) {
     return this.dichVuHoSo.capNhatHoSoCaNhan(idNguoiDung, duLieu);
+  }
+
+  @Get('tuy-chon-ca-nhan')
+  @ApiOperation({ summary: 'Lấy tùy chọn cài đặt cá nhân của người dùng hiện tại' })
+  @ApiResponse({ status: 200, description: 'Tùy chọn cá nhân trả về thành công' })
+  async layTuyChonCaNhan(@NguoiDungHienTai('id') idNguoiDung: string) {
+    return this.dichVuHoSo.layTuyChonCaNhan(idNguoiDung);
+  }
+
+  @Patch('tuy-chon-ca-nhan')
+  @ApiOperation({ summary: 'Cập nhật tùy chọn cài đặt cá nhân của người dùng hiện tại' })
+  @ApiResponse({ status: 200, description: 'Cập nhật tùy chọn cá nhân thành công' })
+  async capNhatTuyChonCaNhan(
+    @NguoiDungHienTai('id') idNguoiDung: string,
+    @Body(new ZodValidationPipe(soDoTuyChonCaNhan)) duLieu: Partial<TuyChonCaNhan>,
+  ) {
+    return this.dichVuHoSo.capNhatTuyChonCaNhan(idNguoiDung, duLieu);
   }
 
   @Post('anh-dai-dien')

@@ -42,13 +42,17 @@ export class DichVuLlmService {
     nhietDo: number;
     tokenToiDa: number;
   }> {
-    // 1. Đọc từ CSDL
+    // 1. Đọc từ CSDL (sử dụng layBanDoCaiDatNoiBo để giải mã khóa bí mật)
     let caiDatMap: Record<string, string> = {};
     try {
-      const danhSach = await this.dichVuCaiDat.layDanhSachCaiDat();
-      danhSach.forEach((item) => {
-        caiDatMap[item.khoa] = item.giaTri;
-      });
+      if (this.dichVuCaiDat.layBanDoCaiDatNoiBo) {
+        caiDatMap = await this.dichVuCaiDat.layBanDoCaiDatNoiBo();
+      } else {
+        const danhSach = await this.dichVuCaiDat.layDanhSachCaiDat();
+        danhSach.forEach((item) => {
+          caiDatMap[item.khoa] = item.giaTri;
+        });
+      }
     } catch (e) {
       this.nhatKy.warn('Không thể tải cấu hình từ CSDL, sử dụng cấu hình mặc định/môi trường');
     }
@@ -56,6 +60,7 @@ export class DichVuLlmService {
     // 2. Xác định nhà cung cấp
     const nhaCungCapRaw = (
       cauHinhOverride?.nhaCungCap ||
+      caiDatMap['tro_ly_ai.nha_cung_cap'] ||
       caiDatMap['AI_NHA_CUNG_CAP'] ||
       process.env.AI_NHA_CUNG_CAP ||
       'gemini'
@@ -71,9 +76,17 @@ export class DichVuLlmService {
       ? (nhaCungCapRaw as NhaCungCapLlm)
       : 'gemini';
 
-    // 3. Xác định API Key
-    let apiKey = cauHinhOverride?.apiKey ?? caiDatMap['AI_API_KEY'];
-    if (!apiKey) {
+    // 3. Xác định API Key (nếu override gửi mặt nạ •••••••• hoặc không truyền thì lấy khóa thực đã giải mã trong CSDL)
+    const coTruyenApiKeyOverride = cauHinhOverride?.apiKey !== undefined;
+    const overrideKey = cauHinhOverride?.apiKey?.trim() ?? '';
+    const laMatNa = overrideKey.length > 0 && /^[•*]+$/.test(overrideKey);
+    let apiKey =
+      coTruyenApiKeyOverride && !laMatNa
+        ? overrideKey
+        : caiDatMap['tro_ly_ai.khoa_bi_mat_api'] || caiDatMap['AI_API_KEY'];
+
+    if (!coTruyenApiKeyOverride && (!apiKey || /^[•*]+$/.test(apiKey))) {
+      apiKey = '';
       if (nhaCungCap === 'gemini') {
         apiKey = process.env.GEMINI_API_KEY || '';
       } else if (nhaCungCap === 'openai') {
@@ -96,6 +109,7 @@ export class DichVuLlmService {
 
     const model =
       cauHinhOverride?.model ||
+      caiDatMap['tro_ly_ai.ten_mo_hinh'] ||
       caiDatMap['AI_MODEL'] ||
       (nhaCungCap === 'gemini' ? process.env.GEMINI_MODEL : undefined) ||
       modelMacDinh;
@@ -108,6 +122,7 @@ export class DichVuLlmService {
 
     const baseUrl =
       cauHinhOverride?.baseUrl ||
+      caiDatMap['tro_ly_ai.url_may_chu_tuy_chinh'] ||
       caiDatMap['AI_BASE_URL'] ||
       process.env.AI_BASE_URL ||
       baseUrlMacDinh;
@@ -115,16 +130,18 @@ export class DichVuLlmService {
     // 6. Prompt hệ thống & Tham số
     const promptHeThong =
       cauHinhOverride?.promptHeThong ||
+      caiDatMap['tro_ly_ai.chi_dan_he_thong'] ||
       caiDatMap['AI_PROMPT_HE_THONG'] ||
       'Bạn là Trợ lý AI học thuật thông minh của Hệ thống LMS Trường học. Hãy hỗ trợ người học lịch sự, sư phạm, chính xác bằng tiếng Việt chuẩn mực.';
 
+    const rawNhietDo = caiDatMap['tro_ly_ai.nhiet_do_sang_tao'] || caiDatMap['AI_NHIET_DO'];
     const nhietDo =
-      cauHinhOverride?.nhietDo ??
-      (caiDatMap['AI_NHIET_DO'] ? parseFloat(caiDatMap['AI_NHIET_DO']) : 0.7);
+      cauHinhOverride?.nhietDo ?? (rawNhietDo ? parseFloat(rawNhietDo) : 0.7);
 
+    const rawTokenToiDa =
+      caiDatMap['tro_ly_ai.so_token_phan_hoi_toi_da'] || caiDatMap['AI_TOKEN_TOI_DA'];
     const tokenToiDa =
-      cauHinhOverride?.tokenToiDa ??
-      (caiDatMap['AI_TOKEN_TOI_DA'] ? parseInt(caiDatMap['AI_TOKEN_TOI_DA'], 10) : 1024);
+      cauHinhOverride?.tokenToiDa ?? (rawTokenToiDa ? parseInt(rawTokenToiDa, 10) : 1024);
 
     return {
       nhaCungCap,

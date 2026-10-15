@@ -4,11 +4,13 @@ import {
   ForbiddenException,
   BadRequestException,
   Logger,
+  Optional,
 } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { AccessToken, WebhookReceiver } from 'livekit-server-sdk';
 import { PrismaService } from '../../cot-loi/csdl/prisma.service';
 import { KhoPhongHoc } from './kho-phong-hoc.repository';
+import { DichVuCaiDatService } from '../cai-dat/dich-vu-cai-dat.service';
 import {
   KetQuaTokenLiveKit,
   PayloadJwt,
@@ -31,6 +33,7 @@ export class DichVuPhongHoc {
     private readonly khoPhongHoc: KhoPhongHoc,
     private readonly prisma: PrismaService,
     private readonly configService: ConfigService,
+    @Optional() private readonly dichVuCaiDat?: DichVuCaiDatService,
   ) {}
 
   private layIdNguoiDung(nguoiDung: PayloadJwt): string {
@@ -38,7 +41,7 @@ export class DichVuPhongHoc {
   }
 
   /**
-   * Cấp Token truy cập ngắn hạn (TTL = 120 phút) cho phòng học LiveKit
+   * Cấp Token truy cập ngắn hạn (TTL theo cài đặt phong_hoc.thoi_han_token_phut) cho phòng học LiveKit
    */
   async taoTokenTruyCap(
     idLopHocPhan: string,
@@ -129,10 +132,13 @@ export class DichVuPhongHoc {
       this.configService.get<string>('LIVEKIT_API_SECRET') || 'secret_key_livekit_lms_2026';
     const urlMayChuLiveKit = this.configService.get<string>('LIVEKIT_URL') || 'ws://localhost:7880';
 
+    const soPhutTtl =
+      (await this.dichVuCaiDat?.layGiaTriSo('phong_hoc.thoi_han_token_phut', 120)) ?? 120;
+
     const at = new AccessToken(apiKey, apiSecret, {
       identity: idNguoiDung,
       name: nguoiDung.hoTen,
-      ttl: '2h',
+      ttl: `${Math.max(30, Math.min(360, soPhutTtl))}m`,
       metadata: JSON.stringify({
         idNguoiDung,
         hoTen: nguoiDung.hoTen,
@@ -605,6 +611,9 @@ export class DichVuPhongHoc {
     });
     const mapHienCo = new Map(banGhiHienCo.map((b) => [b.idHocSinh, b]));
 
+    const soPhutChoPhepTre =
+      (await this.dichVuCaiDat?.layGiaTriSo('diem_danh.so_phut_tinh_di_muon', 15)) ?? 15;
+
     let soCoMat = 0;
     let soDiMuon = 0;
     let soVangCoPhep = 0;
@@ -630,7 +639,7 @@ export class DichVuPhongHoc {
       // Kiểm tra nhật ký tham gia phòng trực tuyến
       const cacLuotVao = nhatKyBuoi.filter((nk) => nk.idNguoiDung === idUserHS);
       if (cacLuotVao.length > 0) {
-        // Kiểm tra xem lần vào đầu tiên có trễ hơn 15 phút so với giờ bắt đầu không
+        // Kiểm tra xem lần vào đầu tiên có trễ hơn ngưỡng cấu hình so với giờ bắt đầu không
         const lanVaoDau = cacLuotVao.reduce((min, cur) =>
           cur.thoiGianVao < min.thoiGianVao ? cur : min,
         );
@@ -638,7 +647,7 @@ export class DichVuPhongHoc {
           (new Date(lanVaoDau.thoiGianVao).getTime() - new Date(buoiHoc.thoiGianBD).getTime()) /
           (60 * 1000);
 
-        if (phutTre > 15) {
+        if (phutTre > soPhutChoPhepTre) {
           await this.khoPhongHoc.diemDanhHocSinh(
             idBuoiHoc,
             idHocSinh,
@@ -833,6 +842,21 @@ export class DichVuPhongHoc {
       },
     });
 
+    const nguongBuoiVangCamThi =
+      (await this.dichVuCaiDat?.layGiaTriSo('diem_danh.nguong_buoi_vang_cam_thi', 3)) ?? 3;
+    const nguongPhanTramCamThi =
+      (await this.dichVuCaiDat?.layGiaTriSo(
+        'diem_danh.nguong_phan_tram_chuyen_can_cam_thi',
+        70,
+      )) ?? 70;
+    const diemTruVangKhongPhep =
+      (await this.dichVuCaiDat?.layGiaTriSo('diem_danh.diem_tru_vang_khong_phep', 2.0)) ?? 2.0;
+    const diemTruDiMuonHoacCoPhep =
+      (await this.dichVuCaiDat?.layGiaTriSo(
+        'diem_danh.diem_tru_di_muon_hoac_co_phep',
+        0.5,
+      )) ?? 0.5;
+
     const tongSoBuoiHoc = lop.cacBuoiHoc.length;
     const cacBuoiCoDiemDanh = lop.cacBuoiHoc.filter((b) => b.banGhiDiemDanh.length > 0);
     const soBuoiDaToChuc = cacBuoiCoDiemDanh.length;
@@ -865,15 +889,20 @@ export class DichVuPhongHoc {
             )
           : 100;
 
-      // Quy đổi điểm chuyên cần dự kiến thang 10
+      // Quy đổi điểm chuyên cần dự kiến thang 10 theo cài đặt hệ thống
       const diemTru =
-        soBuoiVangKhongPhep * 2.0 + soBuoiDiMuon * 0.5 + soBuoiVangCoPhep * 0.5;
+        soBuoiVangKhongPhep * diemTruVangKhongPhep +
+        soBuoiDiMuon * diemTruDiMuonHoacCoPhep +
+        soBuoiVangCoPhep * diemTruDiMuonHoacCoPhep;
       const diemChuyenCanDuKien = Number(Math.max(0, Math.min(10, 10 - diemTru)).toFixed(1));
 
       let mucCanhBao: 'AN_TOAN' | 'LUU_Y' | 'NGUY_CO_CAM_THI' = 'AN_TOAN';
       let nhanXetChuyenCan = 'Chuyên cần tốt, duy trì tham gia đầy đủ các buổi học.';
 
-      if (soBuoiVangKhongPhep >= 3 || (tongSoBuoiDaDiemDanh >= 3 && tyLeChuyenCan < 70)) {
+      if (
+        soBuoiVangKhongPhep >= nguongBuoiVangCamThi ||
+        (tongSoBuoiDaDiemDanh >= 3 && tyLeChuyenCan < nguongPhanTramCamThi)
+      ) {
         mucCanhBao = 'NGUY_CO_CAM_THI';
         nhanXetChuyenCan = `Cảnh báo học vụ: Vắng không phép ${soBuoiVangKhongPhep} buổi (Tỷ lệ chuyên cần ${tyLeChuyenCan}%), nguy cơ không đủ điều kiện dự thi kết thúc học phần.`;
       } else if (soBuoiVangKhongPhep >= 1 || soBuoiDiMuon >= 2 || tyLeChuyenCan < 85) {

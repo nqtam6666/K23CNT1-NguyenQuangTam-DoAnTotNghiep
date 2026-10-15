@@ -14,8 +14,8 @@
   --border: #E5E2DA;
   --text: #2B2A27;
   --muted: #7A766D;
-  --accent: #059669;
-  --accent-soft: #E6F6EF;
+  --accent: var(--custom-accent-light, #059669);
+  --accent-soft: var(--custom-accent-soft-light, #E6F6EF);
   --active-bg: #F3EDE4;
   --danger: #DC2626;
   --danger-soft: #FCE8E6;
@@ -78,8 +78,8 @@
     --border: #38362F;
     --text: #EDEAE2;
     --muted: #9A968B;
-    --accent: #34D399;
-    --accent-soft: #12372B;
+    --accent: var(--custom-accent-dark, #34D399);
+    --accent-soft: var(--custom-accent-soft-dark, #12372B);
     --active-bg: #2C2A24;
     --danger: #F87171;
     --danger-soft: #3A1F1D;
@@ -98,8 +98,8 @@
   --border: #38362F;
   --text: #EDEAE2;
   --muted: #9A968B;
-  --accent: #34D399;
-  --accent-soft: #12372B;
+  --accent: var(--custom-accent-dark, #34D399);
+  --accent-soft: var(--custom-accent-soft-dark, #12372B);
   --active-bg: #2C2A24;
   --danger: #F87171;
   --danger-soft: #3A1F1D;
@@ -196,6 +196,70 @@
   * {
     border-color: var(--border);
     outline-color: var(--accent);
+  }
+
+  /* Màu bôi đen văn bản (Text Selection) hiện đại, đồng bộ chuẩn Warm Minimal */
+  ::selection {
+    background-color: var(--accent);
+    color: var(--primary-foreground);
+    text-shadow: none;
+  }
+
+  ::-moz-selection {
+    background-color: var(--accent);
+    color: var(--primary-foreground);
+    text-shadow: none;
+  }
+
+  /* Kiểu bôi đen: Dịu mắt (26% màu chủ đạo) */
+  html[data-selection-style="diu"] ::selection {
+    background-color: color-mix(in srgb, var(--accent) 26%, var(--surface));
+    color: var(--text);
+  }
+  html[data-selection-style="diu"] ::-moz-selection {
+    background-color: color-mix(in srgb, var(--accent) 26%, var(--surface));
+    color: var(--text);
+  }
+
+  /* Kiểu bôi đen: Biên tập cổ điển (Than ấm tương phản cao) */
+  html[data-selection-style="than_am"] ::selection {
+    background-color: var(--text);
+    color: var(--surface);
+  }
+  html[data-selection-style="than_am"] ::-moz-selection {
+    background-color: var(--text);
+    color: var(--surface);
+  }
+
+  /* Đảo tương phản khi bôi đen bên trong phần tử đang có nền accent */
+  .bg-accent::selection,
+  .bg-accent ::selection,
+  .bg-\[var\(--accent\)\]::selection,
+  .bg-\[var\(--accent\)\] ::selection {
+    background-color: var(--text);
+    color: var(--surface);
+  }
+
+  /* Bôi đen dịu mắt bên trong ô nhập liệu và khối mã nguồn */
+  input::selection,
+  textarea::selection,
+  code::selection,
+  pre::selection {
+    background-color: color-mix(in srgb, var(--accent) 26%, var(--surface));
+    color: var(--text);
+  }
+
+  /* Mật độ hiển thị bảng dữ liệu theo cài đặt hệ thống */
+  html[data-density="gon"] table th,
+  html[data-density="gon"] table td {
+    padding-top: 0.45rem;
+    padding-bottom: 0.45rem;
+  }
+
+  html[data-density="thoang"] table th,
+  html[data-density="thoang"] table td {
+    padding-top: 0.95rem;
+    padding-bottom: 0.95rem;
   }
 
   html {
@@ -417,4 +481,61 @@ div[data-nextjs-dev-indicator-position] {
   visibility: hidden !important;
   opacity: 0 !important;
   pointer-events: none !important;
+}
+
+/* ==========================================================
+   CUSTOM SCROLLBAR HIỆN ĐẠI (FLOATING PILL - KHÔNG MŨI TÊN)
+   ========================================================== */
+::-webkit-scrollbar,
+*::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-button,
+*::-webkit-scrollbar-button {
+  display: none !important;
+  width: 0 !important;
+  height: 0 !important;
+}
+
+::-webkit-scrollbar-track,
+*::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+::-webkit-scrollbar-corner,
+*::-webkit-scrollbar-corner {
+  background: transparent;
+}
+
+::-webkit-scrollbar-thumb,
+*::-webkit-scrollbar-thumb {
+  background-color: color-mix(in srgb, var(--muted) 38%, transparent);
+  border-radius: 9999px;
+  border: 2px solid transparent;
+  background-clip: padding-box;
+  min-height: 36px;
+}
+
+::-webkit-scrollbar-thumb:hover,
+*::-webkit-scrollbar-thumb:hover {
+  background-color: color-mix(in srgb, var(--muted) 68%, transparent);
+  border: 1.5px solid transparent;
+  background-clip: padding-box;
+}
+
+::-webkit-scrollbar-thumb:active,
+*::-webkit-scrollbar-thumb:active {
+  background-color: var(--accent);
+  border: 1.5px solid transparent;
+  background-clip: padding-box;
+}
+
+/* Fallback riêng cho Firefox (tránh làm Chromium tắt ::-webkit-scrollbar) */
+@supports not selector(::-webkit-scrollbar) {
+  * {
+    scrollbar-width: thin;
+    scrollbar-color: color-mix(in srgb, var(--muted) 40%, transparent) transparent;
+  }
 }

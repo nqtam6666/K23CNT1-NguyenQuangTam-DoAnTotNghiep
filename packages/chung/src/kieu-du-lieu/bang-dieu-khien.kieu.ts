@@ -81,3 +81,70 @@ export interface SucKhoeHeThong {
   };
   thoiGian: string;
 }
+
+export type PhanLoaiThongBao =
+  | 'CAN_XU_LY'
+  | 'LOP_HOC'
+  | 'BAI_TAP'
+  | 'DIEM_SO'
+  | 'DIEM_DANH'
+  | 'HE_THONG';
+
+export interface MucThongBaoThucTe {
+  id: string;
+  loai: 'info' | 'success' | 'warning' | 'danger';
+  phanLoai: PhanLoaiThongBao;
+  eyebrow: string;
+  tieuDe: string;
+  noiDung: string;
+  thoiGian: string;
+  daDoc: boolean;
+  duongDan?: string;
+  nhanHanhDong?: string;
+}
+
+export interface ThongTinHocKyThucTe {
+  tenHocKy: string;
+  tenNamHoc: string;
+  ngayBatDau: string;
+  ngayKetThuc: string;
+  soLopThamGia: number;
+  soBuoiHocHomNay: number;
+  soViecCanXuLy: number;
+}
+
+export interface PhanHoiThongBaoBangDieuKhien {
+  hocKyHienTai: ThongTinHocKyThucTe | null;
+  banTinToanTruong: {
+    tieuDe: string;
+    noiDung: string;
+    loai: 'info' | 'success' | 'warning' | 'danger';
+    thoiGianCapNhat: string | null;
+  } | null;
+  danhSachThongBao: MucThongBaoThucTe[];
+  tongSoChuaDoc: number;
+  thoiGianDongBo: string;
+}
+
+export interface KetQuaGuiThuThongBaoDaKenh {
+  thanhCong: boolean;
+  thongDiep: string;
+  chiTietKenh: {
+    nenTang: {
+      daGhiNhan: boolean;
+      thongDiep: string;
+    };
+    windows: {
+      kichHoat: boolean;
+      thongDiep: string;
+    };
+    gmail: {
+      daGui: boolean;
+      emailDich: string;
+      thongDiep: string;
+    };
+  };
+  thongBaoMoi: MucThongBaoThucTe;
+}
+
+

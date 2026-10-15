@@ -4,6 +4,7 @@ import {
   ConflictException,
   ForbiddenException,
   BadRequestException,
+  Optional,
 } from '@nestjs/common';
 import {
   CapNhatHoSoDto,
@@ -17,9 +18,12 @@ import {
   MaLoiNghiepVu,
   VaiTro,
   PayloadJwt,
+  TuyChonCaNhan,
+  TUY_CHON_CA_NHAN_MAC_DINH,
 } from '@lms/chung';
 import { KhoHoSo } from './kho-ho-so.repository';
 import { KhoNguoiDung } from '../nguoi-dung/kho-nguoi-dung.repository';
+import { DichVuCaiDatService } from '../cai-dat/dich-vu-cai-dat.service';
 import * as fs from 'fs';
 import * as path from 'path';
 import { randomUUID } from 'crypto';
@@ -29,7 +33,34 @@ export class DichVuHoSo {
   constructor(
     private readonly khoHoSo: KhoHoSo,
     private readonly khoNguoiDung: KhoNguoiDung,
+    @Optional() private readonly dichVuCaiDat?: DichVuCaiDatService,
   ) {}
+
+  /**
+   * Lấy tùy chọn cá nhân của người dùng đang đăng nhập
+   */
+  async layTuyChonCaNhan(idNguoiDung: string): Promise<TuyChonCaNhan> {
+    if (!this.dichVuCaiDat) {
+      return TUY_CHON_CA_NHAN_MAC_DINH;
+    }
+    return this.dichVuCaiDat.layTuyChonCaNhan(idNguoiDung);
+  }
+
+  /**
+   * Cập nhật tùy chọn cá nhân của người dùng đang đăng nhập
+   */
+  async capNhatTuyChonCaNhan(
+    idNguoiDung: string,
+    duLieu: Partial<TuyChonCaNhan>,
+  ): Promise<TuyChonCaNhan> {
+    if (!this.dichVuCaiDat) {
+      return {
+        ...TUY_CHON_CA_NHAN_MAC_DINH,
+        ...duLieu,
+      } as TuyChonCaNhan;
+    }
+    return this.dichVuCaiDat.capNhatTuyChonCaNhan(idNguoiDung, duLieu);
+  }
 
   /**
    * Lấy toàn bộ thông tin hồ sơ của người dùng đang đăng nhập
@@ -45,23 +76,24 @@ export class DichVuHoSo {
     }
 
     const { matKhau, ...duLieu } = nguoiDung;
+    const tuyChonCaNhan = await this.layTuyChonCaNhan(idNguoiDung);
 
     if (vaiTro === VaiTro.HOC_SINH) {
       const hoSoHocSinh = await this.khoHoSo.timHoSoHocSinhTheoIdNguoiDung(idNguoiDung);
-      return { ...duLieu, hoSoHocSinh };
+      return { ...duLieu, hoSoHocSinh, tuyChonCaNhan };
     }
 
     if (vaiTro === VaiTro.GIAO_VIEN) {
       const hoSoGiaoVien = await this.khoHoSo.timHoSoGiaoVienTheoIdNguoiDung(idNguoiDung);
-      return { ...duLieu, hoSoGiaoVien };
+      return { ...duLieu, hoSoGiaoVien, tuyChonCaNhan };
     }
 
     if (vaiTro === VaiTro.PHU_HUYNH) {
       const danhSachConEm = await this.khoHoSo.layDanhSachConEmCuaPhuHuynh(idNguoiDung);
-      return { ...duLieu, danhSachConEm };
+      return { ...duLieu, danhSachConEm, tuyChonCaNhan };
     }
 
-    return duLieu;
+    return { ...duLieu, tuyChonCaNhan };
   }
 
   /**

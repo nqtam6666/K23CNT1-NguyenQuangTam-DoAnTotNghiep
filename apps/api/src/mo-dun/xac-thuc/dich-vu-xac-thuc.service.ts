@@ -4,6 +4,7 @@ import {
   UnauthorizedException,
   NotFoundException,
   BadRequestException,
+  ForbiddenException,
 } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { ConfigService } from '@nestjs/config';
@@ -18,15 +19,129 @@ import {
   PayloadJwt,
   VaiTro,
 } from '@lms/chung';
-import { KhoNguoiDung } from './kho-nguoi-dung.repository';
+import { KhoNguoiDung, CauHinhBaoMatHeThong } from '../nguoi-dung/kho-nguoi-dung.repository';
+
+interface TrangThaiDemSai {
+  cacLanSaiMs: number[];
+  khoaDenLucMs: number;
+}
 
 @Injectable()
 export class DichVuXacThuc {
+  private readonly boDemSaiTheoEmail = new Map<string, TrangThaiDemSai>();
+  private readonly boDemThuTheoIp = new Map<string, number[]>();
+
   constructor(
     private readonly khoNguoiDung: KhoNguoiDung,
     private readonly jwtService: JwtService,
     private readonly configService: ConfigService,
   ) {}
+
+  private async layCauHinhBaoMat(): Promise<CauHinhBaoMatHeThong> {
+    if (this.khoNguoiDung.layCauHinhBaoMat) {
+      return this.khoNguoiDung.layCauHinhBaoMat();
+    }
+    return {
+      choPhepTuDangKy: true,
+      thoiGianPhienGiay: 86400,
+      soLanSaiToiDa: 5,
+      cuaSoDemSaiPhut: 15,
+      thoiGianKhoaTamPhut: 15,
+      gioiHanDangNhapTheoIp: 100,
+      cuaSoGioiHanIpPhut: 15,
+      doDaiMatKhauToiThieu: 8,
+      matKhauBatBuocChuVaSo: true,
+    };
+  }
+
+  private kiemTraDoManhMatKhau(matKhau: string, cauHinh: CauHinhBaoMatHeThong) {
+    if (matKhau.length < cauHinh.doDaiMatKhauToiThieu) {
+      throw new BadRequestException({
+        thanhCong: false,
+        maLoi: MaLoiNghiepVu.DU_LIEU_KHONG_HOP_LE,
+        thongDiep: `Mật khẩu phải có độ dài tối thiểu ${cauHinh.doDaiMatKhauToiThieu} ký tự theo chính sách bảo mật của trường.`,
+      });
+    }
+
+    if (cauHinh.matKhauBatBuocChuVaSo) {
+      const coChu = /[a-zA-Z]/.test(matKhau);
+      const coSo = /[0-9]/.test(matKhau);
+      if (!coChu || !coSo) {
+        throw new BadRequestException({
+          thanhCong: false,
+          maLoi: MaLoiNghiepVu.DU_LIEU_KHONG_HOP_LE,
+          thongDiep: 'Mật khẩu phải bao gồm cả chữ cái và chữ số.',
+        });
+      }
+    }
+  }
+
+  private kiemTraGioiHanTruocDangNhap(
+    email: string,
+    diaChiIp: string | undefined,
+    cauHinh: CauHinhBaoMatHeThong,
+  ) {
+    const bayGio = Date.now();
+    const khoaEmail = email.trim().toLowerCase();
+
+    // 1. Kiểm tra khóa tạm thời theo từng tài khoản (chống Brute Force)
+    const trangThaiEmail = this.boDemSaiTheoEmail.get(khoaEmail);
+    if (trangThaiEmail && trangThaiEmail.khoaDenLucMs > bayGio) {
+      const soPhutConLai = Math.max(
+        1,
+        Math.ceil((trangThaiEmail.khoaDenLucMs - bayGio) / (60 * 1000)),
+      );
+      throw new UnauthorizedException({
+        thanhCong: false,
+        maLoi: MaLoiNghiepVu.TAI_KHOAN_BI_KHOA,
+        thongDiep: `Tài khoản đang tạm khóa do nhập sai mật khẩu quá ${cauHinh.soLanSaiToiDa} lần. Vui lòng thử lại sau ${soPhutConLai} phút.`,
+      });
+    }
+
+    // 2. Kiểm tra tần suất thử đăng nhập theo địa chỉ IP (đặt ngưỡng cao cho phòng máy trường học)
+    if (diaChiIp) {
+      const cuaSoIpMs = cauHinh.cuaSoGioiHanIpPhut * 60 * 1000;
+      const danhSachLanThu = (this.boDemThuTheoIp.get(diaChiIp) || []).filter(
+        (ts) => bayGio - ts < cuaSoIpMs,
+      );
+      if (danhSachLanThu.length >= cauHinh.gioiHanDangNhapTheoIp) {
+        throw new UnauthorizedException({
+          thanhCong: false,
+          maLoi: MaLoiNghiepVu.YEU_CAU_KHONG_HOP_LE,
+          thongDiep: `Quá nhiều lượt thử đăng nhập từ địa chỉ mạng hiện tại. Vui lòng đợi vài phút rồi thử lại.`,
+        });
+      }
+      danhSachLanThu.push(bayGio);
+      this.boDemThuTheoIp.set(diaChiIp, danhSachLanThu);
+    }
+  }
+
+  private ghiNhanDangNhapSai(email: string, cauHinh: CauHinhBaoMatHeThong) {
+    const bayGio = Date.now();
+    const khoaEmail = email.trim().toLowerCase();
+    const cuaSoMs = cauHinh.cuaSoDemSaiPhut * 60 * 1000;
+    const hienTai = this.boDemSaiTheoEmail.get(khoaEmail) || {
+      cacLanSaiMs: [],
+      khoaDenLucMs: 0,
+    };
+
+    const cacLanSaiMoi = hienTai.cacLanSaiMs.filter((ts) => bayGio - ts < cuaSoMs);
+    cacLanSaiMoi.push(bayGio);
+
+    let khoaDenLucMs = 0;
+    if (cacLanSaiMoi.length >= cauHinh.soLanSaiToiDa) {
+      khoaDenLucMs = bayGio + cauHinh.thoiGianKhoaTamPhut * 60 * 1000;
+    }
+
+    this.boDemSaiTheoEmail.set(khoaEmail, {
+      cacLanSaiMs: cacLanSaiMoi,
+      khoaDenLucMs,
+    });
+  }
+
+  private xoaDemDangNhapSai(email: string) {
+    this.boDemSaiTheoEmail.delete(email.trim().toLowerCase());
+  }
 
   /**
    * Đăng ký tài khoản mới với mật khẩu mã hóa Argon2id
@@ -36,6 +151,19 @@ export class DichVuXacThuc {
     thongTinThietBi?: string,
     diaChiIp?: string,
   ): Promise<KetQuaXacThuc> {
+    const cauHinhBaoMat = await this.layCauHinhBaoMat();
+
+    if (!cauHinhBaoMat.choPhepTuDangKy) {
+      throw new ForbiddenException({
+        thanhCong: false,
+        maLoi: MaLoiNghiepVu.KHONG_CO_QUYEN_TRUY_CAP,
+        thongDiep:
+          'Cổng tự đăng ký tài khoản hiện đang đóng. Vui lòng liên hệ Phòng Đào tạo hoặc Quản trị viên để được cấp tài khoản.',
+      });
+    }
+
+    this.kiemTraDoManhMatKhau(duLieu.matKhau, cauHinhBaoMat);
+
     const nguoiDungTonTai = await this.khoNguoiDung.timTheoEmail(duLieu.email);
     if (nguoiDungTonTai) {
       throw new ConflictException({
@@ -57,7 +185,7 @@ export class DichVuXacThuc {
       matKhau: matKhauBăm,
       hoTen: duLieu.hoTen,
       soDienThoai: duLieu.soDienThoai,
-      vaiTro: duLieu.vaiTro || VaiTro.HOC_SINH,
+      vaiTro: VaiTro.HOC_SINH,
     });
 
     return this.taoCapToken(
@@ -79,8 +207,12 @@ export class DichVuXacThuc {
     thongTinThietBi?: string,
     diaChiIp?: string,
   ): Promise<KetQuaXacThuc> {
+    const cauHinhBaoMat = await this.layCauHinhBaoMat();
+    this.kiemTraGioiHanTruocDangNhap(duLieu.email, diaChiIp, cauHinhBaoMat);
+
     const nguoiDung = await this.khoNguoiDung.timTheoEmail(duLieu.email);
     if (!nguoiDung) {
+      this.ghiNhanDangNhapSai(duLieu.email, cauHinhBaoMat);
       throw new UnauthorizedException({
         thanhCong: false,
         maLoi: MaLoiNghiepVu.MAT_KHAU_KHONG_CHINH_XAC,
@@ -96,23 +228,18 @@ export class DichVuXacThuc {
       });
     }
 
-    let khopMatKhau = await argon2.verify(nguoiDung.matKhau, duLieu.matKhau);
-    // Hỗ trợ mật khẩu chuẩn thay thế (Admin@123) cho tài khoản Quản trị viên
-    if (
-      !khopMatKhau &&
-      nguoiDung.vaiTro === VaiTro.QUAN_TRI_VIEN &&
-      (duLieu.matKhau === 'Admin@123' || duLieu.matKhau === 'admin123')
-    ) {
-      khopMatKhau = true;
-    }
+    const khopMatKhau = await argon2.verify(nguoiDung.matKhau, duLieu.matKhau);
 
     if (!khopMatKhau) {
+      this.ghiNhanDangNhapSai(duLieu.email, cauHinhBaoMat);
       throw new UnauthorizedException({
         thanhCong: false,
         maLoi: MaLoiNghiepVu.MAT_KHAU_KHONG_CHINH_XAC,
         thongDiep: 'Email hoặc mật khẩu không chính xác',
       });
     }
+
+    this.xoaDemDangNhapSai(duLieu.email);
 
     return this.taoCapToken(
       nguoiDung.id,
@@ -192,6 +319,9 @@ export class DichVuXacThuc {
    * Đổi mật khẩu tài khoản
    */
   async doiMatKhau(idNguoiDung: string, duLieu: DoiMatKhauDto): Promise<void> {
+    const cauHinhBaoMat = await this.layCauHinhBaoMat();
+    this.kiemTraDoManhMatKhau(duLieu.matKhauMoi, cauHinhBaoMat);
+
     const nguoiDung = await this.khoNguoiDung.timTheoId(idNguoiDung);
     if (!nguoiDung) {
       throw new NotFoundException({
@@ -226,18 +356,67 @@ export class DichVuXacThuc {
    * Đăng xuất và thu hồi phiên làm việc trong cơ sở dữ liệu
    */
   async dangXuat(refreshToken: string): Promise<void> {
+    const phienId = this.giaiMaPhienIdTuRefreshToken(refreshToken);
+    if (phienId) {
+      await this.khoNguoiDung.thuHoiPhien(phienId);
+    }
+  }
+
+  private giaiMaPhienIdTuRefreshToken(refreshToken?: string): string | undefined {
+    if (!refreshToken) return undefined;
     try {
       const payload: any = this.jwtService.verify(refreshToken, {
         secret:
           this.configService.get<string>('JWT_REFRESH_SECRET') ||
           'chuoi_bi_mat_refresh_token_lms_sieu_bao_mat_2026_abc',
       });
-      if (payload?.phienId) {
-        await this.khoNguoiDung.thuHoiPhien(payload.phienId);
-      }
+      return payload?.phienId;
     } catch {
-      // Bỏ qua lỗi token hết hạn khi người dùng đăng xuất
+      return undefined;
     }
+  }
+
+  /**
+   * Lấy danh sách thiết bị / phiên đang đăng nhập của người dùng hiện tại
+   */
+  async layDanhSachPhienDangNhap(idNguoiDung: string, refreshTokenHienTai?: string) {
+    const phienHienTaiId = this.giaiMaPhienIdTuRefreshToken(refreshTokenHienTai);
+    const danhSach = (await this.khoNguoiDung.layDanhSachPhienDangNhap?.(idNguoiDung)) || [];
+    return danhSach.map((phien) => ({
+      ...phien,
+      laThietBiHienTai: Boolean(phienHienTaiId && phien.id === phienHienTaiId),
+    }));
+  }
+
+  /**
+   * Thu hồi một phiên đăng nhập từ xa (Chống IDOR: chỉ thu hồi phiên thuộc về chính người dùng đó)
+   */
+  async thuHoiMotPhien(idNguoiDung: string, idPhien: string) {
+    const soLuong = await this.khoNguoiDung.thuHoiPhienCuaNguoiDung?.(idPhien, idNguoiDung);
+    if (!soLuong) {
+      throw new NotFoundException({
+        thanhCong: false,
+        maLoi: MaLoiNghiepVu.KHONG_TIM_THAY_TAI_NGUYEN,
+        thongDiep: 'Không tìm thấy phiên đăng nhập hoặc thiết bị đã được đăng xuất',
+      });
+    }
+    return { thanhCong: true, thongDiep: 'Đã thu hồi phiên đăng nhập trên thiết bị' };
+  }
+
+  /**
+   * Đăng xuất khỏi tất cả các thiết bị khác (giữ lại thiết bị hiện tại nếu có)
+   */
+  async dangXuatTatCaThietBiKhac(idNguoiDung: string, refreshTokenHienTai?: string) {
+    const phienHienTaiId = this.giaiMaPhienIdTuRefreshToken(refreshTokenHienTai);
+    const ketQua = await this.khoNguoiDung.thuHoiTatCaPhienCuaNguoiDung(
+      idNguoiDung,
+      phienHienTaiId,
+    );
+    return {
+      thanhCong: true,
+      soLuongThuHoi: ketQua?.count ?? 0,
+      thongDiep: 'Đã đăng xuất khỏi tất cả các thiết bị khác',
+    };
   }
 
   /**
@@ -309,7 +488,12 @@ export class DichVuXacThuc {
       },
     );
 
-    await argon2.hash(refreshToken);
+    const refreshTokenHash = await argon2.hash(refreshToken);
+    if (this.khoNguoiDung.capNhatPhienDangNhap) {
+      await this.khoNguoiDung.capNhatPhienDangNhap(phienMoi.id, {
+        refreshTokenHash,
+      });
+    }
     await this.khoNguoiDung.capNhatNguoiDung(idNguoiDung, {});
 
     return {

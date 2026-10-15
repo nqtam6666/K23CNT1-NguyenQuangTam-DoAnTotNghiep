@@ -12,13 +12,13 @@ import {
   Calendar,
   BookOpen,
   ArrowRight,
-  Sparkles,
-  ShieldCheck,
-  AlertCircle,
+  Edit2,
+  Trash2,
+  Loader2,
 } from 'lucide-react';
 import { mayKhachApi } from '../../../tien-ich/may-khach-api';
 import { thongBao } from '../../../tien-ich/thong-bao';
-import { LopHocPhan, TaoLopHocPhanInput, VaiTro, PayloadJwt } from '@lms/chung';
+import { TaoLopHocPhanInput, VaiTro, PayloadJwt } from '@lms/chung';
 import { HopThoai } from '../../../thanh-phan/hop-thoai';
 import { KhungXuongThe } from '../../../thanh-phan/khung-xuong';
 
@@ -27,10 +27,11 @@ export default function TrangLopHocPhan() {
   const [tuKhoa, setTuKhoa] = useState('');
   const [moModalThamGia, setMoModalThamGia] = useState(false);
   const [moModalTaoLop, setMoModalTaoLop] = useState(false);
+  const [idLopDangSua, setIdLopDangSua] = useState<string | null>(null);
+  const [lopCanXoa, setLopCanXoa] = useState<any | null>(null);
   const [maThamGia, setMaThamGia] = useState('');
-  const [thongBaoLoi, setThongBaoLoi] = useState<string | null>(null);
 
-  // Form tạo lớp
+  // Form tạo / sửa lớp
   const [formTaoLop, setFormTaoLop] = useState<TaoLopHocPhanInput>({
     maLopHocPhan: '',
     tenLopHocPhan: '',
@@ -61,7 +62,7 @@ export default function TrangLopHocPhan() {
     },
   });
 
-  // Lấy danh mục để select khi tạo lớp (chỉ tải khi modal mở)
+  // Lấy danh mục để select khi tạo / sửa lớp (chỉ tải khi modal mở)
   const { data: danhSachMonHoc } = useQuery({
     queryKey: ['mon-hoc-select'],
     queryFn: async () => {
@@ -97,24 +98,26 @@ export default function TrangLopHocPhan() {
       queryClient.invalidateQueries({ queryKey: ['lop-hoc-phan'] });
       setMoModalThamGia(false);
       setMaThamGia('');
-      setThongBaoLoi(null);
       thongBao.thanhCong(
-        'Ghi danh thành công!',
+        'Ghi danh thành công',
         res.data?.thongDiep || 'Bạn đã tham gia lớp học phần thành công.',
       );
     },
     onError: (err: any) => {
       const msg = err.response?.data?.thongDiep || 'Mã tham gia không hợp lệ hoặc lỗi kết nối';
-      setThongBaoLoi(msg);
       thongBao.thatBai('Tham gia lớp học thất bại', msg);
     },
   });
 
-  const taoLopMutation = useMutation({
-    mutationFn: (duLieu: TaoLopHocPhanInput) => mayKhachApi.post('/lop-hoc-phan', duLieu),
+  const luuLopMutation = useMutation({
+    mutationFn: (duLieu: TaoLopHocPhanInput) =>
+      idLopDangSua
+        ? mayKhachApi.patch(`/lop-hoc-phan/${idLopDangSua}`, duLieu)
+        : mayKhachApi.post('/lop-hoc-phan', duLieu),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['lop-hoc-phan'] });
       setMoModalTaoLop(false);
+      setIdLopDangSua(null);
       setFormTaoLop({
         maLopHocPhan: '',
         tenLopHocPhan: '',
@@ -123,16 +126,26 @@ export default function TrangLopHocPhan() {
         idGiaoVien: '',
         moTa: '',
       });
-      setThongBaoLoi(null);
       thongBao.thanhCong(
-        'Tạo lớp học phần thành công!',
-        'Lớp học phần mới đã được khởi tạo trên hệ thống.',
+        idLopDangSua ? 'Cập nhật lớp học phần thành công' : 'Tạo lớp học phần thành công',
+        'Thông tin lớp học phần đã được lưu trên hệ thống.',
       );
     },
     onError: (err: any) => {
-      const msg = err.response?.data?.thongDiep || 'Lỗi khi tạo lớp học phần';
-      setThongBaoLoi(msg);
-      thongBao.thatBai('Tạo lớp thất bại', msg);
+      const msg = err.response?.data?.thongDiep || 'Lỗi khi lưu lớp học phần';
+      thongBao.thatBai('Không thể lưu lớp học phần', msg);
+    },
+  });
+
+  const xoaLopMutation = useMutation({
+    mutationFn: (id: string) => mayKhachApi.delete(`/lop-hoc-phan/${id}`),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['lop-hoc-phan'] });
+      setLopCanXoa(null);
+      thongBao.thanhCong('Đã xóa lớp học phần', 'Lớp học phần đã được xóa khỏi hệ thống.');
+    },
+    onError: (err: any) => {
+      thongBao.loiHeThong(err, 'Không thể xóa lớp học phần này');
     },
   });
 
@@ -141,6 +154,19 @@ export default function TrangLopHocPhan() {
     nguoiDungHienTai?.vaiTro === VaiTro.GIAO_VU;
 
   const laHocSinh = nguoiDungHienTai?.vaiTro === VaiTro.HOC_SINH;
+
+  const moModalSuaLop = (lop: any) => {
+    setIdLopDangSua(lop.id);
+    setFormTaoLop({
+      maLopHocPhan: lop.maLopHocPhan || '',
+      tenLopHocPhan: lop.tenLopHocPhan || '',
+      idMonHoc: lop.idMonHoc || lop.monHoc?.id || '',
+      idHocKy: lop.idHocKy || lop.hocKy?.id || '',
+      idGiaoVien: lop.idGiaoVien || lop.giaoVien?.id || '',
+      moTa: lop.moTa || '',
+    });
+    setMoModalTaoLop(true);
+  };
 
   return (
     <div className="space-y-6">
@@ -152,7 +178,7 @@ export default function TrangLopHocPhan() {
             Không gian Lớp học phần
           </h1>
           <p className="text-[14px] text-[var(--muted)] mt-1">
-            Không gian học tập trực tuyến tích hợp phòng LiveKit SFU, tài liệu và thời khóa biểu
+            Không gian học tập trực tuyến tích hợp phòng học trực tuyến, tài liệu và thời khóa biểu
           </p>
         </div>
 
@@ -161,7 +187,6 @@ export default function TrangLopHocPhan() {
             <button
               onClick={() => {
                 setMaThamGia('');
-                setThongBaoLoi(null);
                 setMoModalThamGia(true);
               }}
               className="inline-flex items-center gap-2 px-4 py-[11px] border border-[var(--border)] bg-[var(--surface)] hover:brightness-95 text-[var(--text)] text-[13px] font-semibold rounded-[4px] transition-all cursor-pointer"
@@ -174,7 +199,15 @@ export default function TrangLopHocPhan() {
           {laAdminHoacGiaoVu && (
             <button
               onClick={() => {
-                setThongBaoLoi(null);
+                setIdLopDangSua(null);
+                setFormTaoLop({
+                  maLopHocPhan: '',
+                  tenLopHocPhan: '',
+                  idMonHoc: '',
+                  idHocKy: '',
+                  idGiaoVien: '',
+                  moTa: '',
+                });
                 setMoModalTaoLop(true);
               }}
               className="inline-flex items-center gap-2 px-5 py-[11px] bg-[var(--accent)] hover:brightness-95 text-white text-[13px] font-semibold rounded-[4px] transition-all shadow-[0_2px_8px_-2px_color-mix(in_srgb,var(--accent)_30%,transparent)] cursor-pointer"
@@ -189,7 +222,10 @@ export default function TrangLopHocPhan() {
       {/* Tìm kiếm */}
       <div className="flex items-center gap-3">
         <div className="relative w-full sm:w-96">
-          <Search className="w-4 h-4 text-[var(--muted)] absolute left-3 top-1/2 -translate-y-1/2" strokeWidth={1.5} />
+          <Search
+            className="w-4 h-4 text-[var(--muted)] absolute left-3 top-1/2 -translate-y-1/2"
+            strokeWidth={1.5}
+          />
           <input
             type="text"
             placeholder="Tìm theo mã hoặc tên lớp học phần..."
@@ -216,16 +252,41 @@ export default function TrangLopHocPhan() {
                   <span className="px-2 py-0.5 bg-[var(--surface)] border border-[var(--border)] rounded-[4px] text-[11px] font-mono font-bold tracking-wider uppercase text-[var(--accent)]">
                     {lop.maLopHocPhan}
                   </span>
-                  <span className="inline-flex items-center gap-1.5 text-[11px] font-mono font-semibold bg-[var(--accent-soft)] text-[var(--accent)] border border-[var(--border)] px-2 py-0.5 rounded-[4px]">
-                    <span className="w-1.5 h-1.5 rounded-full bg-[var(--accent)]"></span>
-                    Sẵn sàng
-                  </span>
+                  <div className="flex items-center gap-1.5">
+                    {laAdminHoacGiaoVu && (
+                      <>
+                        <button
+                          type="button"
+                          onClick={() => moModalSuaLop(lop)}
+                          title="Chỉnh sửa lớp học phần"
+                          className="p-1 text-[var(--muted)] hover:text-[var(--accent)] hover:bg-[var(--accent-soft)] rounded-[4px] transition-colors cursor-pointer"
+                        >
+                          <Edit2 className="w-3.5 h-3.5" strokeWidth={1.5} />
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() => setLopCanXoa(lop)}
+                          title="Xóa lớp học phần"
+                          className="p-1 text-[var(--muted)] hover:text-[var(--danger)] hover:bg-[var(--danger-soft)] rounded-[4px] transition-colors cursor-pointer"
+                        >
+                          <Trash2 className="w-3.5 h-3.5" strokeWidth={1.5} />
+                        </button>
+                      </>
+                    )}
+                    <span className="inline-flex items-center gap-1.5 text-[11px] font-mono font-semibold bg-[var(--accent-soft)] text-[var(--accent)] border border-[var(--border)] px-2 py-0.5 rounded-[4px]">
+                      <span className="w-1.5 h-1.5 rounded-full bg-[var(--accent)]"></span>
+                      Sẵn sàng
+                    </span>
+                  </div>
                 </div>
                 <h3 className="font-mono font-bold text-[16px] text-[var(--text)] mt-3 line-clamp-1 group-hover:text-[var(--accent)] transition-colors">
                   {lop.tenLopHocPhan}
                 </h3>
                 <p className="text-xs text-[var(--muted)] mt-1 flex items-center gap-1.5">
-                  <BookOpen className="w-3.5 h-3.5 shrink-0 text-[var(--accent)]" strokeWidth={1.5} />
+                  <BookOpen
+                    className="w-3.5 h-3.5 shrink-0 text-[var(--accent)]"
+                    strokeWidth={1.5}
+                  />
                   <span>{lop.monHoc?.tenMonHoc || 'Chưa gắn môn'}</span>
                 </p>
               </div>
@@ -237,7 +298,9 @@ export default function TrangLopHocPhan() {
                     <span className="text-[var(--muted)] flex items-center gap-1.5">
                       <Calendar className="w-3.5 h-3.5" strokeWidth={1.5} /> Học kỳ:
                     </span>
-                    <span className="font-mono font-medium text-[var(--text)]">{lop.hocKy?.tenHocKy || '—'}</span>
+                    <span className="font-mono font-medium text-[var(--text)]">
+                      {lop.hocKy?.tenHocKy || '—'}
+                    </span>
                   </div>
 
                   <div className="flex items-center justify-between">
@@ -258,7 +321,9 @@ export default function TrangLopHocPhan() {
                         <p className="font-medium text-[var(--text)] truncate">
                           {lop.giaoVien.nguoiDung.hoTen}
                         </p>
-                        <p className="text-[11px] font-mono text-[var(--muted)]">Giáo viên phụ trách</p>
+                        <p className="text-[11px] font-mono text-[var(--muted)]">
+                          Giáo viên phụ trách
+                        </p>
                       </div>
                     </div>
                   )}
@@ -288,7 +353,9 @@ export default function TrangLopHocPhan() {
       ) : (
         <div className="text-center py-14 bg-[var(--surface)] border border-dashed border-[var(--border)] rounded-[4px]">
           <Video className="w-10 h-10 text-[var(--muted)] mx-auto mb-3" strokeWidth={1.5} />
-          <h3 className="font-mono font-bold text-[var(--text)] text-[15px]">Chưa có lớp học phần nào</h3>
+          <h3 className="font-mono font-bold text-[var(--text)] text-[15px]">
+            Chưa có lớp học phần nào
+          </h3>
           <p className="text-[13px] text-[var(--muted)] mt-1 max-w-sm mx-auto">
             {laHocSinh
               ? 'Bạn chưa được ghi danh vào lớp học phần nào. Nhấn "Tham gia bằng mã" nếu có mã mời từ giáo viên.'
@@ -334,7 +401,7 @@ export default function TrangLopHocPhan() {
               type="button"
               disabled={!maThamGia.trim() || thamGiaMutation.isPending}
               onClick={() => thamGiaMutation.mutate(maThamGia.trim())}
-              className="px-5 py-2.5 bg-accent hover:bg-accent text-white rounded text-sm font-semibold disabled:opacity-50 cursor-pointer shadow-sm shadow-emerald-600/20"
+              className="px-5 py-2.5 bg-accent hover:bg-accent text-white rounded text-sm font-semibold disabled:opacity-50 cursor-pointer"
             >
               {thamGiaMutation.isPending ? 'Đang xác thực...' : 'Tham gia ngay'}
             </button>
@@ -342,12 +409,15 @@ export default function TrangLopHocPhan() {
         </div>
       </HopThoai>
 
-      {/* MODAL TẠO LỚP HỌC PHẦN */}
+      {/* MODAL TẠO / SỬA LỚP HỌC PHẦN */}
       <HopThoai
         mo={moModalTaoLop}
-        onDong={() => setMoModalTaoLop(false)}
-        tieuDe="Tạo Lớp học phần mới"
-        moTa="Điền thông tin môn học, học kỳ và giáo viên phụ trách để mở lớp mới"
+        onDong={() => {
+          setMoModalTaoLop(false);
+          setIdLopDangSua(null);
+        }}
+        tieuDe={idLopDangSua ? 'Chỉnh sửa Lớp học phần' : 'Tạo Lớp học phần mới'}
+        moTa="Điền thông tin môn học, học kỳ và giáo viên phụ trách"
         kichThuoc="vua"
       >
         <div className="space-y-4">
@@ -433,9 +503,7 @@ export default function TrangLopHocPhan() {
             </div>
 
             <div>
-              <label className="block text-xs font-semibold text-text mb-1">
-                Mô tả tóm tắt
-              </label>
+              <label className="block text-xs font-semibold text-text mb-1">Mô tả tóm tắt</label>
               <textarea
                 rows={2}
                 placeholder="Mục tiêu và yêu cầu môn học..."
@@ -449,7 +517,10 @@ export default function TrangLopHocPhan() {
           <div className="flex justify-end gap-3 pt-3 border-t border-border">
             <button
               type="button"
-              onClick={() => setMoModalTaoLop(false)}
+              onClick={() => {
+                setMoModalTaoLop(false);
+                setIdLopDangSua(null);
+              }}
               className="px-4 py-2.5 border border-border text-text rounded text-sm font-medium hover:bg-bg cursor-pointer"
             >
               Hủy
@@ -461,12 +532,60 @@ export default function TrangLopHocPhan() {
                 !formTaoLop.idMonHoc ||
                 !formTaoLop.idHocKy ||
                 !formTaoLop.idGiaoVien ||
-                taoLopMutation.isPending
+                luuLopMutation.isPending
               }
-              onClick={() => taoLopMutation.mutate(formTaoLop)}
-              className="px-5 py-2.5 bg-accent hover:bg-accent text-white rounded text-sm font-semibold disabled:opacity-50 cursor-pointer shadow-sm shadow-emerald-600/20"
+              onClick={() => luuLopMutation.mutate(formTaoLop)}
+              className="px-5 py-2.5 bg-accent hover:bg-accent text-white rounded text-sm font-semibold disabled:opacity-50 cursor-pointer"
             >
-              {taoLopMutation.isPending ? 'Đang tạo...' : 'Tạo lớp'}
+              {luuLopMutation.isPending
+                ? 'Đang lưu...'
+                : idLopDangSua
+                  ? 'Lưu thay đổi'
+                  : 'Tạo lớp'}
+            </button>
+          </div>
+        </div>
+      </HopThoai>
+
+      {/* MODAL XÁC NHẬN XÓA LỚP HỌC PHẦN */}
+      <HopThoai
+        mo={Boolean(lopCanXoa)}
+        onDong={() => setLopCanXoa(null)}
+        tieuDe="Xác nhận xóa Lớp học phần"
+        moTa="Lớp học phần chỉ có thể xóa khi chưa phát sinh dữ liệu buổi học hoặc bài kiểm tra."
+        kichThuoc="nho"
+      >
+        <div className="space-y-4">
+          {lopCanXoa && (
+            <div className="p-3.5 rounded-lg bg-danger-soft border border-danger text-xs text-text space-y-1">
+              <p className="font-semibold text-danger">
+                Bạn có chắc chắn muốn xóa lớp học phần này?
+              </p>
+              <p>
+                Mã lớp: <span className="font-mono font-semibold">{lopCanXoa.maLopHocPhan}</span>
+              </p>
+              <p>
+                Tên lớp: <span className="font-semibold">{lopCanXoa.tenLopHocPhan}</span>
+              </p>
+            </div>
+          )}
+
+          <div className="flex justify-end gap-3 pt-3 border-t border-border">
+            <button
+              type="button"
+              onClick={() => setLopCanXoa(null)}
+              className="px-4 py-2 border border-border text-text rounded-lg text-sm hover:bg-bg cursor-pointer"
+            >
+              Hủy
+            </button>
+            <button
+              type="button"
+              disabled={xoaLopMutation.isPending}
+              onClick={() => lopCanXoa && xoaLopMutation.mutate(lopCanXoa.id)}
+              className="px-4 py-2 bg-danger text-white rounded-lg text-sm font-medium hover:opacity-90 disabled:opacity-50 flex items-center gap-2 cursor-pointer"
+            >
+              {xoaLopMutation.isPending && <Loader2 className="w-4 h-4 animate-spin" />}
+              Xác nhận xóa
             </button>
           </div>
         </div>

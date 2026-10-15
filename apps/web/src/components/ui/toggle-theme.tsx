@@ -39,6 +39,7 @@ export function ToggleTheme({ className }: { className?: string }) {
 			document.documentElement.classList.toggle('dark', isDark);
 			document.documentElement.setAttribute('data-theme', isDark ? 'dark' : 'light');
 			localStorage.setItem('lms_theme', isDark ? 'toi' : 'sang');
+			localStorage.setItem('lms_user_theme_override', 'true');
 		} catch {
 			// Bỏ qua lỗi ghi localStorage
 		}

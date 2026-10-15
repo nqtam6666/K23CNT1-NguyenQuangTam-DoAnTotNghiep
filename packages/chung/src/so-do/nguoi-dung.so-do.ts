@@ -45,6 +45,16 @@ export const taoNguoiDungSchema = z.object({
 });
 
 /**
+ * Schema Zod quản trị viên tạo hàng loạt người dùng
+ */
+export const taoNhieuNguoiDungSchema = z.object({
+  danhSach: z
+    .array(taoNguoiDungSchema)
+    .min(1, 'Danh sách người dùng không được để trống')
+    .max(200, 'Tối đa 200 người dùng mỗi đợt thêm hàng loạt'),
+});
+
+/**
  * Schema Zod cập nhật thông tin người dùng (Quản trị viên)
  */
 export const capNhatNguoiDungSchema = z.object({
@@ -87,6 +97,7 @@ export const truyVanNguoiDungSchema = truyVanPhanTrangSchema.extend({
 
 export type CapNhatHoSoDto = z.infer<typeof capNhatHoSoSchema>;
 export type TaoNguoiDungDto = z.infer<typeof taoNguoiDungSchema>;
+export type TaoNhieuNguoiDungDto = z.infer<typeof taoNhieuNguoiDungSchema>;
 export type CapNhatNguoiDungDto = z.infer<typeof capNhatNguoiDungSchema>;
 export type ChuyenTrangThaiNguoiDungDto = z.infer<typeof chuyenTrangThaiNguoiDungSchema>;
 export type DatLaiMatKhauAdminDto = z.infer<typeof datLaiMatKhauAdminSchema>;

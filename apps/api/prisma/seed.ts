@@ -667,7 +667,7 @@ async function main() {
       khoa: 'CHO_PHEP_DANG_KY',
       giaTri: 'true',
       nhom: 'HOC_VU',
-      moTa: 'Cho phép người dùng tự đăng ký tài khoản mới trên giao diện khách',
+      moTa: 'Cho phép học sinh tự đăng ký tài khoản mới tại màn hình đăng nhập',
       kieuDuLieu: 'LOGIC',
       congKhai: true,
     },

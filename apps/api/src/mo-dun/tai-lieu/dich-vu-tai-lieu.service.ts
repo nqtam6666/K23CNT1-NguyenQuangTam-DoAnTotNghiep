@@ -3,9 +3,11 @@ import {
   NotFoundException,
   ForbiddenException,
   BadRequestException,
+  Optional,
 } from '@nestjs/common';
 import { KhoTaiLieuRepository } from './kho-tai-lieu.repository';
 import { PrismaService } from '../../cot-loi/csdl/prisma.service';
+import { DichVuCaiDatService } from '../cai-dat/dich-vu-cai-dat.service';
 import {
   PayloadJwt,
   VaiTro,
@@ -22,6 +24,7 @@ export class DichVuTaiLieuService {
   constructor(
     private readonly khoTaiLieu: KhoTaiLieuRepository,
     private readonly prisma: PrismaService,
+    @Optional() private readonly dichVuCaiDat?: DichVuCaiDatService,
   ) {}
 
   async kiemTraQuyenTruyCapLop(idLopHocPhan: string, nguoiDung: PayloadJwt) {
@@ -153,30 +156,35 @@ export class DichVuTaiLieuService {
       });
     }
 
+    const dungLuongToiDaMb =
+      (await this.dichVuCaiDat?.layGiaTriSo('bai_tap.dung_luong_tai_lieu_toi_da_mb', 25)) ?? 25;
+    if (tep.size > dungLuongToiDaMb * 1024 * 1024) {
+      throw new BadRequestException({
+        thanhCong: false,
+        maLoi: MaLoiNghiepVu.DU_LIEU_KHONG_HOP_LE,
+        thongDiep: `Kích thước tệp tài liệu vượt quá giới hạn cho phép (${dungLuongToiDaMb}MB).`,
+      });
+    }
+
+    const chuoiDinhDang =
+      (await this.dichVuCaiDat?.layGiaTriChuoi(
+        'bai_tap.dinh_dang_tep_cho_phep',
+        'pdf,doc,docx,xls,xlsx,ppt,pptx,txt,zip,rar,mp4,png,jpg,jpeg',
+      )) || 'pdf,doc,docx,xls,xlsx,ppt,pptx,txt,zip,rar,mp4,png,jpg,jpeg';
+
+    const duoiHopLe = chuoiDinhDang
+      .split(',')
+      .map((d) => d.trim().toLowerCase().replace(/^\./, ''))
+      .filter(Boolean);
+
     // Kiểm tra đuôi file an toàn
     const phanMoRong = path.extname(tep.originalname).toLowerCase().replace('.', '');
-    const duoiHopLe = [
-      'pdf',
-      'doc',
-      'docx',
-      'xls',
-      'xlsx',
-      'ppt',
-      'pptx',
-      'txt',
-      'zip',
-      'rar',
-      'mp4',
-      'png',
-      'jpg',
-      'jpeg',
-    ];
 
     if (!duoiHopLe.includes(phanMoRong)) {
       throw new BadRequestException({
         thanhCong: false,
         maLoi: MaLoiNghiepVu.DU_LIEU_KHONG_HOP_LE,
-        thongDiep: `Định dạng tệp .${phanMoRong} không được hỗ trợ. Vui lòng chọn tệp PDF, Word, Excel, PowerPoint, ZIP hoặc hình ảnh.`,
+        thongDiep: `Định dạng tệp .${phanMoRong} không được hỗ trợ. Chỉ chấp nhận: ${duoiHopLe.join(', ')}`,
       });
     }
 

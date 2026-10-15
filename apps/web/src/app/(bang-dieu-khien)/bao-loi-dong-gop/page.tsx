@@ -36,6 +36,8 @@ import { mayKhachApi } from '../../../tien-ich/may-khach-api';
 import { thongBao } from '../../../tien-ich/thong-bao';
 import { HopThoai } from '../../../thanh-phan/hop-thoai';
 import { KhungXuongBang } from '../../../thanh-phan/khung-xuong';
+import { CongTac } from '../../../thanh-phan/cong-tac';
+import { AnimatedBackground } from '@/components/ui/animated-tabs';
 
 // Từ điển nhãn hiển thị tiếng Việt chuẩn
 const NHAN_LOAI: Record<LoaiBaoLoiDongGop, { nhan: string; moTa: string; mauSac: string; icon: any }> = {
@@ -368,6 +370,43 @@ export default function TrangBaoLoiDongGop() {
 
       {/* 3. Thanh tìm kiếm và bộ lọc */}
       <div className="p-4 rounded bg-surface border border-border shadow-sm space-y-3">
+        {/* Thanh lọc nhanh theo trạng thái (Segmented Control) */}
+        <div className="flex flex-wrap items-center gap-1 p-1 rounded-[var(--radius)] bg-[var(--bg)] border border-[var(--border)] w-fit">
+          <AnimatedBackground
+            defaultValue={boLocTrangThai || 'TAT_CA'}
+            className="rounded-[var(--radius)] bg-[var(--surface)] border border-[var(--border)]"
+            transition={{ type: 'spring', bounce: 0.15, duration: 0.25 }}
+          >
+            {[
+              { ma: 'TAT_CA', nhan: 'Tất cả trạng thái', giaTri: '' },
+              { ma: TrangThaiBaoLoi.CHO_TIEP_NHAN, nhan: 'Chờ tiếp nhận', giaTri: TrangThaiBaoLoi.CHO_TIEP_NHAN },
+              { ma: TrangThaiBaoLoi.DANG_XU_LY, nhan: 'Đang xử lý', giaTri: TrangThaiBaoLoi.DANG_XU_LY },
+              { ma: TrangThaiBaoLoi.DA_XU_LY, nhan: 'Đã giải quyết', giaTri: TrangThaiBaoLoi.DA_XU_LY },
+              { ma: TrangThaiBaoLoi.TU_CHOI, nhan: 'Từ chối', giaTri: TrangThaiBaoLoi.TU_CHOI },
+            ].map((tab) => {
+              const dangChon = (boLocTrangThai || '') === tab.giaTri;
+              return (
+                <button
+                  key={tab.ma}
+                  data-id={tab.ma}
+                  type="button"
+                  onClick={() => {
+                    setBoLocTrangThai(tab.giaTri);
+                    setTrangHienTai(1);
+                  }}
+                  className={`px-3 py-1.5 text-xs font-mono rounded-[var(--radius)] transition-colors cursor-pointer ${
+                    dangChon
+                      ? 'text-[var(--accent)] font-bold'
+                      : 'text-[var(--muted)] hover:text-[var(--text)]'
+                  }`}
+                >
+                  {tab.nhan}
+                </button>
+              );
+            })}
+          </AnimatedBackground>
+        </div>
+
         <div className="flex flex-col md:flex-row md:items-center gap-3">
           {/* Ô tìm kiếm */}
           <div className="relative flex-1">
@@ -582,14 +621,17 @@ export default function TrangBaoLoiDongGop() {
                       </button>
                     )}
 
-                    {laChuSoHuu && item.trangThai === TrangThaiBaoLoi.CHO_TIEP_NHAN && (
+                    {(laQuanTri ||
+                      (laChuSoHuu && item.trangThai === TrangThaiBaoLoi.CHO_TIEP_NHAN)) && (
                       <button
                         onClick={() => xuLyXoa(item.id)}
-                        className="inline-flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg border border-danger hover:bg-danger-soft text-xs font-medium text-danger transition-colors"
-                        title="Hủy phản ánh này"
+                        className="inline-flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg border border-danger hover:bg-danger-soft text-xs font-medium text-danger transition-colors cursor-pointer"
+                        title={laQuanTri ? 'Xóa phản ánh này' : 'Hủy phản ánh này'}
                       >
                         <Trash2 className="w-3.5 h-3.5" />
-                        <span className="sr-only sm:not-sr-only">Hủy</span>
+                        <span className="sr-only sm:not-sr-only">
+                          {laQuanTri ? 'Xóa' : 'Hủy'}
+                        </span>
                       </button>
                     )}
                   </div>
@@ -654,25 +696,34 @@ export default function TrangBaoLoiDongGop() {
               Phân loại yêu cầu
             </label>
             <div className="grid grid-cols-1 sm:grid-cols-3 gap-2.5">
-              {[
-                { loai: LoaiBaoLoiDongGop.BAO_LOI, label: 'Báo lỗi hệ thống', sub: 'Chức năng lỗi, không tải được trang' },
-                { loai: LoaiBaoLoiDongGop.DONG_GOP_Y_KIEN, label: 'Đóng góp ý kiến', sub: 'Góp ý giao diện, tiện ích mới' },
-                { loai: LoaiBaoLoiDongGop.HO_TRO_KY_THUAT, label: 'Hỗ trợ kỹ thuật', sub: 'Tài khoản, quyền hạn, thiết bị' },
-              ].map((item) => (
-                <button
-                  type="button"
-                  key={item.loai}
-                  onClick={() => setFormGui((f) => ({ ...f, loaiPhanHoi: item.loai }))}
-                  className={`p-3 rounded-lg border text-left transition-all ${
-                    formGui.loaiPhanHoi === item.loai
-                      ? 'border-accent bg-accent-soft text-accent ring-2 ring-accent'
-                      : 'border-border hover:border-border '
-                  }`}
-                >
-                  <p className="text-xs font-semibold">{item.label}</p>
-                  <p className="text-[11px] text-muted mt-0.5">{item.sub}</p>
-                </button>
-              ))}
+              <AnimatedBackground
+                defaultValue={formGui.loaiPhanHoi}
+                className="rounded-[var(--radius)] bg-accent-soft border border-accent"
+                transition={{ type: 'spring', bounce: 0.15, duration: 0.25 }}
+              >
+                {[
+                  { loai: LoaiBaoLoiDongGop.BAO_LOI, label: 'Báo lỗi hệ thống', sub: 'Chức năng lỗi, không tải được trang' },
+                  { loai: LoaiBaoLoiDongGop.DONG_GOP_Y_KIEN, label: 'Đóng góp ý kiến', sub: 'Góp ý giao diện, tiện ích mới' },
+                  { loai: LoaiBaoLoiDongGop.HO_TRO_KY_THUAT, label: 'Hỗ trợ kỹ thuật', sub: 'Tài khoản, quyền hạn, thiết bị' },
+                ].map((item) => (
+                  <button
+                    type="button"
+                    key={item.loai}
+                    data-id={item.loai}
+                    onClick={() => setFormGui((f) => ({ ...f, loaiPhanHoi: item.loai }))}
+                    className={`p-3 rounded-[var(--radius)] border text-left transition-all cursor-pointer ${
+                      formGui.loaiPhanHoi === item.loai
+                        ? 'border-accent text-accent'
+                        : 'border-border hover:border-accent'
+                    }`}
+                  >
+                    <div>
+                      <p className="text-xs font-semibold">{item.label}</p>
+                      <p className="text-[11px] text-muted mt-0.5">{item.sub}</p>
+                    </div>
+                  </button>
+                ))}
+              </AnimatedBackground>
             </div>
           </div>
 
@@ -682,25 +733,32 @@ export default function TrangBaoLoiDongGop() {
               Mức độ ưu tiên
             </label>
             <div className="grid grid-cols-4 gap-2">
-              {[
-                { u: MucDoUuTienBaoLoi.THAP, label: 'Thấp' },
-                { u: MucDoUuTienBaoLoi.TRUNG_BINH, label: 'Trung bình' },
-                { u: MucDoUuTienBaoLoi.CAO, label: 'Cao' },
-                { u: MucDoUuTienBaoLoi.KHAN_CAP, label: 'Khẩn cấp' },
-              ].map((p) => (
-                <button
-                  type="button"
-                  key={p.u}
-                  onClick={() => setFormGui((f) => ({ ...f, mucDoUuTien: p.u }))}
-                  className={`py-2 px-3 rounded-lg border text-center text-xs font-medium transition-all ${
-                    formGui.mucDoUuTien === p.u
-                      ? 'border-accent bg-accent text-white'
-                      : 'border-border text-text hover:bg-bg '
-                  }`}
-                >
-                  {p.label}
-                </button>
-              ))}
+              <AnimatedBackground
+                defaultValue={formGui.mucDoUuTien}
+                className="rounded-[var(--radius)] bg-accent border border-accent"
+                transition={{ type: 'spring', bounce: 0.15, duration: 0.25 }}
+              >
+                {[
+                  { u: MucDoUuTienBaoLoi.THAP, label: 'Thấp' },
+                  { u: MucDoUuTienBaoLoi.TRUNG_BINH, label: 'Trung bình' },
+                  { u: MucDoUuTienBaoLoi.CAO, label: 'Cao' },
+                  { u: MucDoUuTienBaoLoi.KHAN_CAP, label: 'Khẩn cấp' },
+                ].map((p) => (
+                  <button
+                    type="button"
+                    key={p.u}
+                    data-id={p.u}
+                    onClick={() => setFormGui((f) => ({ ...f, mucDoUuTien: p.u }))}
+                    className={`py-2 px-3 rounded-[var(--radius)] border justify-center text-center text-xs font-medium transition-all cursor-pointer ${
+                      formGui.mucDoUuTien === p.u
+                        ? 'border-accent text-white font-semibold'
+                        : 'border-border text-text hover:bg-bg'
+                    }`}
+                  >
+                    {p.label}
+                  </button>
+                ))}
+              </AnimatedBackground>
             </div>
           </div>
 
@@ -738,13 +796,11 @@ export default function TrangBaoLoiDongGop() {
           </div>
 
           {/* Đính kèm thông tin thiết bị */}
-          <div className="flex items-center gap-2.5 p-3 rounded-lg bg-bg border border-border ">
-            <input
-              type="checkbox"
+          <div className="flex items-center gap-3 p-3 rounded-lg bg-bg border border-border ">
+            <CongTac
               id="kemThongTin"
               checked={formGui.kemThongTinThietBi}
-              onChange={(e) => setFormGui((f) => ({ ...f, kemThongTinThietBi: e.target.checked }))}
-              className="w-4 h-4 rounded text-accent focus:ring-accent border-border"
+              onChange={(checked) => setFormGui((f) => ({ ...f, kemThongTinThietBi: checked }))}
             />
             <label htmlFor="kemThongTin" className="text-xs text-muted cursor-pointer">
               Tự động gửi thông tin thiết bị để bộ phận kỹ thuật hỗ trợ khắc phục nhanh nhất.

@@ -3,9 +3,11 @@ import {
   NotFoundException,
   ForbiddenException,
   BadRequestException,
+  Optional,
 } from '@nestjs/common';
 import { KhoBaiTapRepository } from './kho-bai-tap.repository';
 import { PrismaService } from '../../cot-loi/csdl/prisma.service';
+import { DichVuCaiDatService } from '../cai-dat/dich-vu-cai-dat.service';
 import {
   PayloadJwt,
   VaiTro,
@@ -23,6 +25,7 @@ export class DichVuBaiTapService {
   constructor(
     private readonly khoBaiTap: KhoBaiTapRepository,
     private readonly prisma: PrismaService,
+    @Optional() private readonly dichVuCaiDat?: DichVuCaiDatService,
   ) {}
 
   async kiemTraQuyenTruyCapLop(idLopHocPhan: string, nguoiDung: PayloadJwt) {
@@ -194,7 +197,7 @@ export class DichVuBaiTapService {
       });
     }
 
-    return this.khoBaiTap.taoBaiTap({
+    const baiTapMoi = await this.khoBaiTap.taoBaiTap({
       idLopHocPhan,
       tieuDe: duLieu.tieuDe.trim(),
       noiDung: duLieu.noiDung.trim(),
@@ -202,6 +205,18 @@ export class DichVuBaiTapService {
       diemToiDa: duLieu.diemToiDa || 10,
       hinhThucNop: duLieu.hinhThucNop,
     });
+
+    const chuoiHanNop = hanNop.toLocaleString('vi-VN', { hour12: false });
+    void this.dichVuCaiDat?.phatThongBaoChoLopHocPhan({
+      idLopHocPhan,
+      idNguoiTao: nguoiDung.sub,
+      tieuDe: `Bài tập mới: ${duLieu.tieuDe.trim()}`,
+      noiDung: `Lớp ${lop.tenLopHocPhan} vừa có bài tập mới. Hạn nộp: ${chuoiHanNop}. Điểm tối đa: ${duLieu.diemToiDa || 10}.`,
+      duongDan: `/bai-tap/${baiTapMoi.id}`,
+      loaiSuKien: 'BAI_TAP_MOI',
+    });
+
+    return baiTapMoi;
   }
 
   async xoaBaiTap(idBaiTap: string, nguoiDung: PayloadJwt) {
@@ -271,27 +286,33 @@ export class DichVuBaiTapService {
     let duongDanTep: string | null = null;
 
     if (tep) {
+      const dungLuongToiDaMb =
+        (await this.dichVuCaiDat?.layGiaTriSo('bai_tap.dung_luong_tep_nop_toi_da_mb', 15)) ?? 15;
+      if (tep.size > dungLuongToiDaMb * 1024 * 1024) {
+        throw new BadRequestException({
+          thanhCong: false,
+          maLoi: MaLoiNghiepVu.DU_LIEU_KHONG_HOP_LE,
+          thongDiep: `Kích thước tệp bài nộp vượt quá giới hạn cho phép (${dungLuongToiDaMb}MB).`,
+        });
+      }
+
+      const chuoiDinhDang =
+        (await this.dichVuCaiDat?.layGiaTriChuoi(
+          'bai_tap.dinh_dang_tep_cho_phep',
+          'pdf,doc,docx,xls,xlsx,ppt,pptx,txt,zip,rar,png,jpg,jpeg',
+        )) || 'pdf,doc,docx,xls,xlsx,ppt,pptx,txt,zip,rar,png,jpg,jpeg';
+
+      const duoiHopLe = chuoiDinhDang
+        .split(',')
+        .map((d) => d.trim().toLowerCase().replace(/^\./, ''))
+        .filter(Boolean);
+
       const phanMoRong = path.extname(tep.originalname).toLowerCase().replace('.', '');
-      const duoiHopLe = [
-        'pdf',
-        'doc',
-        'docx',
-        'xls',
-        'xlsx',
-        'ppt',
-        'pptx',
-        'txt',
-        'zip',
-        'rar',
-        'png',
-        'jpg',
-        'jpeg',
-      ];
       if (!duoiHopLe.includes(phanMoRong)) {
         throw new BadRequestException({
           thanhCong: false,
           maLoi: MaLoiNghiepVu.DU_LIEU_KHONG_HOP_LE,
-          thongDiep: 'Định dạng tệp nộp bài không được hỗ trợ',
+          thongDiep: `Định dạng tệp .${phanMoRong} không được hỗ trợ. Chỉ chấp nhận: ${duoiHopLe.join(', ')}`,
         });
       }
 
@@ -314,12 +335,24 @@ export class DichVuBaiTapService {
       });
     }
 
-    // Kiểm tra hạn nộp
+    // Kiểm tra hạn nộp & cấu hình cho phép nộp muộn
     const bayGio = new Date();
-    const trangThai =
-      bayGio > new Date(baiTap.hanNop)
-        ? TrangThaiBaiNop.NOP_MUON
-        : TrangThaiBaiNop.DA_NOP;
+    const quaHan = bayGio > new Date(baiTap.hanNop);
+    if (quaHan) {
+      const choPhepNopMuon =
+        (await this.dichVuCaiDat?.layGiaTriBoolean('bai_tap.cho_phep_nop_muon_mac_dinh', true)) ??
+        true;
+      if (!choPhepNopMuon) {
+        throw new BadRequestException({
+          thanhCong: false,
+          maLoi: MaLoiNghiepVu.YEU_CAU_KHONG_HOP_LE,
+          thongDiep:
+            'Đã quá thời hạn nộp bài và quy định hệ thống hiện không cho phép nộp bài sau hạn chót.',
+        });
+      }
+    }
+
+    const trangThai = quaHan ? TrangThaiBaiNop.NOP_MUON : TrangThaiBaiNop.DA_NOP;
 
     return this.khoBaiTap.luuBaiNop({
       idBaiTap,
@@ -410,10 +443,20 @@ export class DichVuBaiTapService {
       });
     }
 
-    return this.khoBaiTap.chamDiemBaiNop(
+    const daCham = await this.khoBaiTap.chamDiemBaiNop(
       idBaiNop,
       duLieu.diemSo,
       duLieu.nhanXet ? duLieu.nhanXet.trim() : null,
     );
+
+    void this.dichVuCaiDat?.phatThongBaoDaKenhChoNguoiDung({
+      danhSachIdNguoiDung: [baiNop.idNguoiDung],
+      tieuDe: `Đã chấm điểm bài tập: ${baiNop.baiTap.tieuDe}`,
+      noiDung: `Bài nộp của bạn đạt ${duLieu.diemSo}/${baiNop.baiTap.diemToiDa} điểm.${duLieu.nhanXet?.trim() ? ` Nhận xét: "${duLieu.nhanXet.trim()}"` : ''}`,
+      duongDan: `/bai-tap/${baiNop.idBaiTap}`,
+      loaiSuKien: 'CHAM_DIEM',
+    });
+
+    return daCham;
   }
 }

@@ -3,10 +3,12 @@ import {
   NotFoundException,
   ForbiddenException,
   Logger,
+  Optional,
 } from '@nestjs/common';
 import { PrismaService } from '../../cot-loi/csdl/prisma.service';
 import { KhoSoDiemRepository } from './kho-so-diem.repository';
 import { DichVuLlmService } from '../tro-ly-ai/dich-vu-llm.service';
+import { DichVuCaiDatService } from '../cai-dat/dich-vu-cai-dat.service';
 import {
   PayloadJwt,
   VaiTro,
@@ -29,6 +31,7 @@ export class DichVuSoDiemService {
     private readonly khoSoDiem: KhoSoDiemRepository,
     private readonly prisma: PrismaService,
     private readonly dichVuLlm: DichVuLlmService,
+    @Optional() private readonly dichVuCaiDat?: DichVuCaiDatService,
   ) {}
 
   private layIdNguoiDung(nguoiDung: PayloadJwt): string {
@@ -38,7 +41,10 @@ export class DichVuSoDiemService {
   /**
    * Quy đổi điểm Hệ 10 sang Hệ 4, Điểm chữ và Xếp loại học phần chuẩn tín chỉ
    */
-  private quyDoiDiemHocPhan(diemHe10: number | null): {
+  private quyDoiDiemHocPhan(
+    diemHe10: number | null,
+    nguongDiemDatToiThieu = 4.0,
+  ): {
     diemHe4: number | null;
     diemChu: 'A' | 'B+' | 'B' | 'C+' | 'C' | 'D+' | 'D' | 'F' | 'CHUA_XEP_LOAI';
     xepLoai: string;
@@ -53,25 +59,32 @@ export class DichVuSoDiemService {
       };
     }
 
+    const datQuaMon = diemHe10 >= nguongDiemDatToiThieu;
+
     if (diemHe10 >= 8.5) {
-      return { diemHe4: 4.0, diemChu: 'A', xepLoai: 'Xuất sắc / Giỏi', datQuaMon: true };
+      return { diemHe4: 4.0, diemChu: 'A', xepLoai: 'Xuất sắc / Giỏi', datQuaMon };
     }
     if (diemHe10 >= 8.0) {
-      return { diemHe4: 3.5, diemChu: 'B+', xepLoai: 'Khá giỏi', datQuaMon: true };
+      return { diemHe4: 3.5, diemChu: 'B+', xepLoai: 'Khá giỏi', datQuaMon };
     }
     if (diemHe10 >= 7.0) {
-      return { diemHe4: 3.0, diemChu: 'B', xepLoai: 'Khá', datQuaMon: true };
+      return { diemHe4: 3.0, diemChu: 'B', xepLoai: 'Khá', datQuaMon };
     }
     if (diemHe10 >= 6.5) {
-      return { diemHe4: 2.5, diemChu: 'C+', xepLoai: 'Trung bình khá', datQuaMon: true };
+      return { diemHe4: 2.5, diemChu: 'C+', xepLoai: 'Trung bình khá', datQuaMon };
     }
     if (diemHe10 >= 5.5) {
-      return { diemHe4: 2.0, diemChu: 'C', xepLoai: 'Trung bình', datQuaMon: true };
+      return { diemHe4: 2.0, diemChu: 'C', xepLoai: 'Trung bình', datQuaMon };
     }
     if (diemHe10 >= 5.0) {
-      return { diemHe4: 1.5, diemChu: 'D+', xepLoai: 'Trung bình yếu', datQuaMon: true };
+      return {
+        diemHe4: 1.5,
+        diemChu: datQuaMon ? 'D+' : 'F',
+        xepLoai: datQuaMon ? 'Trung bình yếu' : 'Không đạt (Học lại)',
+        datQuaMon,
+      };
     }
-    if (diemHe10 >= 4.0) {
+    if (diemHe10 >= nguongDiemDatToiThieu) {
       return { diemHe4: 1.0, diemChu: 'D', xepLoai: 'Đạt tối thiểu', datQuaMon: true };
     }
     return { diemHe4: 0.0, diemChu: 'F', xepLoai: 'Không đạt (Học lại)', datQuaMon: false };
@@ -83,20 +96,39 @@ export class DichVuSoDiemService {
   private async damBaoCotDiemMacDinh(idLopHocPhan: string) {
     let danhSachCot = await this.khoSoDiem.layCotDiemTheoLop(idLopHocPhan);
     if (danhSachCot.length === 0) {
-      await this.prisma.$transaction([
-        this.prisma.cotDiem.create({
-          data: { idLopHocPhan, tenCotDiem: 'Chuyên cần', heSo: 1.0 },
-        }),
-        this.prisma.cotDiem.create({
-          data: { idLopHocPhan, tenCotDiem: 'Luyện tập & Bài tập', heSo: 2.0 },
-        }),
-        this.prisma.cotDiem.create({
-          data: { idLopHocPhan, tenCotDiem: 'Giữa kỳ (Thi thử)', heSo: 2.0 },
-        }),
-        this.prisma.cotDiem.create({
-          data: { idLopHocPhan, tenCotDiem: 'Cuối kỳ', heSo: 5.0 },
-        }),
-      ]);
+      let mauCot = [
+        { tenCotDiem: 'Chuyên cần', heSo: 1.0 },
+        { tenCotDiem: 'Luyện tập & Bài tập', heSo: 2.0 },
+        { tenCotDiem: 'Giữa kỳ (Thi thử)', heSo: 2.0 },
+        { tenCotDiem: 'Cuối kỳ', heSo: 5.0 },
+      ];
+      try {
+        const chuoiJson = await this.dichVuCaiDat?.layGiaTriChuoi(
+          'hoc_vu.mau_cot_diem_mac_dinh',
+          '',
+        );
+        if (chuoiJson) {
+          const parsed = JSON.parse(chuoiJson);
+          if (Array.isArray(parsed) && parsed.length > 0) {
+            mauCot = parsed
+              .filter((c) => c && typeof c.tenCotDiem === 'string')
+              .map((c) => ({
+                tenCotDiem: c.tenCotDiem.trim(),
+                heSo: Math.max(0.1, Number(c.heSo) || 1.0),
+              }));
+          }
+        }
+      } catch {
+        // Giữ mẫu cột mặc định
+      }
+
+      await this.prisma.$transaction(
+        mauCot.map((c) =>
+          this.prisma.cotDiem.create({
+            data: { idLopHocPhan, tenCotDiem: c.tenCotDiem, heSo: c.heSo },
+          }),
+        ),
+      );
       danhSachCot = await this.khoSoDiem.layCotDiemTheoLop(idLopHocPhan);
     }
     return danhSachCot;
@@ -187,6 +219,10 @@ export class DichVuSoDiemService {
     }
 
     const danhSachCot = await this.damBaoCotDiemMacDinh(idLopHocPhan);
+    const nguongDiemDat =
+      (await this.dichVuCaiDat?.layGiaTriSo('hoc_vu.diem_dat_toi_thieu_he_10', 4.0)) ?? 4.0;
+    const soChuSoLamTron =
+      (await this.dichVuCaiDat?.layGiaTriSo('hoc_vu.so_chu_so_lam_tron_diem', 2)) === 1 ? 1 : 2;
 
     const phanBoDiemChu = { A: 0, B: 0, C: 0, D: 0, F: 0 };
     let tongDiemLop = 0;
@@ -245,10 +281,10 @@ export class DichVuSoDiemService {
 
       const diemTrungBinhHe10 =
         tongHeSoDaCoDiem > 0
-          ? Number((tongDiemNhanHeSo / tongHeSoDaCoDiem).toFixed(2))
+          ? Number((tongDiemNhanHeSo / tongHeSoDaCoDiem).toFixed(soChuSoLamTron))
           : null;
 
-      const quyDoi = this.quyDoiDiemHocPhan(diemTrungBinhHe10);
+      const quyDoi = this.quyDoiDiemHocPhan(diemTrungBinhHe10, nguongDiemDat);
 
       if (diemTrungBinhHe10 !== null) {
         soHocSinhDaDuDiem++;

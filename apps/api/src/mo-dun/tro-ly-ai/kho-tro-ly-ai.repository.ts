@@ -63,6 +63,23 @@ export class KhoTroLyAiRepository {
     });
   }
 
+  async xoaTatCaPhienCuaNguoiDung(idNguoiDung: string) {
+    return this.prisma.phienTroLy.deleteMany({
+      where: { idNguoiDung },
+    });
+  }
+
+  async demSoLuotHoiTrongNgay(idNguoiDung: string): Promise<number> {
+    const dauNgay = new Date();
+    dauNgay.setHours(0, 0, 0, 0);
+    return this.prisma.nhatKySuDungAI.count({
+      where: {
+        idNguoiDung,
+        ngayTao: { gte: dauNgay },
+      },
+    });
+  }
+
   async taoTinNhan(duLieu: {
     idPhien: string;
     vaiTro: 'user' | 'assistant' | 'system';

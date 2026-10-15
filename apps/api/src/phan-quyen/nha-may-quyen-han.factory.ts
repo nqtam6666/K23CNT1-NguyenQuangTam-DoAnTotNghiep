@@ -15,10 +15,10 @@ export class NhaMayQuyenHan {
       can(HanhDong.QuanLy, DoiTuong.TatCa);
       cannot(HanhDong.Doc, DoiTuong.PhuHuynhHocSinh);
     } else if (nguoiDung.vaiTro === VaiTro.BAN_GIAM_HIEU) {
-      // Ban giám hiệu: Xem toàn bộ hệ thống và xuất báo cáo
+      // Ban giám hiệu: Xem toàn bộ hệ thống và xuất báo cáo (trừ cài đặt kỹ thuật hệ thống và mục phụ huynh)
       can(HanhDong.Doc, DoiTuong.TatCa);
       can(HanhDong.XuatBaoCao, DoiTuong.TatCa);
-      cannot(HanhDong.Doc, DoiTuong.PhuHuynhHocSinh);
+      cannot(HanhDong.Doc, [DoiTuong.PhuHuynhHocSinh, DoiTuong.CaiDatHeThong]);
     } else if (nguoiDung.vaiTro === VaiTro.GIAO_VU) {
       // Giáo vụ: Quản lý chương trình học vụ, hồ sơ học sinh, giáo viên, lớp học phần
       can(HanhDong.QuanLy, [
@@ -45,6 +45,7 @@ export class NhaMayQuyenHan {
       ]);
       can([HanhDong.Doc, HanhDong.Tao, HanhDong.Sua], DoiTuong.NguoiDung);
       can(HanhDong.Doc, DoiTuong.TatCa);
+      cannot(HanhDong.Doc, [DoiTuong.PhuHuynhHocSinh, DoiTuong.CaiDatHeThong]);
     } else if (nguoiDung.vaiTro === VaiTro.GIAO_VIEN) {
       // Giáo viên: Quản lý bài tập, kiểm tra, bài giảng, điểm danh, chấm điểm, trợ lý AI
       can(HanhDong.Doc, [

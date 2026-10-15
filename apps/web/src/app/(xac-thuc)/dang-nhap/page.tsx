@@ -11,6 +11,7 @@ import { mayKhachApi } from '../../../tien-ich/may-khach-api';
 import { thongBao } from '../../../tien-ich/thong-bao';
 import { useCaiDatHeThong } from '../../../tien-ich/use-cai-dat';
 import { ToggleTheme } from '@/components/ui/toggle-theme';
+import { AnimatedBackground } from '@/components/ui/animated-tabs';
 import { NutBam } from '../../../thanh-phan/nut-bam';
 
 const TAI_KHOAN_MAU = [
@@ -45,6 +46,7 @@ export default function TrangDangNhap() {
   const queryClient = useQueryClient();
   const [dangXuLy, setDangXuLy] = useState(false);
   const [hienMatKhau, setHienMatKhau] = useState(false);
+  const [vaiTroMauChon, setVaiTroMauChon] = useState<string | undefined>(undefined);
   const { layGiaTri, choPhepDangKy } = useCaiDatHeThong();
   const tenHeThong = layGiaTri('TEN_HE_THONG', 'SmartClass AI');
   const khauHieu = layGiaTri('KHAU_HIEU', 'Hệ thống Lớp học số tích hợp Trí tuệ nhân tạo');
@@ -67,6 +69,7 @@ export default function TrangDangNhap() {
   });
 
   const xuLyChonTaiKhoanMau = (email: string, matKhau: string, vaiTro: string) => {
+    setVaiTroMauChon(vaiTro);
     setValue('email', email, { shouldValidate: true });
     setValue('matKhau', matKhau, { shouldValidate: true });
     thongBao.thongTin('Đã chọn tài khoản mẫu', `${vaiTro}: ${email}`);
@@ -232,17 +235,28 @@ export default function TrangDangNhap() {
             </div>
 
             <div className="grid grid-cols-2 sm:grid-cols-3 gap-1.5">
-              {TAI_KHOAN_MAU.map((tk) => (
-                <button
-                  key={tk.email}
-                  type="button"
-                  onClick={() => xuLyChonTaiKhoanMau(tk.email, tk.matKhau, tk.vaiTro)}
-                  className="px-2.5 py-2 rounded-[var(--radius)] border border-[var(--border)] bg-[var(--bg)] hover:bg-[var(--accent-soft)] hover:border-[var(--accent)] hover:text-[var(--accent)] font-mono text-xs font-medium text-[var(--text)] transition-colors text-center truncate cursor-pointer"
-                  title={`${tk.vaiTro}: ${tk.email} (Mật khẩu: ${tk.matKhau})`}
-                >
-                  {tk.vaiTro}
-                </button>
-              ))}
+              <AnimatedBackground
+                defaultValue={vaiTroMauChon}
+                className="rounded-[var(--radius)] bg-[var(--accent-soft)] border border-[var(--accent)]"
+                transition={{ type: 'spring', bounce: 0.15, duration: 0.25 }}
+              >
+                {TAI_KHOAN_MAU.map((tk) => (
+                  <button
+                    key={tk.email}
+                    data-id={tk.vaiTro}
+                    type="button"
+                    onClick={() => xuLyChonTaiKhoanMau(tk.email, tk.matKhau, tk.vaiTro)}
+                    className={`px-2.5 py-2 rounded-[var(--radius)] border bg-[var(--bg)] hover:border-[var(--accent)] font-mono text-xs font-medium transition-colors justify-center text-center truncate cursor-pointer ${
+                      vaiTroMauChon === tk.vaiTro
+                        ? 'border-[var(--accent)] text-[var(--accent)] font-semibold'
+                        : 'border-[var(--border)] text-[var(--text)] hover:text-[var(--accent)]'
+                    }`}
+                    title={`${tk.vaiTro}: ${tk.email} (Mật khẩu: ${tk.matKhau})`}
+                  >
+                    {tk.vaiTro}
+                  </button>
+                ))}
+              </AnimatedBackground>
             </div>
 
             <p className="text-[11px] text-[var(--muted)] text-center">

@@ -77,6 +77,13 @@ export class DieuKhienTroLyAiController {
     return this.dichVuTroLyAi.layChiTietPhien(id, nguoiDung);
   }
 
+  @Delete('phien')
+  @ApiOperation({ summary: 'Xóa toàn bộ lịch sử các phiên trò chuyện của người dùng hiện tại' })
+  @KiemTraQuyen(HanhDong.Xoa, DoiTuong.PhienTroLy)
+  async xoaTatCaPhien(@NguoiDungHienTai() nguoiDung: PayloadJwt) {
+    return this.dichVuTroLyAi.xoaTatCaPhien(nguoiDung);
+  }
+
   @Delete('phien/:id')
   @ApiOperation({ summary: 'Xóa một phiên trò chuyện' })
   @KiemTraQuyen(HanhDong.Xoa, DoiTuong.PhienTroLy)

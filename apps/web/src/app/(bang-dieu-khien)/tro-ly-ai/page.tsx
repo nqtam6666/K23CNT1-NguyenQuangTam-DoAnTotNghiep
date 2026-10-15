@@ -38,6 +38,7 @@ import { thongBao } from '@/tien-ich/thong-bao';
 import { HopThoai } from '@/thanh-phan/hop-thoai';
 import { AnhDaiDien } from '@/thanh-phan/anh-dai-dien';
 import { DinhDangMarkdown } from '@/thanh-phan/dinh-dang-markdown';
+import { AnimatedBackground } from '@/components/ui/animated-tabs';
 
 export default function TrangTroLyHocTap() {
   const queryClient = useQueryClient();
@@ -288,47 +289,54 @@ export default function TrangTroLyHocTap() {
                 Chưa có phiên trò chuyện nào. Hãy gửi câu hỏi đầu tiên!
               </div>
             ) : (
-              danhSachPhien.map((phien) => {
-                const laChon = phien.id === idPhienChon;
-                return (
-                  <div
-                    key={phien.id}
-                    onClick={() => setIdPhienChon(phien.id)}
-                    className={`group relative flex items-center justify-between p-3 rounded cursor-pointer text-xs transition-all ${
-                      laChon
-                        ? 'bg-primary text-primary-foreground font-semibold shadow-xs'
-                        : 'text-foreground hover:bg-muted/50 border border-transparent hover:border-border/60'
-                    }`}
-                  >
-                    <div className="truncate pr-6">
-                      <p className="truncate">{phien.tieuDe}</p>
-                      <p
-                        className={`text-[10px] mt-0.5 ${
-                          laChon ? 'text-primary-foreground/80' : 'text-muted-foreground'
-                        }`}
-                      >
-                        {new Date(phien.ngayTao).toLocaleDateString('vi-VN')} •{' '}
-                        {phien._count?.cacTinNhan || 0} tin nhắn
-                      </p>
-                    </div>
-
-                    <button
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        mutationXoaPhien.mutate(phien.id);
-                      }}
-                      title="Xóa phiên"
-                      className={`p-1 rounded-md opacity-0 group-hover:opacity-100 transition-opacity ${
+              <AnimatedBackground
+                defaultValue={idPhienChon || ''}
+                className="rounded-[var(--radius)] bg-[var(--accent-soft)] border-l-[3px] border-l-[var(--accent)]"
+                transition={{ type: 'spring', bounce: 0.15, duration: 0.25 }}
+              >
+                {danhSachPhien.map((phien) => {
+                  const laChon = phien.id === idPhienChon;
+                  return (
+                    <div
+                      key={phien.id}
+                      data-id={phien.id}
+                      onClick={() => setIdPhienChon(phien.id)}
+                      className={`group relative w-full flex items-center justify-between p-3 rounded-[var(--radius)] cursor-pointer text-xs transition-all ${
                         laChon
-                          ? 'hover:bg-primary-foreground/20 text-primary-foreground'
-                          : 'hover:bg-destructive/10 text-muted-foreground hover:text-destructive'
+                          ? 'text-[var(--accent)] font-semibold'
+                          : 'text-foreground hover:bg-muted/50 border border-transparent hover:border-border/60'
                       }`}
                     >
-                      <Trash2 className="w-3.5 h-3.5" />
-                    </button>
-                  </div>
-                );
-              })
+                      <div className="truncate pr-6">
+                        <p className="truncate">{phien.tieuDe}</p>
+                        <p
+                          className={`text-[10px] mt-0.5 ${
+                            laChon ? 'text-[var(--muted)]' : 'text-muted-foreground'
+                          }`}
+                        >
+                          {new Date(phien.ngayTao).toLocaleDateString('vi-VN')} •{' '}
+                          {phien._count?.cacTinNhan || 0} tin nhắn
+                        </p>
+                      </div>
+
+                      <button
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          mutationXoaPhien.mutate(phien.id);
+                        }}
+                        title="Xóa phiên"
+                        className={`p-1 rounded-[var(--radius)] opacity-0 group-hover:opacity-100 transition-opacity ${
+                          laChon
+                            ? 'hover:bg-[var(--danger-soft)] text-[var(--danger)]'
+                            : 'hover:bg-destructive/10 text-muted-foreground hover:text-destructive'
+                        }`}
+                      >
+                        <Trash2 className="w-3.5 h-3.5" />
+                      </button>
+                    </div>
+                  );
+                })}
+              </AnimatedBackground>
             )}
           </div>
         </div>
@@ -391,19 +399,27 @@ export default function TrangTroLyHocTap() {
                     Gợi ý câu hỏi phổ biến:
                   </p>
                   <div className="grid grid-cols-1 gap-2">
-                    {goiYCauHoi.map((cau, idx) => (
-                      <button
-                        key={idx}
-                        onClick={() => {
-                          setCauHoiNhap(cau);
-                          mutationHoiDap.mutate(cau);
-                        }}
-                        className="text-left p-2.5 rounded border border-border/80 bg-background hover:bg-muted/40 text-xs text-foreground/90 transition-all flex items-center justify-between group"
-                      >
-                        <span className="truncate">{cau}</span>
-                        <ArrowRight className="w-3.5 h-3.5 text-muted-foreground group-hover:text-primary group-hover:translate-x-0.5 transition-all shrink-0 ml-2" />
-                      </button>
-                    ))}
+                    <AnimatedBackground
+                      enableHover
+                      className="rounded-[var(--radius)] bg-[var(--active-bg)]"
+                      transition={{ type: 'spring', bounce: 0.15, duration: 0.25 }}
+                    >
+                      {goiYCauHoi.map((cau, idx) => (
+                        <button
+                          key={idx}
+                          data-id={String(idx)}
+                          type="button"
+                          onClick={() => {
+                            setCauHoiNhap(cau);
+                            mutationHoiDap.mutate(cau);
+                          }}
+                          className="w-full text-left p-2.5 rounded-[var(--radius)] border border-border/80 bg-background hover:border-[var(--accent)] text-xs text-foreground/90 transition-all flex items-center justify-between group cursor-pointer"
+                        >
+                          <span className="truncate">{cau}</span>
+                          <ArrowRight className="w-3.5 h-3.5 text-muted-foreground group-hover:text-primary group-hover:translate-x-0.5 transition-all shrink-0 ml-2" />
+                        </button>
+                      ))}
+                    </AnimatedBackground>
                   </div>
                 </div>
               </div>

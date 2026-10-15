@@ -27,11 +27,15 @@ import { ChiBaoSucKhoe } from '../../thanh-phan/chi-bao-suc-khoe';
 import { TimKiemNhanh } from '../../thanh-phan/tim-kiem-nhanh';
 import { DichNgonNgu } from '../../thanh-phan/dich-ngon-ngu';
 import { ToggleTheme } from '@/components/ui/toggle-theme';
+import { AnimatedBackground } from '@/components/ui/animated-tabs';
 import { AnhDaiDien } from '../../thanh-phan/anh-dai-dien';
 import { MucThanhBen } from '../../thanh-phan/muc-thanh-ben';
 import { HopThoai } from '../../thanh-phan/hop-thoai';
 import { NutBam } from '../../thanh-phan/nut-bam';
-import { HopThoaiThongBaoHeThong } from '../../thanh-phan/hop-thong-bao';
+import {
+  HopThoaiThongBaoHeThong,
+  useThongBaoThucTe,
+} from '../../thanh-phan/hop-thong-bao';
 
 const BAN_DO_TIEU_DE_TRANG: Record<string, string> = {
   '/bang-dieu-khien': 'Tổng quan',
@@ -74,6 +78,12 @@ export default function LayoutBangDieuKhien({ children }: { children: ReactNode 
   const moTaPhu = `${layGiaTri('MA_LOP_KHOA', 'K23CNT1')} · ${layGiaTri('TAC_GIA', 'Quang Tâm')}`;
   const urlLogo = layGiaTri('URL_LOGO');
   const urlIcon = layGiaTri('URL_ICON');
+  const thuGonThanhBenMacDinh =
+    layGiaTri('giao_dien.thu_gon_thanh_ben_mac_dinh', 'false') === 'true';
+  const choPhepDoiCheDoSangToi =
+    layGiaTri('giao_dien.cho_phep_doi_che_do_sang_toi', 'true') !== 'false';
+  const hienThiChiBaoSucKhoe =
+    layGiaTri('giao_dien.hien_thi_chi_bao_suc_khoe_he_thong', 'true') !== 'false';
 
   // Đọc trạng thái giao diện Sáng / Tối đã lưu từ localStorage khi tải trang
   useEffect(() => {
@@ -98,17 +108,19 @@ export default function LayoutBangDieuKhien({ children }: { children: ReactNode 
     }
   }, []);
 
-  // Đọc trạng thái thu gọn đã lưu từ localStorage khi tải trang
+  // Đọc trạng thái thu gọn đã lưu từ localStorage hoặc mặc định từ cài đặt hệ thống
   useEffect(() => {
     try {
       const trangThaiLuu = localStorage.getItem('lms_sidebar_thu_gon');
       if (trangThaiLuu !== null) {
         setThuGon(trangThaiLuu === 'true');
+      } else {
+        setThuGon(thuGonThanhBenMacDinh);
       }
     } catch {
       // Bỏ qua nếu môi trường không cho phép truy cập localStorage
     }
-  }, []);
+  }, [thuGonThanhBenMacDinh]);
 
   const batTatThuGon = () => {
     setThuGon((prev) => {
@@ -137,10 +149,23 @@ export default function LayoutBangDieuKhien({ children }: { children: ReactNode 
     return () => window.removeEventListener('keydown', xuLyPhimTat);
   }, []);
 
-  // Lấy hồ sơ người dùng từ API (kèm bộ đệm sessionStorage để F5 hiển thị tức thì, không nháy Skeleton)
+  // Khôi phục nhanh hồ sơ từ sessionStorage ngay sau khi hydrate để tránh lỗi Hydration #418
+  useEffect(() => {
+    try {
+      const raw = sessionStorage.getItem('lms_cache_ho_so');
+      if (raw && !queryClient.getQueryData(['ho-so-hien-tai'])) {
+        queryClient.setQueryData(['ho-so-hien-tai'], JSON.parse(raw) as PayloadJwt);
+      }
+    } catch {
+      // Bỏ qua lỗi đọc sessionStorage
+    }
+  }, [queryClient]);
+
+  // Lấy hồ sơ người dùng từ API
   const {
     data: nguoiDung,
     isError,
+    error: loiHoSo,
     isLoading,
   } = useQuery<PayloadJwt>({
     queryKey: ['ho-so-hien-tai'],
@@ -154,22 +179,21 @@ export default function LayoutBangDieuKhien({ children }: { children: ReactNode 
       }
       return duLieu;
     },
-    initialData: () => {
-      if (typeof window === 'undefined') return undefined;
-      try {
-        const raw = sessionStorage.getItem('lms_cache_ho_so');
-        return raw ? (JSON.parse(raw) as PayloadJwt) : undefined;
-      } catch {
-        return undefined;
-      }
-    },
-    initialDataUpdatedAt: 0,
     staleTime: 30 * 1000,
-    retry: false,
+    retry: (soLanThu, loi: any) => {
+      // Không thử lại nếu là lỗi 401 (đã qua interceptor làm mới token mà vẫn thất bại)
+      if (loi?.response?.status === 401) return false;
+      // Thử lại tối đa 3 lần nếu máy chủ API đang khởi động lại khi build
+      return soLanThu < 3;
+    },
+    retryDelay: 1000,
   });
 
+  const { tongSoChuaDoc } = useThongBaoThucTe(Boolean(nguoiDung));
+
   useEffect(() => {
-    if (isError) {
+    const maTrangThai = (loiHoSo as any)?.response?.status;
+    if (isError && maTrangThai === 401) {
       try {
         sessionStorage.removeItem('lms_cache_ho_so');
         sessionStorage.removeItem('lms_cache_bang_dieu_khien');
@@ -178,7 +202,7 @@ export default function LayoutBangDieuKhien({ children }: { children: ReactNode 
       }
       router.push('/dang-nhap');
     }
-  }, [isError, router]);
+  }, [isError, loiHoSo, router]);
 
   // Kiểm soát truy cập trực tiếp bằng URL (Route Guard chống bypass)
   useEffect(() => {
@@ -262,6 +286,15 @@ export default function LayoutBangDieuKhien({ children }: { children: ReactNode 
   }, [menuTheoVaiTro]);
 
   const thuTuNhom: NhomMenu[] = ['CA_NHAN', 'HOC_TAP', 'QUAN_TRI'];
+
+  const duongDanActive = useMemo(() => {
+    const khop = menuTheoVaiTro.find(
+      (item) =>
+        pathname === item.duongDan ||
+        (item.duongDan !== '/bang-dieu-khien' && pathname.startsWith(item.duongDan)),
+    );
+    return khop?.duongDan;
+  }, [menuTheoVaiTro, pathname]);
 
   const batTatSangToi = () => {
     const tiepTheo = cheDoSangToi === 'sang' ? 'toi' : 'sang';
@@ -376,24 +409,31 @@ export default function LayoutBangDieuKhien({ children }: { children: ReactNode 
 
                   {thuGon && <div className="h-px bg-[var(--border)] my-1.5 mx-2" />}
 
-                  {danhSachNhom.map((item) => {
-                    const laTrangHienTai =
-                      pathname === item.duongDan ||
-                      (item.duongDan !== '/bang-dieu-khien' && pathname.startsWith(item.duongDan));
+                  <AnimatedBackground
+                    layoutId="thanh-ben-chinh"
+                    defaultValue={duongDanActive}
+                    className="bg-[var(--accent-soft)] border-l-[3px] border-l-[var(--accent)] rounded-r-[var(--radius)]"
+                    transition={{ type: 'spring', bounce: 0.15, duration: 0.25 }}
+                  >
+                    {danhSachNhom.map((item) => {
+                      const laTrangHienTai = item.duongDan === duongDanActive;
 
-                    return (
-                      <MucThanhBen
-                        key={item.id}
-                        href={item.duongDan}
-                        icon={item.bieuTuong}
-                        active={laTrangHienTai}
-                        thuGon={thuGon}
-                        huyHieu={item.huyHieu !== undefined ? String(item.huyHieu) : undefined}
-                      >
-                        {item.tieuDe}
-                      </MucThanhBen>
-                    );
-                  })}
+                      return (
+                        <MucThanhBen
+                          key={item.id}
+                          data-id={item.duongDan}
+                          href={item.duongDan}
+                          icon={item.bieuTuong}
+                          active={laTrangHienTai}
+                          thuGon={thuGon}
+                          title={item.tieuDe}
+                          huyHieu={item.huyHieu !== undefined ? String(item.huyHieu) : undefined}
+                        >
+                          {item.tieuDe}
+                        </MucThanhBen>
+                      );
+                    })}
+                  </AnimatedBackground>
                 </div>
               );
             })
@@ -496,25 +536,34 @@ export default function LayoutBangDieuKhien({ children }: { children: ReactNode 
               </kbd>
             </button>
 
-            {/* Nút mở Modal thông báo hệ thống (hỗ trợ tắt 24h / đã hiểu) */}
+            {/* Nút mở Modal thông báo học vụ thực tế (hiển thị số lượng chưa đọc) */}
             <button
               type="button"
               onClick={() => setThongBaoHeThongMo(true)}
-              title="Xem thông báo học vụ"
+              title={
+                tongSoChuaDoc > 0
+                  ? `Xem thông báo học vụ (${tongSoChuaDoc} chưa đọc)`
+                  : 'Xem thông báo học vụ'
+              }
               aria-label="Xem thông báo học vụ"
-              className="inline-flex items-center justify-center p-2 rounded-[var(--radius)] border border-[var(--border)] bg-[var(--surface)] hover:bg-[var(--active-bg)] text-[var(--muted)] hover:text-[var(--text)] transition-colors cursor-pointer shrink-0"
+              className="relative inline-flex items-center justify-center p-2 rounded-[var(--radius)] border border-[var(--border)] bg-[var(--surface)] hover:bg-[var(--active-bg)] text-[var(--muted)] hover:text-[var(--text)] transition-colors cursor-pointer shrink-0"
             >
               <Bell strokeWidth={1.5} className="w-[18px] h-[18px]" />
+              {tongSoChuaDoc > 0 && (
+                <span className="absolute -top-1.5 -right-1.5 min-w-[18px] h-[18px] px-1 rounded-full bg-[var(--danger)] text-white font-mono text-[10px] font-bold leading-none flex items-center justify-center tabular-nums border border-[var(--surface)]">
+                  {tongSoChuaDoc > 99 ? '99+' : tongSoChuaDoc}
+                </span>
+              )}
             </button>
 
-            {/* Chỉ báo sức khỏe hệ thống (CHỈ HIỂN THỊ CHO QUẢN TRỊ VIÊN) */}
-            <ChiBaoSucKhoe vaiTroNguoiDung={nguoiDung?.vaiTro} />
+            {/* Chỉ báo sức khỏe hệ thống (CHỈ HIỂN THỊ CHO QUẢN TRỊ VIÊN KHI BẬT CÀI ĐẶT) */}
+            {hienThiChiBaoSucKhoe && <ChiBaoSucKhoe vaiTroNguoiDung={nguoiDung?.vaiTro} />}
 
             {/* Bộ dịch ngôn ngữ đa quốc gia GTranslate */}
             <DichNgonNgu />
 
             {/* Bộ chuyển đổi giao diện Hệ thống / Sáng / Tối */}
-            <ToggleTheme />
+            {choPhepDoiCheDoSangToi && <ToggleTheme />}
 
             {/* Ảnh đại diện cá nhân trên Top Header */}
             {nguoiDung && (

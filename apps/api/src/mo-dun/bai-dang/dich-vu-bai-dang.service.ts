@@ -3,9 +3,11 @@ import {
   NotFoundException,
   ForbiddenException,
   BadRequestException,
+  Optional,
 } from '@nestjs/common';
 import { KhoBaiDangRepository } from './kho-bai-dang.repository';
 import { PrismaService } from '../../cot-loi/csdl/prisma.service';
+import { DichVuCaiDatService } from '../cai-dat/dich-vu-cai-dat.service';
 import {
   PayloadJwt,
   VaiTro,
@@ -19,6 +21,7 @@ export class DichVuBaiDangService {
   constructor(
     private readonly khoBaiDang: KhoBaiDangRepository,
     private readonly prisma: PrismaService,
+    @Optional() private readonly dichVuCaiDat?: DichVuCaiDatService,
   ) {}
 
   /**
@@ -134,12 +137,30 @@ export class DichVuBaiDangService {
       ghimDauTrang = false;
     }
 
-    return this.khoBaiDang.taoBaiDang({
+    const baiDangMoi = await this.khoBaiDang.taoBaiDang({
       idLopHocPhan,
       idNguoiDung: nguoiDung.sub,
       noiDung: duLieu.noiDung.trim(),
       ghimDauTrang,
     });
+
+    const tomTat =
+      duLieu.noiDung.trim().length > 160
+        ? `${duLieu.noiDung.trim().slice(0, 157)}...`
+        : duLieu.noiDung.trim();
+
+    void this.dichVuCaiDat?.phatThongBaoChoLopHocPhan({
+      idLopHocPhan,
+      idNguoiTao: nguoiDung.sub,
+      tieuDe: ghimDauTrang
+        ? `Thông báo ghim mới · ${lop.tenLopHocPhan}`
+        : `Thông báo mới · ${lop.tenLopHocPhan}`,
+      noiDung: tomTat,
+      duongDan: `/lop-hoc/${idLopHocPhan}`,
+      loaiSuKien: 'BAI_DANG',
+    });
+
+    return baiDangMoi;
   }
 
   async xoaBaiDang(idBaiDang: string, nguoiDung: PayloadJwt) {

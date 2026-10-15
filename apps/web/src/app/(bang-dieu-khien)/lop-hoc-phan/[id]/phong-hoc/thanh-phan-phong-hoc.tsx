@@ -18,6 +18,7 @@ import {
   Minimize2,
 } from 'lucide-react';
 import { thongBao } from '../../../../../tien-ich/thong-bao';
+import { useCaiDatHeThong } from '../../../../../tien-ich/use-cai-dat';
 
 interface ThuocTinhThanhPhanPhongHoc {
   urlMayChuLiveKit: string;
@@ -50,10 +51,36 @@ export default function ThanhPhanPhongHocLiveKit({
   onLeaveRoom,
   onReloadToken,
 }: ThuocTinhThanhPhanPhongHoc) {
+  const { layGiaTri } = useCaiDatHeThong();
   const [lyDoMatKetNoi, setLyDoMatKetNoi] = useState<string | null>(null);
   const [daRoiPhong, setDaRoiPhong] = useState(false);
   const [soLanThuLai, setSoLanThuLai] = useState(0);
   const [cheDoGocRong, setCheDoGocRong] = useState(true); // true = contain (chuẩn góc rộng 16:9, không zoom gần)
+
+  const tatMicroHeThong = layGiaTri('phong_hoc.tat_micro_khi_vao_phong', 'true') !== 'false';
+  const tatCameraHeThong = layGiaTri('phong_hoc.tat_camera_khi_vao_phong', 'true') !== 'false';
+
+  const { batMicroKhiVao, batCameraKhiVao } = useMemo(() => {
+    let batMicro = !tatMicroHeThong;
+    let batCamera = !tatCameraHeThong;
+    try {
+      if (typeof window !== 'undefined') {
+        const raw = localStorage.getItem('lms_tuy_chon_ca_nhan');
+        if (raw) {
+          const parsed = JSON.parse(raw);
+          if (typeof parsed?.phongHoc?.batMicroKhiVaoPhong === 'boolean') {
+            batMicro = parsed.phongHoc.batMicroKhiVaoPhong;
+          }
+          if (typeof parsed?.phongHoc?.batCameraKhiVaoPhong === 'boolean') {
+            batCamera = parsed.phongHoc.batCameraKhiVaoPhong;
+          }
+        }
+      }
+    } catch {
+      // Bỏ qua lỗi đọc localStorage
+    }
+    return { batMicroKhiVao: batMicro, batCameraKhiVao: batCamera };
+  }, [tatMicroHeThong, tatCameraHeThong]);
 
   // Cấu hình phòng học chuẩn HD và tối ưu băng thông
   const tuyChonPhong = useMemo<RoomOptions>(
@@ -63,6 +90,11 @@ export default function ThanhPhanPhongHocLiveKit({
       videoCaptureDefaults: {
         resolution: VideoPresets.h720.resolution,
         facingMode: 'user',
+      },
+      audioCaptureDefaults: {
+        autoGainControl: true,
+        echoCancellation: true,
+        noiseSuppression: true,
       },
       publishDefaults: {
         simulcast: true,
@@ -223,15 +255,23 @@ export default function ThanhPhanPhongHocLiveKit({
           serverUrl={urlMayChuLiveKit}
           token={token}
           connect={true}
-          video={{
-            resolution: VideoPresets.h720.resolution,
-            facingMode: 'user',
-          }}
-          audio={{
-            autoGainControl: true,
-            echoCancellation: true,
-            noiseSuppression: true,
-          }}
+          video={
+            batCameraKhiVao
+              ? {
+                  resolution: VideoPresets.h720.resolution,
+                  facingMode: 'user',
+                }
+              : false
+          }
+          audio={
+            batMicroKhiVao
+              ? {
+                  autoGainControl: true,
+                  echoCancellation: true,
+                  noiseSuppression: true,
+                }
+              : false
+          }
           options={tuyChonPhong}
           data-lk-theme="default"
           onDisconnected={xuLyMatKetNoi}

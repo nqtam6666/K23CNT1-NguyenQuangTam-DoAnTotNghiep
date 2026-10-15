@@ -19,6 +19,7 @@ export type AnimatedBackgroundProps = {
   className?: string;
   transition?: Transition;
   enableHover?: boolean;
+  layoutId?: string;
 };
 
 export function AnimatedBackground({
@@ -28,9 +29,11 @@ export function AnimatedBackground({
   className,
   transition,
   enableHover = false,
+  layoutId,
 }: AnimatedBackgroundProps) {
   const [activeId, setActiveId] = useState<string | null>(null);
   const uniqueId = useId();
+  const resolvedLayoutId = layoutId ? `background-${layoutId}` : `background-${uniqueId}`;
 
   const handleSetActiveId = (id: string | null) => {
     setActiveId(id);
@@ -81,8 +84,8 @@ export function AnimatedBackground({
         <AnimatePresence initial={false}>
           {activeId === id && (
             <motion.div
-              layoutId={`background-${uniqueId}`}
-              className={cn('absolute inset-0', className)}
+              layoutId={resolvedLayoutId}
+              className={cn('absolute inset-0 pointer-events-none', className)}
               transition={transition}
               initial={{ opacity: defaultValue ? 1 : 0 }}
               animate={{
@@ -94,7 +97,10 @@ export function AnimatedBackground({
             />
           )}
         </AnimatePresence>
-        <span className='z-10 inline-flex items-center gap-[inherit]'>
+        <span
+          data-slot="animated-tab-label"
+          className="z-10 flex flex-1 items-center justify-[inherit] gap-[inherit] min-w-0"
+        >
           {child.props.children}
         </span>
       </>

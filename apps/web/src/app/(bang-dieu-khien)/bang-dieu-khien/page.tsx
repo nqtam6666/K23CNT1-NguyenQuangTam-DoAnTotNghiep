@@ -1,7 +1,8 @@
 'use client';
 
+import { useEffect } from 'react';
 import dynamic from 'next/dynamic';
-import { useQuery } from '@tanstack/react-query';
+import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { RefreshCw, Layers } from 'lucide-react';
 import { mayKhachApi } from '../../../tien-ich/may-khach-api';
 import { PayloadJwt, PhanHoiBangDieuKhien } from '@lms/chung';
@@ -39,6 +40,27 @@ const BieuDoVaiTro = dynamic(
 );
 
 export default function TrangBangDieuKhien() {
+  const queryClient = useQueryClient();
+
+  // Khôi phục nhanh dữ liệu từ sessionStorage ngay sau khi hydrate (tránh lỗi Hydration #418)
+  useEffect(() => {
+    try {
+      const rawHoSo = sessionStorage.getItem('lms_cache_ho_so');
+      if (rawHoSo && !queryClient.getQueryData(['ho-so-hien-tai'])) {
+        queryClient.setQueryData(['ho-so-hien-tai'], JSON.parse(rawHoSo) as PayloadJwt);
+      }
+      const rawBangDieuKhien = sessionStorage.getItem('lms_cache_bang_dieu_khien');
+      if (rawBangDieuKhien && !queryClient.getQueryData(['du-lieu-bang-dieu-khien'])) {
+        queryClient.setQueryData(
+          ['du-lieu-bang-dieu-khien'],
+          JSON.parse(rawBangDieuKhien) as PhanHoiBangDieuKhien,
+        );
+      }
+    } catch {
+      // Bỏ qua lỗi đọc sessionStorage
+    }
+  }, [queryClient]);
+
   // 1. Hồ sơ người dùng hiện tại
   const { data: nguoiDung, isLoading: dangTaiHoSo } = useQuery<PayloadJwt>({
     queryKey: ['ho-so-hien-tai'],
@@ -52,16 +74,6 @@ export default function TrangBangDieuKhien() {
       }
       return duLieu;
     },
-    initialData: () => {
-      if (typeof window === 'undefined') return undefined;
-      try {
-        const raw = sessionStorage.getItem('lms_cache_ho_so');
-        return raw ? (JSON.parse(raw) as PayloadJwt) : undefined;
-      } catch {
-        return undefined;
-      }
-    },
-    initialDataUpdatedAt: 0,
     staleTime: 60 * 1000,
   });
 
@@ -84,16 +96,6 @@ export default function TrangBangDieuKhien() {
       }
       return duLieu;
     },
-    initialData: () => {
-      if (typeof window === 'undefined') return undefined;
-      try {
-        const raw = sessionStorage.getItem('lms_cache_bang_dieu_khien');
-        return raw ? (JSON.parse(raw) as PhanHoiBangDieuKhien) : undefined;
-      } catch {
-        return undefined;
-      }
-    },
-    initialDataUpdatedAt: 0,
     staleTime: 60 * 1000,
   });
 

@@ -26,6 +26,12 @@ function ThanhTienTrinhNoiDung() {
     let timerDem: NodeJS.Timeout;
 
     const batDauChayTienTrinh = () => {
+      if (
+        typeof document !== 'undefined' &&
+        document.documentElement.getAttribute('data-top-progress') === 'false'
+      ) {
+        return;
+      }
       setDangTai(true);
       setTienTrinh(15);
       clearInterval(timerDem);

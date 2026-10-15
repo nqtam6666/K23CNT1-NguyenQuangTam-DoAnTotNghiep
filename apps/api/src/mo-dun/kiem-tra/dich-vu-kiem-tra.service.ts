@@ -4,10 +4,12 @@ import {
   ForbiddenException,
   BadRequestException,
   Logger,
+  Optional,
 } from '@nestjs/common';
 import { PrismaService } from '../../cot-loi/csdl/prisma.service';
 import { KhoKiemTraRepository } from './kho-kiem-tra.repository';
 import { DichVuLlmService } from '../tro-ly-ai/dich-vu-llm.service';
+import { DichVuCaiDatService } from '../cai-dat/dich-vu-cai-dat.service';
 import {
   PayloadJwt,
   VaiTro,
@@ -31,6 +33,7 @@ export class DichVuKiemTraService {
     private readonly khoKiemTra: KhoKiemTraRepository,
     private readonly prisma: PrismaService,
     private readonly dichVuLlm: DichVuLlmService,
+    @Optional() private readonly dichVuCaiDat?: DichVuCaiDatService,
   ) {}
 
   private layIdNguoiDung(nguoiDung: PayloadJwt): string {
@@ -200,7 +203,18 @@ export class DichVuKiemTraService {
       });
     }
 
-    return this.khoKiemTra.taoBaiKiemTra(idLopHocPhan, duLieu);
+    const baiKiemTraMoi = await this.khoKiemTra.taoBaiKiemTra(idLopHocPhan, duLieu);
+
+    void this.dichVuCaiDat?.phatThongBaoChoLopHocPhan({
+      idLopHocPhan,
+      idNguoiTao: idNguoiDung,
+      tieuDe: `Bài kiểm tra mới: ${duLieu.tieuDe.trim()}`,
+      noiDung: `Lớp ${lop.tenLopHocPhan} vừa có đề ${duLieu.cheDo === CheDoKiemTra.THI_THU ? 'thi thử' : 'luyện tập'} mới (${duLieu.thoiGianLamPhut || 30} phút).`,
+      duongDan: `/lop-hoc/${idLopHocPhan}/kiem-tra/${baiKiemTraMoi.id}`,
+      loaiSuKien: 'BAI_KIEM_TRA_MOI',
+    });
+
+    return baiKiemTraMoi;
   }
 
   /**

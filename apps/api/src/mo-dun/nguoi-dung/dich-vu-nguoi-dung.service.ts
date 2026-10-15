@@ -7,6 +7,7 @@ import {
 import * as argon2 from 'argon2';
 import {
   TaoNguoiDungDto,
+  TaoNhieuNguoiDungDto,
   CapNhatNguoiDungDto,
   ChuyenTrangThaiNguoiDungDto,
   DatLaiMatKhauAdminDto,
@@ -75,6 +76,65 @@ export class DichVuNguoiDung {
 
     const { matKhau, ...ketQua } = nguoiDung;
     return ketQua;
+  }
+
+  /**
+   * Quản trị viên tạo hàng loạt người dùng
+   */
+  async taoHangLoat(duLieu: TaoNhieuNguoiDungDto) {
+    const danhSachThanhCong: any[] = [];
+    const danhSachBoQua: Array<{ email: string; hoTen: string; lyDo: string }> = [];
+    const tapEmailTrongLo = new Set<string>();
+
+    for (const muc of duLieu.danhSach) {
+      const emailChuan = muc.email.trim().toLowerCase();
+      if (tapEmailTrongLo.has(emailChuan)) {
+        danhSachBoQua.push({
+          email: emailChuan,
+          hoTen: muc.hoTen,
+          lyDo: 'Trùng email trong danh sách tải lên',
+        });
+        continue;
+      }
+      tapEmailTrongLo.add(emailChuan);
+
+      const daTonTai = await this.khoNguoiDung.timTheoEmail(emailChuan);
+      if (daTonTai) {
+        danhSachBoQua.push({
+          email: emailChuan,
+          hoTen: muc.hoTen,
+          lyDo: 'Email đã tồn tại trong hệ thống',
+        });
+        continue;
+      }
+
+      const matKhauBam = await argon2.hash(muc.matKhau, {
+        type: argon2.argon2id,
+        memoryCost: 2 ** 16,
+        timeCost: 3,
+        parallelism: 1,
+      });
+
+      const nguoiDung = await this.khoNguoiDung.taoNguoiDung({
+        email: emailChuan,
+        matKhau: matKhauBam,
+        hoTen: muc.hoTen.trim(),
+        soDienThoai: muc.soDienThoai?.trim() || undefined,
+        vaiTro: muc.vaiTro,
+        kichHoat: muc.kichHoat ?? true,
+      });
+
+      const { matKhau, ...ketQua } = nguoiDung;
+      danhSachThanhCong.push(ketQua);
+    }
+
+    return {
+      soThanhCong: danhSachThanhCong.length,
+      soBoQua: danhSachBoQua.length,
+      tongSoYeuCau: duLieu.danhSach.length,
+      danhSachThanhCong,
+      danhSachBoQua,
+    };
   }
 
   /**

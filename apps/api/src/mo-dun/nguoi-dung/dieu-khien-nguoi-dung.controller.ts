@@ -15,11 +15,13 @@ import { ApiTags, ApiOperation, ApiResponse, ApiBearerAuth } from '@nestjs/swagg
 import { DichVuNguoiDung } from './dich-vu-nguoi-dung.service';
 import {
   taoNguoiDungSchema,
+  taoNhieuNguoiDungSchema,
   capNhatNguoiDungSchema,
   chuyenTrangThaiNguoiDungSchema,
   datLaiMatKhauAdminSchema,
   truyVanNguoiDungSchema,
   TaoNguoiDungDto,
+  TaoNhieuNguoiDungDto,
   CapNhatNguoiDungDto,
   ChuyenTrangThaiNguoiDungDto,
   DatLaiMatKhauAdminDto,
@@ -58,6 +60,17 @@ export class DieuKhienNguoiDung {
   @ApiResponse({ status: 201, description: 'Người dùng được tạo thành công' })
   async taoMoi(@Body(new ZodValidationPipe(taoNguoiDungSchema)) duLieu: TaoNguoiDungDto) {
     return this.dichVuNguoiDung.taoMoi(duLieu);
+  }
+
+  @Post('hang-loat')
+  @KiemTraQuyen(HanhDong.Tao, DoiTuong.NguoiDung)
+  @HttpCode(HttpStatus.CREATED)
+  @ApiOperation({ summary: 'Tạo hàng loạt tài khoản người dùng mới' })
+  @ApiResponse({ status: 201, description: 'Kết quả tạo hàng loạt người dùng' })
+  async taoHangLoat(
+    @Body(new ZodValidationPipe(taoNhieuNguoiDungSchema)) duLieu: TaoNhieuNguoiDungDto,
+  ) {
+    return this.dichVuNguoiDung.taoHangLoat(duLieu);
   }
 
   @Get(':id')

@@ -1,7 +1,9 @@
 import {
   Controller,
   Post,
+  Delete,
   Body,
+  Param,
   UseGuards,
   Req,
   Res,
@@ -157,6 +159,42 @@ export class DieuKhienXacThuc {
   ) {
     await this.dichVuXacThuc.doiMatKhau(idNguoiDung, duLieu);
     return { thongDiep: 'Đổi mật khẩu thành công' };
+  }
+
+  @Get('phien-dang-nhap')
+  @ApiBearerAuth()
+  @ApiOperation({ summary: 'Lấy danh sách các thiết bị đang đăng nhập của tài khoản hiện tại' })
+  @ApiResponse({ status: 200, description: 'Danh sách phiên đăng nhập đang hoạt động' })
+  async layDanhSachPhienDangNhap(
+    @NguoiDungHienTai('id') idNguoiDung: string,
+    @Req() yeuCau: Request,
+  ) {
+    const refreshToken = (yeuCau as any).cookies?.['refresh_token'];
+    return this.dichVuXacThuc.layDanhSachPhienDangNhap(idNguoiDung, refreshToken);
+  }
+
+  @Delete('phien-dang-nhap/:id')
+  @ApiBearerAuth()
+  @ApiOperation({ summary: 'Thu hồi một phiên đăng nhập thiết bị cụ thể' })
+  @ApiResponse({ status: 200, description: 'Đã thu hồi phiên đăng nhập' })
+  async thuHoiMotPhien(
+    @NguoiDungHienTai('id') idNguoiDung: string,
+    @Param('id') idPhien: string,
+  ) {
+    return this.dichVuXacThuc.thuHoiMotPhien(idNguoiDung, idPhien);
+  }
+
+  @Post('dang-xuat-tat-ca')
+  @HttpCode(HttpStatus.OK)
+  @ApiBearerAuth()
+  @ApiOperation({ summary: 'Đăng xuất khỏi tất cả các thiết bị khác' })
+  @ApiResponse({ status: 200, description: 'Đã thu hồi toàn bộ phiên đăng nhập khác' })
+  async dangXuatTatCaThietBiKhac(
+    @NguoiDungHienTai('id') idNguoiDung: string,
+    @Req() yeuCau: Request,
+  ) {
+    const refreshToken = (yeuCau as any).cookies?.['refresh_token'];
+    return this.dichVuXacThuc.dangXuatTatCaThietBiKhac(idNguoiDung, refreshToken);
   }
 
   private datCookieToken(

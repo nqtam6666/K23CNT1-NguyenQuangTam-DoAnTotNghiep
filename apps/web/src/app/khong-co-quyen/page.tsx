@@ -11,7 +11,7 @@ export default function TrangKhongCoQuyen() {
           </div>
           <div>
             <p className="eyebrow">PHÂN QUYỀN TRUY CẬP</p>
-            <h1 className="font-mono text-[20px] font-bold text-[var(--text)] tracking-tight">
+            <h1 className="font-sans text-[20px] font-bold text-[var(--text)] tracking-tight">
               403 - Không có quyền truy cập
             </h1>
           </div>

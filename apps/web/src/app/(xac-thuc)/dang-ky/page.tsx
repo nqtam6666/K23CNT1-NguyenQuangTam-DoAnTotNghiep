@@ -128,8 +128,8 @@ export default function TrangDangKy() {
           )}
 
           <div className="min-w-0">
-            <p className="eyebrow">CỔNG ĐĂNG KÝ HỌC VIÊN</p>
-            <h1 className="font-mono text-[20px] font-bold text-[var(--text)] tracking-tight truncate">
+            <p className="eyebrow">CỔNG ĐĂNG KÝ SINH VIÊN</p>
+            <h1 className="font-sans text-[20px] font-bold text-[var(--text)] tracking-tight truncate">
               Tạo tài khoản {tenHeThong}
             </h1>
             <p className="text-xs text-[var(--muted)] truncate">{khauHieu}</p>
@@ -151,7 +151,7 @@ export default function TrangDangKy() {
                 <ShieldAlert strokeWidth={1.5} className="w-5 h-5" />
               </div>
               <div className="space-y-1">
-                <h2 className="font-mono text-base font-bold text-[var(--text)]">
+                <h2 className="font-sans text-base font-bold text-[var(--text)]">
                   Cổng đăng ký tự do đang tạm đóng
                 </h2>
                 <p className="text-sm text-[var(--muted)] leading-relaxed">
@@ -161,7 +161,7 @@ export default function TrangDangKy() {
               <div className="pt-2">
                 <Link
                   href="/dang-nhap"
-                  className="inline-flex items-center justify-center gap-2 w-full px-4 py-2.5 rounded-[var(--radius)] border border-[var(--border)] bg-[var(--bg)] hover:bg-[var(--active-bg)] font-mono text-xs font-semibold text-[var(--text)] transition-colors"
+                  className="inline-flex items-center justify-center gap-2 w-full px-4 py-2.5 rounded-[var(--radius)] border border-[var(--border)] bg-[var(--bg)] hover:bg-[var(--active-bg)] font-sans text-xs font-semibold text-[var(--text)] transition-colors"
                 >
                   <ArrowLeft strokeWidth={1.5} className="w-4 h-4" />
                   Quay lại trang đăng nhập
@@ -175,9 +175,9 @@ export default function TrangDangKy() {
                 <div className="space-y-1.5">
                   <label
                     htmlFor="hoTen"
-                    className="block font-mono text-[12px] font-semibold text-[var(--text)]"
+                    className="block font-sans text-[13px] font-semibold text-[var(--text)]"
                   >
-                    Họ và tên học viên <span className="text-[var(--danger)]">*</span>
+                    Họ và tên sinh viên <span className="text-[var(--danger)]">*</span>
                   </label>
                   <div className="relative">
                     <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-[var(--muted)]">

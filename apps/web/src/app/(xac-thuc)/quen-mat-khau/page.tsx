@@ -69,7 +69,7 @@ export default function TrangQuenMatKhau() {
 
           <div className="min-w-0">
             <p className="eyebrow">KHÔI PHỤC TÀI KHOẢN</p>
-            <h1 className="font-mono text-[20px] font-bold text-[var(--text)] tracking-tight truncate">
+            <h1 className="font-sans text-[20px] font-bold text-[var(--text)] tracking-tight truncate">
               Quên mật khẩu
             </h1>
             <p className="text-xs text-[var(--muted)] truncate">{tenHeThong}</p>

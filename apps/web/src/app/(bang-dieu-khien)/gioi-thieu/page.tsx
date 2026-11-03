@@ -115,7 +115,7 @@ export default function TrangGioiThieu() {
             <div className="w-9 h-9 rounded-[var(--radius)] border border-[var(--border)] bg-[var(--surface)] text-[var(--accent)] flex items-center justify-center">
               <CalendarCheck2 strokeWidth={1.5} className="w-5 h-5" />
             </div>
-            <h3 className="font-mono font-bold text-[var(--text)] text-sm">
+            <h3 className="font-sans font-bold text-[var(--text)] text-sm">
               Điểm danh & Chuyên cần
             </h3>
             <p className="text-xs text-[var(--muted)] leading-relaxed">
@@ -128,7 +128,7 @@ export default function TrangGioiThieu() {
             <div className="w-9 h-9 rounded-[var(--radius)] border border-[var(--border)] bg-[var(--surface)] text-[var(--accent)] flex items-center justify-center">
               <FileCheck2 strokeWidth={1.5} className="w-5 h-5" />
             </div>
-            <h3 className="font-mono font-bold text-[var(--text)] text-sm">
+            <h3 className="font-sans font-bold text-[var(--text)] text-sm">
               Luyện tập & Thi thử
             </h3>
             <p className="text-xs text-[var(--muted)] leading-relaxed">
@@ -141,7 +141,7 @@ export default function TrangGioiThieu() {
             <div className="w-9 h-9 rounded-[var(--radius)] border border-[var(--border)] bg-[var(--surface)] text-[var(--accent)] flex items-center justify-center">
               <GraduationCap strokeWidth={1.5} className="w-5 h-5" />
             </div>
-            <h3 className="font-mono font-bold text-[var(--text)] text-sm">
+            <h3 className="font-sans font-bold text-[var(--text)] text-sm">
               Quản lý kết quả học phần
             </h3>
             <p className="text-xs text-[var(--muted)] leading-relaxed">
@@ -154,7 +154,7 @@ export default function TrangGioiThieu() {
             <div className="w-9 h-9 rounded-[var(--radius)] border border-[var(--border)] bg-[var(--surface)] text-[var(--accent)] flex items-center justify-center">
               <Video strokeWidth={1.5} className="w-5 h-5" />
             </div>
-            <h3 className="font-mono font-bold text-[var(--text)] text-sm">
+            <h3 className="font-sans font-bold text-[var(--text)] text-sm">
               Phòng học số & Trợ lý AI
             </h3>
             <p className="text-xs text-[var(--muted)] leading-relaxed">

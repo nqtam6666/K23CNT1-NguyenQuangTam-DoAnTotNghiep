@@ -381,7 +381,7 @@ export function TabTaiLieu({ idLopHocPhan, nguoiDung, laGiaoVienLop }: ThuocTinh
       {/* Thanh hành động */}
       <div className="flex flex-wrap items-center justify-between gap-4 bg-surface rounded border border-border p-5">
         <div>
-          <h3 className="text-base font-mono font-bold text-text">
+          <h3 className="text-base font-sans font-bold text-text">
             Kho học liệu & Quản lý phiên bản
           </h3>
           <p className="text-xs text-muted mt-0.5">
@@ -411,7 +411,7 @@ export function TabTaiLieu({ idLopHocPhan, nguoiDung, laGiaoVienLop }: ThuocTinh
       ) : danhSachTaiLieu.length === 0 ? (
         <div className="rounded border border-dashed border-border p-12 text-center bg-surface">
           <BookOpen className="w-12 h-12 text-muted mx-auto mb-3" strokeWidth={1.5} />
-          <h4 className="text-base font-mono font-bold text-text">Chưa có tài liệu nào</h4>
+          <h4 className="text-base font-sans font-bold text-text">Chưa có tài liệu nào</h4>
           <p className="text-sm text-muted mt-1 max-w-sm mx-auto">
             {coQuyenQuanLy
               ? 'Hãy tải lên tài liệu học tập đầu tiên để sinh viên tham khảo và phục vụ Trợ lý AI.'

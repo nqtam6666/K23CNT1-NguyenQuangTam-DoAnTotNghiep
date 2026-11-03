@@ -27,7 +27,7 @@ interface ThuocTinhHopThoaiDoiAnh {
 const AVATAR_MAU = [
   {
     id: 'hoc-sinh-1',
-    ten: 'Học viên Năng động',
+    ten: 'Sinh viên Năng động',
     svg: `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><circle cx="50" cy="50" r="48" fill="rgb(5,150,105)"/><circle cx="50" cy="38" r="18" fill="rgb(230,246,239)"/><path d="M26 80c0-13 11-22 24-22s24 9 24 22" fill="rgb(4,120,87)"/><circle cx="44" cy="36" r="2.5" fill="rgb(43,42,39)"/><circle cx="56" cy="36" r="2.5" fill="rgb(43,42,39)"/><path d="M46 44q4 3 8 0" stroke="rgb(43,42,39)" stroke-width="2" fill="none" stroke-linecap="round"/></svg>`,
   },
   {

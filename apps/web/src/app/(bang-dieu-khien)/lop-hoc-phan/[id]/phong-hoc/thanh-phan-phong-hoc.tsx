@@ -153,7 +153,7 @@ export default function ThanhPhanPhongHocLiveKit({
         <div className="w-16 h-16 rounded-full bg-accent/15 border border-accent flex items-center justify-center text-accent mb-4">
           <LogOut className="w-8 h-8 stroke-[1.5]" />
         </div>
-        <h3 className="text-lg font-mono font-bold text-[var(--phong-text)] mb-2">Bạn đã rời khỏi phòng học</h3>
+        <h3 className="text-lg font-sans font-bold text-[var(--phong-text)] mb-2">Bạn đã rời khỏi phòng học</h3>
         <p className="text-sm text-[var(--phong-muted)] max-w-md mb-6 leading-relaxed">
           Bạn vừa kết thúc phiên học trực tuyến. Bạn có thể tham gia lại phòng bất cứ lúc nào hoặc quay về trang thông tin lớp học.
         </p>
@@ -233,7 +233,7 @@ export default function ThanhPhanPhongHocLiveKit({
           <div className="w-16 h-16 rounded-full bg-danger/15 border border-danger flex items-center justify-center text-danger mb-4">
             <WifiOff className="w-8 h-8 stroke-[1.5]" />
           </div>
-          <h3 className="text-lg font-mono font-bold text-[var(--phong-text)] mb-2">Đường truyền bị ngắt kết nối</h3>
+          <h3 className="text-lg font-sans font-bold text-[var(--phong-text)] mb-2">Đường truyền bị ngắt kết nối</h3>
           <p className="text-sm text-[var(--phong-muted)] max-w-md mb-6 leading-relaxed">
             {lyDoMatKetNoi}
           </p>

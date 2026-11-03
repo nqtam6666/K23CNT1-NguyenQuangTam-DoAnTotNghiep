@@ -229,7 +229,7 @@ export function HopThongBao({
           )}
         </div>
 
-        <h4 className="font-mono text-sm font-bold text-[var(--text)] leading-snug">
+        <h4 className="font-sans text-sm font-bold text-[var(--text)] leading-snug">
           {tieuDe}
         </h4>
 

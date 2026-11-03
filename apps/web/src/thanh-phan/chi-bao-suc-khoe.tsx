@@ -128,7 +128,7 @@ export function ChiBaoSucKhoe({ vaiTroNguoiDung }: Props) {
           <div className="flex items-center justify-between pb-3 border-b border-[var(--border)]">
             <div className="flex items-center gap-2">
               <Activity strokeWidth={1.5} className="w-4 h-4 text-[var(--accent)]" />
-              <h4 className="font-mono font-bold text-[var(--text)] text-xs uppercase tracking-wider">
+              <h4 className="font-sans font-bold text-[var(--text)] text-xs uppercase tracking-wider">
                 Trạng thái hạ tầng máy chủ
               </h4>
             </div>

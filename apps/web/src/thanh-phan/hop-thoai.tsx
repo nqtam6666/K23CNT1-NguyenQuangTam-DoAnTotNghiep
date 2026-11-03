@@ -149,7 +149,7 @@ export function HopThoai({
         <div className="flex items-start justify-between gap-4 px-5 py-4 border-b border-[var(--border)] shrink-0">
           <div className="space-y-0.5 min-w-0">
             {eyebrow && <p className="eyebrow">{eyebrow}</p>}
-            <h3 className="font-mono text-[16px] sm:text-[17px] font-bold text-[var(--text)] tracking-tight">
+            <h3 className="font-sans text-[16px] sm:text-[17px] font-bold text-[var(--text)] tracking-tight">
               {tieuDe}
             </h3>
             {moTa && <p className="text-xs text-[var(--muted)] leading-relaxed">{moTa}</p>}

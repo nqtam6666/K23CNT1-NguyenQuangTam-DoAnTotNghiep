@@ -2054,7 +2054,7 @@ export default function TrangCaiDatHeThong() {
                         ? `TÌM KIẾM TRÊN TOÀN BỘ HỆ THỐNG · ${danhSachMucHienThi.length} KẾT QUẢ`
                         : `${thongTinNhomHienTai.eyebrow} · ${danhSachMucHienThi.length} CÀI ĐẶT TRONG NHÓM`}
                     </p>
-                    <h2 className="font-mono text-[17px] font-bold text-[var(--text)]">
+                    <h2 className="font-sans text-[17px] font-bold text-[var(--text)]">
                       {dangTimKiem
                         ? `Kết quả cho "${tuKhoaTimKiem}"`
                         : thongTinNhomHienTai.ten}

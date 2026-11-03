@@ -170,7 +170,7 @@ export default function TrangPhongHocTrucTuyen({ params }: { params: Promise<{ i
 
           <div className="min-w-0">
             <div className="flex items-center gap-2">
-              <h2 className="font-mono font-bold text-sm sm:text-base text-[var(--phong-text)] truncate">
+              <h2 className="font-sans font-bold text-sm sm:text-base text-[var(--phong-text)] truncate">
                 {lopHocPhan?.tenLopHocPhan || 'Lớp học phần'}
               </h2>
               <span className="inline-flex items-center gap-1.5 px-2 py-0.5 rounded-[var(--radius)] text-[11px] font-mono font-semibold bg-accent/15 text-accent border border-accent">
@@ -225,7 +225,7 @@ export default function TrangPhongHocTrucTuyen({ params }: { params: Promise<{ i
         {moNhatKy && (
           <aside className="w-80 sm:w-96 bg-[var(--phong-surface)] border-l border-[var(--phong-border)] flex flex-col h-full z-10 text-[var(--phong-text)]">
             <div className="p-4 border-b border-[var(--phong-border)] flex items-center justify-between">
-              <h3 className="font-mono font-bold text-sm text-[var(--phong-text)] flex items-center gap-2">
+              <h3 className="font-sans font-bold text-sm text-[var(--phong-text)] flex items-center gap-2">
                 <Users className="w-4 h-4 text-accent stroke-[1.5]" />
                 Nhật ký có mặt & Điểm danh
               </h3>

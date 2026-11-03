@@ -82,7 +82,7 @@ export function TrangThaiRong({
         <BieuTuong strokeWidth={1.5} className="w-5 h-5" />
       </div>
       {tieuDe && (
-        <h3 className="font-mono text-sm font-bold text-[var(--text)] mb-1">{tieuDe}</h3>
+        <h3 className="font-sans text-sm font-bold text-[var(--text)] mb-1">{tieuDe}</h3>
       )}
       <p className="text-xs text-[var(--muted)] max-w-md leading-relaxed">{moTa}</p>
       {hanhDong && <div className="mt-4">{hanhDong}</div>}

@@ -368,7 +368,7 @@ export default function TrangHoSoCaNhan() {
         <div className="text-center sm:text-left flex-1 min-w-0">
           <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
             <div>
-              <h2 className="text-lg font-mono font-bold text-[var(--text)] truncate">
+              <h2 className="text-lg font-sans font-bold text-[var(--text)] truncate">
                 {hoSo?.hoTen}
               </h2>
               <p className="text-sm text-[var(--muted)] truncate">{hoSo?.email}</p>
@@ -483,7 +483,7 @@ export default function TrangHoSoCaNhan() {
           >
             <div>
               <p className="eyebrow mb-0.5">THÔNG TIN LIÊN HỆ</p>
-              <h3 className="font-mono font-bold text-[var(--text)] text-base">
+              <h3 className="font-sans font-bold text-[var(--text)] text-base">
                 Chỉnh sửa thông tin cá nhân
               </h3>
             </div>
@@ -543,7 +543,7 @@ export default function TrangHoSoCaNhan() {
           {/* Thông tin học vụ Học sinh */}
           {hoSo?.hoSoHocSinh && (
             <div className="p-6 rounded-[var(--radius)] bg-[var(--surface)] border border-[var(--border)]">
-              <h3 className="font-mono font-bold text-[var(--text)] text-base mb-4 flex items-center gap-2">
+              <h3 className="font-sans font-bold text-[var(--text)] text-base mb-4 flex items-center gap-2">
                 <GraduationCap className="w-5 h-5 text-[var(--accent)] stroke-[1.5]" />
                 Hồ sơ Học vụ Sinh viên
               </h3>
@@ -581,7 +581,7 @@ export default function TrangHoSoCaNhan() {
           {/* Thông tin chuyên môn Giáo viên */}
           {hoSo?.hoSoGiaoVien && (
             <div className="p-6 rounded-[var(--radius)] bg-[var(--surface)] border border-[var(--border)]">
-              <h3 className="font-mono font-bold text-[var(--text)] text-base mb-4 flex items-center gap-2">
+              <h3 className="font-sans font-bold text-[var(--text)] text-base mb-4 flex items-center gap-2">
                 <School className="w-5 h-5 text-[var(--accent)] stroke-[1.5]" />
                 Hồ sơ Chuyên môn Giảng viên
               </h3>
@@ -620,7 +620,7 @@ export default function TrangHoSoCaNhan() {
           >
             <div>
               <p className="eyebrow mb-0.5">MẬT KHẨU TÀI KHOẢN</p>
-              <h3 className="font-mono font-bold text-[var(--text)] text-base">
+              <h3 className="font-sans font-bold text-[var(--text)] text-base">
                 Đổi mật khẩu bảo mật
               </h3>
             </div>
@@ -691,7 +691,7 @@ export default function TrangHoSoCaNhan() {
             <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-3 border-b border-[var(--border)]">
               <div>
                 <p className="eyebrow mb-0.5">QUẢN LÝ PHIÊN LÀM VIỆC</p>
-                <h3 className="font-mono font-bold text-[var(--text)] text-base">
+                <h3 className="font-sans font-bold text-[var(--text)] text-base">
                   Thiết bị đang đăng nhập ({danhSachPhien.length})
                 </h3>
                 <p className="text-xs text-[var(--muted)] mt-0.5">
@@ -788,7 +788,7 @@ export default function TrangHoSoCaNhan() {
           <section className="p-6 rounded-[var(--radius)] bg-[var(--surface)] border border-[var(--border)] space-y-4">
             <div>
               <p className="eyebrow mb-0.5">KHÔNG GIAN LÀM VIỆC</p>
-              <h3 className="font-mono font-bold text-[var(--text)] text-base">
+              <h3 className="font-sans font-bold text-[var(--text)] text-base">
                 Chế độ Giao diện & Thanh điều hướng
               </h3>
             </div>
@@ -885,7 +885,7 @@ export default function TrangHoSoCaNhan() {
               <Video className="w-4 h-4 text-[var(--accent)] stroke-[1.5]" />
               <div>
                 <p className="eyebrow">PHÒNG HỌC TRỰC TUYẾN</p>
-                <h3 className="font-mono font-bold text-[var(--text)] text-base">
+                <h3 className="font-sans font-bold text-[var(--text)] text-base">
                   Trạng thái Thiết bị Nghe nhìn Mặc định
                 </h3>
               </div>
@@ -949,7 +949,7 @@ export default function TrangHoSoCaNhan() {
                 <Bell className="w-4 h-4 text-[var(--accent)] stroke-[1.5]" />
                 <div>
                   <p className="eyebrow">KÊNH THÔNG BÁO ĐA NỀN TẢNG</p>
-                  <h3 className="font-mono font-bold text-[var(--text)] text-base">
+                  <h3 className="font-sans font-bold text-[var(--text)] text-base">
                     Thông báo Nền tảng, Màn hình Windows &amp; Hộp thư Gmail
                   </h3>
                 </div>
@@ -1226,7 +1226,7 @@ export default function TrangHoSoCaNhan() {
               <Shield className="w-4 h-4 text-[var(--accent)] stroke-[1.5]" />
               <div>
                 <p className="eyebrow">QUYỀN RIÊNG TƯ LỚP HỌC</p>
-                <h3 className="font-mono font-bold text-[var(--text)] text-base">
+                <h3 className="font-sans font-bold text-[var(--text)] text-base">
                   Hiển thị Thông tin Cá nhân
                 </h3>
               </div>
@@ -1260,7 +1260,7 @@ export default function TrangHoSoCaNhan() {
               <Bot className="w-4 h-4 text-[var(--accent)] stroke-[1.5]" />
               <div>
                 <p className="eyebrow">TRỢ LÝ HỌC TẬP AI</p>
-                <h3 className="font-mono font-bold text-[var(--text)] text-base">
+                <h3 className="font-sans font-bold text-[var(--text)] text-base">
                   Phong cách Giải đáp & Lịch sử Hội thoại
                 </h3>
               </div>

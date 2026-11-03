@@ -429,7 +429,7 @@ export function TabSoDiem({ idLopHocPhan, nguoiDung, laGiaoVienLop }: ThuocTinhT
               <div className="bg-card rounded border border-border/80 p-5 shadow-sm space-y-4">
                 <div className="flex flex-wrap items-center justify-between gap-2">
                   <div>
-                    <h4 className="text-sm font-mono font-bold text-foreground flex items-center gap-2">
+                    <h4 className="text-sm font-sans font-bold text-foreground flex items-center gap-2">
                       <AlertTriangle className="w-4 h-4 text-danger" />
                       Cảnh báo sớm tiến độ & Kết quả học tập
                     </h4>
@@ -530,7 +530,7 @@ export function TabSoDiem({ idLopHocPhan, nguoiDung, laGiaoVienLop }: ThuocTinhT
               {/* Khối 2: Đề xuất nội dung ôn tập dựa trên các câu hỏi trả lời sai */}
               <div className="bg-card rounded border border-border/80 p-5 shadow-sm space-y-4">
                 <div>
-                  <h4 className="text-sm font-mono font-bold text-foreground flex items-center gap-2">
+                  <h4 className="text-sm font-sans font-bold text-foreground flex items-center gap-2">
                     <BookOpen className="w-4 h-4 text-accent" />
                     Đề xuất nội dung ôn tập từ câu trả lời sai
                   </h4>

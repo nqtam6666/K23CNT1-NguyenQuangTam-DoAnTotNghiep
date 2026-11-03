@@ -48,7 +48,6 @@ import { HopThoaiDoiAnhDaiDien } from '../../../thanh-phan/hop-thoai-doi-anh-dai
 import { HopThoai } from '../../../thanh-phan/hop-thoai';
 import { CongTac } from '../../../thanh-phan/cong-tac';
 import { phatThongBaoManHinhWindows } from '../../../thanh-phan/hop-thong-bao';
-import { AnimatedBackground } from '@/components/ui/animated-tabs';
 
 type TabHoSo = 'thong-tin' | 'doi-mat-khau' | 'tuy-chon' | 'quyen-rieng-tu-ai';
 
@@ -395,83 +394,73 @@ export default function TrangHoSoCaNhan() {
 
       {/* Thanh chuyển đổi 4 Tab cài đặt cá nhân */}
       <div className="border-b border-[var(--border)] flex flex-wrap gap-1">
-        <AnimatedBackground
-          defaultValue={tabHienTai}
-          className="rounded-t-[var(--radius)] bg-[var(--accent-soft)]"
-          transition={{ type: 'spring', bounce: 0.15, duration: 0.25 }}
+        <button
+          type="button"
+          onClick={() => {
+            setTabHienTai('thong-tin');
+            setThongBaoThanhCong(null);
+            setThongBaoLoi(null);
+          }}
+          className={`px-4 py-2.5 text-xs sm:text-sm font-sans border-b-2 transition-colors flex items-center gap-2 cursor-pointer ${
+            tabHienTai === 'thong-tin'
+              ? 'border-[var(--accent)] text-[var(--accent)] font-semibold'
+              : 'border-transparent text-[var(--muted)] hover:text-[var(--text)]'
+          }`}
         >
-          <button
-            data-id="thong-tin"
-            type="button"
-            onClick={() => {
-              setTabHienTai('thong-tin');
-              setThongBaoThanhCong(null);
-              setThongBaoLoi(null);
-            }}
-            className={`px-4 py-2.5 text-xs sm:text-sm font-mono border-b-2 transition-colors flex items-center gap-2 cursor-pointer ${
-              tabHienTai === 'thong-tin'
-                ? 'border-[var(--accent)] text-[var(--accent)] font-bold'
-                : 'border-transparent text-[var(--muted)] hover:text-[var(--text)]'
-            }`}
-          >
-            <User className="w-4 h-4 stroke-[1.5]" />
-            <span>Thông tin cơ bản</span>
-          </button>
+          <User className="w-4 h-4 stroke-[1.5]" />
+          <span>Thông tin cơ bản</span>
+        </button>
 
-          <button
-            data-id="doi-mat-khau"
-            type="button"
-            onClick={() => {
-              setTabHienTai('doi-mat-khau');
-              setThongBaoThanhCong(null);
-              setThongBaoLoi(null);
-            }}
-            className={`px-4 py-2.5 text-xs sm:text-sm font-mono border-b-2 transition-colors flex items-center gap-2 cursor-pointer ${
-              tabHienTai === 'doi-mat-khau'
-                ? 'border-[var(--accent)] text-[var(--accent)] font-bold'
-                : 'border-transparent text-[var(--muted)] hover:text-[var(--text)]'
-            }`}
-          >
-            <Key className="w-4 h-4 stroke-[1.5]" />
-            <span>Mật khẩu & Phiên thiết bị</span>
-          </button>
+        <button
+          type="button"
+          onClick={() => {
+            setTabHienTai('doi-mat-khau');
+            setThongBaoThanhCong(null);
+            setThongBaoLoi(null);
+          }}
+          className={`px-4 py-2.5 text-xs sm:text-sm font-sans border-b-2 transition-colors flex items-center gap-2 cursor-pointer ${
+            tabHienTai === 'doi-mat-khau'
+              ? 'border-[var(--accent)] text-[var(--accent)] font-semibold'
+              : 'border-transparent text-[var(--muted)] hover:text-[var(--text)]'
+          }`}
+        >
+          <Key className="w-4 h-4 stroke-[1.5]" />
+          <span>Mật khẩu & Phiên thiết bị</span>
+        </button>
 
-          <button
-            data-id="tuy-chon"
-            type="button"
-            onClick={() => {
-              setTabHienTai('tuy-chon');
-              setThongBaoThanhCong(null);
-              setThongBaoLoi(null);
-            }}
-            className={`px-4 py-2.5 text-xs sm:text-sm font-mono border-b-2 transition-colors flex items-center gap-2 cursor-pointer ${
-              tabHienTai === 'tuy-chon'
-                ? 'border-[var(--accent)] text-[var(--accent)] font-bold'
-                : 'border-transparent text-[var(--muted)] hover:text-[var(--text)]'
-            }`}
-          >
-            <Sliders className="w-4 h-4 stroke-[1.5]" />
-            <span>Giao diện & Thông báo</span>
-          </button>
+        <button
+          type="button"
+          onClick={() => {
+            setTabHienTai('tuy-chon');
+            setThongBaoThanhCong(null);
+            setThongBaoLoi(null);
+          }}
+          className={`px-4 py-2.5 text-xs sm:text-sm font-sans border-b-2 transition-colors flex items-center gap-2 cursor-pointer ${
+            tabHienTai === 'tuy-chon'
+              ? 'border-[var(--accent)] text-[var(--accent)] font-semibold'
+              : 'border-transparent text-[var(--muted)] hover:text-[var(--text)]'
+          }`}
+        >
+          <Sliders className="w-4 h-4 stroke-[1.5]" />
+          <span>Giao diện & Thông báo</span>
+        </button>
 
-          <button
-            data-id="quyen-rieng-tu-ai"
-            type="button"
-            onClick={() => {
-              setTabHienTai('quyen-rieng-tu-ai');
-              setThongBaoThanhCong(null);
-              setThongBaoLoi(null);
-            }}
-            className={`px-4 py-2.5 text-xs sm:text-sm font-mono border-b-2 transition-colors flex items-center gap-2 cursor-pointer ${
-              tabHienTai === 'quyen-rieng-tu-ai'
-                ? 'border-[var(--accent)] text-[var(--accent)] font-bold'
-                : 'border-transparent text-[var(--muted)] hover:text-[var(--text)]'
-            }`}
-          >
-            <Bot className="w-4 h-4 stroke-[1.5]" />
-            <span>Quyền riêng tư & Trợ lý AI</span>
-          </button>
-        </AnimatedBackground>
+        <button
+          type="button"
+          onClick={() => {
+            setTabHienTai('quyen-rieng-tu-ai');
+            setThongBaoThanhCong(null);
+            setThongBaoLoi(null);
+          }}
+          className={`px-4 py-2.5 text-xs sm:text-sm font-sans border-b-2 transition-colors flex items-center gap-2 cursor-pointer ${
+            tabHienTai === 'quyen-rieng-tu-ai'
+              ? 'border-[var(--accent)] text-[var(--accent)] font-semibold'
+              : 'border-transparent text-[var(--muted)] hover:text-[var(--text)]'
+          }`}
+        >
+          <Bot className="w-4 h-4 stroke-[1.5]" />
+          <span>Quyền riêng tư & Trợ lý AI</span>
+        </button>
       </div>
 
       {/* TAB 1: THÔNG TIN CƠ BẢN & HỒ SƠ HỌC VỤ */}
@@ -794,67 +783,60 @@ export default function TrangHoSoCaNhan() {
             </div>
 
             <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
-              <AnimatedBackground
-                defaultValue={tuyChon.cheDoGiaoDien}
-                className="rounded-[var(--radius)] bg-[var(--accent-soft)] border border-[var(--accent)]"
-                transition={{ type: 'spring', bounce: 0.15, duration: 0.25 }}
-              >
-                {[
-                  {
-                    ma: 'sang' as const,
-                    nhan: 'Giao diện Sáng',
-                    moTa: 'Nền giấy ấm dịu mắt ban ngày',
-                    icon: Sun,
-                  },
-                  {
-                    ma: 'toi' as const,
-                    nhan: 'Giao diện Tối',
-                    moTa: 'Giảm chói khi học ban đêm',
-                    icon: Moon,
-                  },
-                  {
-                    ma: 'he_thong' as const,
-                    nhan: 'Theo thiết bị',
-                    moTa: 'Tự động đồng bộ theo hệ điều hành',
-                    icon: Laptop,
-                  },
-                ].map((item) => {
-                  const dangChon = tuyChon.cheDoGiaoDien === item.ma;
-                  const BieuTuong = item.icon;
-                  return (
-                    <button
-                      key={item.ma}
-                      data-id={item.ma}
-                      type="button"
-                      onClick={() =>
-                        setTuyChon((truoc) => ({ ...truoc, cheDoGiaoDien: item.ma }))
-                      }
-                      className={`p-3.5 rounded-[var(--radius)] border text-left transition-colors cursor-pointer ${
-                        dangChon
-                          ? 'border-[var(--accent)] text-[var(--text)]'
-                          : 'bg-[var(--bg)] border-[var(--border)] text-[var(--muted)] hover:text-[var(--text)]'
-                      }`}
-                    >
-                      <div className="w-full">
-                        <div className="flex items-center justify-between mb-1.5">
-                          <BieuTuong
-                            className={`w-4 h-4 stroke-[1.5] ${
-                              dangChon ? 'text-[var(--accent)]' : 'text-[var(--muted)]'
-                            }`}
-                          />
-                          {dangChon && (
-                            <span className="text-[10px] font-mono font-bold text-[var(--accent)]">
-                              ĐANG CHỌN
-                            </span>
-                          )}
-                        </div>
-                        <p className="text-xs font-bold text-[var(--text)]">{item.nhan}</p>
-                        <p className="text-[11px] text-[var(--muted)] mt-0.5">{item.moTa}</p>
+              {[
+                {
+                  ma: 'sang' as const,
+                  nhan: 'Giao diện Sáng',
+                  moTa: 'Nền giấy ấm dịu mắt ban ngày',
+                  icon: Sun,
+                },
+                {
+                  ma: 'toi' as const,
+                  nhan: 'Giao diện Tối',
+                  moTa: 'Giảm chói khi học ban đêm',
+                  icon: Moon,
+                },
+                {
+                  ma: 'he_thong' as const,
+                  nhan: 'Theo thiết bị',
+                  moTa: 'Tự động đồng bộ theo hệ điều hành',
+                  icon: Laptop,
+                },
+              ].map((item) => {
+                const dangChon = tuyChon.cheDoGiaoDien === item.ma;
+                const BieuTuong = item.icon;
+                return (
+                  <button
+                    key={item.ma}
+                    type="button"
+                    onClick={() =>
+                      setTuyChon((truoc) => ({ ...truoc, cheDoGiaoDien: item.ma }))
+                    }
+                    className={`p-3.5 rounded-[var(--radius)] border text-left transition-colors cursor-pointer ${
+                      dangChon
+                        ? 'bg-[var(--accent-soft)] border-[var(--accent)] text-[var(--text)]'
+                        : 'bg-[var(--bg)] border-[var(--border)] text-[var(--muted)] hover:text-[var(--text)]'
+                    }`}
+                  >
+                    <div className="w-full">
+                      <div className="flex items-center justify-between mb-1.5">
+                        <BieuTuong
+                          className={`w-4 h-4 stroke-[1.5] ${
+                            dangChon ? 'text-[var(--accent)]' : 'text-[var(--muted)]'
+                          }`}
+                        />
+                        {dangChon && (
+                          <span className="text-[10px] font-mono font-bold text-[var(--accent)]">
+                            ĐANG CHỌN
+                          </span>
+                        )}
                       </div>
-                    </button>
-                  );
-                })}
-              </AnimatedBackground>
+                      <p className="text-xs font-bold text-[var(--text)]">{item.nhan}</p>
+                      <p className="text-[11px] text-[var(--muted)] mt-0.5">{item.moTa}</p>
+                    </div>
+                  </button>
+                );
+              })}
             </div>
 
             <div className="pt-2 flex items-center justify-between p-3.5 rounded-[var(--radius)] bg-[var(--bg)] border border-[var(--border)]">

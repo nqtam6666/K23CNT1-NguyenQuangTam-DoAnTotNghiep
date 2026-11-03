@@ -37,7 +37,6 @@ import { HopThoai } from './hop-thoai';
 import { NutBam } from './nut-bam';
 import { useCaiDatHeThong } from '../tien-ich/use-cai-dat';
 import { mayKhachApi } from '../tien-ich/may-khach-api';
-import AnimatedBackground from '../components/ui/animated-tabs';
 
 export type LoaiThongBao = 'info' | 'success' | 'warning' | 'danger';
 
@@ -838,31 +837,29 @@ export function HopThoaiThongBaoHeThong({
 
         {/* 4. Thanh bộ lọc phân đoạn & thao tác nhanh */}
         <div className="flex flex-wrap items-center justify-between gap-2 pt-1">
-          <div className="inline-flex items-center p-1 rounded-[var(--radius)] bg-[var(--bg)] border border-[var(--border)]">
-            <AnimatedBackground
-              defaultValue={boLoc}
-              onValueChange={(val) => {
-                if (val) setBoLoc(val as BoLocThongBao);
-              }}
-              className="rounded-[var(--radius)] bg-[var(--surface)] border border-[var(--border)]"
-              transition={{ type: 'spring', bounce: 0.15, duration: 0.25 }}
-            >
-              {[
-                { id: 'TAT_CA', nhan: `Tất cả (${danhSachThongBao.length})` },
-                { id: 'CHUA_DOC', nhan: `Chưa đọc (${tongSoChuaDoc})` },
-                { id: 'CAN_XU_LY', nhan: `Cần xử lý (${soCanXuLy})` },
-                { id: 'LOP_HOC', nhan: 'Lớp học & Điểm' },
-              ].map((tab) => (
+          <div className="inline-flex items-center p-1 rounded-[var(--radius)] bg-[var(--bg)] border border-[var(--border)] gap-0.5">
+            {[
+              { id: 'TAT_CA', nhan: `Tất cả (${danhSachThongBao.length})` },
+              { id: 'CHUA_DOC', nhan: `Chưa đọc (${tongSoChuaDoc})` },
+              { id: 'CAN_XU_LY', nhan: `Cần xử lý (${soCanXuLy})` },
+              { id: 'LOP_HOC', nhan: 'Lớp học & Điểm' },
+            ].map((tab) => {
+              const dangChon = boLoc === tab.id;
+              return (
                 <button
                   key={tab.id}
-                  data-id={tab.id}
                   type="button"
-                  className="px-2.5 py-1 font-mono text-xs text-[var(--muted)] data-[checked=true]:text-[var(--text)] data-[checked=true]:font-bold transition-colors cursor-pointer"
+                  onClick={() => setBoLoc(tab.id as BoLocThongBao)}
+                  className={`px-2.5 py-1 rounded-[var(--radius)] font-sans text-xs transition-colors cursor-pointer ${
+                    dangChon
+                      ? 'bg-[var(--surface)] border border-[var(--border)] text-[var(--text)] font-semibold'
+                      : 'border border-transparent text-[var(--muted)] hover:text-[var(--text)]'
+                  }`}
                 >
                   {tab.nhan}
                 </button>
-              ))}
-            </AnimatedBackground>
+              );
+            })}
           </div>
 
           <div className="flex items-center gap-1.5">

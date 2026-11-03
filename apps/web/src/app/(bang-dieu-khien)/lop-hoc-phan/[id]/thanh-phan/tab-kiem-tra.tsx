@@ -21,7 +21,6 @@ import {
 import { mayKhachApi } from '../../../../../tien-ich/may-khach-api';
 import { thongBao } from '../../../../../tien-ich/thong-bao';
 import { HopThoai } from '../../../../../thanh-phan/hop-thoai';
-import AnimatedBackground from '@/components/ui/animated-tabs';
 import {
   BaiKiemTra,
   CauHoi,
@@ -280,35 +279,27 @@ export function TabKiemTra({ idLopHocPhan, nguoiDung, laGiaoVienLop }: ThuocTinh
         </div>
 
         <div className="flex flex-wrap items-center gap-2.5">
-          <div className="flex items-center bg-muted/60 p-1 rounded">
-            <AnimatedBackground
-              defaultValue={boLocCheDo}
-              onValueChange={(val) => val && setBoLocCheDo(val as 'TAT_CA' | CheDoKiemTra)}
-              className="rounded-lg bg-background shadow-xs"
-              transition={{ type: 'spring', bounce: 0.2, duration: 0.3 }}
-            >
-              {(
-                [
-                  { ma: 'TAT_CA', nhan: 'Tất cả' },
-                  { ma: CheDoKiemTra.LUYEN_TAP, nhan: 'Luyện tập' },
-                  { ma: CheDoKiemTra.THI_THU, nhan: 'Thi thử' },
-                ] as const
-              ).map((tab) => (
-                <button
-                  key={tab.ma}
-                  data-id={tab.ma}
-                  type="button"
-                  onClick={() => setBoLocCheDo(tab.ma)}
-                  className={`px-3 py-1.5 rounded-lg text-xs font-semibold transition-colors cursor-pointer ${
-                    boLocCheDo === tab.ma
-                      ? 'text-foreground'
-                      : 'text-muted-foreground hover:text-foreground'
-                  }`}
-                >
-                  {tab.nhan}
-                </button>
-              ))}
-            </AnimatedBackground>
+          <div className="flex items-center bg-[var(--bg)] border border-[var(--border)] p-1 rounded-[var(--radius)]">
+            {(
+              [
+                { ma: 'TAT_CA', nhan: 'Tất cả' },
+                { ma: CheDoKiemTra.LUYEN_TAP, nhan: 'Luyện tập' },
+                { ma: CheDoKiemTra.THI_THU, nhan: 'Thi thử' },
+              ] as const
+            ).map((tab) => (
+              <button
+                key={tab.ma}
+                type="button"
+                onClick={() => setBoLocCheDo(tab.ma)}
+                className={`px-3 py-1.5 rounded-[var(--radius)] text-xs font-semibold transition-colors cursor-pointer ${
+                  boLocCheDo === tab.ma
+                    ? 'bg-[var(--surface)] text-foreground border border-[var(--border)]'
+                    : 'text-muted-foreground hover:text-foreground'
+                }`}
+              >
+                {tab.nhan}
+              </button>
+            ))}
           </div>
 
           {coQuyenQuanLy && (

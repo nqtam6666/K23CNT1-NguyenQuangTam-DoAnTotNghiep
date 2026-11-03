@@ -27,7 +27,6 @@ import { ChiBaoSucKhoe } from '../../thanh-phan/chi-bao-suc-khoe';
 import { TimKiemNhanh } from '../../thanh-phan/tim-kiem-nhanh';
 import { DichNgonNgu } from '../../thanh-phan/dich-ngon-ngu';
 import { ToggleTheme } from '@/components/ui/toggle-theme';
-import { AnimatedBackground } from '@/components/ui/animated-tabs';
 import { AnhDaiDien } from '../../thanh-phan/anh-dai-dien';
 import { MucThanhBen } from '../../thanh-phan/muc-thanh-ben';
 import { HopThoai } from '../../thanh-phan/hop-thoai';
@@ -449,19 +448,13 @@ export default function LayoutBangDieuKhien({ children }: { children: ReactNode 
 
                   {thuGon && <div className="h-px bg-[var(--border)] my-1.5 mx-1" />}
 
-                  <AnimatedBackground
-                    layoutId="thanh-ben-chinh"
-                    defaultValue={duongDanActive}
-                    className="bg-[var(--accent-soft)] rounded-[var(--radius)]"
-                    transition={{ type: 'spring', bounce: 0.12, duration: 0.22 }}
-                  >
+                  <div className="space-y-0.5">
                     {danhSachNhom.map((item) => {
                       const laTrangHienTai = item.duongDan === duongDanActive;
 
                       return (
                         <MucThanhBen
                           key={item.id}
-                          data-id={item.duongDan}
                           href={item.duongDan}
                           icon={item.bieuTuong}
                           active={laTrangHienTai}
@@ -473,7 +466,7 @@ export default function LayoutBangDieuKhien({ children }: { children: ReactNode 
                         </MucThanhBen>
                       );
                     })}
-                  </AnimatedBackground>
+                  </div>
                 </div>
               );
             })

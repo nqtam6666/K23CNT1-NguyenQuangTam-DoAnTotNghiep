@@ -55,7 +55,6 @@ export default function TrangConEmPhuHuynh() {
                 key={lienKet.id}
                 className="rounded-[var(--radius)] bg-surface border border-border shadow-2xs overflow-hidden"
               >
-                <div className="h-1 w-full bg-[var(--accent)]" />
                 <div className="p-5 space-y-4">
                   <div className="flex items-center gap-4">
                     <div className="w-12 h-12 rounded-full bg-accent-soft text-accent font-bold text-lg flex items-center justify-center border border-accent shrink-0">

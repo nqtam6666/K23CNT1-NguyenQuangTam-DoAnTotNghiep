@@ -78,7 +78,7 @@ async function main() {
   const giaoVien = await prisma.nguoiDung.upsert({
     where: { email: 'giaovien1@lms.edu.vn' },
     update: {
-      hoTen: 'Trần Văn Giáo Viên',
+      hoTen: 'Trần Văn Giảng Viên',
       matKhau: matKhauHash,
       vaiTro: VaiTro.GIAO_VIEN,
       kichHoat: true,
@@ -86,7 +86,7 @@ async function main() {
     create: {
       email: 'giaovien1@lms.edu.vn',
       matKhau: matKhauHash,
-      hoTen: 'Trần Văn Giáo Viên',
+      hoTen: 'Trần Văn Giảng Viên',
       soDienThoai: '0923456789',
       vaiTro: VaiTro.GIAO_VIEN,
       kichHoat: true,
@@ -188,7 +188,7 @@ async function main() {
   const hocSinh = await prisma.nguoiDung.upsert({
     where: { email: 'hocsinh1@lms.edu.vn' },
     update: {
-      hoTen: 'Lê Hoàng Học Sinh',
+      hoTen: 'Lê Hoàng Sinh Viên',
       matKhau: matKhauHash,
       vaiTro: VaiTro.HOC_SINH,
       kichHoat: true,
@@ -196,7 +196,7 @@ async function main() {
     create: {
       email: 'hocsinh1@lms.edu.vn',
       matKhau: matKhauHash,
-      hoTen: 'Lê Hoàng Học Sinh',
+      hoTen: 'Lê Hoàng Sinh Viên',
       soDienThoai: '0934567890',
       vaiTro: VaiTro.HOC_SINH,
       kichHoat: true,

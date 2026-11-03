@@ -17,7 +17,6 @@ import {
 import { mayKhachApi } from '../../../../../tien-ich/may-khach-api';
 import { thongBao } from '../../../../../tien-ich/thong-bao';
 import { HopThoai } from '../../../../../thanh-phan/hop-thoai';
-import AnimatedBackground from '@/components/ui/animated-tabs';
 import {
   BuoiHoc,
   PayloadJwt,
@@ -303,50 +302,40 @@ export function TabDiemDanh({
           </p>
         </div>
 
-        <div className="flex flex-wrap items-center gap-1.5 bg-muted/50 p-1 rounded">
-          <AnimatedBackground
-            defaultValue={cheDoXem}
-            onValueChange={(val) => val && setCheDoXem(val as typeof cheDoXem)}
-            className="rounded bg-primary shadow-sm"
-            transition={{ type: 'spring', bounce: 0.2, duration: 0.3 }}
+        <div className="flex flex-wrap items-center gap-1.5 bg-[var(--bg)] border border-[var(--border)] p-1 rounded-[var(--radius)]">
+          <button
+            type="button"
+            onClick={() => setCheDoXem('theo-buoi')}
+            className={`px-3.5 py-1.5 rounded-[var(--radius)] text-xs font-semibold transition-colors cursor-pointer ${
+              cheDoXem === 'theo-buoi'
+                ? 'bg-[var(--accent)] text-white'
+                : 'text-muted-foreground hover:text-foreground'
+            }`}
           >
-            <button
-              data-id="theo-buoi"
-              type="button"
-              onClick={() => setCheDoXem('theo-buoi')}
-              className={`px-3.5 py-2 rounded text-xs font-semibold transition-colors cursor-pointer ${
-                cheDoXem === 'theo-buoi'
-                  ? 'text-primary-foreground'
-                  : 'text-muted-foreground hover:text-foreground'
-              }`}
-            >
-              Điểm danh theo buổi
-            </button>
-            <button
-              data-id="chuyen-can"
-              type="button"
-              onClick={() => setCheDoXem('chuyen-can')}
-              className={`px-3.5 py-2 rounded text-xs font-semibold transition-colors cursor-pointer ${
-                cheDoXem === 'chuyen-can'
-                  ? 'text-primary-foreground'
-                  : 'text-muted-foreground hover:text-foreground'
-              }`}
-            >
-              Thống kê & Cảnh báo chuyên cần
-            </button>
-            <button
-              data-id="don-xin-nghi"
-              type="button"
-              onClick={() => setCheDoXem('don-xin-nghi')}
-              className={`px-3.5 py-2 rounded text-xs font-semibold transition-colors cursor-pointer ${
-                cheDoXem === 'don-xin-nghi'
-                  ? 'text-primary-foreground'
-                  : 'text-muted-foreground hover:text-foreground'
-              }`}
-            >
-              Đơn xin nghỉ phép ({danhSachDonNghi.length})
-            </button>
-          </AnimatedBackground>
+            Điểm danh theo buổi
+          </button>
+          <button
+            type="button"
+            onClick={() => setCheDoXem('chuyen-can')}
+            className={`px-3.5 py-1.5 rounded-[var(--radius)] text-xs font-semibold transition-colors cursor-pointer ${
+              cheDoXem === 'chuyen-can'
+                ? 'bg-[var(--accent)] text-white'
+                : 'text-muted-foreground hover:text-foreground'
+            }`}
+          >
+            Thống kê & Cảnh báo chuyên cần
+          </button>
+          <button
+            type="button"
+            onClick={() => setCheDoXem('don-xin-nghi')}
+            className={`px-3.5 py-1.5 rounded-[var(--radius)] text-xs font-semibold transition-colors cursor-pointer ${
+              cheDoXem === 'don-xin-nghi'
+                ? 'bg-[var(--accent)] text-white'
+                : 'text-muted-foreground hover:text-foreground'
+            }`}
+          >
+            Đơn xin nghỉ phép ({danhSachDonNghi.length})
+          </button>
         </div>
       </div>
 

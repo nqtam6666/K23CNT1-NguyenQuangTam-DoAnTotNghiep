@@ -317,10 +317,10 @@ export default function TrangHoSoCaNhan() {
       {/* Tiêu đề trang */}
       <div>
         <p className="eyebrow mb-1">TÀI KHOẢN & TÙY CHỌN CÁ NHÂN</p>
-        <h1 className="text-[22px] font-mono font-bold text-[var(--text)] tracking-tight">
+        <h1 className="text-[22px] font-sans font-bold text-[var(--text)] tracking-tight">
           Hồ sơ & Cài đặt Cá nhân
         </h1>
-        <p className="text-[14px] text-[var(--muted)] mt-1">
+        <p className="text-[13.5px] text-[var(--muted)] mt-1">
           Quản lý thông tin định danh, mật khẩu, phiên thiết bị, giao diện làm việc và quyền riêng tư
         </p>
       </div>

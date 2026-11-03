@@ -1,0 +1,634 @@
+<!DOCTYPE html>
+<html lang="vi" data-theme="light">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>SmartClass AI — Đợt 4: Quản trị Người dùng, Học vụ & Thời khóa biểu</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600;700&display=swap">
+  <style>
+    :root, [data-theme="light"] {
+      --bg: #FAF8F4;
+      --surface: #FFFDF8;
+      --active-bg: #F2EFE9;
+      --text: #1C1B18;
+      --muted: #6B675E;
+      --border: #E6E2DA;
+      --accent: #0F766E;
+      --accent-hover: #115E59;
+      --accent-soft: #CCFBF1;
+      --danger: #DC2626;
+      --danger-soft: #FEE2E2;
+      --warning: #D97706;
+      --warning-soft: #FEF3C7;
+      --info: #0284C7;
+      --info-soft: #E0F2FE;
+      --lop-1: #0F766E;
+      --lop-2: #B45309;
+      --lop-3: #0369A1;
+      --lop-4: #15803D;
+      --radius: 8px;
+      --shadow-sm: 0 1px 2px rgba(28, 27, 24, 0.04), 0 2px 6px rgba(28, 27, 24, 0.03);
+    }
+    [data-theme="dark"] {
+      --bg: #1A1916;
+      --surface: #22211D;
+      --active-bg: #2B2924;
+      --text: #EDEBE6;
+      --muted: #9B968C;
+      --border: #33312B;
+      --accent: #2DD4BF;
+      --accent-hover: #5EEAD4;
+      --accent-soft: rgba(45, 212, 191, 0.14);
+      --danger: #F87171;
+      --danger-soft: rgba(248, 113, 113, 0.15);
+      --warning: #FBBF24;
+      --warning-soft: rgba(251, 191, 36, 0.15);
+      --info: #38BDF8;
+      --info-soft: rgba(56, 189, 248, 0.15);
+      --lop-1: #2DD4BF;
+      --lop-2: #FBBF24;
+      --lop-3: #38BDF8;
+      --lop-4: #4ADE80;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: 'Be Vietnam Pro', system-ui, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      font-size: 14px;
+      line-height: 1.6;
+      -webkit-font-smoothing: antialiased;
+    }
+    .mono { font-family: 'JetBrains Mono', monospace; font-variant-numeric: tabular-nums; }
+    .eyebrow {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 11px;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      color: var(--muted);
+    }
+
+    /* Thanh chuyển màn hình mẫu */
+    .preview-bar {
+      position: sticky;
+      top: 0;
+      z-index: 50;
+      background: var(--surface);
+      border-bottom: 1px solid var(--border);
+      padding: 10px 24px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+    }
+    .preview-tabs { display: flex; gap: 6px; }
+    .preview-tab {
+      padding: 6px 14px;
+      border-radius: var(--radius);
+      border: 1px solid var(--border);
+      background: var(--bg);
+      color: var(--muted);
+      font-size: 12.5px;
+      font-weight: 600;
+      cursor: pointer;
+    }
+    .preview-tab.active {
+      background: var(--accent);
+      color: #FFFFFF;
+      border-color: var(--accent);
+    }
+    [data-theme="dark"] .preview-tab.active { color: #132A26; }
+
+    /* Khung App */
+    .app-shell {
+      display: grid;
+      grid-template-columns: 232px 1fr;
+      min-height: calc(100vh - 53px);
+    }
+    .sidebar {
+      background: var(--surface);
+      border-right: 1px solid var(--border);
+      padding: 20px 14px;
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 6px 10px 18px;
+      border-bottom: 1px solid var(--border);
+      margin-bottom: 8px;
+    }
+    .brand-mark {
+      width: 32px;
+      height: 32px;
+      border-radius: var(--radius);
+      background: var(--accent);
+      color: #fff;
+      display: grid;
+      place-items: center;
+      font-weight: 700;
+      font-size: 13px;
+    }
+    .nav-item {
+      padding: 9px 12px;
+      border-radius: var(--radius);
+      color: var(--muted);
+      font-size: 13px;
+      font-weight: 500;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      cursor: pointer;
+    }
+    .nav-item.active {
+      background: var(--accent-soft);
+      color: var(--accent);
+      font-weight: 600;
+    }
+    .main-area {
+      padding: 28px 32px;
+      max-width: 1240px;
+      width: 100%;
+      margin: 0 auto;
+    }
+
+    .screen { display: none; }
+    .screen.active { display: block; }
+
+    .page-header {
+      display: flex;
+      align-items: flex-end;
+      justify-content: space-between;
+      gap: 16px;
+      margin-bottom: 20px;
+    }
+    .page-title {
+      font-size: 22px;
+      font-weight: 700;
+      letter-spacing: -0.02em;
+      margin-top: 2px;
+    }
+    .page-desc {
+      font-size: 13.5px;
+      color: var(--muted);
+      margin-top: 3px;
+    }
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 9px 15px;
+      border-radius: var(--radius);
+      font-size: 13px;
+      font-weight: 600;
+      border: 1px solid var(--border);
+      background: var(--surface);
+      color: var(--text);
+      cursor: pointer;
+    }
+    .btn-primary {
+      background: var(--accent);
+      border-color: var(--accent);
+      color: #FFFFFF;
+    }
+    [data-theme="dark"] .btn-primary { color: #132A26; }
+
+    .kpi-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 14px;
+      margin-bottom: 18px;
+    }
+    .kpi-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 14px 16px;
+      box-shadow: var(--shadow-sm);
+    }
+    .kpi-val {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 22px;
+      font-weight: 700;
+      margin-top: 4px;
+    }
+
+    .toolbar {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 12px 14px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      margin-bottom: 16px;
+    }
+    .search-box {
+      padding: 8px 12px;
+      border-radius: var(--radius);
+      border: 1px solid var(--border);
+      background: var(--bg);
+      color: var(--text);
+      width: 320px;
+      font-size: 13px;
+    }
+    .chip-group { display: flex; gap: 6px; flex-wrap: wrap; }
+    .chip {
+      padding: 6px 11px;
+      border-radius: var(--radius);
+      border: 1px solid var(--border);
+      background: var(--bg);
+      color: var(--muted);
+      font-size: 12px;
+      font-weight: 600;
+      cursor: pointer;
+    }
+    .chip.active {
+      background: var(--accent-soft);
+      color: var(--accent);
+      border-color: var(--accent);
+    }
+
+    .card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow-sm);
+      overflow: hidden;
+    }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 13px;
+    }
+    th {
+      background: var(--bg);
+      border-bottom: 1px solid var(--border);
+      padding: 11px 16px;
+      text-align: left;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 11px;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      color: var(--muted);
+    }
+    td {
+      padding: 13px 16px;
+      border-bottom: 1px solid var(--border);
+    }
+    tr:last-child td { border-bottom: none; }
+    .badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 3px 9px;
+      border-radius: var(--radius);
+      font-size: 11.5px;
+      font-weight: 600;
+      border: 1px solid var(--border);
+      background: var(--bg);
+    }
+    .badge-accent {
+      background: var(--accent-soft);
+      color: var(--accent);
+      border-color: var(--accent);
+    }
+    .badge-info {
+      background: var(--info-soft);
+      color: var(--info);
+      border-color: var(--info);
+    }
+    .badge-warn {
+      background: var(--warning-soft);
+      color: var(--warning);
+      border-color: var(--warning);
+    }
+
+    /* Học vụ */
+    .year-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 18px;
+      margin-top: 16px;
+    }
+    .year-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      overflow: hidden;
+      box-shadow: var(--shadow-sm);
+    }
+    .year-band { height: 4px; background: var(--border); }
+    .year-card.active { border-color: var(--accent); }
+    .year-card.active .year-band { background: var(--accent); }
+    .sem-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 10px 12px;
+      background: var(--bg);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      margin-top: 8px;
+    }
+
+    /* Thời khóa biểu */
+    .tkb-slot {
+      padding: 10px;
+      border-radius: var(--radius);
+      border: 1px solid var(--border);
+      border-left: 3px solid var(--lop-1);
+      background: var(--bg);
+    }
+  </style>
+</head>
+<body>
+  <div class="preview-bar">
+    <div style="display:flex;align-items:center;gap:12px;">
+      <span class="eyebrow">SMARTCLASS AI • ĐỢT 4</span>
+      <div class="preview-tabs">
+        <button class="preview-tab active" data-screen="users" onclick="switchScreen('users')">1. Quản lý Người dùng (/nguoi-dung)</button>
+        <button class="preview-tab" data-screen="academic" onclick="switchScreen('academic')">2. Quản lý Học vụ (/hoc-vu)</button>
+        <button class="preview-tab" data-screen="timetable" onclick="switchScreen('timetable')">3. Thời khóa biểu (/thoi-khoa-bieu)</button>
+      </div>
+    </div>
+    <button class="btn" onclick="toggleTheme()">Chuyển Sáng / Tối</button>
+  </div>
+
+  <div class="app-shell">
+    <aside class="sidebar">
+      <div class="brand">
+        <div class="brand-mark">SC</div>
+        <div>
+          <div style="font-weight:700;font-size:14px;">SmartClass AI</div>
+          <div class="eyebrow" style="font-size:10px;">Cổng Đào tạo Số</div>
+        </div>
+      </div>
+      <div class="nav-item">Bảng điều khiển</div>
+      <div class="nav-item" id="nav-users" onclick="switchScreen('users')">Quản lý Người dùng</div>
+      <div class="nav-item" id="nav-academic" onclick="switchScreen('academic')">Quản lý Học vụ</div>
+      <div class="nav-item">Lớp học phần</div>
+      <div class="nav-item" id="nav-timetable" onclick="switchScreen('timetable')">Thời khóa biểu</div>
+      <div class="nav-item">Trợ lý học tập AI</div>
+      <div class="nav-item">Cài đặt hệ thống</div>
+    </aside>
+
+    <main class="main-area">
+      <!-- MÀN HÌNH 1: QUẢN LÝ NGƯỜI DÙNG -->
+      <section class="screen active" id="screen-users">
+        <div class="page-header">
+          <div>
+            <p class="eyebrow">QUẢN TRỊ HỆ THỐNG</p>
+            <h1 class="page-title">Quản lý Người dùng</h1>
+            <p class="page-desc">Quản lý tài khoản, phân quyền vai trò và trạng thái hoạt động của Giảng viên, Sinh viên và Cán bộ.</p>
+          </div>
+          <div style="display:flex;gap:10px;">
+            <button class="btn">Nhập hàng loạt (.CSV)</button>
+            <button class="btn btn-primary">+ Thêm người dùng mới</button>
+          </div>
+        </div>
+
+        <div class="kpi-grid">
+          <div class="kpi-card">
+            <span class="eyebrow">TỔNG TÀI KHOẢN</span>
+            <div class="kpi-val">248</div>
+          </div>
+          <div class="kpi-card">
+            <span class="eyebrow">GIẢNG VIÊN & CÁN BỘ</span>
+            <div class="kpi-val" style="color:var(--accent);">32</div>
+          </div>
+          <div class="kpi-card">
+            <span class="eyebrow">SINH VIÊN ĐANG HỌC</span>
+            <div class="kpi-val" style="color:var(--info);">210</div>
+          </div>
+          <div class="kpi-card">
+            <span class="eyebrow">ĐANG HOẠT ĐỘNG</span>
+            <div class="kpi-val">99.2%</div>
+          </div>
+        </div>
+
+        <div class="toolbar">
+          <input class="search-box" type="text" placeholder="Tìm theo họ tên, email, số điện thoại..." />
+          <div class="chip-group">
+            <span class="chip active">Tất cả (248)</span>
+            <span class="chip">Quản trị viên</span>
+            <span class="chip">Giáo vụ</span>
+            <span class="chip">Giảng viên</span>
+            <span class="chip">Sinh viên</span>
+          </div>
+        </div>
+
+        <div class="card">
+          <table>
+            <thead>
+              <tr>
+                <th>Người dùng</th>
+                <th>Số điện thoại</th>
+                <th>Vai trò</th>
+                <th>Trạng thái</th>
+                <th>Ngày tạo</th>
+                <th style="text-align:right;">Thao tác</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>
+                  <div style="font-weight:600;">Trần Văn Giảng Viên</div>
+                  <div class="mono" style="font-size:11.5px;color:var(--muted);">giaovien1@lms.edu.vn</div>
+                </td>
+                <td class="mono">0912 345 678</td>
+                <td><span class="badge badge-accent">Giảng viên</span></td>
+                <td><span class="badge badge-accent">● Hoạt động</span></td>
+                <td class="mono" style="color:var(--muted);">01/09/2025</td>
+                <td style="text-align:right;" class="mono">Sửa · Đổi MK · Khóa</td>
+              </tr>
+              <tr>
+                <td>
+                  <div style="font-weight:600;">Lê Hoàng Sinh Viên</div>
+                  <div class="mono" style="font-size:11.5px;color:var(--muted);">hocsinh1@lms.edu.vn</div>
+                </td>
+                <td class="mono">0987 654 321</td>
+                <td><span class="badge badge-info">Sinh viên</span></td>
+                <td><span class="badge badge-accent">● Hoạt động</span></td>
+                <td class="mono" style="color:var(--muted);">05/09/2025</td>
+                <td style="text-align:right;" class="mono">Sửa · Đổi MK · Khóa</td>
+              </tr>
+              <tr>
+                <td>
+                  <div style="font-weight:600;">Nguyễn Thị Giáo Vụ</div>
+                  <div class="mono" style="font-size:11.5px;color:var(--muted);">giaovu@lms.edu.vn</div>
+                </td>
+                <td class="mono">0903 112 233</td>
+                <td><span class="badge badge-warn">Giáo vụ</span></td>
+                <td><span class="badge badge-accent">● Hoạt động</span></td>
+                <td class="mono" style="color:var(--muted);">20/08/2025</td>
+                <td style="text-align:right;" class="mono">Sửa · Đổi MK · Khóa</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+      <!-- MÀN HÌNH 2: QUẢN LÝ HỌC VỤ -->
+      <section class="screen" id="screen-academic">
+        <div class="page-header">
+          <div>
+            <p class="eyebrow">PHÂN HỆ ĐÀO TẠO</p>
+            <h1 class="page-title">Quản lý Học vụ & Đào tạo</h1>
+            <p class="page-desc">Thiết lập danh mục năm học, học kỳ, môn học và lớp hành chính của nhà trường.</p>
+          </div>
+          <button class="btn btn-primary">+ Thêm Năm học mới</button>
+        </div>
+
+        <div class="kpi-grid" style="grid-template-columns: repeat(3, 1fr);">
+          <div class="kpi-card">
+            <span class="eyebrow">NĂM HỌC ĐÃ CẤU HÌNH</span>
+            <div class="kpi-val">2 năm học</div>
+          </div>
+          <div class="kpi-card">
+            <span class="eyebrow">DANH MỤC MÔN HỌC</span>
+            <div class="kpi-val" style="color:var(--accent);">14 môn học</div>
+          </div>
+          <div class="kpi-card">
+            <span class="eyebrow">LỚP HÀNH CHÍNH</span>
+            <div class="kpi-val" style="color:var(--info);">8 lớp</div>
+          </div>
+        </div>
+
+        <div class="year-grid">
+          <div class="year-card active">
+            <div class="year-band"></div>
+            <div style="padding:18px;">
+              <div style="display:flex;justify-content:space-between;align-items:center;">
+                <div>
+                  <span class="badge badge-accent">Năm học hiện tại</span>
+                  <h3 style="font-size:17px;font-weight:700;margin-top:6px;">Năm học 2025 – 2026</h3>
+                </div>
+                <button class="btn" style="padding:6px 10px;font-size:12px;">+ Thêm học kỳ</button>
+              </div>
+              <div style="margin-top:14px;">
+                <p class="eyebrow">DANH SÁCH HỌC KỲ (2)</p>
+                <div class="sem-row">
+                  <div>
+                    <div style="font-weight:600;">Học kỳ 1 (2025–2026)</div>
+                    <div class="mono" style="font-size:11.5px;color:var(--muted);">01/09/2025 – 15/01/2026</div>
+                  </div>
+                  <span class="badge badge-accent">Đang diễn ra</span>
+                </div>
+                <div class="sem-row">
+                  <div>
+                    <div style="font-weight:600;">Học kỳ 2 (2025–2026)</div>
+                    <div class="mono" style="font-size:11.5px;color:var(--muted);">19/01/2026 – 30/05/2026</div>
+                  </div>
+                  <span class="badge">Kế hoạch</span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="year-card">
+            <div class="year-band"></div>
+            <div style="padding:18px;">
+              <div style="display:flex;justify-content:space-between;align-items:center;">
+                <div>
+                  <span class="badge">Đã lưu trữ</span>
+                  <h3 style="font-size:17px;font-weight:700;margin-top:6px;">Năm học 2024 – 2025</h3>
+                </div>
+                <button class="btn" style="padding:6px 10px;font-size:12px;">+ Thêm học kỳ</button>
+              </div>
+              <div style="margin-top:14px;">
+                <p class="eyebrow">DANH SÁCH HỌC KỲ (2)</p>
+                <div class="sem-row">
+                  <div>
+                    <div style="font-weight:600;">Học kỳ 1 (2024–2025)</div>
+                    <div class="mono" style="font-size:11.5px;color:var(--muted);">01/09/2024 – 15/01/2025</div>
+                  </div>
+                  <span class="badge">Hoàn tất</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- MÀN HÌNH 3: THỜI KHÓA BIỂU -->
+      <section class="screen" id="screen-timetable">
+        <div class="page-header">
+          <div>
+            <p class="eyebrow">KẾ HOẠCH GIẢNG DẠY & HỌC TẬP</p>
+            <h1 class="page-title">Thời khóa biểu tuần</h1>
+            <p class="page-desc">Lịch học tập và giảng dạy 7 ngày trong tuần được đồng bộ tự động từ phân hệ học vụ.</p>
+          </div>
+          <div style="display:flex;gap:10px;">
+            <button class="btn">Học kỳ 1 (2025–2026)</button>
+            <button class="btn">In lịch tuần</button>
+          </div>
+        </div>
+
+        <div class="card">
+          <table>
+            <thead>
+              <tr>
+                <th style="width:110px;text-align:center;">Tiết / Giờ</th>
+                <th>Thứ Hai</th>
+                <th>Thứ Ba</th>
+                <th>Thứ Tư</th>
+                <th>Thứ Năm</th>
+                <th>Thứ Sáu</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td class="mono" style="text-align:center;">
+                  <div style="font-weight:700;">Tiết 1–3</div>
+                  <div style="font-size:11px;color:var(--muted);">07:00 – 09:25</div>
+                </td>
+                <td>
+                  <div class="tkb-slot" style="border-left-color:var(--lop-1);">
+                    <div class="mono" style="font-size:10.5px;color:var(--lop-1);font-weight:700;">LHP-TIN10-01</div>
+                    <div style="font-weight:700;margin-top:2px;">Tin học 10 - Lập trình Python</div>
+                    <div style="font-size:11.5px;color:var(--muted);margin-top:4px;">Phòng Lab 2 • Trần Văn Giảng Viên</div>
+                  </div>
+                </td>
+                <td style="text-align:center;color:var(--muted);">—</td>
+                <td>
+                  <div class="tkb-slot" style="border-left-color:var(--lop-2);">
+                    <div class="mono" style="font-size:10.5px;color:var(--lop-2);font-weight:700;">LHP-TOAN10-01</div>
+                    <div style="font-weight:700;margin-top:2px;">Toán học 10 - Nhóm 01</div>
+                    <div style="font-size:11.5px;color:var(--muted);margin-top:4px;">Phòng P201 • Trần Văn Giảng Viên</div>
+                  </div>
+                </td>
+                <td style="text-align:center;color:var(--muted);">—</td>
+                <td style="text-align:center;color:var(--muted);">—</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
+    </main>
+  </div>
+
+  <script>
+    function switchScreen(name) {
+      document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+      document.querySelectorAll('.preview-tab').forEach(t => t.classList.remove('active'));
+      const el = document.getElementById('screen-' + name);
+      if (el) el.classList.add('active');
+      const tab = document.querySelector('.preview-tab[data-screen="' + name + '"]');
+      if (tab) tab.classList.add('active');
+    }
+    function toggleTheme() {
+      const html = document.documentElement;
+      html.setAttribute('data-theme', html.getAttribute('data-theme') === 'dark' ? 'light' : 'dark');
+    }
+    const q = new URLSearchParams(window.location.search).get('screen');
+    if (q) switchScreen(q);
+  </script>
+</body>
+</html>

@@ -1860,7 +1860,7 @@ export default function TrangCaiDatHeThong() {
           </div>
           <div>
             <p className="eyebrow">QUẢN TRỊ HỆ THỐNG TRƯỜNG HỌC</p>
-            <h1 className="text-[22px] font-mono font-bold tracking-tight text-[var(--text)] leading-tight">
+            <h1 className="text-[22px] font-sans font-bold tracking-tight text-[var(--text)] leading-tight">
               Cài đặt Hệ thống
             </h1>
           </div>

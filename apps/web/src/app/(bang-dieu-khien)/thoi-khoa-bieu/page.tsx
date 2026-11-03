@@ -4,13 +4,11 @@ import { useState } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import {
   Calendar as CalendarIcon,
-  Clock,
   Printer,
   BookOpen,
   MapPin,
   User,
   Filter,
-  Layers,
 } from 'lucide-react';
 import { mayKhachApi } from '../../../tien-ich/may-khach-api';
 import { ThoiKhoaBieu, HocKy } from '@lms/chung';
@@ -62,14 +60,16 @@ export default function TrangThoiKhoaBieu() {
     { tiet: 10, gio: '16:25 - 17:10', buoi: 'Chiều' },
   ];
 
-  // Bảng màu cho các thẻ môn học (Tối ưu độ tương phản cho cả Light và Dark mode)
-  const mauThe = [
-    'bg-accent-soft border-accent text-accent ',
-    'bg-accent-soft border-accent text-accent ',
-    'bg-accent-soft border-accent text-accent ',
-    'bg-danger-soft border-danger text-danger ',
-    'bg-accent-soft border-accent text-accent ',
-    'bg-info-soft border-info text-info ',
+  // Bảng màu 8 lớp học phần trong hệ thống thiết kế Soft Academic Studio
+  const bangMauLop = [
+    'var(--lop-1)',
+    'var(--lop-2)',
+    'var(--lop-3)',
+    'var(--lop-4)',
+    'var(--lop-5)',
+    'var(--lop-6)',
+    'var(--lop-7)',
+    'var(--lop-8)',
   ];
 
   // Tìm tiết học bắt đầu tại tiết và thứ cụ thể
@@ -86,29 +86,31 @@ export default function TrangThoiKhoaBieu() {
   };
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-5">
       {/* Header */}
-      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+      <div className="flex flex-col sm:flex-row sm:items-end sm:justify-between gap-4">
         <div>
-          <p className="eyebrow mb-1">Kế hoạch giảng dạy</p>
-          <h1 className="text-[22px] font-mono font-bold tracking-tight text-[var(--text)]">Thời khóa biểu tuần</h1>
-          <p className="text-[14px] text-[var(--muted)] mt-1">
-            Lịch học tập và giảng dạy hàng tuần được đồng bộ tự động từ hệ thống quản lý học vụ
+          <p className="eyebrow mb-1">Kế hoạch giảng dạy & học tập</p>
+          <h1 className="text-[22px] font-sans font-bold tracking-tight text-[var(--text)]">
+            Thời khóa biểu tuần
+          </h1>
+          <p className="text-[13.5px] text-[var(--muted)] mt-1">
+            Lịch học tập và giảng dạy 7 ngày trong tuần được đồng bộ tự động từ phân hệ học vụ.
           </p>
         </div>
 
-        <div className="flex flex-wrap items-center gap-2 sm:gap-3">
+        <div className="flex flex-wrap items-center gap-2.5">
           {/* Lọc theo học kỳ */}
-          <div className="flex items-center gap-2 bg-surface border border-border rounded px-2.5 py-1.5 shadow-2xs">
+          <div className="flex items-center gap-2 bg-surface border border-border rounded-[var(--radius)] px-3 py-2 shadow-2xs">
             <Filter className="w-3.5 h-3.5 text-muted shrink-0" />
             <select
               value={idHocKyLoc}
               onChange={(e) => setIdHocKyLoc(e.target.value)}
-              className="bg-transparent text-text text-xs font-medium focus:outline-none cursor-pointer"
+              className="bg-transparent text-text text-[12.5px] font-semibold focus:outline-none cursor-pointer"
             >
               <option value="">-- Tất cả học kỳ --</option>
               {danhSachHocKy?.map((hk) => (
-                <option key={hk.id} value={hk.id} className="">
+                <option key={hk.id} value={hk.id}>
                   {hk.tenHocKy} {hk.hienTai ? '(Hiện tại)' : ''}
                 </option>
               ))}
@@ -117,23 +119,23 @@ export default function TrangThoiKhoaBieu() {
 
           <button
             onClick={() => window.print()}
-            className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-surface hover:bg-bg border border-border text-text text-xs font-semibold rounded transition-colors shadow-2xs cursor-pointer shrink-0"
+            className="inline-flex items-center gap-1.5 px-3.5 py-2 bg-surface hover:bg-bg border border-border text-text text-[12.5px] font-semibold rounded-[var(--radius)] transition-colors shadow-2xs cursor-pointer shrink-0"
           >
             <Printer className="w-3.5 h-3.5 text-muted" />
-            <span>In lịch</span>
+            <span>In lịch tuần</span>
           </button>
         </div>
       </div>
 
       {/* Grid Thời khóa biểu dạng Lịch tuần */}
-      <div className="bg-surface border border-border rounded overflow-hidden shadow-sm">
+      <div className="bg-surface border border-border rounded-[var(--radius)] overflow-hidden shadow-2xs">
         {/* Chỉ dẫn cuộn ngang trên tablet / mobile */}
         <div className="px-4 py-2 bg-bg border-b border-border flex items-center justify-between text-[11px] text-muted xl:hidden">
           <span className="flex items-center gap-1.5 font-medium">
             <CalendarIcon className="w-3.5 h-3.5 text-accent shrink-0" />
             Lịch học 7 ngày trong tuần
           </span>
-          <span className="text-[10px] text-muted ">
+          <span className="text-[10px] text-muted">
             Cuộn ngang để xem đầy đủ →
           </span>
         </div>
@@ -141,21 +143,21 @@ export default function TrangThoiKhoaBieu() {
         <div className="overflow-x-auto">
           <table className="w-full border-collapse text-left text-xs min-w-[840px]">
             <thead>
-              <tr className="bg-bg text-text border-b border-border">
-                <th className="py-3.5 px-3 border-r border-border text-center w-24 font-bold">
+              <tr className="bg-bg text-muted border-b border-border font-mono text-[11px] uppercase tracking-wider">
+                <th className="py-3 px-3 border-r border-border text-center w-28 font-semibold">
                   Tiết / Giờ
                 </th>
                 {cacThu.map((thu) => (
                   <th
                     key={thu.ma}
-                    className="py-3.5 px-3 border-r border-border text-center font-bold"
+                    className="py-3 px-3 border-r border-border text-center font-semibold"
                   >
                     {thu.ten}
                   </th>
                 ))}
               </tr>
             </thead>
-            <tbody className="divide-y divide-border ">
+            <tbody className="divide-y divide-border">
               {isLoading ? (
                 [1, 2, 3, 4, 5, 6].map((i) => (
                   <tr key={i} className="animate-pulse">
@@ -164,9 +166,9 @@ export default function TrangThoiKhoaBieu() {
                       <KhungXuong className="h-2.5 w-16 mx-auto mt-1" />
                     </td>
                     {Array.from({ length: 7 }).map((_, c) => (
-                      <td key={c} className="p-2 border-r border-border ">
+                      <td key={c} className="p-2 border-r border-border">
                         {(i + c) % 3 === 0 && (
-                          <div className="p-2.5 rounded-lg bg-accent-soft border border-accent space-y-1.5">
+                          <div className="p-2.5 rounded-[var(--radius)] bg-accent-soft border border-accent space-y-1.5">
                             <KhungXuong className="h-3 w-16" />
                             <KhungXuong className="h-3.5 w-24" />
                             <KhungXuong className="h-2.5 w-20" />
@@ -178,11 +180,11 @@ export default function TrangThoiKhoaBieu() {
                 ))
               ) : (
                 cacTiet.map((t) => (
-                  <tr key={t.tiet} className="hover:bg-bg transition-colors">
+                  <tr key={t.tiet} className="hover:bg-bg/60 transition-colors">
                     {/* Cột Tiết & Giờ */}
                     <td className="py-2.5 px-3 border-r border-border bg-bg text-center font-mono">
-                      <p className="font-bold text-text ">Tiết {t.tiet}</p>
-                      <p className="text-[10px] text-muted mt-0.5">{t.gio}</p>
+                      <p className="font-bold text-text">Tiết {t.tiet}</p>
+                      <p className="text-[10.5px] text-muted mt-0.5 tabular-nums">{t.gio}</p>
                     </td>
 
                     {/* Cột 7 ngày trong tuần */}
@@ -195,27 +197,35 @@ export default function TrangThoiKhoaBieu() {
 
                       if (tietHoc) {
                         const mauIndex =
-                          (tietHoc.lopHocPhan?.tenLopHocPhan?.length || 0) % mauThe.length;
-                        const classMau = mauThe[mauIndex];
+                          (tietHoc.lopHocPhan?.maLopHocPhan?.length ||
+                            tietHoc.lopHocPhan?.tenLopHocPhan?.length ||
+                            0) % bangMauLop.length;
+                        const mauLop = bangMauLop[mauIndex];
 
                         return (
                           <td
                             key={thu.ma}
                             rowSpan={tietHoc.soTiet}
-                            className={`p-2.5 border-r border-border align-top transition-all ${classMau} border rounded-lg shadow-sm`}
+                            className="p-2 border-r border-border align-top"
                           >
-                            <div className="space-y-1">
-                              <span className="font-mono text-[10px] font-bold uppercase tracking-wider block opacity-75">
+                            <div
+                              className="h-full p-2.5 rounded-[var(--radius)] border border-[var(--border)] border-l-[3px] bg-[var(--bg)] space-y-1"
+                              style={{ borderLeftColor: mauLop }}
+                            >
+                              <span
+                                className="font-mono text-[10.5px] font-bold uppercase tracking-wider block"
+                                style={{ color: mauLop }}
+                              >
                                 {tietHoc.lopHocPhan?.maLopHocPhan}
                               </span>
-                              <h4 className="font-bold text-xs line-clamp-2">
+                              <h4 className="font-bold text-[12.5px] text-[var(--text)] line-clamp-2 leading-snug">
                                 {tietHoc.lopHocPhan?.tenLopHocPhan}
                               </h4>
-                              <p className="text-[11px] flex items-center gap-1 font-medium opacity-90">
+                              <p className="text-[11px] flex items-center gap-1 font-medium text-[var(--muted)]">
                                 <BookOpen className="w-3 h-3 shrink-0" />
                                 {tietHoc.lopHocPhan?.monHoc?.tenMonHoc}
                               </p>
-                              <div className="pt-1.5 mt-1 border-t border-current/10 flex flex-col gap-0.5 text-[10px] opacity-80">
+                              <div className="pt-1.5 mt-1 border-t border-[var(--border)] flex flex-col gap-0.5 text-[11px] text-[var(--muted)]">
                                 <span className="flex items-center gap-1">
                                   <MapPin className="w-3 h-3 shrink-0" />
                                   {tietHoc.phongHoc || 'Phòng trực tuyến'}
@@ -235,7 +245,7 @@ export default function TrangThoiKhoaBieu() {
                       return (
                         <td
                           key={thu.ma}
-                          className="p-2 border-r border-border text-center text-muted hover:bg-accent-soft "
+                          className="p-2 border-r border-border text-center text-muted"
                         >
                           —
                         </td>

@@ -417,19 +417,18 @@ export default function TrangQuanLyNguoiDung() {
   const layMauBadgeVaiTro = (vaiTro: string) => {
     switch (vaiTro) {
       case 'QUAN_TRI_VIEN':
-        return 'bg-accent-soft text-accent border-accent ';
+        return 'bg-accent-soft text-accent border-accent';
       case 'BAN_GIAM_HIEU':
-        return 'bg-accent-soft text-accent border-accent ';
       case 'GIAO_VU':
-        return 'bg-accent-soft text-accent border-accent ';
+        return 'bg-[var(--warning-soft)] text-[var(--warning)] border-[var(--warning)]';
       case 'GIAO_VIEN':
-        return 'bg-accent-soft text-accent border-accent ';
+        return 'bg-accent-soft text-accent border-accent';
       case 'HOC_SINH':
-        return 'bg-info-soft text-info border-info ';
+        return 'bg-info-soft text-info border-info';
       case 'PHU_HUYNH':
-        return 'bg-accent-soft text-accent border-accent ';
+        return 'bg-active-bg text-text border-border';
       default:
-        return 'bg-active-bg text-text border-border ';
+        return 'bg-active-bg text-text border-border';
     }
   };
 
@@ -442,16 +441,16 @@ export default function TrangQuanLyNguoiDung() {
   );
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-5">
       {/* Tiêu đề & Nút Thao tác */}
-      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+      <div className="flex flex-col sm:flex-row sm:items-end sm:justify-between gap-4">
         <div>
           <p className="eyebrow mb-1">Quản trị hệ thống</p>
-          <h2 className="text-[22px] font-mono font-bold text-[var(--text)] tracking-tight">
+          <h2 className="text-[22px] font-sans font-bold text-[var(--text)] tracking-tight">
             Quản lý Người dùng
           </h2>
-          <p className="text-[14px] text-[var(--muted)] mt-1">
-            Quản lý tài khoản, phân quyền vai trò và trạng thái hoạt động trong hệ thống LMS
+          <p className="text-[13.5px] text-[var(--muted)] mt-1">
+            Quản lý tài khoản, phân quyền vai trò và trạng thái hoạt động của Giảng viên, Sinh viên và Cán bộ.
           </p>
         </div>
         <div className="flex flex-wrap items-center gap-2.5">
@@ -461,26 +460,26 @@ export default function TrangQuanLyNguoiDung() {
               setKetQuaHangLoat(null);
               setModalHangLoatMo(true);
             }}
-            className="inline-flex items-center gap-2 px-4 py-[11px] bg-[var(--surface)] border border-[var(--border)] hover:bg-[var(--active-bg)] text-[var(--text)] text-[13px] font-semibold rounded-[4px] transition-colors cursor-pointer"
+            className="inline-flex items-center gap-2 px-4 py-2.5 bg-[var(--surface)] border border-[var(--border)] hover:bg-[var(--active-bg)] text-[var(--text)] text-[13px] font-semibold rounded-[var(--radius)] transition-colors cursor-pointer"
           >
-            <Upload className="w-[17px] h-[17px] text-[var(--accent)]" strokeWidth={1.5} />
-            Thêm hàng loạt
+            <Upload className="w-4 h-4 text-[var(--accent)]" strokeWidth={1.75} />
+            Nhập hàng loạt (.CSV)
           </button>
           <button
             type="button"
             onClick={() => setModalTaoMo(true)}
-            className="inline-flex items-center gap-2 px-5 py-[11px] bg-[var(--accent)] hover:brightness-95 text-white text-[13px] font-semibold rounded-[4px] shadow-[0_2px_8px_-2px_color-mix(in_srgb,var(--accent)_30%,transparent)] transition-all cursor-pointer"
+            className="inline-flex items-center gap-2 px-4 py-2.5 bg-[var(--accent)] hover:brightness-95 text-white text-[13px] font-semibold rounded-[var(--radius)] transition-colors cursor-pointer"
           >
-            <UserPlus className="w-[18px] h-[18px]" strokeWidth={1.5} />
+            <UserPlus className="w-4 h-4" strokeWidth={1.75} />
             Thêm người dùng mới
           </button>
         </div>
       </div>
 
-      {/* Thanh Tìm kiếm & Bộ lọc */}
-      <div className="p-4 rounded bg-surface border border-border shadow-2xs flex flex-col sm:flex-row items-center gap-4">
-        <div className="relative flex-1 w-full">
-          <Search className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-muted " />
+      {/* Thanh Tìm kiếm & Bộ lọc Chip Vai trò */}
+      <div className="p-3.5 rounded-[var(--radius)] bg-surface border border-border shadow-2xs flex flex-col lg:flex-row lg:items-center justify-between gap-3">
+        <div className="relative w-full lg:w-80">
+          <Search className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-muted" />
           <input
             type="search"
             name="tim_kiem_nguoi_dung"
@@ -496,31 +495,47 @@ export default function TrangQuanLyNguoiDung() {
               setTuKhoa(e.target.value);
               setTrangHienTai(1);
             }}
-            className="w-full pl-9 pr-4 py-2 border border-border rounded-lg text-sm text-text placeholder:text-muted bg-surface focus:outline-none focus:ring-2 focus:ring-accent"
+            className="w-full pl-9 pr-3.5 py-2 border border-border rounded-[var(--radius)] text-[13px] text-text placeholder:text-muted bg-bg focus:outline-none focus:border-accent transition-colors"
           />
         </div>
 
-        <div className="w-full sm:w-60">
-          <select
-            value={vaiTroLoc}
-            onChange={(e) => {
-              setVaiTroLoc(e.target.value);
+        <div className="flex items-center gap-1.5 flex-wrap">
+          <button
+            type="button"
+            onClick={() => {
+              setVaiTroLoc('');
               setTrangHienTai(1);
             }}
-            className="w-full py-2 px-3 border border-border rounded-lg text-sm bg-surface focus:outline-none focus:ring-2 focus:ring-accent"
+            className={`px-3 py-1.5 rounded-[var(--radius)] text-[12px] font-semibold border transition-colors cursor-pointer ${
+              vaiTroLoc === ''
+                ? 'bg-accent-soft text-accent border-accent'
+                : 'bg-bg text-muted border-border hover:text-text'
+            }`}
           >
-            <option value="">-- Tất cả vai trò --</option>
-            {DANH_SACH_VAI_TRO.map((vt) => (
-              <option key={vt} value={vt}>
-                {layNhanVaiTro(vt)}
-              </option>
-            ))}
-          </select>
+            Tất cả{data?.tongSo !== undefined && vaiTroLoc === '' ? ` (${data.tongSo})` : ''}
+          </button>
+          {DANH_SACH_VAI_TRO.map((vt) => (
+            <button
+              key={vt}
+              type="button"
+              onClick={() => {
+                setVaiTroLoc(vt);
+                setTrangHienTai(1);
+              }}
+              className={`px-3 py-1.5 rounded-[var(--radius)] text-[12px] font-semibold border transition-colors cursor-pointer ${
+                vaiTroLoc === vt
+                  ? 'bg-accent-soft text-accent border-accent'
+                  : 'bg-bg text-muted border-border hover:text-text'
+              }`}
+            >
+              {layNhanVaiTro(vt)}
+            </button>
+          ))}
         </div>
       </div>
 
       {/* Bảng Dữ liệu người dùng */}
-      <div className="bg-surface rounded border border-border shadow-2xs overflow-hidden">
+      <div className="bg-surface rounded-[var(--radius)] border border-border shadow-2xs overflow-hidden">
         {isLoading ? (
           <KhungXuongBang soDong={6} soCot={6} />
         ) : isError ? (
@@ -538,35 +553,37 @@ export default function TrangQuanLyNguoiDung() {
           </div>
         ) : (
           <div className="overflow-x-auto">
-            <table className="w-full text-left text-sm text-muted ">
-              <thead className="bg-bg border-b border-border text-xs font-semibold text-muted uppercase tracking-wider">
+            <table className="w-full text-left text-[13px] text-muted">
+              <thead className="bg-bg border-b border-border text-[11px] font-mono font-semibold text-muted uppercase tracking-wider">
                 <tr>
-                  <th className="py-3.5 px-4">Người dùng</th>
-                  <th className="py-3.5 px-4">Số điện thoại</th>
-                  <th className="py-3.5 px-4">Vai trò</th>
-                  <th className="py-3.5 px-4">Trạng thái</th>
-                  <th className="py-3.5 px-4">Ngày tạo</th>
-                  <th className="py-3.5 px-4 text-right">Thao tác</th>
+                  <th className="py-3 px-4">Người dùng</th>
+                  <th className="py-3 px-4">Số điện thoại</th>
+                  <th className="py-3 px-4">Vai trò</th>
+                  <th className="py-3 px-4">Trạng thái</th>
+                  <th className="py-3 px-4">Ngày tạo</th>
+                  <th className="py-3 px-4 text-right">Thao tác</th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-border ">
+              <tbody className="divide-y divide-border">
                 {data?.danhSach?.map((item: any) => (
                   <tr key={item.id} className="hover:bg-bg transition-colors">
                     <td className="py-3.5 px-4">
                       <div className="flex items-center gap-3">
-                        <div className="w-9 h-9 rounded-full bg-active-bg text-text font-semibold flex items-center justify-center text-xs border border-border ">
+                        <div className="w-9 h-9 rounded-full bg-active-bg text-text font-semibold flex items-center justify-center text-xs border border-border shrink-0">
                           {item.hoTen?.charAt(0) || 'U'}
                         </div>
                         <div>
                           <p className="font-semibold text-text leading-tight">{item.hoTen}</p>
-                          <p className="text-xs text-muted ">{item.email}</p>
+                          <p className="font-mono text-[11.5px] text-muted mt-0.5">{item.email}</p>
                         </div>
                       </div>
                     </td>
-                    <td className="py-3.5 px-4 text-xs">{item.soDienThoai || 'Chưa cập nhật'}</td>
+                    <td className="py-3.5 px-4 font-mono text-xs tabular-nums">
+                      {item.soDienThoai || 'Chưa cập nhật'}
+                    </td>
                     <td className="py-3.5 px-4">
                       <span
-                        className={`inline-block px-2.5 py-1 text-xs font-medium rounded-full border ${layMauBadgeVaiTro(
+                        className={`inline-block px-2.5 py-0.5 text-[11.5px] font-semibold rounded-[var(--radius)] border ${layMauBadgeVaiTro(
                           item.vaiTro,
                         )}`}
                       >
@@ -575,18 +592,18 @@ export default function TrangQuanLyNguoiDung() {
                     </td>
                     <td className="py-3.5 px-4">
                       {item.kichHoat ? (
-                        <span className="inline-flex items-center gap-1.5 px-2 py-0.5 rounded-full text-xs font-medium bg-accent-soft text-accent border border-accent">
+                        <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-[var(--radius)] text-[11.5px] font-semibold bg-accent-soft text-accent border border-accent">
                           <span className="w-1.5 h-1.5 rounded-full bg-accent" />
                           Hoạt động
                         </span>
                       ) : (
-                        <span className="inline-flex items-center gap-1.5 px-2 py-0.5 rounded-full text-xs font-medium bg-danger-soft text-danger border border-danger">
+                        <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-[var(--radius)] text-[11.5px] font-semibold bg-danger-soft text-danger border border-danger">
                           <span className="w-1.5 h-1.5 rounded-full bg-danger" />
                           Đã khóa
                         </span>
                       )}
                     </td>
-                    <td className="py-3.5 px-4 text-xs text-muted">
+                    <td className="py-3.5 px-4 font-mono text-xs text-muted tabular-nums">
                       {new Date(item.ngayTao).toLocaleDateString('vi-VN')}
                     </td>
                     <td className="py-3.5 px-4 text-right">

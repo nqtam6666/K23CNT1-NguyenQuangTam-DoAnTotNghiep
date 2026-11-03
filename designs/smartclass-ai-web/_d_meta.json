@@ -29,8 +29,17 @@
           "status": "approved"
         }
       ]
+    },
+    "Dot 4 - Quan tri va Cai dat": {
+      "versions": [
+        {
+          "path": "Quan tri va Cai dat.html",
+          "createdAt": "2026-11-03T09:20:00.000Z",
+          "status": "approved"
+        }
+      ]
     }
   },
   "createdAt": "2026-11-03T07:44:50.050Z",
-  "updatedAt": "2026-11-03T08:56:00.000Z"
+  "updatedAt": "2026-11-03T09:25:00.000Z"
 }

@@ -120,7 +120,7 @@ export function TabBaiTap({ idLopHocPhan, nguoiDung, laGiaoVienLop }: ThuocTinhT
       setNoiDung('');
       setHanNop(layNgayMacDinh());
       queryClient.invalidateQueries({ queryKey: ['bai-tap-lop', idLopHocPhan] });
-      thongBao.thanhCong('Giao bài tập thành công', 'Bài tập đã được gửi tới học sinh trong lớp.');
+      thongBao.thanhCong('Giao bài tập thành công', 'Bài tập đã được gửi tới sinh viên trong lớp.');
     },
     onError: (err: any) => {
       thongBao.thatBai(
@@ -277,7 +277,7 @@ export function TabBaiTap({ idLopHocPhan, nguoiDung, laGiaoVienLop }: ThuocTinhT
           <h4 className="text-base font-semibold text-foreground">Chưa có bài tập nào</h4>
           <p className="text-sm text-muted-foreground mt-1 max-w-sm mx-auto">
             {coQuyenQuanLy
-              ? 'Lớp học chưa có bài tập nào. Hãy nhấn "Giao bài tập mới" để giao việc cho học sinh.'
+              ? 'Lớp học chưa có bài tập nào. Hãy nhấn "Giao bài tập mới" để giao việc cho sinh viên.'
               : 'Hiện tại bạn không có bài tập nào cần làm cho lớp học này.'}
           </p>
         </div>
@@ -349,7 +349,7 @@ export function TabBaiTap({ idLopHocPhan, nguoiDung, laGiaoVienLop }: ThuocTinhT
                       <>
                         <span>•</span>
                         <span className="text-primary font-medium">
-                          Đã nộp: {bt._count?.cacBaiNop || 0} học sinh
+                          Đã nộp: {bt._count?.cacBaiNop || 0} sinh viên
                         </span>
                       </>
                     )}
@@ -407,7 +407,7 @@ export function TabBaiTap({ idLopHocPhan, nguoiDung, laGiaoVienLop }: ThuocTinhT
         mo={moModalGiaoBai}
         onDong={() => setMoModalGiaoBai(false)}
         tieuDe="Giao bài tập mới"
-        moTa="Thiết lập tiêu đề, yêu cầu làm bài và thời hạn chót cho học sinh"
+        moTa="Thiết lập tiêu đề, yêu cầu làm bài và thời hạn chót cho sinh viên"
       >
         <form
           onSubmit={(e) => {
@@ -508,7 +508,7 @@ export function TabBaiTap({ idLopHocPhan, nguoiDung, laGiaoVienLop }: ThuocTinhT
             <div className="rounded bg-accent/10 border border-accent p-4 space-y-1.5">
               <div className="flex items-center justify-between">
                 <span className="text-xs font-semibold text-accent">
-                  Kết quả đánh giá từ giáo viên:
+                  Kết quả đánh giá từ giảng viên:
                 </span>
                 <span className="text-base font-bold text-accent">
                   {baiTapChon.baiNopCuaToi.diemSo} / {baiTapChon.diemToiDa} điểm
@@ -523,7 +523,7 @@ export function TabBaiTap({ idLopHocPhan, nguoiDung, laGiaoVienLop }: ThuocTinhT
           )}
 
           <div className="rounded bg-muted/40 p-3.5 text-xs text-muted-foreground whitespace-pre-line leading-relaxed border border-border/60">
-            <span className="font-semibold text-foreground block mb-1">Yêu cầu từ giáo viên:</span>
+            <span className="font-semibold text-foreground block mb-1">Yêu cầu từ giảng viên:</span>
             {baiTapChon?.noiDung}
           </div>
 
@@ -629,7 +629,7 @@ export function TabBaiTap({ idLopHocPhan, nguoiDung, laGiaoVienLop }: ThuocTinhT
                 <div className="flex items-center gap-2.5">
                   <AnhDaiDien
                     url={baiNopDangCham.nguoiNop?.anhDaiDien}
-                    hoTen={baiNopDangCham.nguoiNop?.hoTen || 'Học sinh'}
+                    hoTen={baiNopDangCham.nguoiNop?.hoTen || 'Sinh viên'}
                     kichThuoc="md"
                   />
                   <div>
@@ -685,7 +685,7 @@ export function TabBaiTap({ idLopHocPhan, nguoiDung, laGiaoVienLop }: ThuocTinhT
                   className="inline-flex items-center gap-1.5 rounded bg-background border border-border px-3 py-1.5 text-xs font-semibold text-primary hover:bg-muted/50 transition-colors"
                 >
                   <Download className="w-3.5 h-3.5" />
-                  Tải tệp bài làm của học sinh
+                  Tải tệp bài làm của sinh viên
                 </a>
               )}
 
@@ -739,14 +739,14 @@ export function TabBaiTap({ idLopHocPhan, nguoiDung, laGiaoVienLop }: ThuocTinhT
             <div className="h-40 rounded bg-muted/40 animate-pulse" />
           ) : danhSachBaiNop.length === 0 ? (
             <div className="text-center py-8 text-muted-foreground text-sm">
-              Chưa có học sinh nào nộp bài tập này.
+              Chưa có sinh viên nào nộp bài tập này.
             </div>
           ) : (
             <div className="rounded border border-border/80 overflow-hidden">
               <table className="w-full text-left text-xs">
                 <thead className="bg-muted/50 border-b border-border text-muted-foreground font-semibold">
                   <tr>
-                    <th className="p-3 pl-4">Học sinh</th>
+                    <th className="p-3 pl-4">Sinh viên</th>
                     <th className="p-3">Thời gian nộp</th>
                     <th className="p-3">Trạng thái</th>
                     <th className="p-3">Điểm số</th>
@@ -760,7 +760,7 @@ export function TabBaiTap({ idLopHocPhan, nguoiDung, laGiaoVienLop }: ThuocTinhT
                         <div className="flex items-center gap-2.5">
                           <AnhDaiDien
                             url={bn.nguoiNop?.anhDaiDien}
-                            hoTen={bn.nguoiNop?.hoTen || 'Học sinh'}
+                            hoTen={bn.nguoiNop?.hoTen || 'Sinh viên'}
                             kichThuoc="sm"
                           />
                           <div>

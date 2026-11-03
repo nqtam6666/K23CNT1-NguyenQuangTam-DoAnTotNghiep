@@ -545,11 +545,11 @@ export default function TrangHoSoCaNhan() {
             <div className="p-6 rounded-[var(--radius)] bg-[var(--surface)] border border-[var(--border)]">
               <h3 className="font-mono font-bold text-[var(--text)] text-base mb-4 flex items-center gap-2">
                 <GraduationCap className="w-5 h-5 text-[var(--accent)] stroke-[1.5]" />
-                Hồ sơ Học vụ Học sinh
+                Hồ sơ Học vụ Sinh viên
               </h3>
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 text-sm">
                 <div>
-                  <span className="text-xs text-[var(--muted)]">Mã học sinh:</span>
+                  <span className="text-xs text-[var(--muted)]">Mã sinh viên:</span>
                   <p className="font-mono font-semibold text-[var(--text)]">
                     {hoSo.hoSoHocSinh.maHocSinh}
                   </p>
@@ -587,7 +587,7 @@ export default function TrangHoSoCaNhan() {
               </h3>
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 text-sm">
                 <div>
-                  <span className="text-xs text-[var(--muted)]">Mã giáo viên:</span>
+                  <span className="text-xs text-[var(--muted)]">Mã giảng viên:</span>
                   <p className="font-mono font-semibold text-[var(--text)]">
                     {hoSo.hoSoGiaoVien.maGiaoVien}
                   </p>
@@ -1235,7 +1235,7 @@ export default function TrangHoSoCaNhan() {
             <div className="flex items-center justify-between p-4 rounded-[var(--radius)] bg-[var(--bg)] border border-[var(--border)]">
               <div className="pr-4 space-y-1">
                 <p className="text-xs font-semibold text-[var(--text)]">
-                  Ẩn số điện thoại cá nhân với danh sách học sinh cùng lớp
+                  Ẩn số điện thoại cá nhân với danh sách sinh viên cùng lớp
                 </p>
                 <p className="text-[11px] text-[var(--muted)] leading-relaxed">
                   Khi bật, số điện thoại của bạn được ẩn trên danh sách thành viên lớp học phần. Giảng viên phụ trách lớp và Phòng Đào tạo vẫn xem được để liên hệ học vụ khi cần.
@@ -1243,7 +1243,7 @@ export default function TrangHoSoCaNhan() {
               </div>
               <CongTac
                 checked={tuyChon.anThongTinLienHeVoiLop}
-                ariaLabel="Ẩn số điện thoại cá nhân với danh sách học sinh cùng lớp"
+                ariaLabel="Ẩn số điện thoại cá nhân với danh sách sinh viên cùng lớp"
                 onChange={(checked) =>
                   setTuyChon((truoc) => ({
                     ...truoc,

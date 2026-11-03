@@ -190,8 +190,8 @@ export default function TrangPhongHocTrucTuyen({ params }: { params: Promise<{ i
             <span className="text-xs text-[var(--phong-muted)]">Tham gia với vai trò:</span>
             <p className="text-xs font-semibold text-accent">
               {duLieuToken.vaiTroTrongPhong === 'CHU_TRI'
-                ? 'Chủ trì (Giáo viên)'
-                : 'Học sinh (Thành viên)'}
+                ? 'Chủ trì (Giảng viên)'
+                : 'Sinh viên (Thành viên)'}
             </p>
           </div>
 
@@ -282,7 +282,7 @@ export default function TrangPhongHocTrucTuyen({ params }: { params: Promise<{ i
                       >
                         <div>
                           <p className="font-semibold text-[var(--phong-text)]">
-                            {dd.hocSinh?.nguoiDung?.hoTen || 'Học sinh'}
+                            {dd.hocSinh?.nguoiDung?.hoTen || 'Sinh viên'}
                           </p>
                           <p className="text-[11px] text-[var(--phong-muted)] font-mono">
                             {dd.hocSinh?.maHocSinh}

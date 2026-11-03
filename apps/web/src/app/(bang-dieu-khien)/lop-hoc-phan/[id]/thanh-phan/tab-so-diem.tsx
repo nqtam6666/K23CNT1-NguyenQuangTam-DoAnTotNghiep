@@ -284,14 +284,14 @@ export function TabSoDiem({ idLopHocPhan, nguoiDung, laGiaoVienLop }: ThuocTinhT
             <div className="bg-card rounded border border-border/80 p-5 shadow-sm">
               <span className="text-xs text-muted-foreground">Phân loại Điểm A & Điểm B</span>
               <p className="text-2xl font-mono font-bold text-accent mt-1">
-                {duLieuSoDiem.thongKe.phanBoDiemChu.A + duLieuSoDiem.thongKe.phanBoDiemChu.B} học sinh
+                {duLieuSoDiem.thongKe.phanBoDiemChu.A + duLieuSoDiem.thongKe.phanBoDiemChu.B} sinh viên
               </p>
             </div>
 
             <div className="bg-card rounded border border-border/80 p-5 shadow-sm">
               <span className="text-xs text-muted-foreground">Cần hỗ trợ phụ đạo (Điểm D / F)</span>
               <p className="text-2xl font-mono font-bold text-danger mt-1">
-                {duLieuSoDiem.thongKe.phanBoDiemChu.D + duLieuSoDiem.thongKe.phanBoDiemChu.F} học sinh
+                {duLieuSoDiem.thongKe.phanBoDiemChu.D + duLieuSoDiem.thongKe.phanBoDiemChu.F} sinh viên
               </p>
             </div>
           </div>
@@ -434,7 +434,7 @@ export function TabSoDiem({ idLopHocPhan, nguoiDung, laGiaoVienLop }: ThuocTinhT
                       Cảnh báo sớm tiến độ & Kết quả học tập
                     </h4>
                     <p className="text-xs text-muted-foreground mt-0.5">
-                      Phát hiện sớm học sinh vắng học, chậm nộp bài tập hoặc điểm kiểm tra giảm sút
+                      Phát hiện sớm sinh viên vắng học, chậm nộp bài tập hoặc điểm kiểm tra giảm sút
                     </p>
                   </div>
                   <div className="flex items-center gap-1.5 text-[11px] font-mono">

@@ -24,8 +24,8 @@ export const NHAN_VAI_TRO: Record<VaiTro, string> = {
   [VaiTro.QUAN_TRI_VIEN]: 'Quản trị viên',
   [VaiTro.BAN_GIAM_HIEU]: 'Ban giám hiệu',
   [VaiTro.GIAO_VU]: 'Giáo vụ',
-  [VaiTro.GIAO_VIEN]: 'Giáo viên',
-  [VaiTro.HOC_SINH]: 'Học sinh',
+  [VaiTro.GIAO_VIEN]: 'Giảng viên',
+  [VaiTro.HOC_SINH]: 'Sinh viên',
   [VaiTro.PHU_HUYNH]: 'Phụ huynh',
 };
 

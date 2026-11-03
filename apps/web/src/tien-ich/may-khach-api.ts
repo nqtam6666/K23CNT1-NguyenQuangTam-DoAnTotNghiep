@@ -13,6 +13,8 @@ export const mayKhachApi = axios.create({
 // Khoá đồng bộ (Mutex) tránh nhiều request 401 cùng lúc gọi /lam-moi-token làm huỷ phiên xoay vòng
 let dangLamMoiTokenPromise: Promise<unknown> | null = null;
 
+const TRANG_CONG_KHAI = ['/', '/dang-nhap', '/dang-ky', '/quen-mat-khau'];
+
 // Interceptor xử lý tự động làm mới Token khi mã lỗi 401
 mayKhachApi.interceptors.response.use(
   (phanHoi) => phanHoi,
@@ -44,10 +46,14 @@ mayKhachApi.interceptors.response.use(
           try {
             sessionStorage.removeItem('lms_cache_ho_so');
             sessionStorage.removeItem('lms_cache_bang_dieu_khien');
+            localStorage.removeItem('lms_cache_ho_so');
+            localStorage.removeItem('lms_cache_bang_dieu_khien');
           } catch {
-            // Bỏ qua lỗi xoá sessionStorage
+            // Bỏ qua lỗi xoá bộ nhớ trình duyệt
           }
-          if (window.location.pathname !== '/dang-nhap') {
+          // Trang công khai (trang chủ, đăng nhập, đăng ký, quên mật khẩu) chỉ kiểm tra phiên,
+          // không được chuyển hướng khách sang trang đăng nhập.
+          if (!TRANG_CONG_KHAI.includes(window.location.pathname)) {
             window.location.href = '/dang-nhap';
           }
         }

@@ -681,7 +681,7 @@ export default function TrangQuanLyNguoiDung() {
         mo={modalHangLoatMo}
         onDong={() => setModalHangLoatMo(false)}
         tieuDe="Thêm người dùng hàng loạt"
-        moTa="Nhập nhanh danh sách học sinh, giáo viên từ tệp CSV / Excel hoặc bảng nhập trực tiếp"
+        moTa="Nhập nhanh danh sách sinh viên, giảng viên từ tệp CSV / Excel hoặc bảng nhập trực tiếp"
         kichThuoc="lon"
       >
         <div className="space-y-4">

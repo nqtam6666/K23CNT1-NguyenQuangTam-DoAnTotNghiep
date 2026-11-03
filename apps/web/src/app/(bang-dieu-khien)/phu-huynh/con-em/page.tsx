@@ -23,14 +23,14 @@ export default function TrangConEmPhuHuynh() {
         <p className="eyebrow mb-1">Cổng thông tin phụ huynh</p>
         <h2 className="text-[22px] font-mono font-bold text-[var(--text)] tracking-tight">Theo dõi Con em</h2>
         <p className="text-[14px] text-[var(--muted)] mt-1">
-          Danh sách học sinh được liên kết với tài khoản phụ huynh của bạn trong hệ thống trường học
+          Danh sách sinh viên được liên kết với tài khoản phụ huynh của bạn trong hệ thống trường học
         </p>
       </div>
 
       {isLoading ? (
         <div className="py-20 text-center">
           <Loader2 className="w-8 h-8 animate-spin text-accent mx-auto mb-2" />
-          <p className="text-sm text-muted">Đang tải danh sách học sinh liên kết...</p>
+          <p className="text-sm text-muted">Đang tải danh sách sinh viên liên kết...</p>
         </div>
       ) : isError ? (
         <div className="p-8 text-center text-danger bg-surface rounded border border-border">
@@ -40,9 +40,9 @@ export default function TrangConEmPhuHuynh() {
       ) : danhSachConEm.length === 0 ? (
         <div className="py-16 text-center bg-surface rounded border border-border shadow-2xs">
           <HeartHandshake className="w-12 h-12 text-muted mx-auto mb-3" />
-          <p className="font-medium text-text">Chưa có liên kết học sinh nào</p>
+          <p className="font-medium text-text">Chưa có liên kết sinh viên nào</p>
           <p className="text-xs text-muted mt-1 max-w-sm mx-auto">
-            Vui lòng liên hệ phòng Giáo vụ hoặc Giáo viên chủ nhiệm để xác nhận và thiết lập liên
+            Vui lòng liên hệ phòng Giáo vụ hoặc Giảng viên chủ nhiệm để xác nhận và thiết lập liên
             kết tài khoản phụ huynh.
           </p>
         </div>
@@ -72,7 +72,7 @@ export default function TrangConEmPhuHuynh() {
 
                 <div className="pt-3 border-t border-border grid grid-cols-2 gap-3 text-xs">
                   <div>
-                    <span className="text-muted">Mã học sinh:</span>
+                    <span className="text-muted">Mã sinh viên:</span>
                     <p className="font-semibold text-text">{hocSinh?.maHocSinh}</p>
                   </div>
                   <div>

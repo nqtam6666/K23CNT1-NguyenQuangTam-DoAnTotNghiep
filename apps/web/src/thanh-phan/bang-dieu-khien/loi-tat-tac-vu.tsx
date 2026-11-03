@@ -27,7 +27,7 @@ export function LoiTatTacVu({ vaiTro }: Props) {
         return [
           {
             tieuDe: 'Thêm người dùng',
-            moTa: 'Tạo tài khoản giáo viên, học sinh mới',
+            moTa: 'Tạo tài khoản giảng viên, sinh viên mới',
             duongDan: '/nguoi-dung',
             bieuTuong: Users,
           },
@@ -49,7 +49,7 @@ export function LoiTatTacVu({ vaiTro }: Props) {
         return [
           {
             tieuDe: 'Thêm người dùng',
-            moTa: 'Tạo tài khoản giáo viên, học sinh mới',
+            moTa: 'Tạo tài khoản giảng viên, sinh viên mới',
             duongDan: '/nguoi-dung',
             bieuTuong: Users,
           },
@@ -110,7 +110,7 @@ export function LoiTatTacVu({ vaiTro }: Props) {
             bieuTuong: Calendar,
           },
           {
-            tieuDe: 'Hồ sơ học sinh',
+            tieuDe: 'Hồ sơ sinh viên',
             moTa: 'Thông tin cá nhân, kết quả học tập',
             duongDan: '/ho-so',
             bieuTuong: UserCheck,

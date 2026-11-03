@@ -415,7 +415,7 @@ export function TabTaiLieu({ idLopHocPhan, nguoiDung, laGiaoVienLop }: ThuocTinh
           <p className="text-sm text-muted mt-1 max-w-sm mx-auto">
             {coQuyenQuanLy
               ? 'Hãy tải lên tài liệu học tập đầu tiên để sinh viên tham khảo và phục vụ Trợ lý AI.'
-              : 'Giáo viên phụ trách chưa đăng tải tài liệu nào cho lớp học phần này.'}
+              : 'Giảng viên phụ trách chưa đăng tải tài liệu nào cho lớp học phần này.'}
           </p>
         </div>
       ) : (

@@ -727,8 +727,8 @@ export default function TrangQuanLyHocVu() {
                   <th className="py-3 px-4">Mã lớp</th>
                   <th className="py-3 px-4">Tên lớp</th>
                   <th className="py-3 px-4 text-center">Khối lớp</th>
-                  <th className="py-3 px-4">Giáo viên chủ nhiệm</th>
-                  <th className="py-3 px-4 text-center">Sĩ số học sinh</th>
+                  <th className="py-3 px-4">Giảng viên chủ nhiệm</th>
+                  <th className="py-3 px-4 text-center">Sĩ số sinh viên</th>
                   <th className="py-3 px-4 text-right">Thao tác</th>
                 </tr>
               </thead>
@@ -772,7 +772,7 @@ export default function TrangQuanLyHocVu() {
                       </td>
                       <td className="py-3 px-4 text-center">
                         <span className="px-2.5 py-1 bg-accent-soft text-accent rounded-full text-xs font-semibold">
-                          {lop._count?.danhSachHocSinh || 0} học sinh
+                          {lop._count?.danhSachHocSinh || 0} sinh viên
                         </span>
                       </td>
                       <td className="py-3 px-4 text-right">
@@ -1073,7 +1073,7 @@ export default function TrangQuanLyHocVu() {
           setIdLopHanhChinhDangSua(null);
         }}
         tieuDe={idLopHanhChinhDangSua ? 'Chỉnh sửa Lớp hành chính' : 'Thêm Lớp hành chính mới'}
-        moTa="Thiết lập mã lớp, tên lớp, khối và phân công giáo viên chủ nhiệm"
+        moTa="Thiết lập mã lớp, tên lớp, khối và phân công giảng viên chủ nhiệm"
         kichThuoc="nho"
       >
         <div className="space-y-4">
@@ -1124,7 +1124,7 @@ export default function TrangQuanLyHocVu() {
             </div>
             <div>
               <label className="block text-xs font-medium text-text mb-1">
-                Giáo viên chủ nhiệm
+                Giảng viên chủ nhiệm
               </label>
               <select
                 value={formLopHanhChinh.idGiaoVienCN || ''}

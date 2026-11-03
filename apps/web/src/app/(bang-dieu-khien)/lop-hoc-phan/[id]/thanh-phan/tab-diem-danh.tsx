@@ -138,7 +138,7 @@ export function TabDiemDanh({
       queryClient.invalidateQueries({ queryKey: ['buoi-hoc-lop', idLopHocPhan] });
       thongBao.thanhCong(
         `Đã mở mã điểm danh: ${data.maDiemDanh}`,
-        `Mã có hiệu lực trong ${thoiHanPhut} phút để học sinh tự điểm danh.`,
+        `Mã có hiệu lực trong ${thoiHanPhut} phút để sinh viên tự điểm danh.`,
       );
     },
     onError: (err: any) => {
@@ -238,7 +238,7 @@ export function TabDiemDanh({
       setMoModalXinNghi(false);
       setLyDoNghi('');
       queryClient.invalidateQueries({ queryKey: ['don-xin-nghi-lop', idLopHocPhan] });
-      thongBao.thanhCong('Đã gửi đơn xin nghỉ phép', 'Giáo viên phụ trách sẽ xem xét và phản hồi.');
+      thongBao.thanhCong('Đã gửi đơn xin nghỉ phép', 'Giảng viên phụ trách sẽ xem xét và phản hồi.');
     },
     onError: (err: any) => {
       thongBao.thatBai(
@@ -484,7 +484,7 @@ export function TabDiemDanh({
                           </select>
                         </div>
                         <p className="text-[11px] text-[var(--muted)]">
-                          Chiếu mã 6 chữ số lên màn hình để học sinh tự điểm danh trên thiết bị cá nhân
+                          Chiếu mã 6 chữ số lên màn hình để sinh viên tự điểm danh trên thiết bị cá nhân
                         </p>
                       </div>
 
@@ -529,7 +529,7 @@ export function TabDiemDanh({
                           Tự điểm danh bằng mã PIN
                         </span>
                         <p className="text-[11px] text-[var(--muted)]">
-                          Nhập mã PIN 6 chữ số do giáo viên cung cấp trong giờ học để xác nhận có mặt
+                          Nhập mã PIN 6 chữ số do giảng viên cung cấp trong giờ học để xác nhận có mặt
                         </p>
                       </div>
 
@@ -570,7 +570,7 @@ export function TabDiemDanh({
                       <thead className="bg-muted/50 border-b border-border text-muted-foreground font-semibold">
                         <tr>
                           <th className="py-3 px-4">Mã HS</th>
-                          <th className="py-3 px-4">Họ và tên học sinh</th>
+                          <th className="py-3 px-4">Họ và tên sinh viên</th>
                           <th className="py-3 px-4">Trạng thái điểm danh</th>
                           <th className="py-3 px-4">Ghi chú</th>
                         </tr>
@@ -695,7 +695,7 @@ export function TabDiemDanh({
                     Cảnh báo nguy cơ cấm thi (&gt;20% vắng)
                   </span>
                   <p className="text-2xl font-extrabold text-danger mt-1">
-                    {thongKeChuyenCan.soHocSinhNguyCoCamThi} học sinh
+                    {thongKeChuyenCan.soHocSinhNguyCoCamThi} sinh viên
                   </p>
                 </div>
               </div>
@@ -815,7 +815,7 @@ export function TabDiemDanh({
                   {danhSachDonNghi.map((don) => (
                     <tr key={don.id} className="hover:bg-muted/20">
                       <td className="py-3 px-4 font-semibold text-foreground">
-                        {don.nguoiGui?.hoTen || 'Học sinh'}{' '}
+                        {don.nguoiGui?.hoTen || 'Sinh viên'}{' '}
                         {don.nguoiGui?.hoSoHocSinh?.maHocSinh && (
                           <span className="text-muted-foreground font-mono">
                             ({don.nguoiGui.hoSoHocSinh.maHocSinh})
@@ -891,7 +891,7 @@ export function TabDiemDanh({
         mo={moModalXinNghi}
         onDong={() => setMoModalXinNghi(false)}
         tieuDe="Gửi đơn xin nghỉ phép trực tuyến"
-        moTa="Đơn xin nghỉ được giáo viên phê duyệt sẽ tự động tính là Vắng có phép khi đồng bộ điểm danh"
+        moTa="Đơn xin nghỉ được giảng viên phê duyệt sẽ tự động tính là Vắng có phép khi đồng bộ điểm danh"
       >
         <form
           onSubmit={(e) => {

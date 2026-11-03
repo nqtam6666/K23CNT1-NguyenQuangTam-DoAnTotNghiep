@@ -198,8 +198,8 @@ export default function TrangChiTietLopHocPhan({ params }: { params: Promise<{ i
       setMoModalGhiDanh(false);
       setIdHocSinhChon('');
       setThongBaoLoi(null);
-      setThongBaoThanhCong('Ghi danh học sinh thành công');
-      thongBao.thanhCong('Ghi danh thành công!', 'Đã thêm học sinh vào lớp học phần.');
+      setThongBaoThanhCong('Ghi danh sinh viên thành công');
+      thongBao.thanhCong('Ghi danh thành công!', 'Đã thêm sinh viên vào lớp học phần.');
     },
     onError: (err: any) => {
       const msg = err.response?.data?.thongDiep || 'Lỗi khi ghi danh';
@@ -220,7 +220,7 @@ export default function TrangChiTietLopHocPhan({ params }: { params: Promise<{ i
       setThongBaoThanhCong('Ghi danh theo lớp hành chính thành công');
       thongBao.thanhCong(
         'Ghi danh theo lớp thành công!',
-        'Toàn bộ học sinh trong lớp sinh hoạt đã được thêm vào lớp học phần.',
+        'Toàn bộ sinh viên trong lớp sinh hoạt đã được thêm vào lớp học phần.',
       );
     },
     onError: (err: any) => {
@@ -236,13 +236,13 @@ export default function TrangChiTietLopHocPhan({ params }: { params: Promise<{ i
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['ghi-danh-lop', id] });
       queryClient.invalidateQueries({ queryKey: ['chi-tiet-lop', id] });
-      setThongBaoThanhCong('Đã xóa học sinh khỏi lớp học phần');
-      thongBao.thanhCong('Đã rút tên học sinh khỏi lớp học phần.');
+      setThongBaoThanhCong('Đã xóa sinh viên khỏi lớp học phần');
+      thongBao.thanhCong('Đã rút tên sinh viên khỏi lớp học phần.');
     },
     onError: (err: any) => {
-      const msg = err.response?.data?.thongDiep || 'Lỗi khi xóa học sinh';
+      const msg = err.response?.data?.thongDiep || 'Lỗi khi xóa sinh viên';
       setThongBaoLoi(msg);
-      thongBao.thatBai('Rút tên học sinh thất bại', msg);
+      thongBao.thatBai('Rút tên sinh viên thất bại', msg);
     },
   });
 
@@ -280,7 +280,7 @@ export default function TrangChiTietLopHocPhan({ params }: { params: Promise<{ i
         </div>
         <h2 className="text-xl font-bold text-text">Không thể truy cập lớp học phần</h2>
         <p className="text-sm text-muted">
-          Bạn không có quyền truy cập lớp học này hoặc lớp học không tồn tại. Vui lòng kiểm tra lại liên kết hoặc liên hệ giáo viên phụ trách.
+          Bạn không có quyền truy cập lớp học này hoặc lớp học không tồn tại. Vui lòng kiểm tra lại liên kết hoặc liên hệ giảng viên phụ trách.
         </p>
         <Link
           href="/lop-hoc-phan"
@@ -350,7 +350,7 @@ export default function TrangChiTietLopHocPhan({ params }: { params: Promise<{ i
               </span>
               <span className="flex items-center gap-1.5 font-mono">
                 <Users className="w-4 h-4 text-[var(--accent)]" strokeWidth={1.5} />
-                {lopHocPhan._count?.danhSachGhiDanh || 0} học sinh đã ghi danh
+                {lopHocPhan._count?.danhSachGhiDanh || 0} sinh viên đã ghi danh
               </span>
               {lopHocPhan.giaoVien && (
                 <span className="flex items-center gap-1.5">
@@ -697,7 +697,7 @@ export default function TrangChiTietLopHocPhan({ params }: { params: Promise<{ i
                 className="inline-flex items-center gap-2 px-3.5 py-2 bg-accent hover:bg-accent text-white text-xs font-semibold rounded-lg transition-colors shadow-sm"
               >
                 <UserPlus className="w-4 h-4" />
-                Thêm Học sinh
+                Thêm Sinh viên
               </button>
             </div>
           )}
@@ -706,7 +706,7 @@ export default function TrangChiTietLopHocPhan({ params }: { params: Promise<{ i
             <table className="w-full text-left text-sm text-muted ">
               <thead className="bg-bg border-b border-border text-text font-semibold">
                 <tr>
-                  <th className="py-3 px-4">Mã học sinh</th>
+                  <th className="py-3 px-4">Mã sinh viên</th>
                   <th className="py-3 px-4">Họ và tên</th>
                   <th className="py-3 px-4">Lớp hành chính</th>
                   <th className="py-3 px-4">Ngày ghi danh</th>
@@ -717,7 +717,7 @@ export default function TrangChiTietLopHocPhan({ params }: { params: Promise<{ i
                 {dangTaiGhiDanh ? (
                   <tr>
                     <td colSpan={5} className="py-10 text-center text-muted">
-                      Đang tải danh sách học sinh...
+                      Đang tải danh sách sinh viên...
                     </td>
                   </tr>
                 ) : danhSachGhiDanh && danhSachGhiDanh.length > 0 ? (
@@ -759,7 +759,7 @@ export default function TrangChiTietLopHocPhan({ params }: { params: Promise<{ i
                 ) : (
                   <tr>
                     <td colSpan={5} className="py-10 text-center text-muted">
-                      Chưa có học sinh nào được ghi danh vào lớp học phần này
+                      Chưa có sinh viên nào được ghi danh vào lớp học phần này
                     </td>
                   </tr>
                 )}
@@ -867,19 +867,19 @@ export default function TrangChiTietLopHocPhan({ params }: { params: Promise<{ i
       <HopThoai
         mo={moModalGhiDanh}
         onDong={() => setMoModalGhiDanh(false)}
-        tieuDe="Ghi danh Học sinh vào lớp"
-        moTa="Thêm học sinh cụ thể vào danh sách lớp học phần"
+        tieuDe="Ghi danh Sinh viên vào lớp"
+        moTa="Thêm sinh viên cụ thể vào danh sách lớp học phần"
         kichThuoc="nho"
       >
         <div className="space-y-4">
           <div>
-            <label className="block text-xs font-medium text-text mb-1">Chọn học sinh</label>
+            <label className="block text-xs font-medium text-text mb-1">Chọn sinh viên</label>
             <select
               value={idHocSinhChon}
               onChange={(e) => setIdHocSinhChon(e.target.value)}
               className="w-full px-3 py-2 border border-border rounded-lg text-sm bg-surface focus:ring-2 focus:ring-accent"
             >
-              <option value="">-- Chọn học sinh từ danh sách --</option>
+              <option value="">-- Chọn sinh viên từ danh sách --</option>
               {tatCaHocSinh?.map((hs: any) => (
                 <option key={hs.id} value={hs.id}>
                   {hs.maHocSinh} - {hs.nguoiDung.hoTen} ({hs.lopHanhChinh?.tenLop || 'Chưa xếp lớp'})
@@ -912,7 +912,7 @@ export default function TrangChiTietLopHocPhan({ params }: { params: Promise<{ i
         mo={moModalImportLop}
         onDong={() => setMoModalImportLop(false)}
         tieuDe="Ghi danh theo Lớp hành chính"
-        moTa="Toàn bộ học sinh thuộc lớp hành chính được chọn sẽ được tự động ghi danh vào lớp học phần này"
+        moTa="Toàn bộ sinh viên thuộc lớp hành chính được chọn sẽ được tự động ghi danh vào lớp học phần này"
         kichThuoc="nho"
       >
         <div className="space-y-4">
@@ -928,7 +928,7 @@ export default function TrangChiTietLopHocPhan({ params }: { params: Promise<{ i
               <option value="">-- Chọn lớp hành chính --</option>
               {danhSachLopHanhChinh?.map((lop: any) => (
                 <option key={lop.id} value={lop.id}>
-                  {lop.maLop} - {lop.tenLop} ({lop._count?.danhSachHocSinh || 0} học sinh)
+                  {lop.maLop} - {lop.tenLop} ({lop._count?.danhSachHocSinh || 0} sinh viên)
                 </option>
               ))}
             </select>

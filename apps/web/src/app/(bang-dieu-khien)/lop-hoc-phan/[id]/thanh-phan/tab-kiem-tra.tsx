@@ -168,7 +168,7 @@ export function TabKiemTra({ idLopHocPhan, nguoiDung, laGiaoVienLop }: ThuocTinh
       queryClient.invalidateQueries({ queryKey: ['chi-tiet-kiem-tra', vars.idBaiKiemTra] });
       thongBao.thanhCong(
         vars.trangThai === TrangThaiBaiKiemTra.DANG_MO
-          ? 'Đã phát hành bài kiểm tra cho học sinh!'
+          ? 'Đã phát hành bài kiểm tra cho sinh viên!'
           : 'Đã cập nhật trạng thái bài kiểm tra.',
       );
     },
@@ -340,7 +340,7 @@ export function TabKiemTra({ idLopHocPhan, nguoiDung, laGiaoVienLop }: ThuocTinh
           <p className="text-sm text-muted-foreground mt-1 max-w-md mx-auto">
             {coQuyenQuanLy
               ? 'Hãy nhấn "Biên soạn đề thông minh từ Tài liệu" để hệ thống trích xuất nội dung giáo trình của lớp và tạo bộ câu hỏi trắc nghiệm.'
-              : 'Giáo viên chưa mở đề luyện tập hoặc thi thử nào cho học phần này.'}
+              : 'Giảng viên chưa mở đề luyện tập hoặc thi thử nào cho học phần này.'}
           </p>
         </div>
       ) : (
@@ -850,7 +850,7 @@ export function TabKiemTra({ idLopHocPhan, nguoiDung, laGiaoVienLop }: ThuocTinh
         mo={!!idBaiXemChiTiet}
         onDong={() => setIdBaiXemChiTiet(null)}
         tieuDe={chiTietBaiKiemTra?.tieuDe || 'Chi tiết bài kiểm tra'}
-        moTa="Kiểm duyệt ngân hàng câu hỏi, đáp án và theo dõi kết quả làm bài của học sinh"
+        moTa="Kiểm duyệt ngân hàng câu hỏi, đáp án và theo dõi kết quả làm bài của sinh viên"
         kichThuoc="rat-lon"
       >
         {dangTaiChiTiet ? (
@@ -876,7 +876,7 @@ export function TabKiemTra({ idLopHocPhan, nguoiDung, laGiaoVienLop }: ThuocTinh
                   className="inline-flex items-center gap-1.5 rounded bg-accent hover:bg-accent px-3.5 py-1.5 text-xs font-semibold text-white cursor-pointer"
                 >
                   <Unlock className="w-3.5 h-3.5" />
-                  Duyệt & Phát hành cho học sinh
+                  Duyệt & Phát hành cho sinh viên
                 </button>
               )}
             </div>
@@ -919,7 +919,7 @@ export function TabKiemTra({ idLopHocPhan, nguoiDung, laGiaoVienLop }: ThuocTinh
             {/* Bảng kết quả làm bài của học sinh */}
             <div className="space-y-2">
               <h4 className="text-xs font-bold uppercase tracking-wider text-muted">
-                Lịch sử làm bài của học sinh ({chiTietBaiKiemTra.cacLuotLam?.length || 0})
+                Lịch sử làm bài của sinh viên ({chiTietBaiKiemTra.cacLuotLam?.length || 0})
               </h4>
               {chiTietBaiKiemTra.cacLuotLam && chiTietBaiKiemTra.cacLuotLam.length > 0 ? (
                 <div className="rounded border border-border overflow-hidden">
@@ -959,7 +959,7 @@ export function TabKiemTra({ idLopHocPhan, nguoiDung, laGiaoVienLop }: ThuocTinh
                   </table>
                 </div>
               ) : (
-                <p className="text-xs text-muted italic">Chưa có học sinh nào nộp bài.</p>
+                <p className="text-xs text-muted italic">Chưa có sinh viên nào nộp bài.</p>
               )}
             </div>
           </div>

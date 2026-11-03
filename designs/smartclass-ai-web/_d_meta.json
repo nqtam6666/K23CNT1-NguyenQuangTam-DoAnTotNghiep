@@ -1,0 +1,18 @@
+{
+  "type": "design",
+  "designSystems": [],
+  "primaryDesignSystem": null,
+  "assets": {
+    "Dot 1 - Trang chu va Dang nhap": {
+      "versions": [
+        {
+          "path": "Trang chu va Dang nhap.html",
+          "createdAt": "2026-11-03T07:44:50.050Z",
+          "status": "needs-review"
+        }
+      ]
+    }
+  },
+  "createdAt": "2026-11-03T07:44:50.050Z",
+  "updatedAt": "2026-11-03T07:44:50.050Z"
+}

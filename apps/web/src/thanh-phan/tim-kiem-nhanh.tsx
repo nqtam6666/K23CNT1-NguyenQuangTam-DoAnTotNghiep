@@ -133,7 +133,7 @@ export function TimKiemNhanh({ vaiTroNguoiDung, dangMo, onDong }: Props) {
         {
           id: 'nguoi-dung-tao-moi',
           tieuDe: 'Tạo tài khoản & Đăng ký người dùng mới',
-          moTaPhu: 'Quản lý người dùng · Cấp tài khoản Giáo viên, Học sinh, Phụ huynh',
+          moTaPhu: 'Quản lý người dùng · Cấp tài khoản Giảng viên, Sinh viên, Phụ huynh',
           duongDan: '/nguoi-dung',
           nhomHienThi: 'Mục chức năng',
           bieuTuong: Users,

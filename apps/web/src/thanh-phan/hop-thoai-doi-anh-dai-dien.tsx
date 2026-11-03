@@ -32,7 +32,7 @@ const AVATAR_MAU = [
   },
   {
     id: 'hoc-sinh-2',
-    ten: 'Học sinh Sáng tạo',
+    ten: 'Sinh viên Sáng tạo',
     svg: `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><circle cx="50" cy="50" r="48" fill="rgb(16,185,129)"/><circle cx="50" cy="38" r="18" fill="rgb(250,248,244)"/><path d="M26 80c0-13 11-22 24-22s24 9 24 22" fill="rgb(5,150,105)"/><circle cx="43" cy="36" r="2.5" fill="rgb(43,42,39)"/><circle cx="57" cy="36" r="2.5" fill="rgb(43,42,39)"/><path d="M45 43q5 3 10 0" stroke="rgb(43,42,39)" stroke-width="2" fill="none" stroke-linecap="round"/></svg>`,
   },
   {

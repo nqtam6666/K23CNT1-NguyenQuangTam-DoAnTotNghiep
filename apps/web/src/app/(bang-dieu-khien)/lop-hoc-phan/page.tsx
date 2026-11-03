@@ -322,7 +322,7 @@ export default function TrangLopHocPhan() {
                       <Users className="w-3.5 h-3.5" strokeWidth={1.5} /> Sĩ số:
                     </span>
                     <span className="font-mono font-semibold text-[var(--text)] bg-[var(--bg)] px-2 py-0.5 rounded-[4px] border border-[var(--border)]">
-                      {lop._count?.danhSachGhiDanh || 0} học sinh
+                      {lop._count?.danhSachGhiDanh || 0} sinh viên
                     </span>
                   </div>
 
@@ -336,7 +336,7 @@ export default function TrangLopHocPhan() {
                           {lop.giaoVien.nguoiDung.hoTen}
                         </p>
                         <p className="text-[11px] font-mono text-[var(--muted)]">
-                          Giáo viên phụ trách
+                          Giảng viên phụ trách
                         </p>
                       </div>
                     </div>
@@ -373,7 +373,7 @@ export default function TrangLopHocPhan() {
           </h3>
           <p className="text-[13px] text-[var(--muted)] mt-1 max-w-sm mx-auto">
             {laHocSinh
-              ? 'Bạn chưa được ghi danh vào lớp học phần nào. Nhấn "Tham gia bằng mã" nếu có mã mời từ giáo viên.'
+              ? 'Bạn chưa được ghi danh vào lớp học phần nào. Nhấn "Tham gia bằng mã" nếu có mã mời từ giảng viên.'
               : 'Hãy bắt đầu tạo lớp học phần để phân công giảng dạy và xếp thời khóa biểu.'}
           </p>
         </div>
@@ -384,7 +384,7 @@ export default function TrangLopHocPhan() {
         mo={moModalThamGia}
         onDong={() => setMoModalThamGia(false)}
         tieuDe="Tham gia bằng mã mời"
-        moTa="Nhập mã lớp 6 ký tự được cấp bởi giáo viên bộ môn"
+        moTa="Nhập mã lớp 6 ký tự được cấp bởi giảng viên bộ môn"
         kichThuoc="nho"
       >
         <div className="space-y-4">
@@ -432,7 +432,7 @@ export default function TrangLopHocPhan() {
           setIdLopDangSua(null);
         }}
         tieuDe={idLopDangSua ? 'Chỉnh sửa Lớp học phần' : 'Tạo Lớp học phần mới'}
-        moTa="Điền thông tin môn học, học kỳ và giáo viên phụ trách"
+        moTa="Điền thông tin môn học, học kỳ và giảng viên phụ trách"
         kichThuoc="vua"
       >
         <div className="space-y-4">
@@ -501,14 +501,14 @@ export default function TrangLopHocPhan() {
 
             <div>
               <label className="block text-xs font-semibold text-text mb-1">
-                Giáo viên phụ trách
+                Giảng viên phụ trách
               </label>
               <select
                 value={formTaoLop.idGiaoVien}
                 onChange={(e) => setFormTaoLop({ ...formTaoLop, idGiaoVien: e.target.value })}
                 className="w-full px-3.5 py-2.5 border border-border rounded text-sm bg-surface focus:ring-2 focus:ring-accent cursor-pointer"
               >
-                <option value="">-- Chọn giáo viên --</option>
+                <option value="">-- Chọn giảng viên --</option>
                 {danhSachGiaoVien?.map((gv: any) => (
                   <option key={gv.id} value={gv.id}>
                     {gv.maGiaoVien} - {gv.nguoiDung.hoTen} ({gv.chuyenMon || 'Giảng dạy'})

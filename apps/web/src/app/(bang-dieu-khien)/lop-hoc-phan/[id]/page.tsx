@@ -22,6 +22,8 @@ import {
   QrCode,
   BrainCircuit,
   GraduationCap,
+  Copy,
+  UserCheck,
 } from 'lucide-react';
 import { mayKhachApi } from '../../../../tien-ich/may-khach-api';
 import { thongBao } from '../../../../tien-ich/thong-bao';
@@ -32,7 +34,6 @@ import { TabBaiTap } from './thanh-phan/tab-bai-tap';
 import { TabDiemDanh } from './thanh-phan/tab-diem-danh';
 import { TabKiemTra } from './thanh-phan/tab-kiem-tra';
 import { TabSoDiem } from './thanh-phan/tab-so-diem';
-import AnimatedBackground from '@/components/ui/animated-tabs';
 import {
   LopHocPhan,
   ThoiKhoaBieu,
@@ -165,7 +166,7 @@ export default function TrangChiTietLopHocPhan({ params }: { params: Promise<{ i
       setMoModalTkb(false);
       setThongBaoLoi(null);
       setThongBaoThanhCong('Thêm tiết học thành công');
-      thongBao.thanhCong('Thêm tiết học thành công!');
+      thongBao.thanhCong('Thêm tiết học thành công');
     },
     onError: (err: any) => {
       const msg = err.response?.data?.thongDiep || 'Lỗi khi thêm tiết học (trùng lịch)';
@@ -180,7 +181,7 @@ export default function TrangChiTietLopHocPhan({ params }: { params: Promise<{ i
       queryClient.invalidateQueries({ queryKey: ['buoi-hoc-lop', id] });
       const msg = res.data.duLieu?.thongBao || 'Đã sinh danh sách buổi học tự động';
       setThongBaoThanhCong(msg);
-      thongBao.thanhCong('Sinh lịch học thành công!', msg);
+      thongBao.thanhCong('Sinh lịch học thành công', msg);
     },
     onError: (err: any) => {
       const msg = err.response?.data?.thongDiep || 'Lỗi khi sinh buổi học';
@@ -199,7 +200,7 @@ export default function TrangChiTietLopHocPhan({ params }: { params: Promise<{ i
       setIdHocSinhChon('');
       setThongBaoLoi(null);
       setThongBaoThanhCong('Ghi danh sinh viên thành công');
-      thongBao.thanhCong('Ghi danh thành công!', 'Đã thêm sinh viên vào lớp học phần.');
+      thongBao.thanhCong('Ghi danh thành công', 'Đã thêm sinh viên vào lớp học phần.');
     },
     onError: (err: any) => {
       const msg = err.response?.data?.thongDiep || 'Lỗi khi ghi danh';
@@ -219,7 +220,7 @@ export default function TrangChiTietLopHocPhan({ params }: { params: Promise<{ i
       setThongBaoLoi(null);
       setThongBaoThanhCong('Ghi danh theo lớp hành chính thành công');
       thongBao.thanhCong(
-        'Ghi danh theo lớp thành công!',
+        'Ghi danh theo lớp thành công',
         'Toàn bộ sinh viên trong lớp sinh hoạt đã được thêm vào lớp học phần.',
       );
     },
@@ -266,25 +267,33 @@ export default function TrangChiTietLopHocPhan({ params }: { params: Promise<{ i
 
   const laGiaoVien = nguoiDungHienTai?.vaiTro === VaiTro.GIAO_VIEN;
 
+  const saoChepMaMoi = (ma: string) => {
+    navigator.clipboard?.writeText(ma);
+    thongBao.thanhCong('Đã sao chép mã mời', `Mã tham gia ${ma} đã được lưu vào bộ nhớ tạm.`);
+  };
+
   if (dangTaiLop) {
     return (
-      <div className="text-center py-20 text-muted">Đang tải thông tin lớp học phần...</div>
+      <div className="text-center py-20 text-[var(--muted)]">
+        Đang tải thông tin lớp học phần...
+      </div>
     );
   }
 
   if (loiLop || !lopHocPhan) {
     return (
       <div className="max-w-lg mx-auto py-20 text-center space-y-4">
-        <div className="w-16 h-16 bg-danger-soft text-danger rounded-full flex items-center justify-center mx-auto">
+        <div className="w-16 h-16 bg-[var(--danger-soft)] text-[var(--danger)] rounded-full flex items-center justify-center mx-auto">
           <AlertCircle className="w-8 h-8" />
         </div>
-        <h2 className="text-xl font-bold text-text">Không thể truy cập lớp học phần</h2>
-        <p className="text-sm text-muted">
-          Bạn không có quyền truy cập lớp học này hoặc lớp học không tồn tại. Vui lòng kiểm tra lại liên kết hoặc liên hệ giảng viên phụ trách.
+        <h2 className="text-xl font-bold text-[var(--text)]">Không thể truy cập lớp học phần</h2>
+        <p className="text-sm text-[var(--muted)]">
+          Bạn không có quyền truy cập lớp học này hoặc lớp học không tồn tại. Vui lòng kiểm tra lại
+          liên kết hoặc liên hệ giảng viên phụ trách.
         </p>
         <Link
           href="/lop-hoc-phan"
-          className="inline-flex items-center gap-2 px-4 py-2 bg-accent text-white rounded-lg text-sm font-medium hover:bg-accent"
+          className="inline-flex items-center gap-2 px-4 py-2 bg-[var(--accent)] text-white rounded-[var(--radius)] text-sm font-medium hover:bg-[var(--accent-hover)]"
         >
           <ArrowLeft className="w-4 h-4" /> Quay lại danh sách lớp
         </Link>
@@ -292,35 +301,60 @@ export default function TrangChiTietLopHocPhan({ params }: { params: Promise<{ i
     );
   }
 
+  const cacTab = [
+    { id: 'bang-tin', nhan: 'Bảng tin', icon: MessageSquare },
+    { id: 'tai-lieu', nhan: 'Tài liệu môn học', icon: BookOpen },
+    { id: 'bai-tap', nhan: 'Bài tập', icon: ClipboardCheck },
+    { id: 'kiem-tra', nhan: 'Luyện tập & Thi thử', icon: BrainCircuit },
+    { id: 'diem-danh', nhan: 'Điểm danh thông minh', icon: QrCode },
+    { id: 'so-diem', nhan: 'Kết quả học phần', icon: GraduationCap },
+    { id: 'thoi-khoa-bieu', nhan: 'Thời khóa biểu', icon: Clock },
+    {
+      id: 'hoc-sinh',
+      nhan: `Thành viên (${lopHocPhan._count?.danhSachGhiDanh || 0})`,
+      icon: Users,
+    },
+  ] as const;
+
   return (
-    <div className="space-y-6">
-      {/* Nút quay lại */}
-      <Link
-        href="/lop-hoc-phan"
-        className="inline-flex items-center gap-1.5 text-xs font-semibold text-muted hover:text-accent transition-colors"
-      >
-        <ArrowLeft className="w-4 h-4" /> Quay lại danh sách lớp học phần
-      </Link>
+    <div className="space-y-5">
+      {/* Breadcrumb quay lại */}
+      <div className="flex items-center gap-2 text-xs text-[var(--muted)]">
+        <Link
+          href="/lop-hoc-phan"
+          className="inline-flex items-center gap-1.5 font-semibold text-[var(--muted)] hover:text-[var(--accent)] transition-colors"
+        >
+          <ArrowLeft className="w-3.5 h-3.5" />
+          Danh sách lớp học phần
+        </Link>
+        <span>/</span>
+        <span className="font-mono font-semibold text-[var(--text)]">
+          {lopHocPhan.maLopHocPhan}
+        </span>
+      </div>
 
       {/* Thông báo */}
       {thongBaoLoi && (
-        <div className="p-3 bg-danger-soft text-danger text-sm rounded flex items-center justify-between">
+        <div className="p-3 bg-[var(--danger-soft)] text-[var(--danger)] text-sm rounded-[var(--radius)] flex items-center justify-between">
           <span className="flex items-center gap-2">
             <AlertCircle className="w-4 h-4 shrink-0" /> {thongBaoLoi}
           </span>
-          <button onClick={() => setThongBaoLoi(null)} className="text-xs font-bold underline">
+          <button
+            onClick={() => setThongBaoLoi(null)}
+            className="text-xs font-bold underline cursor-pointer"
+          >
             Đóng
           </button>
         </div>
       )}
       {thongBaoThanhCong && (
-        <div className="p-3 bg-accent-soft text-accent text-sm rounded flex items-center justify-between">
+        <div className="p-3 bg-[var(--accent-soft)] text-[var(--accent)] text-sm rounded-[var(--radius)] flex items-center justify-between">
           <span className="flex items-center gap-2">
             <CheckCircle2 className="w-4 h-4 shrink-0" /> {thongBaoThanhCong}
           </span>
           <button
             onClick={() => setThongBaoThanhCong(null)}
-            className="text-xs font-bold underline"
+            className="text-xs font-bold underline cursor-pointer"
           >
             Đóng
           </button>
@@ -328,181 +362,104 @@ export default function TrangChiTietLopHocPhan({ params }: { params: Promise<{ i
       )}
 
       {/* Banner thông tin lớp học */}
-      <div className="bg-[var(--surface)] text-[var(--text)] border border-[var(--border)] rounded-[4px] p-6 sm:p-7">
-        <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-5">
-          <div className="space-y-2.5">
-            <div className="flex flex-wrap items-center gap-2.5">
-              <span className="eyebrow">Lớp học phần</span>
-              <span className="px-2 py-0.5 bg-[var(--accent-soft)] text-[var(--accent)] border border-[var(--border)] rounded-[4px] text-[11px] font-mono font-bold tracking-wider uppercase">
-                {lopHocPhan.maLopHocPhan}
-              </span>
-              <span className="text-xs font-mono text-[var(--muted)]">
-                {lopHocPhan.monHoc?.tenMonHoc} ({lopHocPhan.monHoc?.soTinChi} tín chỉ)
-              </span>
-            </div>
-            <h1 className="text-[22px] sm:text-[24px] font-mono font-bold tracking-tight text-[var(--text)]">
-              {lopHocPhan.tenLopHocPhan}
-            </h1>
-            <div className="flex flex-wrap items-center gap-4 text-xs text-[var(--muted)]">
-              <span className="flex items-center gap-1.5">
-                <Calendar className="w-4 h-4 text-[var(--accent)]" strokeWidth={1.5} />
-                {lopHocPhan.hocKy?.tenHocKy} ({lopHocPhan.hocKy?.namHoc?.tenNamHoc})
-              </span>
-              <span className="flex items-center gap-1.5 font-mono">
-                <Users className="w-4 h-4 text-[var(--accent)]" strokeWidth={1.5} />
-                {lopHocPhan._count?.danhSachGhiDanh || 0} sinh viên đã ghi danh
-              </span>
-              {lopHocPhan.giaoVien && (
-                <span className="flex items-center gap-1.5">
-                  <span className="px-1.5 py-0.5 rounded-[4px] bg-[var(--accent-soft)] text-[var(--accent)] border border-[var(--border)] text-[10px] font-mono font-bold flex items-center justify-center">
-                    GV
-                  </span>
-                  <span className="text-[var(--text)] font-medium">{lopHocPhan.giaoVien.nguoiDung.hoTen}</span>
+      <div className="bg-[var(--surface)] text-[var(--text)] border border-[var(--border)] rounded-[var(--radius)] shadow-xs overflow-hidden">
+        <div className="h-[4px] w-full bg-[var(--accent)]" />
+        <div className="p-6">
+          <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-5">
+            <div className="space-y-2">
+              <div className="flex flex-wrap items-center gap-2.5">
+                <span className="px-2.5 py-0.5 bg-[var(--accent-soft)] text-[var(--accent)] border border-[var(--accent)] rounded-[var(--radius)] text-[11px] font-mono font-bold tracking-wider uppercase">
+                  {lopHocPhan.maLopHocPhan}
                 </span>
-              )}
-            </div>
-          </div>
+                <span className="text-xs font-mono text-[var(--muted)]">
+                  {lopHocPhan.monHoc?.tenMonHoc} • {lopHocPhan.monHoc?.soTinChi || 3} tín chỉ
+                </span>
+                <span className="inline-flex items-center gap-1.5 text-[11px] font-sans font-semibold bg-[var(--accent-soft)] text-[var(--accent)] px-2 py-0.5 rounded-[var(--radius)]">
+                  <span className="w-1.5 h-1.5 rounded-full bg-[var(--accent)]" />
+                  Đang học
+                </span>
+              </div>
 
-          <div className="flex flex-col sm:flex-row gap-3">
-            <Link
-              href={`/lop-hoc-phan/${id}/phong-hoc`}
-              className="inline-flex items-center justify-center gap-2 px-5 py-[11px] bg-[var(--accent)] hover:brightness-95 text-white font-semibold rounded-[4px] text-[13px] transition-all shadow-[0_2px_8px_-2px_color-mix(in_srgb,var(--accent)_30%,transparent)]"
-            >
-              <Video className="w-[18px] h-[18px]" strokeWidth={1.5} />
-              Vào phòng học trực tuyến
-            </Link>
+              <h1 className="text-[22px] sm:text-[24px] font-sans font-bold tracking-tight text-[var(--text)]">
+                {lopHocPhan.tenLopHocPhan}
+              </h1>
+
+              <div className="flex flex-wrap items-center gap-4 text-[12.5px] text-[var(--muted)] pt-0.5">
+                {lopHocPhan.giaoVien && (
+                  <span className="flex items-center gap-1.5">
+                    <UserCheck className="w-4 h-4 text-[var(--accent)]" strokeWidth={1.75} />
+                    <span>Giảng viên:</span>
+                    <strong className="text-[var(--text)] font-semibold">
+                      {lopHocPhan.giaoVien.nguoiDung.hoTen}
+                    </strong>
+                  </span>
+                )}
+                <span className="flex items-center gap-1.5">
+                  <Calendar className="w-4 h-4 text-[var(--accent)]" strokeWidth={1.75} />
+                  {lopHocPhan.hocKy?.tenHocKy} ({lopHocPhan.hocKy?.namHoc?.tenNamHoc})
+                </span>
+                <span className="flex items-center gap-1.5 font-mono">
+                  <Users className="w-4 h-4 text-[var(--accent)]" strokeWidth={1.75} />
+                  {lopHocPhan._count?.danhSachGhiDanh || 0} sinh viên
+                </span>
+              </div>
+            </div>
+
+            <div className="flex flex-wrap items-center gap-3">
+              {(laAdminHoacGiaoVu || laGiaoVienLop) && lopHocPhan.maThamGia && (
+                <button
+                  type="button"
+                  onClick={() => saoChepMaMoi(lopHocPhan.maThamGia!)}
+                  title="Nhấn để sao chép mã mời"
+                  className="px-3.5 py-2 rounded-[var(--radius)] border border-dashed border-[var(--border)] bg-[var(--bg)] hover:border-[var(--accent)] flex items-center gap-2.5 transition-colors cursor-pointer"
+                >
+                  <div className="text-left">
+                    <p className="text-[10px] font-mono uppercase tracking-wider text-[var(--muted)]">
+                      Mã mời lớp
+                    </p>
+                    <p className="text-sm font-mono font-bold text-[var(--accent)] tracking-wider">
+                      {lopHocPhan.maThamGia}
+                    </p>
+                  </div>
+                  <Copy className="w-4 h-4 text-[var(--muted)]" strokeWidth={1.75} />
+                </button>
+              )}
+
+              <Link
+                href={`/lop-hoc-phan/${id}/phong-hoc`}
+                className="inline-flex items-center justify-center gap-2 px-4 py-2.5 bg-[var(--accent)] hover:bg-[var(--accent-hover)] text-white font-semibold rounded-[var(--radius)] text-[13px] transition-colors"
+              >
+                <Video className="w-4 h-4" strokeWidth={1.75} />
+                Vào phòng học trực tuyến
+              </Link>
+            </div>
           </div>
         </div>
-      </div>
 
-      {/* Tabs Điều Hướng */}
-      <div className="flex border-b border-border overflow-x-auto scrollbar-none gap-1 py-1">
-        <AnimatedBackground
-          defaultValue={tabHienTai}
-          onValueChange={(idTab) => idTab && setTabHienTai(idTab as typeof tabHienTai)}
-          className="rounded bg-primary/10 dark:bg-primary/20"
-          transition={{ type: 'spring', bounce: 0.2, duration: 0.3 }}
-        >
-          <button
-            data-id="bang-tin"
-            data-tab="bang-tin"
-            type="button"
-            onClick={() => setTabHienTai('bang-tin')}
-            className={`flex items-center gap-2 px-4 py-2.5 text-sm font-medium border-b-2 whitespace-nowrap transition-colors cursor-pointer ${
-              tabHienTai === 'bang-tin'
-                ? 'border-primary text-primary'
-                : 'border-transparent text-muted-foreground hover:text-foreground'
-            }`}
-          >
-            <MessageSquare className="w-4 h-4" />
-            Bảng tin
-          </button>
-
-          <button
-            data-id="diem-danh"
-            data-tab="diem-danh"
-            type="button"
-            onClick={() => setTabHienTai('diem-danh')}
-            className={`flex items-center gap-2 px-4 py-2.5 text-sm font-medium border-b-2 whitespace-nowrap transition-colors cursor-pointer ${
-              tabHienTai === 'diem-danh'
-                ? 'border-primary text-primary'
-                : 'border-transparent text-muted-foreground hover:text-foreground'
-            }`}
-          >
-            <QrCode className="w-4 h-4" />
-            Điểm danh thông minh
-          </button>
-
-          <button
-            data-id="kiem-tra"
-            data-tab="kiem-tra"
-            type="button"
-            onClick={() => setTabHienTai('kiem-tra')}
-            className={`flex items-center gap-2 px-4 py-2.5 text-sm font-medium border-b-2 whitespace-nowrap transition-colors cursor-pointer ${
-              tabHienTai === 'kiem-tra'
-                ? 'border-primary text-primary'
-                : 'border-transparent text-muted-foreground hover:text-foreground'
-            }`}
-          >
-            <BrainCircuit className="w-4 h-4" />
-            Luyện tập & Thi thử
-          </button>
-
-          <button
-            data-id="bai-tap"
-            data-tab="bai-tap"
-            type="button"
-            onClick={() => setTabHienTai('bai-tap')}
-            className={`flex items-center gap-2 px-4 py-2.5 text-sm font-medium border-b-2 whitespace-nowrap transition-colors cursor-pointer ${
-              tabHienTai === 'bai-tap'
-                ? 'border-primary text-primary'
-                : 'border-transparent text-muted-foreground hover:text-foreground'
-            }`}
-          >
-            <ClipboardCheck className="w-4 h-4" />
-            Bài tập
-          </button>
-
-          <button
-            data-id="so-diem"
-            data-tab="so-diem"
-            type="button"
-            onClick={() => setTabHienTai('so-diem')}
-            className={`flex items-center gap-2 px-4 py-2.5 text-sm font-medium border-b-2 whitespace-nowrap transition-colors cursor-pointer ${
-              tabHienTai === 'so-diem'
-                ? 'border-primary text-primary'
-                : 'border-transparent text-muted-foreground hover:text-foreground'
-            }`}
-          >
-            <GraduationCap className="w-4 h-4" />
-            Kết quả học phần
-          </button>
-
-          <button
-            data-id="tai-lieu"
-            data-tab="tai-lieu"
-            type="button"
-            onClick={() => setTabHienTai('tai-lieu')}
-            className={`flex items-center gap-2 px-4 py-2.5 text-sm font-medium border-b-2 whitespace-nowrap transition-colors cursor-pointer ${
-              tabHienTai === 'tai-lieu'
-                ? 'border-primary text-primary'
-                : 'border-transparent text-muted-foreground hover:text-foreground'
-            }`}
-          >
-            <BookOpen className="w-4 h-4" />
-            Tài liệu môn học
-          </button>
-
-          <button
-            data-id="thoi-khoa-bieu"
-            data-tab="thoi-khoa-bieu"
-            type="button"
-            onClick={() => setTabHienTai('thoi-khoa-bieu')}
-            className={`flex items-center gap-2 px-4 py-2.5 text-sm font-medium border-b-2 whitespace-nowrap transition-colors cursor-pointer ${
-              tabHienTai === 'thoi-khoa-bieu'
-                ? 'border-primary text-primary'
-                : 'border-transparent text-muted-foreground hover:text-foreground'
-            }`}
-          >
-            <Clock className="w-4 h-4" />
-            Thời khóa biểu
-          </button>
-
-          <button
-            data-id="hoc-sinh"
-            data-tab="hoc-sinh"
-            type="button"
-            onClick={() => setTabHienTai('hoc-sinh')}
-            className={`flex items-center gap-2 px-4 py-2.5 text-sm font-medium border-b-2 whitespace-nowrap transition-colors cursor-pointer ${
-              tabHienTai === 'hoc-sinh'
-                ? 'border-primary text-primary'
-                : 'border-transparent text-muted-foreground hover:text-foreground'
-            }`}
-          >
-            <Users className="w-4 h-4" />
-            Thành viên ({lopHocPhan._count?.danhSachGhiDanh || 0})
-          </button>
-        </AnimatedBackground>
+        {/* Thanh Tabs Điều Hướng gạch chân bên trong thẻ Header */}
+        <div className="px-6 border-t border-[var(--border)] bg-[var(--bg)] flex overflow-x-auto scrollbar-none gap-1">
+          {cacTab.map((tab) => {
+            const Icon = tab.icon;
+            const dangChon = tabHienTai === tab.id;
+            return (
+              <button
+                key={tab.id}
+                data-id={tab.id}
+                data-tab={tab.id}
+                type="button"
+                onClick={() => setTabHienTai(tab.id)}
+                className={`flex items-center gap-2 px-3.5 py-3 text-[13px] font-semibold border-b-2 whitespace-nowrap transition-colors cursor-pointer ${
+                  dangChon
+                    ? 'border-[var(--accent)] text-[var(--accent)] bg-[var(--surface)]'
+                    : 'border-transparent text-[var(--muted)] hover:text-[var(--text)]'
+                }`}
+              >
+                <Icon className="w-4 h-4" strokeWidth={1.75} />
+                <span>{tab.nhan}</span>
+              </button>
+            );
+          })}
+        </div>
       </div>
 
       {/* TAB 1: BẢNG TIN */}
@@ -511,6 +468,9 @@ export default function TrangChiTietLopHocPhan({ params }: { params: Promise<{ i
           idLopHocPhan={id}
           nguoiDung={nguoiDungHienTai}
           laGiaoVienLop={laGiaoVienLop}
+          danhSachTkb={danhSachTkb || []}
+          danhSachBuoiHoc={danhSachBuoiHoc || []}
+          onChuyenTab={setTabHienTai}
         />
       )}
 
@@ -560,15 +520,15 @@ export default function TrangChiTietLopHocPhan({ params }: { params: Promise<{ i
         />
       )}
 
-      {/* TAB 4: THỜI KHÓA BIỂU & BUỔI HỌC */}
+      {/* TAB 7: THỜI KHÓA BIỂU & BUỔI HỌC */}
       {tabHienTai === 'thoi-khoa-bieu' && (
         <div className="space-y-6">
           {/* Lịch tuần định kỳ */}
-          <div className="bg-surface border border-border rounded p-5 shadow-sm space-y-4">
-            <div className="flex items-center justify-between">
+          <div className="bg-[var(--surface)] border border-[var(--border)] rounded-[var(--radius)] p-5 shadow-xs space-y-4">
+            <div className="flex flex-wrap items-center justify-between gap-3">
               <div>
-                <h3 className="font-bold text-text text-base">Lịch học tuần định kỳ</h3>
-                <p className="text-xs text-muted">
+                <h3 className="font-bold text-[var(--text)] text-[15px]">Lịch học tuần định kỳ</h3>
+                <p className="text-xs text-[var(--muted)]">
                   Các tiết học cố định lặp lại theo tuần trong học kỳ
                 </p>
               </div>
@@ -576,22 +536,24 @@ export default function TrangChiTietLopHocPhan({ params }: { params: Promise<{ i
               {(laAdminHoacGiaoVu || laGiaoVien) && (
                 <div className="flex items-center gap-2">
                   <button
+                    type="button"
                     onClick={() => {
                       setThongBaoLoi(null);
                       sinhBuoiHocMutation.mutate();
                     }}
                     disabled={sinhBuoiHocMutation.isPending}
-                    className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-accent-soft hover:bg-accent-soft text-accent text-xs font-semibold rounded-lg transition-colors border border-accent"
+                    className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-[var(--accent-soft)] text-[var(--accent)] text-xs font-semibold rounded-[var(--radius)] transition-colors border border-[var(--accent)] cursor-pointer"
                   >
                     <CalendarPlus className="w-3.5 h-3.5" />
                     {sinhBuoiHocMutation.isPending ? 'Đang sinh...' : 'Tự động sinh buổi học'}
                   </button>
                   <button
+                    type="button"
                     onClick={() => {
                       setThongBaoLoi(null);
                       setMoModalTkb(true);
                     }}
-                    className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-accent hover:bg-accent text-white text-xs font-semibold rounded-lg transition-colors shadow-sm"
+                    className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-[var(--accent)] hover:bg-[var(--accent-hover)] text-white text-xs font-semibold rounded-[var(--radius)] transition-colors cursor-pointer"
                   >
                     <Plus className="w-3.5 h-3.5" />
                     Thêm tiết học
@@ -602,32 +564,33 @@ export default function TrangChiTietLopHocPhan({ params }: { params: Promise<{ i
 
             <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
               {dangTaiTkb ? (
-                <div className="col-span-3 text-center py-6 text-muted">
+                <div className="col-span-3 text-center py-6 text-[var(--muted)]">
                   Đang tải lịch học...
                 </div>
               ) : danhSachTkb && danhSachTkb.length > 0 ? (
                 danhSachTkb.map((tkb) => (
                   <div
                     key={tkb.id}
-                    className="p-4 bg-bg border border-border rounded flex items-center justify-between"
+                    className="p-4 bg-[var(--bg)] border border-[var(--border)] rounded-[var(--radius)] flex items-center justify-between"
                   >
                     <div className="space-y-1">
-                      <span className="px-2 py-0.5 bg-accent-soft text-accent font-bold text-xs rounded border border-transparent ">
+                      <span className="px-2 py-0.5 bg-[var(--accent-soft)] text-[var(--accent)] font-mono font-bold text-xs rounded-[var(--radius)]">
                         Thứ {tkb.thuTrongTuan === 8 ? 'CN' : tkb.thuTrongTuan}
                       </span>
-                      <p className="text-sm font-semibold text-text ">
+                      <p className="text-sm font-semibold text-[var(--text)] pt-1">
                         Tiết {tkb.tietBatDau} - Tiết {tkb.tietBatDau + tkb.soTiet - 1} ({tkb.soTiet}{' '}
                         tiết)
                       </p>
-                      <p className="text-xs text-muted ">
+                      <p className="text-xs text-[var(--muted)]">
                         Phòng: {tkb.phongHoc || 'Trực tuyến'}
                       </p>
                     </div>
 
                     {(laAdminHoacGiaoVu || laGiaoVien) && (
                       <button
+                        type="button"
                         onClick={() => xoaTkbMutation.mutate(tkb.id)}
-                        className="text-muted hover:text-danger p-1 rounded-md transition-colors"
+                        className="text-[var(--muted)] hover:text-[var(--danger)] p-1 rounded-[var(--radius)] transition-colors cursor-pointer"
                       >
                         <Trash2 className="w-4 h-4" />
                       </button>
@@ -635,7 +598,7 @@ export default function TrangChiTietLopHocPhan({ params }: { params: Promise<{ i
                   </div>
                 ))
               ) : (
-                <div className="col-span-3 text-center py-6 text-muted italic">
+                <div className="col-span-3 text-center py-6 text-[var(--muted)]">
                   Chưa có lịch học tuần nào được thiết lập
                 </div>
               )}
@@ -643,28 +606,28 @@ export default function TrangChiTietLopHocPhan({ params }: { params: Promise<{ i
           </div>
 
           {/* Danh sách các buổi học cụ thể */}
-          <div className="bg-surface border border-border rounded p-5 shadow-sm space-y-4">
-            <h3 className="font-bold text-text text-base">Danh sách Buổi học cụ thể</h3>
-            <div className="divide-y divide-border ">
+          <div className="bg-[var(--surface)] border border-[var(--border)] rounded-[var(--radius)] p-5 shadow-xs space-y-4">
+            <h3 className="font-bold text-[var(--text)] text-[15px]">Danh sách Buổi học cụ thể</h3>
+            <div className="divide-y divide-[var(--border)]">
               {dangTaiBuoiHoc ? (
-                <div className="text-center py-6 text-muted">Đang tải buổi học...</div>
+                <div className="text-center py-6 text-[var(--muted)]">Đang tải buổi học...</div>
               ) : danhSachBuoiHoc && danhSachBuoiHoc.length > 0 ? (
                 danhSachBuoiHoc.map((buoi) => (
                   <div key={buoi.id} className="py-3 flex items-center justify-between">
                     <div>
-                      <h4 className="text-sm font-semibold text-text ">{buoi.chuDe}</h4>
-                      <p className="text-xs text-muted mt-0.5">
+                      <h4 className="text-sm font-semibold text-[var(--text)]">{buoi.chuDe}</h4>
+                      <p className="text-xs font-mono text-[var(--muted)] mt-0.5">
                         {new Date(buoi.thoiGianBD).toLocaleString('vi-VN')} -{' '}
                         {new Date(buoi.thoiGianKT).toLocaleTimeString('vi-VN')}
                       </p>
                     </div>
-                    <span className="px-2.5 py-1 bg-active-bg text-muted rounded-full text-xs font-medium border border-transparent ">
+                    <span className="px-2.5 py-1 bg-[var(--bg)] text-[var(--muted)] rounded-[var(--radius)] text-xs font-medium border border-[var(--border)]">
                       {buoi.trangThai === 'CHUA_BAT_DAU' ? 'Chưa bắt đầu' : buoi.trangThai}
                     </span>
                   </div>
                 ))
               ) : (
-                <div className="text-center py-8 text-muted italic">
+                <div className="text-center py-8 text-[var(--muted)]">
                   Chưa có buổi học nào. Nhấn &quot;Tự động sinh buổi học&quot; để sinh lịch học theo
                   thời khóa biểu.
                 </div>
@@ -674,27 +637,29 @@ export default function TrangChiTietLopHocPhan({ params }: { params: Promise<{ i
         </div>
       )}
 
-      {/* TAB 2: DANH SÁCH HỌC SINH GHI DANH */}
+      {/* TAB 8: DANH SÁCH SINH VIÊN GHI DANH */}
       {tabHienTai === 'hoc-sinh' && (
         <div className="space-y-4">
           {laAdminHoacGiaoVu && (
             <div className="flex justify-end gap-3">
               <button
+                type="button"
                 onClick={() => {
                   setThongBaoLoi(null);
                   setMoModalImportLop(true);
                 }}
-                className="inline-flex items-center gap-2 px-3.5 py-2 border border-border bg-surface hover:bg-bg text-text text-xs font-semibold rounded-lg transition-colors shadow-sm"
+                className="inline-flex items-center gap-2 px-3.5 py-2 border border-[var(--border)] bg-[var(--surface)] hover:bg-[var(--bg)] text-[var(--text)] text-xs font-semibold rounded-[var(--radius)] transition-colors cursor-pointer"
               >
-                <School className="w-4 h-4 text-accent" />
+                <School className="w-4 h-4 text-[var(--accent)]" />
                 Ghi danh theo Lớp hành chính
               </button>
               <button
+                type="button"
                 onClick={() => {
                   setThongBaoLoi(null);
                   setMoModalGhiDanh(true);
                 }}
-                className="inline-flex items-center gap-2 px-3.5 py-2 bg-accent hover:bg-accent text-white text-xs font-semibold rounded-lg transition-colors shadow-sm"
+                className="inline-flex items-center gap-2 px-3.5 py-2 bg-[var(--accent)] hover:bg-[var(--accent-hover)] text-white text-xs font-semibold rounded-[var(--radius)] transition-colors cursor-pointer"
               >
                 <UserPlus className="w-4 h-4" />
                 Thêm Sinh viên
@@ -702,9 +667,9 @@ export default function TrangChiTietLopHocPhan({ params }: { params: Promise<{ i
             </div>
           )}
 
-          <div className="bg-surface border border-border rounded overflow-hidden shadow-sm">
-            <table className="w-full text-left text-sm text-muted ">
-              <thead className="bg-bg border-b border-border text-text font-semibold">
+          <div className="bg-[var(--surface)] border border-[var(--border)] rounded-[var(--radius)] overflow-hidden shadow-xs">
+            <table className="w-full text-left text-sm text-[var(--muted)]">
+              <thead className="bg-[var(--bg)] border-b border-[var(--border)] text-[var(--text)] font-semibold text-xs font-mono uppercase">
                 <tr>
                   <th className="py-3 px-4">Mã sinh viên</th>
                   <th className="py-3 px-4">Họ và tên</th>
@@ -713,42 +678,43 @@ export default function TrangChiTietLopHocPhan({ params }: { params: Promise<{ i
                   {laAdminHoacGiaoVu && <th className="py-3 px-4 text-right">Thao tác</th>}
                 </tr>
               </thead>
-              <tbody className="divide-y divide-border ">
+              <tbody className="divide-y divide-[var(--border)]">
                 {dangTaiGhiDanh ? (
                   <tr>
-                    <td colSpan={5} className="py-10 text-center text-muted">
+                    <td colSpan={5} className="py-10 text-center text-[var(--muted)]">
                       Đang tải danh sách sinh viên...
                     </td>
                   </tr>
                 ) : danhSachGhiDanh && danhSachGhiDanh.length > 0 ? (
                   danhSachGhiDanh.map((gd: any) => (
-                    <tr key={gd.id} className="hover:bg-bg transition-colors">
-                      <td className="py-3 px-4 font-mono font-semibold text-accent ">
+                    <tr key={gd.id} className="hover:bg-[var(--bg)] transition-colors">
+                      <td className="py-3 px-4 font-mono font-semibold text-[var(--accent)]">
                         {gd.hocSinh?.maHocSinh}
                       </td>
                       <td className="py-3 px-4">
-                        <p className="font-semibold text-text ">
+                        <p className="font-semibold text-[var(--text)]">
                           {gd.hocSinh?.nguoiDung.hoTen}
                         </p>
-                        <p className="text-xs text-muted ">{gd.hocSinh?.nguoiDung.email}</p>
+                        <p className="text-xs text-[var(--muted)]">{gd.hocSinh?.nguoiDung.email}</p>
                       </td>
                       <td className="py-3 px-4">
                         {gd.hocSinh?.lopHanhChinh ? (
-                          <span className="px-2 py-0.5 bg-active-bg text-text font-medium text-xs rounded border border-transparent ">
+                          <span className="px-2 py-0.5 bg-[var(--bg)] text-[var(--text)] font-mono text-xs rounded-[var(--radius)] border border-[var(--border)]">
                             {gd.hocSinh.lopHanhChinh.tenLop}
                           </span>
                         ) : (
-                          <span className="text-xs text-muted italic">Chưa xếp lớp</span>
+                          <span className="text-xs text-[var(--muted)]">Chưa xếp lớp</span>
                         )}
                       </td>
-                      <td className="py-3 px-4 text-xs text-muted ">
+                      <td className="py-3 px-4 text-xs font-mono text-[var(--muted)]">
                         {new Date(gd.ngayGhiDanh).toLocaleDateString('vi-VN')}
                       </td>
                       {laAdminHoacGiaoVu && (
                         <td className="py-3 px-4 text-right">
                           <button
+                            type="button"
                             onClick={() => xoaGhiDanhMutation.mutate(gd.hocSinh.id)}
-                            className="text-xs text-danger hover:text-danger font-medium px-2 py-1 hover:bg-danger-soft rounded"
+                            className="text-xs text-[var(--danger)] font-semibold px-2 py-1 hover:bg-[var(--danger-soft)] rounded-[var(--radius)] cursor-pointer"
                           >
                             Xóa khỏi lớp
                           </button>
@@ -758,7 +724,7 @@ export default function TrangChiTietLopHocPhan({ params }: { params: Promise<{ i
                   ))
                 ) : (
                   <tr>
-                    <td colSpan={5} className="py-10 text-center text-muted">
+                    <td colSpan={5} className="py-10 text-center text-[var(--muted)]">
                       Chưa có sinh viên nào được ghi danh vào lớp học phần này
                     </td>
                   </tr>
@@ -780,7 +746,7 @@ export default function TrangChiTietLopHocPhan({ params }: { params: Promise<{ i
         <div className="space-y-4">
           <div className="space-y-3">
             <div>
-              <label className="block text-xs font-medium text-text mb-1">
+              <label className="block text-xs font-medium text-[var(--text)] mb-1">
                 Thứ trong tuần
               </label>
               <select
@@ -788,7 +754,7 @@ export default function TrangChiTietLopHocPhan({ params }: { params: Promise<{ i
                 onChange={(e) =>
                   setFormTkb({ ...formTkb, thuTrongTuan: parseInt(e.target.value) || 2 })
                 }
-                className="w-full px-3 py-2 border border-border rounded-lg text-sm bg-surface focus:ring-2 focus:ring-accent"
+                className="w-full px-3 py-2 border border-[var(--border)] rounded-[var(--radius)] text-sm bg-[var(--surface)] focus:border-[var(--accent)] focus:outline-none"
               >
                 <option value={2}>Thứ Hai</option>
                 <option value={3}>Thứ Ba</option>
@@ -802,7 +768,7 @@ export default function TrangChiTietLopHocPhan({ params }: { params: Promise<{ i
 
             <div className="grid grid-cols-2 gap-3">
               <div>
-                <label className="block text-xs font-medium text-text mb-1">
+                <label className="block text-xs font-medium text-[var(--text)] mb-1">
                   Tiết bắt đầu
                 </label>
                 <input
@@ -813,11 +779,11 @@ export default function TrangChiTietLopHocPhan({ params }: { params: Promise<{ i
                   onChange={(e) =>
                     setFormTkb({ ...formTkb, tietBatDau: parseInt(e.target.value) || 1 })
                   }
-                  className="w-full px-3 py-2 border border-border rounded-lg text-sm focus:ring-2 focus:ring-accent"
+                  className="w-full px-3 py-2 border border-[var(--border)] bg-[var(--bg)] rounded-[var(--radius)] text-sm focus:border-[var(--accent)] focus:outline-none"
                 />
               </div>
               <div>
-                <label className="block text-xs font-medium text-text mb-1">Số tiết</label>
+                <label className="block text-xs font-medium text-[var(--text)] mb-1">Số tiết</label>
                 <input
                   type="number"
                   min={1}
@@ -826,28 +792,28 @@ export default function TrangChiTietLopHocPhan({ params }: { params: Promise<{ i
                   onChange={(e) =>
                     setFormTkb({ ...formTkb, soTiet: parseInt(e.target.value) || 1 })
                   }
-                  className="w-full px-3 py-2 border border-border rounded-lg text-sm focus:ring-2 focus:ring-accent"
+                  className="w-full px-3 py-2 border border-[var(--border)] bg-[var(--bg)] rounded-[var(--radius)] text-sm focus:border-[var(--accent)] focus:outline-none"
                 />
               </div>
             </div>
 
             <div>
-              <label className="block text-xs font-medium text-text mb-1">Phòng học</label>
+              <label className="block text-xs font-medium text-[var(--text)] mb-1">Phòng học</label>
               <input
                 type="text"
                 placeholder="VD: P102, Lab 3, Trực tuyến"
                 value={formTkb.phongHoc || ''}
                 onChange={(e) => setFormTkb({ ...formTkb, phongHoc: e.target.value })}
-                className="w-full px-3 py-2 border border-border rounded-lg text-sm focus:ring-2 focus:ring-accent"
+                className="w-full px-3 py-2 border border-[var(--border)] bg-[var(--bg)] rounded-[var(--radius)] text-sm focus:border-[var(--accent)] focus:outline-none"
               />
             </div>
           </div>
 
-          <div className="flex justify-end gap-3 pt-3 border-t border-border">
+          <div className="flex justify-end gap-3 pt-3 border-t border-[var(--border)]">
             <button
               type="button"
               onClick={() => setMoModalTkb(false)}
-              className="px-4 py-2 border border-border text-text rounded-lg text-sm hover:bg-bg cursor-pointer"
+              className="px-4 py-2 border border-[var(--border)] text-[var(--text)] rounded-[var(--radius)] text-xs font-semibold hover:bg-[var(--bg)] cursor-pointer"
             >
               Hủy
             </button>
@@ -855,7 +821,7 @@ export default function TrangChiTietLopHocPhan({ params }: { params: Promise<{ i
               type="button"
               disabled={taoTkbMutation.isPending}
               onClick={() => taoTkbMutation.mutate(formTkb)}
-              className="px-4 py-2 bg-accent hover:bg-accent text-white rounded-lg text-sm font-semibold disabled:opacity-50 cursor-pointer"
+              className="px-4 py-2 bg-[var(--accent)] hover:bg-[var(--accent-hover)] text-white rounded-[var(--radius)] text-xs font-semibold disabled:opacity-50 cursor-pointer"
             >
               {taoTkbMutation.isPending ? 'Đang lưu...' : 'Thêm tiết học'}
             </button>
@@ -873,11 +839,13 @@ export default function TrangChiTietLopHocPhan({ params }: { params: Promise<{ i
       >
         <div className="space-y-4">
           <div>
-            <label className="block text-xs font-medium text-text mb-1">Chọn sinh viên</label>
+            <label className="block text-xs font-medium text-[var(--text)] mb-1">
+              Chọn sinh viên
+            </label>
             <select
               value={idHocSinhChon}
               onChange={(e) => setIdHocSinhChon(e.target.value)}
-              className="w-full px-3 py-2 border border-border rounded-lg text-sm bg-surface focus:ring-2 focus:ring-accent"
+              className="w-full px-3 py-2 border border-[var(--border)] rounded-[var(--radius)] text-sm bg-[var(--surface)] focus:border-[var(--accent)] focus:outline-none"
             >
               <option value="">-- Chọn sinh viên từ danh sách --</option>
               {tatCaHocSinh?.map((hs: any) => (
@@ -887,11 +855,11 @@ export default function TrangChiTietLopHocPhan({ params }: { params: Promise<{ i
               ))}
             </select>
           </div>
-          <div className="flex justify-end gap-3 pt-3 border-t border-border">
+          <div className="flex justify-end gap-3 pt-3 border-t border-[var(--border)]">
             <button
               type="button"
               onClick={() => setMoModalGhiDanh(false)}
-              className="px-4 py-2 border border-border text-text rounded-lg text-sm hover:bg-bg cursor-pointer"
+              className="px-4 py-2 border border-[var(--border)] text-[var(--text)] rounded-[var(--radius)] text-xs font-semibold hover:bg-[var(--bg)] cursor-pointer"
             >
               Hủy
             </button>
@@ -899,7 +867,7 @@ export default function TrangChiTietLopHocPhan({ params }: { params: Promise<{ i
               type="button"
               disabled={!idHocSinhChon || ghiDanhMutation.isPending}
               onClick={() => ghiDanhMutation.mutate(idHocSinhChon)}
-              className="px-4 py-2 bg-accent hover:bg-accent text-white rounded-lg text-sm font-semibold disabled:opacity-50 cursor-pointer"
+              className="px-4 py-2 bg-[var(--accent)] hover:bg-[var(--accent-hover)] text-white rounded-[var(--radius)] text-xs font-semibold disabled:opacity-50 cursor-pointer"
             >
               {ghiDanhMutation.isPending ? 'Đang ghi danh...' : 'Ghi danh'}
             </button>
@@ -917,13 +885,13 @@ export default function TrangChiTietLopHocPhan({ params }: { params: Promise<{ i
       >
         <div className="space-y-4">
           <div>
-            <label className="block text-xs font-medium text-text mb-1">
+            <label className="block text-xs font-medium text-[var(--text)] mb-1">
               Chọn lớp hành chính
             </label>
             <select
               value={idLopHanhChinhChon}
               onChange={(e) => setIdLopHanhChinhChon(e.target.value)}
-              className="w-full px-3 py-2 border border-border rounded-lg text-sm bg-surface focus:ring-2 focus:ring-accent"
+              className="w-full px-3 py-2 border border-[var(--border)] rounded-[var(--radius)] text-sm bg-[var(--surface)] focus:border-[var(--accent)] focus:outline-none"
             >
               <option value="">-- Chọn lớp hành chính --</option>
               {danhSachLopHanhChinh?.map((lop: any) => (
@@ -933,11 +901,11 @@ export default function TrangChiTietLopHocPhan({ params }: { params: Promise<{ i
               ))}
             </select>
           </div>
-          <div className="flex justify-end gap-3 pt-3 border-t border-border">
+          <div className="flex justify-end gap-3 pt-3 border-t border-[var(--border)]">
             <button
               type="button"
               onClick={() => setMoModalImportLop(false)}
-              className="px-4 py-2 border border-border text-text rounded-lg text-sm hover:bg-bg cursor-pointer"
+              className="px-4 py-2 border border-[var(--border)] text-[var(--text)] rounded-[var(--radius)] text-xs font-semibold hover:bg-[var(--bg)] cursor-pointer"
             >
               Hủy
             </button>
@@ -945,7 +913,7 @@ export default function TrangChiTietLopHocPhan({ params }: { params: Promise<{ i
               type="button"
               disabled={!idLopHanhChinhChon || ghiDanhTheoLopMutation.isPending}
               onClick={() => ghiDanhTheoLopMutation.mutate(idLopHanhChinhChon)}
-              className="px-4 py-2 bg-accent hover:bg-accent text-white rounded-lg text-sm font-semibold disabled:opacity-50 cursor-pointer"
+              className="px-4 py-2 bg-[var(--accent)] hover:bg-[var(--accent-hover)] text-white rounded-[var(--radius)] text-xs font-semibold disabled:opacity-50 cursor-pointer"
             >
               {ghiDanhTheoLopMutation.isPending ? 'Đang import...' : 'Tiến hành ghi danh'}
             </button>

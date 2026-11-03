@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef, useMemo } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import {
   Send,
@@ -20,6 +20,8 @@ import {
   SlidersHorizontal,
   Activity,
   Clock,
+  Search,
+  Quote,
 } from 'lucide-react';
 import {
   VaiTro,
@@ -37,24 +39,25 @@ import { thongBao } from '@/tien-ich/thong-bao';
 import { HopThoai } from '@/thanh-phan/hop-thoai';
 import { AnhDaiDien } from '@/thanh-phan/anh-dai-dien';
 import { DinhDangMarkdown } from '@/thanh-phan/dinh-dang-markdown';
-import { AnimatedBackground } from '@/components/ui/animated-tabs';
 
 export default function TrangTroLyHocTap() {
   const queryClient = useQueryClient();
 
   const [idPhienChon, setIdPhienChon] = useState<string | null>(null);
+  const [tuKhoaPhien, setTuKhoaPhien] = useState('');
   const [cauHoiNhap, setCauHoiNhap] = useState('');
   const [idLopLoc, setIdLopLoc] = useState<string>('');
   const [mucDoGiaiThich, setMucDoGiaiThich] = useState<MucDoGiaiThich>(
     MucDoGiaiThich.TRUNG_BINH,
   );
   const [doanXemChiTiet, setDoanXemChiTiet] = useState<NguonTrichDan | null>(null);
+  const [idTinNhanTrichDanChon, setIdTinNhanTrichDanChon] = useState<string | null>(null);
 
   // Lưu gợi ý câu hỏi tiếp theo và bài tập luyện tập của lượt hỏi đáp gần nhất
   const [goiYCauHoiTiepTheo, setGoiYCauHoiTiepTheo] = useState<string[]>([]);
   const [goiYBaiTapLuyenTap, setGoiYBaiTapLuyenTap] = useState<string[]>([]);
 
-  // Modal bản nháp AI (Giáo viên - Nhóm 3)
+  // Modal bản nháp AI (Giảng viên - Nhóm 3)
   const [moModalBanNhap, setMoModalBanNhap] = useState(false);
   const [cheDoTaoBanNhap, setCheDoTaoBanNhap] = useState<'TU_TAI_LIEU' | 'THU_CONG'>('TU_TAI_LIEU');
   const [idLopBanNhap, setIdLopBanNhap] = useState('');
@@ -149,6 +152,12 @@ export default function TrangTroLyHocTap() {
     }
   }, [danhSachPhien, idPhienChon]);
 
+  const danhSachPhienDaLoc = useMemo(() => {
+    const tk = tuKhoaPhien.trim().toLowerCase();
+    if (!tk) return danhSachPhien;
+    return danhSachPhien.filter((p) => (p.tieuDe || '').toLowerCase().includes(tk));
+  }, [danhSachPhien, tuKhoaPhien]);
+
   // 4. Lấy chi tiết tin nhắn của phiên đang chọn
   const { data: chiTietPhien, isLoading: dangTaiTinNhan } = useQuery<PhienTroLy>({
     queryKey: ['chi-tiet-phien-tro-ly', idPhienChon],
@@ -163,6 +172,28 @@ export default function TrangTroLyHocTap() {
   useEffect(() => {
     cuonCuoiTrangRef.current?.scrollIntoView({ behavior: 'smooth' });
   }, [chiTietPhien?.cacTinNhan]);
+
+  // Tìm danh sách trích dẫn đang hiển thị ở cột phải (Cột 3)
+  const { danhSachTrichDanHienTai, tieuDeTinNhanTrichDan } = useMemo(() => {
+    const cacTin = chiTietPhien?.cacTinNhan || [];
+    const cacTinCoTrichDan = cacTin.filter(
+      (t) => t.vaiTro !== 'user' && Array.isArray(t.trichDan) && t.trichDan.length > 0,
+    );
+
+    if (cacTinCoTrichDan.length === 0) {
+      return { danhSachTrichDanHienTai: [] as NguonTrichDan[], tieuDeTinNhanTrichDan: '' };
+    }
+
+    const tinChon =
+      (idTinNhanTrichDanChon &&
+        cacTinCoTrichDan.find((t) => t.id === idTinNhanTrichDanChon)) ||
+      cacTinCoTrichDan[cacTinCoTrichDan.length - 1];
+
+    return {
+      danhSachTrichDanHienTai: tinChon?.trichDan || [],
+      tieuDeTinNhanTrichDan: tinChon?.noiDung?.slice(0, 70) || '',
+    };
+  }, [chiTietPhien?.cacTinNhan, idTinNhanTrichDanChon]);
 
   // 5. Mutation gửi câu hỏi tới Trợ lý AI (kèm mức độ giải thích)
   const mutationHoiDap = useMutation({
@@ -186,6 +217,7 @@ export default function TrangTroLyHocTap() {
       if (data.goiYBaiTapLuyenTap) {
         setGoiYBaiTapLuyenTap(data.goiYBaiTapLuyenTap);
       }
+      setIdTinNhanTrichDanChon(null);
       queryClient.invalidateQueries({ queryKey: ['chi-tiet-phien-tro-ly', data.idPhien] });
       queryClient.invalidateQueries({ queryKey: ['danh-sach-phien-tro-ly'] });
       queryClient.invalidateQueries({ queryKey: ['thong-ke-su-dung-ai'] });
@@ -212,7 +244,7 @@ export default function TrangTroLyHocTap() {
     },
   });
 
-  // 7. Lấy danh sách bản nháp AI theo lớp (Dành cho Giáo viên)
+  // 7. Lấy danh sách bản nháp AI theo lớp (Dành cho Giảng viên)
   const idLopMucTieuBanNhap = idLopLoc || danhSachLop[0]?.id;
   const { data: danhSachBanNhap = [] } = useQuery<BanNhapAI[]>({
     queryKey: ['ban-nhap-ai-lop', idLopMucTieuBanNhap],
@@ -283,7 +315,10 @@ export default function TrangTroLyHocTap() {
       thongBao.thanhCong('Tạo bản nháp thành công', 'Bản nháp gợi ý đã được lưu vào hệ thống.');
     },
     onError: (err: any) => {
-      thongBao.thatBai('Lỗi tạo bản nháp', err.response?.data?.thongDiep || 'Không thể tạo bản nháp.');
+      thongBao.thatBai(
+        'Lỗi tạo bản nháp',
+        err.response?.data?.thongDiep || 'Không thể tạo bản nháp.',
+      );
     },
   });
 
@@ -343,20 +378,21 @@ export default function TrangTroLyHocTap() {
   };
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-5">
       {/* Banner tiêu đề phân hệ */}
-      <div className="flex flex-wrap items-center justify-between gap-4 bg-[var(--surface)] rounded-[4px] border border-[var(--border)] p-5">
+      <div className="flex flex-wrap items-center justify-between gap-4 bg-[var(--surface)] rounded-[var(--radius)] border border-[var(--border)] p-4 sm:p-5 shadow-xs">
         <div className="flex items-center gap-3.5">
-          <div className="w-[44px] h-[44px] rounded-[4px] bg-[var(--bg)] border border-[var(--border)] flex items-center justify-center text-[var(--accent)] shrink-0">
-            <Bot className="w-5 h-5" strokeWidth={1.5} />
+          <div className="w-11 h-11 rounded-[var(--radius)] bg-[var(--accent-soft)] border border-[var(--accent)] flex items-center justify-center text-[var(--accent)] shrink-0">
+            <Bot className="w-5 h-5" strokeWidth={1.75} />
           </div>
           <div>
             <p className="eyebrow mb-0.5">Hỏi đáp học liệu & Biên soạn học thuật</p>
-            <h1 className="text-[20px] font-mono font-bold tracking-tight text-[var(--text)]">
+            <h1 className="text-[20px] font-sans font-bold tracking-tight text-[var(--text)]">
               Trợ lý hỗ trợ học tập
             </h1>
             <p className="text-xs text-[var(--muted)] mt-0.5">
-              Tra cứu giáo trình có trích dẫn nguồn, tùy chỉnh mức độ giải thích và gợi ý luyện tập
+              Tra cứu giáo trình có trích dẫn nguồn, tùy chỉnh mức độ giải thích và gợi ý bài tập tự
+              luyện
             </p>
           </div>
         </div>
@@ -364,10 +400,10 @@ export default function TrangTroLyHocTap() {
         {/* Thanh hạn mức sử dụng hôm nay & Nút tác vụ */}
         <div className="flex flex-wrap items-center gap-2.5">
           {thongKeSuDung && (
-            <div className="inline-flex items-center gap-2 rounded border border-[var(--border)] bg-[var(--bg)] px-3 py-2 text-xs text-[var(--text)]">
+            <div className="inline-flex items-center gap-2 rounded-[var(--radius)] border border-[var(--border)] bg-[var(--bg)] px-3 py-2 text-xs text-[var(--text)]">
               <Clock className="w-3.5 h-3.5 text-[var(--accent)]" />
               <span>Hạn mức hôm nay:</span>
-              <span className="font-mono font-semibold text-[var(--accent)]">
+              <span className="font-mono font-bold text-[var(--accent)] tabular-nums">
                 {thongKeSuDung.soLuotCaNhanHomNay ?? 0}/{thongKeSuDung.gioiHanCaNhanNgay ?? 30} lượt
               </span>
             </div>
@@ -377,7 +413,7 @@ export default function TrangTroLyHocTap() {
             <button
               type="button"
               onClick={() => setMoModalGiamSat(true)}
-              className="inline-flex items-center gap-1.5 rounded border border-[var(--border)] bg-[var(--bg)] px-3.5 py-2 text-xs font-semibold text-[var(--text)] hover:border-[var(--accent)] hover:text-[var(--accent)] transition-colors cursor-pointer"
+              className="inline-flex items-center gap-1.5 rounded-[var(--radius)] border border-[var(--border)] bg-[var(--bg)] px-3.5 py-2 text-xs font-semibold text-[var(--text)] hover:border-[var(--accent)] hover:text-[var(--accent)] transition-colors cursor-pointer"
             >
               <Activity className="w-3.5 h-3.5 text-[var(--accent)]" />
               Lưu lượng & Chi phí
@@ -386,11 +422,12 @@ export default function TrangTroLyHocTap() {
 
           {(laGiaoVien || laQuanTri) && (
             <button
+              type="button"
               onClick={() => {
                 setIdLopBanNhap(idLopLoc || danhSachLop[0]?.id || '');
                 setMoModalBanNhap(true);
               }}
-              className="inline-flex items-center gap-2 rounded bg-primary px-4 py-2 text-xs font-semibold text-primary-foreground shadow-sm hover:bg-primary/90 transition-colors cursor-pointer"
+              className="inline-flex items-center gap-2 rounded-[var(--radius)] bg-[var(--accent)] px-4 py-2 text-xs font-semibold text-white hover:bg-[var(--accent-hover)] transition-colors cursor-pointer"
             >
               <Layers className="w-4 h-4" />
               Biên soạn câu hỏi / Giáo án từ tài liệu
@@ -399,117 +436,117 @@ export default function TrangTroLyHocTap() {
         </div>
       </div>
 
-      {/* Bố cục chính 2 cột: Sidebar phiên trò chuyện & Khung chat */}
-      <div className="grid grid-cols-1 lg:grid-cols-4 gap-6 items-start">
-        {/* Cột 1: Danh sách phiên hội thoại */}
-        <div className="lg:col-span-1 bg-card rounded border border-border/80 p-4 shadow-sm space-y-4">
-          <div className="flex items-center justify-between">
-            <h2 className="text-xs font-mono font-bold text-foreground uppercase tracking-wider">
-              Lịch sử trò chuyện
-            </h2>
-            <button
-              onClick={() => {
-                setIdPhienChon(null);
-                setCauHoiNhap('');
-                setGoiYCauHoiTiepTheo([]);
-                setGoiYBaiTapLuyenTap([]);
-              }}
-              title="Tạo cuộc hội thoại mới"
-              className="inline-flex items-center gap-1 text-xs text-primary font-medium hover:underline cursor-pointer"
-            >
-              <Plus className="w-3.5 h-3.5" />
-              Mới
-            </button>
+      {/* Bố cục chính 3 cột: Lịch sử phiên (3) • Khung hội thoại (6) • Nguồn trích dẫn (3) */}
+      <div className="grid grid-cols-1 lg:grid-cols-12 gap-5 items-start">
+        {/* CỘT 1 (3 CỘT): Lịch sử hội thoại */}
+        <div className="lg:col-span-3 bg-[var(--surface)] rounded-[var(--radius)] border border-[var(--border)] p-4 shadow-xs flex flex-col h-[700px]">
+          <button
+            type="button"
+            onClick={() => {
+              setIdPhienChon(null);
+              setCauHoiNhap('');
+              setGoiYCauHoiTiepTheo([]);
+              setGoiYBaiTapLuyenTap([]);
+              setIdTinNhanTrichDanChon(null);
+            }}
+            className="w-full inline-flex items-center justify-center gap-2 px-3.5 py-2.5 rounded-[var(--radius)] bg-[var(--accent)] hover:bg-[var(--accent-hover)] text-white text-xs font-semibold transition-colors cursor-pointer"
+          >
+            <Plus className="w-4 h-4" strokeWidth={1.75} />
+            Hội thoại mới
+          </button>
+
+          <div className="relative mt-3">
+            <Search
+              className="w-3.5 h-3.5 text-[var(--muted)] absolute left-3 top-1/2 -translate-y-1/2"
+              strokeWidth={1.75}
+            />
+            <input
+              type="text"
+              value={tuKhoaPhien}
+              onChange={(e) => setTuKhoaPhien(e.target.value)}
+              placeholder="Tìm lịch sử câu hỏi..."
+              className="w-full pl-8 pr-3 py-1.5 rounded-[var(--radius)] border border-[var(--border)] bg-[var(--bg)] text-xs text-[var(--text)] placeholder:text-[var(--muted)] focus:border-[var(--accent)] focus:outline-none"
+            />
           </div>
 
-          <div className="space-y-1.5 max-h-[620px] overflow-y-auto pr-1">
+          <div className="flex items-center justify-between mt-4 mb-2">
+            <h2 className="eyebrow">Lịch sử trò chuyện ({danhSachPhienDaLoc.length})</h2>
+          </div>
+
+          <div className="flex-1 space-y-1.5 overflow-y-auto pr-1">
             {dangTaiPhien ? (
               <div className="space-y-2">
                 {[1, 2, 3].map((i) => (
-                  <div key={i} className="h-12 rounded bg-muted/40 animate-pulse" />
+                  <div
+                    key={i}
+                    className="h-12 rounded-[var(--radius)] bg-[var(--bg)] animate-pulse"
+                  />
                 ))}
               </div>
-            ) : danhSachPhien.length === 0 ? (
-              <div className="text-center py-8 text-xs text-muted-foreground">
-                <MessageSquare className="w-8 h-8 text-muted-foreground/30 mx-auto mb-2" />
+            ) : danhSachPhienDaLoc.length === 0 ? (
+              <div className="text-center py-10 text-xs text-[var(--muted)]">
+                <MessageSquare className="w-8 h-8 text-[var(--muted)] opacity-40 mx-auto mb-2" />
                 Chưa có phiên trò chuyện nào. Hãy gửi câu hỏi đầu tiên.
               </div>
             ) : (
-              <AnimatedBackground
-                defaultValue={idPhienChon || ''}
-                className="rounded-[var(--radius)] bg-[var(--accent-soft)] border-l-[3px] border-l-[var(--accent)]"
-                transition={{ type: 'spring', bounce: 0.15, duration: 0.25 }}
-              >
-                {danhSachPhien.map((phien) => {
-                  const laChon = phien.id === idPhienChon;
-                  return (
-                    <div
-                      key={phien.id}
-                      data-id={phien.id}
-                      onClick={() => setIdPhienChon(phien.id)}
-                      className={`group relative w-full flex items-center justify-between p-3 rounded-[var(--radius)] cursor-pointer text-xs transition-colors ${
-                        laChon
-                          ? 'text-[var(--accent)] font-semibold'
-                          : 'text-foreground hover:bg-muted/50 border border-transparent hover:border-border/60'
-                      }`}
-                    >
-                      <div className="truncate pr-6">
-                        <p className="truncate">{phien.tieuDe}</p>
-                        <p
-                          className={`text-[10px] mt-0.5 ${
-                            laChon ? 'text-[var(--muted)]' : 'text-muted-foreground'
-                          }`}
-                        >
-                          {new Date(phien.ngayTao).toLocaleDateString('vi-VN')} •{' '}
-                          {phien._count?.cacTinNhan || 0} tin nhắn
-                        </p>
-                      </div>
-
-                      <button
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          mutationXoaPhien.mutate(phien.id);
-                        }}
-                        title="Xóa phiên"
-                        className={`p-1 rounded-[var(--radius)] opacity-0 group-hover:opacity-100 transition-opacity ${
-                          laChon
-                            ? 'hover:bg-[var(--danger-soft)] text-[var(--danger)]'
-                            : 'hover:bg-destructive/10 text-muted-foreground hover:text-destructive'
-                        }`}
-                      >
-                        <Trash2 className="w-3.5 h-3.5" />
-                      </button>
+              danhSachPhienDaLoc.map((phien) => {
+                const laChon = phien.id === idPhienChon;
+                return (
+                  <div
+                    key={phien.id}
+                    onClick={() => {
+                      setIdPhienChon(phien.id);
+                      setIdTinNhanTrichDanChon(null);
+                    }}
+                    className={`group relative w-full flex items-center justify-between p-3 rounded-[var(--radius)] cursor-pointer text-xs transition-colors border ${
+                      laChon
+                        ? 'bg-[var(--accent-soft)] border-[var(--accent)] text-[var(--accent)] font-semibold'
+                        : 'bg-[var(--surface)] border-transparent hover:bg-[var(--bg)] hover:border-[var(--border)] text-[var(--text)]'
+                    }`}
+                  >
+                    <div className="truncate pr-6">
+                      <p className="truncate">{phien.tieuDe}</p>
+                      <p className="text-[10px] font-mono text-[var(--muted)] mt-0.5">
+                        {new Date(phien.ngayTao).toLocaleDateString('vi-VN')} •{' '}
+                        {phien._count?.cacTinNhan || 0} tin nhắn
+                      </p>
                     </div>
-                  );
-                })}
-              </AnimatedBackground>
+
+                    <button
+                      type="button"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        mutationXoaPhien.mutate(phien.id);
+                      }}
+                      title="Xóa phiên"
+                      className="p-1 rounded-[var(--radius)] opacity-0 group-hover:opacity-100 transition-opacity hover:bg-[var(--danger-soft)] text-[var(--muted)] hover:text-[var(--danger)] cursor-pointer"
+                    >
+                      <Trash2 className="w-3.5 h-3.5" />
+                    </button>
+                  </div>
+                );
+              })
             )}
           </div>
         </div>
 
-        {/* Cột 2: Khung làm việc và hội thoại */}
-        <div className="lg:col-span-3 bg-card rounded border border-border/80 shadow-sm flex flex-col h-[720px]">
+        {/* CỘT 2 (6 CỘT): Khung làm việc và hội thoại */}
+        <div className="lg:col-span-6 bg-[var(--surface)] rounded-[var(--radius)] border border-[var(--border)] shadow-xs flex flex-col h-[700px]">
           {/* Header khu vực chat: Chọn lớp học phần & Chọn mức độ giải thích */}
-          <div className="flex flex-wrap items-center justify-between gap-3 p-4 border-b border-border/80">
-            <div className="flex items-center gap-2">
-              <Bot className="w-5 h-5 text-primary" />
-              <div>
-                <h2 className="text-sm font-mono font-bold text-foreground">
-                  {chiTietPhien?.tieuDe || 'Hội thoại mới'}
-                </h2>
-                <p className="text-[11px] text-muted-foreground">
-                  Chỉ trả lời dựa trên căn cứ tài liệu môn học (Từ chối suy đoán ngoài giáo trình)
-                </p>
-              </div>
+          <div className="flex flex-wrap items-center justify-between gap-3 p-4 border-b border-[var(--border)]">
+            <div className="min-w-0 flex-1">
+              <h2 className="text-sm font-sans font-bold text-[var(--text)] truncate">
+                {chiTietPhien?.tieuDe || 'Hội thoại mới'}
+              </h2>
+              <p className="text-[11px] text-[var(--muted)] truncate">
+                Chỉ trả lời dựa trên căn cứ tài liệu môn học đã tải lên lớp học phần
+              </p>
             </div>
 
-            <div className="flex flex-wrap items-center gap-2.5">
+            <div className="flex flex-wrap items-center gap-2">
               {/* Chọn mức độ giải thích (Nhóm 2) */}
-              <div className="flex items-center gap-1.5 bg-muted/50 border border-border px-2 py-1 rounded">
-                <SlidersHorizontal className="w-3.5 h-3.5 text-muted-foreground" />
-                <span className="text-[11px] text-muted-foreground hidden sm:inline">
-                  Giải thích:
-                </span>
+              <div className="flex items-center gap-1 bg-[var(--bg)] border border-[var(--border)] p-1 rounded-[var(--radius)]">
+                <SlidersHorizontal className="w-3.5 h-3.5 text-[var(--muted)] ml-1" />
                 {(
                   [
                     { ma: MucDoGiaiThich.CO_BAN, nhan: 'Cơ bản' },
@@ -521,10 +558,10 @@ export default function TrangTroLyHocTap() {
                     key={muc.ma}
                     type="button"
                     onClick={() => setMucDoGiaiThich(muc.ma)}
-                    className={`px-2 py-0.5 rounded text-[11px] font-semibold transition-colors cursor-pointer ${
+                    className={`px-2 py-0.5 rounded-[var(--radius)] text-[11px] font-semibold transition-colors cursor-pointer ${
                       mucDoGiaiThich === muc.ma
-                        ? 'bg-accent text-white'
-                        : 'text-muted-foreground hover:text-foreground'
+                        ? 'bg-[var(--accent)] text-white'
+                        : 'text-[var(--muted)] hover:text-[var(--text)]'
                     }`}
                   >
                     {muc.nhan}
@@ -536,12 +573,12 @@ export default function TrangTroLyHocTap() {
               <select
                 value={idLopLoc}
                 onChange={(e) => setIdLopLoc(e.target.value)}
-                className="rounded border border-input bg-background px-3 py-1.5 text-xs text-foreground focus:border-primary focus:outline-none"
+                className="rounded-[var(--radius)] border border-[var(--border)] bg-[var(--bg)] px-2.5 py-1.5 text-xs text-[var(--text)] focus:border-[var(--accent)] focus:outline-none max-w-[210px]"
               >
                 <option value="">Tất cả các lớp học phần</option>
                 {danhSachLop.map((lop) => (
                   <option key={lop.id} value={lop.id}>
-                    {lop.tenLopHocPhan} ({lop.maLopHocPhan})
+                    {lop.maLopHocPhan} — {lop.tenLopHocPhan}
                   </option>
                 ))}
               </select>
@@ -550,47 +587,45 @@ export default function TrangTroLyHocTap() {
 
           {/* Thanh tài liệu học tập sẵn có của lớp — bấm 1 chạm để hỏi hoặc sinh đề */}
           {danhSachTaiLieuChat.length > 0 && (
-            <div className="px-4 py-2.5 border-b border-border/70 bg-muted/20 flex flex-wrap items-center gap-2">
-              <span className="text-[11px] font-mono font-semibold text-muted-foreground flex items-center gap-1 shrink-0">
-                <BookOpen className="w-3.5 h-3.5 text-primary" />
-                Tài liệu sẵn có ({danhSachTaiLieuChat.length}):
+            <div className="px-4 py-2 border-b border-[var(--border)] bg-[var(--bg)] flex flex-wrap items-center gap-1.5">
+              <span className="text-[11px] font-mono font-semibold text-[var(--muted)] flex items-center gap-1 shrink-0">
+                <BookOpen className="w-3.5 h-3.5 text-[var(--accent)]" />
+                Học liệu ({danhSachTaiLieuChat.length}):
               </span>
-              <div className="flex flex-wrap items-center gap-1.5">
-                {danhSachTaiLieuChat.slice(0, 4).map((tl: any) => (
-                  <button
-                    key={tl.id}
-                    type="button"
-                    disabled={mutationHoiDap.isPending}
-                    onClick={() => {
-                      const cau = `Tóm tắt nội dung chính của tài liệu "${tl.tieuDe}" và nêu các ý trọng tâm cần nhớ`;
-                      setCauHoiNhap(cau);
-                      mutationHoiDap.mutate(cau);
-                    }}
-                    title="Nhấn để Trợ lý tóm tắt tài liệu này"
-                    className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded border border-border bg-background hover:border-accent text-[11px] text-foreground transition-colors cursor-pointer"
-                  >
-                    <FileText className="w-3 h-3 text-accent shrink-0" />
-                    <span className="max-w-[200px] truncate">{tl.tieuDe}</span>
-                  </button>
-                ))}
-                {(laGiaoVien || laQuanTri) && (
-                  <button
-                    type="button"
-                    onClick={() => {
-                      const tlDau = danhSachTaiLieuChat[0];
-                      setIdLopBanNhap(idLopHienTai);
-                      setIdTaiLieuBanNhap(tlDau?.id || '');
-                      setChuDeBanNhap(tlDau?.tieuDe || 'Kiến thức trọng tâm học phần');
-                      setCheDoTaoBanNhap('TU_TAI_LIEU');
-                      setMoModalBanNhap(true);
-                    }}
-                    className="inline-flex items-center gap-1 px-2.5 py-1 rounded bg-accent-soft text-accent border border-accent text-[11px] font-semibold hover:bg-accent hover:text-white transition-colors cursor-pointer"
-                  >
-                    <Bot className="w-3 h-3" />
-                    Sinh đề nhanh từ tài liệu
-                  </button>
-                )}
-              </div>
+              {danhSachTaiLieuChat.slice(0, 3).map((tl: any) => (
+                <button
+                  key={tl.id}
+                  type="button"
+                  disabled={mutationHoiDap.isPending}
+                  onClick={() => {
+                    const cau = `Tóm tắt nội dung chính của tài liệu "${tl.tieuDe}" và nêu các ý trọng tâm cần nhớ`;
+                    setCauHoiNhap(cau);
+                    mutationHoiDap.mutate(cau);
+                  }}
+                  title="Nhấn để Trợ lý tóm tắt tài liệu này"
+                  className="inline-flex items-center gap-1.5 px-2 py-0.5 rounded-[var(--radius)] border border-[var(--border)] bg-[var(--surface)] hover:border-[var(--accent)] text-[11px] text-[var(--text)] transition-colors cursor-pointer"
+                >
+                  <FileText className="w-3 h-3 text-[var(--accent)] shrink-0" />
+                  <span className="max-w-[160px] truncate">{tl.tieuDe}</span>
+                </button>
+              ))}
+              {(laGiaoVien || laQuanTri) && (
+                <button
+                  type="button"
+                  onClick={() => {
+                    const tlDau = danhSachTaiLieuChat[0];
+                    setIdLopBanNhap(idLopHienTai);
+                    setIdTaiLieuBanNhap(tlDau?.id || '');
+                    setChuDeBanNhap(tlDau?.tieuDe || 'Kiến thức trọng tâm học phần');
+                    setCheDoTaoBanNhap('TU_TAI_LIEU');
+                    setMoModalBanNhap(true);
+                  }}
+                  className="inline-flex items-center gap-1 px-2 py-0.5 rounded-[var(--radius)] bg-[var(--accent-soft)] text-[var(--accent)] border border-[var(--accent)] text-[11px] font-semibold hover:bg-[var(--accent)] hover:text-white transition-colors cursor-pointer ml-auto"
+                >
+                  <Bot className="w-3 h-3" />
+                  Sinh đề nhanh
+                </button>
+              )}
             </div>
           )}
 
@@ -598,18 +633,18 @@ export default function TrangTroLyHocTap() {
           <div className="flex-1 overflow-y-auto p-5 space-y-5">
             {dangTaiTinNhan ? (
               <div className="flex items-center justify-center h-full">
-                <Loader2 className="w-8 h-8 text-primary animate-spin" />
+                <Loader2 className="w-7 h-7 text-[var(--accent)] animate-spin" />
               </div>
             ) : !chiTietPhien || chiTietPhien.cacTinNhan?.length === 0 ? (
               <div className="flex flex-col items-center justify-center h-full text-center max-w-md mx-auto space-y-4">
-                <div className="w-14 h-14 rounded bg-primary/10 flex items-center justify-center text-primary">
-                  <Bot className="w-7 h-7" />
+                <div className="w-12 h-12 rounded-[var(--radius)] bg-[var(--accent-soft)] flex items-center justify-center text-[var(--accent)]">
+                  <Bot className="w-6 h-6" strokeWidth={1.75} />
                 </div>
                 <div>
-                  <h3 className="text-base font-mono font-bold text-foreground">
+                  <h3 className="text-[15px] font-sans font-bold text-[var(--text)]">
                     Bạn cần hỗ trợ nội dung nào hôm nay?
                   </h3>
-                  <p className="text-xs text-muted-foreground mt-1 leading-relaxed">
+                  <p className="text-xs text-[var(--muted)] mt-1 leading-relaxed">
                     Chọn mức độ giải thích <strong>Cơ bản</strong>, <strong>Trung bình</strong> hoặc{' '}
                     <strong>Nâng cao</strong> để Trợ lý trình bày kiến thức phù hợp với nhu cầu ôn tập.
                   </p>
@@ -617,31 +652,22 @@ export default function TrangTroLyHocTap() {
 
                 {/* Prompt chips gợi ý */}
                 <div className="w-full space-y-2 pt-2">
-                  <p className="text-[11px] font-mono font-semibold text-muted-foreground uppercase tracking-wider text-left">
-                    Gợi ý câu hỏi phổ biến:
-                  </p>
+                  <p className="eyebrow text-left">Gợi ý câu hỏi phổ biến</p>
                   <div className="grid grid-cols-1 gap-2">
-                    <AnimatedBackground
-                      enableHover
-                      className="rounded-[var(--radius)] bg-[var(--active-bg)]"
-                      transition={{ type: 'spring', bounce: 0.15, duration: 0.25 }}
-                    >
-                      {goiYCauHoi.map((cau, idx) => (
-                        <button
-                          key={idx}
-                          data-id={String(idx)}
-                          type="button"
-                          onClick={() => {
-                            setCauHoiNhap(cau);
-                            mutationHoiDap.mutate(cau);
-                          }}
-                          className="w-full text-left p-2.5 rounded-[var(--radius)] border border-border/80 bg-background hover:border-[var(--accent)] text-xs text-foreground/90 transition-colors flex items-center justify-between group cursor-pointer"
-                        >
-                          <span className="truncate">{cau}</span>
-                          <ArrowRight className="w-3.5 h-3.5 text-muted-foreground group-hover:text-primary shrink-0 ml-2" />
-                        </button>
-                      ))}
-                    </AnimatedBackground>
+                    {goiYCauHoi.map((cau, idx) => (
+                      <button
+                        key={idx}
+                        type="button"
+                        onClick={() => {
+                          setCauHoiNhap(cau);
+                          mutationHoiDap.mutate(cau);
+                        }}
+                        className="w-full text-left p-2.5 rounded-[var(--radius)] border border-[var(--border)] bg-[var(--bg)] hover:border-[var(--accent)] text-xs text-[var(--text)] transition-colors flex items-center justify-between group cursor-pointer"
+                      >
+                        <span className="truncate">{cau}</span>
+                        <ArrowRight className="w-3.5 h-3.5 text-[var(--muted)] group-hover:text-[var(--accent)] shrink-0 ml-2" />
+                      </button>
+                    ))}
                   </div>
                 </div>
               </div>
@@ -652,19 +678,24 @@ export default function TrangTroLyHocTap() {
                   return (
                     <div
                       key={tin.id}
-                      className={`flex gap-3.5 ${laNguoiDung ? 'justify-end' : 'justify-start'}`}
+                      onClick={() => {
+                        if (!laNguoiDung && tin.trichDan && tin.trichDan.length > 0) {
+                          setIdTinNhanTrichDanChon(tin.id);
+                        }
+                      }}
+                      className={`flex gap-3 ${laNguoiDung ? 'justify-end' : 'justify-start'}`}
                     >
                       {!laNguoiDung && (
-                        <div className="w-8 h-8 rounded bg-primary/10 text-primary flex items-center justify-center shrink-0 mt-1">
-                          <Bot className="w-4 h-4" />
+                        <div className="w-8 h-8 rounded-[var(--radius)] bg-[var(--accent-soft)] text-[var(--accent)] flex items-center justify-center shrink-0 mt-1">
+                          <Bot className="w-4 h-4" strokeWidth={1.75} />
                         </div>
                       )}
 
                       <div
-                        className={`max-w-[85%] sm:max-w-[78%] rounded p-4 text-xs leading-relaxed space-y-3 ${
+                        className={`max-w-[88%] rounded-[var(--radius)] p-4 text-xs leading-relaxed space-y-3 ${
                           laNguoiDung
-                            ? 'bg-primary text-primary-foreground font-medium'
-                            : 'bg-bg text-text border border-border'
+                            ? 'bg-[var(--accent)] text-white font-medium'
+                            : 'bg-[var(--bg)] text-[var(--text)] border border-[var(--border)]'
                         }`}
                       >
                         <DinhDangMarkdown
@@ -672,30 +703,35 @@ export default function TrangTroLyHocTap() {
                           laNguoiDung={laNguoiDung}
                         />
 
-                        {/* Trích dẫn nguồn tài liệu RAG */}
+                        {/* Huy hiệu nguồn trích dẫn đánh số [1], [2] */}
                         {!laNguoiDung && tin.trichDan && tin.trichDan.length > 0 && (
-                          <div className="pt-3 border-t border-border/60 space-y-2">
-                            <p className="text-[10px] font-mono font-semibold text-muted-foreground uppercase tracking-wider flex items-center gap-1.5">
-                              <BookOpen className="w-3.5 h-3.5 text-primary" />
-                              Tài liệu nguồn trích dẫn ({tin.trichDan.length}):
+                          <div className="pt-2.5 border-t border-[var(--border)] space-y-1.5">
+                            <p className="text-[10px] font-mono font-semibold text-[var(--muted)] uppercase tracking-wider flex items-center gap-1.5">
+                              <BookOpen className="w-3 h-3 text-[var(--accent)]" />
+                              Nguồn trích dẫn giáo trình ({tin.trichDan.length}):
                             </p>
-                            <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                            <div className="flex flex-wrap gap-1.5">
                               {tin.trichDan.map((tc, idx) => (
-                                <div
+                                <button
                                   key={idx}
-                                  onClick={() => setDoanXemChiTiet(tc)}
-                                  className="p-2 rounded bg-background border border-border/70 hover:border-primary/50 cursor-pointer transition-colors flex items-center justify-between gap-2 group"
+                                  type="button"
+                                  onClick={(e) => {
+                                    e.stopPropagation();
+                                    setIdTinNhanTrichDanChon(tin.id);
+                                    setDoanXemChiTiet(tc);
+                                  }}
+                                  className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-[var(--radius)] bg-[var(--surface)] border border-[var(--border)] hover:border-[var(--accent)] text-[11px] text-[var(--text)] transition-colors cursor-pointer"
                                 >
-                                  <div className="truncate">
-                                    <p className="font-semibold text-foreground truncate text-[11px] group-hover:text-primary transition-colors">
-                                      {tc.tieuDeTaiLieu}
-                                    </p>
-                                    <p className="text-[10px] text-muted-foreground mt-0.5 font-mono">
-                                      Đoạn {tc.soThuTu} • {tc.doTuongDong}% tương đồng
-                                    </p>
-                                  </div>
-                                  <ExternalLink className="w-3 h-3 text-muted-foreground group-hover:text-primary transition-colors shrink-0" />
-                                </div>
+                                  <span className="font-mono font-bold text-[var(--accent)]">
+                                    [{idx + 1}]
+                                  </span>
+                                  <span className="truncate max-w-[160px] font-medium">
+                                    {tc.tieuDeTaiLieu}
+                                  </span>
+                                  <span className="font-mono text-[10px] text-[var(--muted)]">
+                                    • {tc.doTuongDong}%
+                                  </span>
+                                </button>
                               ))}
                             </div>
                           </div>
@@ -703,7 +739,7 @@ export default function TrangTroLyHocTap() {
 
                         {/* Tác vụ nhanh dưới câu trả lời cho Giảng viên: Lưu thành Bản nháp lớp học */}
                         {!laNguoiDung && (laGiaoVien || laQuanTri) && (
-                          <div className="pt-2 border-t border-border/50 flex flex-wrap items-center justify-end gap-2">
+                          <div className="pt-2 border-t border-[var(--border)] flex flex-wrap items-center justify-end gap-2">
                             <button
                               type="button"
                               onClick={() => {
@@ -718,9 +754,9 @@ export default function TrangTroLyHocTap() {
                                 setNoiDungBanNhap(tin.noiDung);
                                 setMoModalBanNhap(true);
                               }}
-                              className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded border border-border bg-background hover:border-accent text-[11px] font-semibold text-foreground transition-colors cursor-pointer"
+                              className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-[var(--radius)] border border-[var(--border)] bg-[var(--surface)] hover:border-[var(--accent)] text-[11px] font-semibold text-[var(--text)] transition-colors cursor-pointer"
                             >
-                              <Layers className="w-3 h-3 text-accent" />
+                              <Layers className="w-3 h-3 text-[var(--accent)]" />
                               Lưu câu trả lời làm Bản nháp
                             </button>
                           </div>
@@ -741,20 +777,20 @@ export default function TrangTroLyHocTap() {
                 {/* Khu vực Gợi ý câu hỏi tiếp theo & Bài tập luyện tập sau mỗi câu trả lời (Nhóm 2) */}
                 {!mutationHoiDap.isPending &&
                   (goiYCauHoiTiepTheo.length > 0 || goiYBaiTapLuyenTap.length > 0) && (
-                    <div className="pl-11 space-y-3 pt-1">
+                    <div className="pl-11 space-y-2.5 pt-1">
                       {goiYCauHoiTiepTheo.length > 0 && (
-                        <div className="rounded border border-border bg-bg p-3.5 space-y-2">
-                          <p className="text-[11px] font-mono font-semibold text-muted uppercase tracking-wider flex items-center gap-1.5">
-                            <HelpCircle className="w-3.5 h-3.5 text-accent" />
-                            Gợi ý câu hỏi đào sâu tiếp theo:
+                        <div className="rounded-[var(--radius)] border border-[var(--border)] bg-[var(--bg)] p-3 space-y-2">
+                          <p className="text-[11px] font-mono font-semibold text-[var(--muted)] uppercase tracking-wider flex items-center gap-1.5">
+                            <HelpCircle className="w-3.5 h-3.5 text-[var(--accent)]" />
+                            Câu hỏi đào sâu tiếp theo:
                           </p>
-                          <div className="flex flex-wrap gap-2">
+                          <div className="flex flex-wrap gap-1.5">
                             {goiYCauHoiTiepTheo.map((cauGoiY, idx) => (
                               <button
                                 key={idx}
                                 type="button"
                                 onClick={() => mutationHoiDap.mutate(cauGoiY)}
-                                className="text-left text-xs px-3 py-1.5 rounded border border-border bg-surface hover:border-accent text-text transition-colors cursor-pointer"
+                                className="text-left text-xs px-2.5 py-1.5 rounded-[var(--radius)] border border-[var(--border)] bg-[var(--surface)] hover:border-[var(--accent)] text-[var(--text)] transition-colors cursor-pointer"
                               >
                                 {cauGoiY}
                               </button>
@@ -764,8 +800,8 @@ export default function TrangTroLyHocTap() {
                       )}
 
                       {goiYBaiTapLuyenTap.length > 0 && (
-                        <div className="rounded border border-accent bg-accent-soft p-3.5 space-y-2">
-                          <p className="text-[11px] font-mono font-semibold text-accent uppercase tracking-wider flex items-center gap-1.5">
+                        <div className="rounded-[var(--radius)] border border-[var(--accent)] bg-[var(--accent-soft)] p-3 space-y-2">
+                          <p className="text-[11px] font-mono font-semibold text-[var(--accent)] uppercase tracking-wider flex items-center gap-1.5">
                             <FileText className="w-3.5 h-3.5" />
                             Bài tập tự luyện tập củng cố kiến thức:
                           </p>
@@ -775,11 +811,11 @@ export default function TrangTroLyHocTap() {
                                 key={idx}
                                 type="button"
                                 onClick={() => mutationHoiDap.mutate(btGoiY)}
-                                className="w-full text-left text-xs px-3 py-2 rounded border border-border bg-surface hover:border-accent text-text flex items-center justify-between gap-2 transition-colors cursor-pointer"
+                                className="w-full text-left text-xs px-3 py-2 rounded-[var(--radius)] border border-[var(--border)] bg-[var(--surface)] hover:border-[var(--accent)] text-[var(--text)] flex items-center justify-between gap-2 transition-colors cursor-pointer"
                               >
                                 <span>{btGoiY}</span>
-                                <span className="text-[11px] font-semibold text-accent shrink-0">
-                                  Luyện tập ngay →
+                                <span className="text-[11px] font-semibold text-[var(--accent)] shrink-0">
+                                  Luyện tập →
                                 </span>
                               </button>
                             ))}
@@ -793,12 +829,12 @@ export default function TrangTroLyHocTap() {
 
             {/* Trạng thái AI đang truy hồi và sinh câu trả lời */}
             {mutationHoiDap.isPending && (
-              <div className="flex gap-3.5 justify-start">
-                <div className="w-8 h-8 rounded bg-primary/10 text-primary flex items-center justify-center shrink-0">
-                  <Bot className="w-4 h-4 animate-pulse" />
+              <div className="flex gap-3 justify-start">
+                <div className="w-8 h-8 rounded-[var(--radius)] bg-[var(--accent-soft)] text-[var(--accent)] flex items-center justify-center shrink-0">
+                  <Bot className="w-4 h-4" />
                 </div>
-                <div className="rounded p-4 bg-bg border border-border text-xs text-muted flex items-center gap-2">
-                  <Loader2 className="w-3.5 h-3.5 animate-spin text-primary" />
+                <div className="rounded-[var(--radius)] p-3.5 bg-[var(--bg)] border border-[var(--border)] text-xs text-[var(--muted)] flex items-center gap-2">
+                  <Loader2 className="w-3.5 h-3.5 animate-spin text-[var(--accent)]" />
                   Đang tra cứu tài liệu học tập và tổng hợp câu trả lời...
                 </div>
               </div>
@@ -808,9 +844,9 @@ export default function TrangTroLyHocTap() {
           </div>
 
           {/* Ô nhập tin nhắn + thanh gợi ý nhanh */}
-          <div className="p-3.5 border-t border-border/80 bg-card space-y-2">
+          <div className="p-3.5 border-t border-[var(--border)] bg-[var(--surface)] space-y-2">
             <div className="flex flex-wrap items-center gap-1.5">
-              <span className="text-[10px] font-mono text-muted-foreground mr-1">Hỏi nhanh:</span>
+              <span className="text-[10px] font-mono text-[var(--muted)] mr-1">Hỏi nhanh:</span>
               {[
                 'Tóm tắt nội dung chính của tài liệu học tập',
                 'Giải thích các khái niệm trọng tâm trong bài giảng',
@@ -824,7 +860,7 @@ export default function TrangTroLyHocTap() {
                     setCauHoiNhap(mauCau);
                     mutationHoiDap.mutate(mauCau);
                   }}
-                  className="px-2 py-0.5 rounded border border-border bg-background hover:border-accent text-[11px] text-muted-foreground hover:text-foreground transition-colors cursor-pointer"
+                  className="px-2 py-0.5 rounded-[var(--radius)] border border-[var(--border)] bg-[var(--bg)] hover:border-[var(--accent)] text-[11px] text-[var(--muted)] hover:text-[var(--text)] transition-colors cursor-pointer"
                 >
                   {mauCau}
                 </button>
@@ -836,12 +872,12 @@ export default function TrangTroLyHocTap() {
                 value={cauHoiNhap}
                 onChange={(e) => setCauHoiNhap(e.target.value)}
                 placeholder="Đặt câu hỏi về nội dung bài giảng, công thức hoặc bài tập (Nhấn Enter để gửi)..."
-                className="flex-1 rounded border border-input bg-background px-4 py-2.5 text-xs text-foreground placeholder:text-muted-foreground focus:border-primary focus:outline-none"
+                className="flex-1 rounded-[var(--radius)] border border-[var(--border)] bg-[var(--bg)] px-3.5 py-2.5 text-xs text-[var(--text)] placeholder:text-[var(--muted)] focus:border-[var(--accent)] focus:outline-none"
               />
               <button
                 type="submit"
                 disabled={!cauHoiNhap.trim() || mutationHoiDap.isPending}
-                className="inline-flex items-center justify-center w-10 h-10 rounded bg-primary text-primary-foreground hover:bg-primary/90 disabled:opacity-50 disabled:cursor-not-allowed transition-colors shrink-0 cursor-pointer"
+                className="inline-flex items-center justify-center w-10 h-10 rounded-[var(--radius)] bg-[var(--accent)] text-white hover:bg-[var(--accent-hover)] disabled:opacity-50 disabled:cursor-not-allowed transition-colors shrink-0 cursor-pointer"
               >
                 {mutationHoiDap.isPending ? (
                   <Loader2 className="w-4 h-4 animate-spin" />
@@ -852,31 +888,157 @@ export default function TrangTroLyHocTap() {
             </form>
           </div>
         </div>
+
+        {/* CỘT 3 (3 CỘT): Bảng đối chiếu Nguồn trích dẫn & Học liệu tham chiếu */}
+        <div className="lg:col-span-3 bg-[var(--surface)] rounded-[var(--radius)] border border-[var(--border)] p-4 shadow-xs flex flex-col h-[700px]">
+          <div className="flex items-center justify-between pb-3 border-b border-[var(--border)]">
+            <div className="flex items-center gap-2">
+              <Quote className="w-4 h-4 text-[var(--accent)]" strokeWidth={1.75} />
+              <h2 className="text-[13px] font-sans font-bold text-[var(--text)]">
+                Nguồn trích dẫn
+              </h2>
+            </div>
+            <span className="px-2 py-0.5 rounded-[var(--radius)] bg-[var(--accent-soft)] text-[var(--accent)] font-mono text-[11px] font-bold tabular-nums">
+              {danhSachTrichDanHienTai.length} đoạn
+            </span>
+          </div>
+
+          <div className="flex-1 overflow-y-auto py-3 space-y-3 pr-1">
+            {danhSachTrichDanHienTai.length > 0 ? (
+              <>
+                {tieuDeTinNhanTrichDan && (
+                  <p className="text-[11px] text-[var(--muted)] line-clamp-2">
+                    Căn cứ học liệu cho phản hồi:{' '}
+                    <span className="text-[var(--text)] font-medium">
+                      &ldquo;{tieuDeTinNhanTrichDan}...&rdquo;
+                    </span>
+                  </p>
+                )}
+
+                {danhSachTrichDanHienTai.map((tc, idx) => {
+                  const noiDungTrich = tc.noiDung || '';
+                  return (
+                    <div
+                      key={tc.idDoan || idx}
+                      onClick={() => setDoanXemChiTiet(tc)}
+                      className="p-3 rounded-[var(--radius)] border border-[var(--border)] bg-[var(--bg)] hover:border-[var(--accent)] transition-colors cursor-pointer space-y-2 group"
+                    >
+                      <div className="flex items-start justify-between gap-2">
+                        <div className="flex items-center gap-1.5 min-w-0">
+                          <span className="px-1.5 py-0.5 rounded-[var(--radius)] bg-[var(--accent)] text-white font-mono text-[10px] font-bold shrink-0">
+                            [{idx + 1}]
+                          </span>
+                          <p className="text-xs font-semibold text-[var(--text)] truncate group-hover:text-[var(--accent)] transition-colors">
+                            {tc.tieuDeTaiLieu}
+                          </p>
+                        </div>
+                        <ExternalLink className="w-3.5 h-3.5 text-[var(--muted)] group-hover:text-[var(--accent)] shrink-0" />
+                      </div>
+
+                      <div className="flex items-center justify-between text-[10.5px] font-mono text-[var(--muted)]">
+                        <span>Đoạn #{tc.soThuTu}</span>
+                        <span className="text-[var(--accent)] font-semibold tabular-nums">
+                          {tc.doTuongDong}% tương đồng
+                        </span>
+                      </div>
+
+                      {/* Thanh độ tương đồng ngữ nghĩa */}
+                      <div className="h-1.5 w-full rounded-full bg-[var(--border)] overflow-hidden">
+                        <div
+                          className="h-full bg-[var(--accent)] rounded-full"
+                          style={{
+                            width: `${Math.min(100, Math.max(15, tc.doTuongDong || 75))}%`,
+                          }}
+                        />
+                      </div>
+
+                      {noiDungTrich && (
+                        <p className="text-[11.5px] text-[var(--text)] line-clamp-3 border-l-2 border-[var(--accent)] pl-2.5 py-0.5 leading-relaxed bg-[var(--surface)] rounded-r-[var(--radius)]">
+                          {noiDungTrich}
+                        </p>
+                      )}
+                    </div>
+                  );
+                })}
+              </>
+            ) : (
+              <div className="text-center py-8 px-2 space-y-2">
+                <BookOpen
+                  className="w-8 h-8 text-[var(--muted)] opacity-40 mx-auto"
+                  strokeWidth={1.5}
+                />
+                <p className="text-xs font-semibold text-[var(--text)]">
+                  Chưa có trích dẫn trong phiên này
+                </p>
+                <p className="text-[11.5px] text-[var(--muted)] leading-relaxed">
+                  Khi bạn đặt câu hỏi về bài giảng, các đoạn trích từ giáo trình và độ tương đồng
+                  ngữ nghĩa sẽ hiển thị tại đây để đối chiếu trực tiếp.
+                </p>
+              </div>
+            )}
+
+            {/* Danh sách học liệu của lớp đang chọn */}
+            {danhSachTaiLieuChat.length > 0 && (
+              <div className="pt-3 border-t border-[var(--border)] space-y-2">
+                <p className="eyebrow">
+                  Giáo trình lớp đang chọn ({danhSachTaiLieuChat.length})
+                </p>
+                <div className="space-y-1.5">
+                  {danhSachTaiLieuChat.map((tl: any) => (
+                    <div
+                      key={tl.id}
+                      className="p-2.5 rounded-[var(--radius)] border border-[var(--border)] bg-[var(--bg)] flex items-center justify-between gap-2 text-xs"
+                    >
+                      <div className="flex items-center gap-2 min-w-0">
+                        <FileText className="w-3.5 h-3.5 text-[var(--accent)] shrink-0" />
+                        <span className="truncate font-medium text-[var(--text)]">{tl.tieuDe}</span>
+                      </div>
+                      <button
+                        type="button"
+                        disabled={mutationHoiDap.isPending}
+                        onClick={() => {
+                          const cau = `Tóm tắt nội dung chính của tài liệu "${tl.tieuDe}" và nêu các ý trọng tâm cần nhớ`;
+                          setCauHoiNhap(cau);
+                          mutationHoiDap.mutate(cau);
+                        }}
+                        className="text-[11px] font-semibold text-[var(--accent)] hover:underline shrink-0 cursor-pointer"
+                      >
+                        Hỏi →
+                      </button>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
+          </div>
+        </div>
       </div>
 
-      {/* Bảng quản lý bản nháp AI (Dành cho Giáo viên & Quản trị viên - Nhóm 3) */}
+      {/* Bảng quản lý bản nháp AI (Dành cho Giảng viên & Quản trị viên - Nhóm 3) */}
       {(laGiaoVien || laQuanTri) && (
-        <div className="bg-card rounded border border-border/80 p-5 shadow-sm space-y-4">
+        <div className="bg-[var(--surface)] rounded-[var(--radius)] border border-[var(--border)] p-5 shadow-xs space-y-4">
           <div className="flex flex-wrap items-center justify-between gap-3">
-            <div className="flex items-center gap-2">
-              <Layers className="w-5 h-5 text-primary" />
+            <div className="flex items-center gap-2.5">
+              <Layers className="w-5 h-5 text-[var(--accent)]" strokeWidth={1.75} />
               <div>
-                <h2 className="text-sm font-mono font-bold text-foreground">
+                <h2 className="text-sm font-sans font-bold text-[var(--text)]">
                   Danh sách bản nháp câu hỏi, giáo án & nhận xét chờ giảng viên phê duyệt
                 </h2>
-                <p className="text-xs text-muted-foreground">
-                  Mọi nội dung do Trợ lý biên soạn đều lưu ở trạng thái chờ duyệt và chỉ áp dụng sau khi giảng viên xác nhận
+                <p className="text-xs text-[var(--muted)]">
+                  Mọi nội dung do Trợ lý biên soạn đều lưu ở trạng thái chờ duyệt và chỉ áp dụng sau
+                  khi giảng viên xác nhận
                 </p>
               </div>
             </div>
-            <span className="text-xs font-mono font-semibold px-2.5 py-1 rounded bg-primary/10 text-primary">
+            <span className="text-xs font-mono font-semibold px-2.5 py-1 rounded-[var(--radius)] bg-[var(--accent-soft)] text-[var(--accent)]">
               {danhSachBanNhap.length} bản nháp
             </span>
           </div>
 
           {danhSachBanNhap.length === 0 ? (
-            <div className="text-center py-6 text-xs text-muted bg-bg rounded border border-dashed border-border">
-              Chưa có bản nháp nào được tạo cho lớp học này. Nhấn &quot;Biên soạn câu hỏi / Giáo án từ tài liệu&quot; để tạo mới.
+            <div className="text-center py-6 text-xs text-[var(--muted)] bg-[var(--bg)] rounded-[var(--radius)] border border-dashed border-[var(--border)]">
+              Chưa có bản nháp nào được tạo cho lớp học này. Nhấn &quot;Biên soạn câu hỏi / Giáo án
+              từ tài liệu&quot; để tạo mới.
             </div>
           ) : (
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
@@ -888,44 +1050,46 @@ export default function TrangTroLyHocTap() {
                 return (
                   <div
                     key={bn.id}
-                    className="p-4 rounded border border-border bg-surface space-y-3 flex flex-col justify-between"
+                    className="p-4 rounded-[var(--radius)] border border-[var(--border)] bg-[var(--bg)] space-y-3 flex flex-col justify-between"
                   >
                     <div className="space-y-1.5">
                       <div className="flex items-center justify-between gap-2">
-                        <span className="text-[10px] font-mono font-semibold px-2 py-0.5 rounded bg-active-bg text-text border border-border uppercase">
+                        <span className="text-[10px] font-mono font-semibold px-2 py-0.5 rounded-[var(--radius)] bg-[var(--surface)] text-[var(--text)] border border-[var(--border)] uppercase">
                           {nhanLoaiBanNhap(bn.loaiBanNhap)}
                         </span>
                         <span
-                          className={`text-[10px] font-semibold px-2 py-0.5 rounded ${
+                          className={`text-[10px] font-semibold px-2 py-0.5 rounded-[var(--radius)] ${
                             laDaDuyet
-                              ? 'bg-accent-soft text-accent'
+                              ? 'bg-[var(--accent-soft)] text-[var(--accent)]'
                               : laTuChoi
-                                ? 'bg-danger-soft text-danger'
-                                : 'bg-info-soft text-info'
+                                ? 'bg-[var(--danger-soft)] text-[var(--danger)]'
+                                : 'bg-[var(--info-soft)] text-[var(--info)]'
                           }`}
                         >
                           {laDaDuyet ? 'Đã duyệt' : laTuChoi ? 'Đã từ chối' : 'Chờ duyệt'}
                         </span>
                       </div>
-                      <h3 className="text-xs font-bold text-text line-clamp-1">{bn.tieuDe}</h3>
+                      <h3 className="text-xs font-bold text-[var(--text)] line-clamp-1">
+                        {bn.tieuDe}
+                      </h3>
                       {duLieu?.mucDoKho && (
-                        <p className="text-[10px] font-mono text-accent">
+                        <p className="text-[10px] font-mono text-[var(--accent)]">
                           Độ khó: {duLieu.mucDoKho}
                           {Array.isArray(duLieu.danhSachCauHoi)
                             ? ` • ${duLieu.danhSachCauHoi.length} câu hỏi`
                             : ''}
                         </p>
                       )}
-                      <p className="text-[11px] text-muted line-clamp-2">
+                      <p className="text-[11px] text-[var(--muted)] line-clamp-2">
                         {duLieu?.noiDung || duLieu?.nhanXetChiTiet || duLieu?.moTa || ''}
                       </p>
                     </div>
 
-                    <div className="flex items-center gap-2 pt-2 border-t border-border">
+                    <div className="flex items-center gap-2 pt-2 border-t border-[var(--border)]">
                       <button
                         type="button"
                         onClick={() => setBanNhapXemChiTiet(bn)}
-                        className="py-1.5 px-2.5 rounded border border-border text-text hover:bg-bg text-[11px] font-semibold inline-flex items-center gap-1 cursor-pointer"
+                        className="py-1.5 px-2.5 rounded-[var(--radius)] border border-[var(--border)] bg-[var(--surface)] text-[var(--text)] hover:border-[var(--accent)] text-[11px] font-semibold inline-flex items-center gap-1 cursor-pointer"
                       >
                         <Eye className="w-3 h-3" />
                         Chi tiết
@@ -941,7 +1105,7 @@ export default function TrangTroLyHocTap() {
                                 trangThai: TrangThaiBanNhapAI.DA_DUYET,
                               })
                             }
-                            className="flex-1 py-1.5 px-3 rounded bg-accent hover:bg-accent text-white text-[11px] font-semibold transition-colors cursor-pointer"
+                            className="flex-1 py-1.5 px-3 rounded-[var(--radius)] bg-[var(--accent)] hover:bg-[var(--accent-hover)] text-white text-[11px] font-semibold transition-colors cursor-pointer"
                           >
                             {nhanNutDuyet(bn.loaiBanNhap)}
                           </button>
@@ -953,7 +1117,7 @@ export default function TrangTroLyHocTap() {
                                 trangThai: TrangThaiBanNhapAI.TU_CHOI,
                               })
                             }
-                            className="py-1.5 px-2.5 rounded border border-input text-muted-foreground hover:text-danger hover:bg-danger-soft text-[11px] font-semibold transition-colors cursor-pointer"
+                            className="py-1.5 px-2.5 rounded-[var(--radius)] border border-[var(--border)] bg-[var(--surface)] text-[var(--muted)] hover:text-[var(--danger)] hover:bg-[var(--danger-soft)] text-[11px] font-semibold transition-colors cursor-pointer"
                           >
                             Từ chối
                           </button>
@@ -976,13 +1140,16 @@ export default function TrangTroLyHocTap() {
         moTa={`Độ tương đồng ngữ nghĩa: ${doanXemChiTiet?.doTuongDong}% • Đoạn số ${doanXemChiTiet?.soThuTu}`}
       >
         <div className="space-y-4 text-xs">
-          <div className="rounded bg-bg p-4 border border-border leading-relaxed text-text max-h-[60vh] overflow-y-auto">
-            <DinhDangMarkdown noiDung={doanXemChiTiet?.noiDung || ''} />
+          <div className="rounded-[var(--radius)] bg-[var(--bg)] p-4 border border-[var(--border)] leading-relaxed text-[var(--text)] max-h-[60vh] overflow-y-auto">
+            <DinhDangMarkdown
+              noiDung={doanXemChiTiet?.noiDung || ''}
+            />
           </div>
           <div className="flex justify-end pt-2">
             <button
+              type="button"
               onClick={() => setDoanXemChiTiet(null)}
-              className="rounded border border-border px-4 py-2 text-xs font-semibold text-text hover:bg-active-bg transition-colors cursor-pointer"
+              className="rounded-[var(--radius)] border border-[var(--border)] px-4 py-2 text-xs font-semibold text-[var(--text)] hover:bg-[var(--bg)] transition-colors cursor-pointer"
             >
               Đóng
             </button>
@@ -1000,14 +1167,14 @@ export default function TrangTroLyHocTap() {
       >
         <div className="space-y-4">
           {/* Chuyển chế độ */}
-          <div className="flex items-center gap-2 border-b border-border pb-3">
+          <div className="flex items-center gap-2 border-b border-[var(--border)] pb-3">
             <button
               type="button"
               onClick={() => setCheDoTaoBanNhap('TU_TAI_LIEU')}
-              className={`px-3 py-1.5 rounded text-xs font-semibold cursor-pointer ${
+              className={`px-3 py-1.5 rounded-[var(--radius)] text-xs font-semibold cursor-pointer ${
                 cheDoTaoBanNhap === 'TU_TAI_LIEU'
-                  ? 'bg-accent text-white'
-                  : 'bg-bg text-muted hover:text-text border border-border'
+                  ? 'bg-[var(--accent)] text-white'
+                  : 'bg-[var(--bg)] text-[var(--muted)] hover:text-[var(--text)] border border-[var(--border)]'
               }`}
             >
               Sinh tự động từ tài liệu môn học
@@ -1015,10 +1182,10 @@ export default function TrangTroLyHocTap() {
             <button
               type="button"
               onClick={() => setCheDoTaoBanNhap('THU_CONG')}
-              className={`px-3 py-1.5 rounded text-xs font-semibold cursor-pointer ${
+              className={`px-3 py-1.5 rounded-[var(--radius)] text-xs font-semibold cursor-pointer ${
                 cheDoTaoBanNhap === 'THU_CONG'
-                  ? 'bg-accent text-white'
-                  : 'bg-bg text-muted hover:text-text border border-border'
+                  ? 'bg-[var(--accent)] text-white'
+                  : 'bg-[var(--bg)] text-[var(--muted)] hover:text-[var(--text)] border border-[var(--border)]'
               }`}
             >
               Soạn thảo bản nháp thủ công
@@ -1036,7 +1203,7 @@ export default function TrangTroLyHocTap() {
             >
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                 <div>
-                  <label className="text-xs font-semibold text-foreground">Lớp học phần *</label>
+                  <label className="text-xs font-semibold text-[var(--text)]">Lớp học phần *</label>
                   <select
                     required
                     value={idLopBanNhap}
@@ -1044,7 +1211,7 @@ export default function TrangTroLyHocTap() {
                       setIdLopBanNhap(e.target.value);
                       setIdTaiLieuBanNhap('');
                     }}
-                    className="mt-1.5 w-full rounded border border-input bg-background px-3 py-2 text-xs focus:border-primary focus:outline-none"
+                    className="mt-1.5 w-full rounded-[var(--radius)] border border-[var(--border)] bg-[var(--surface)] px-3 py-2 text-xs focus:border-[var(--accent)] focus:outline-none"
                   >
                     <option value="">Chọn lớp học phần</option>
                     {danhSachLop.map((lop) => (
@@ -1056,7 +1223,7 @@ export default function TrangTroLyHocTap() {
                 </div>
 
                 <div>
-                  <label className="text-xs font-semibold text-foreground">
+                  <label className="text-xs font-semibold text-[var(--text)]">
                     Tài liệu / Giáo trình nguồn (tùy chọn)
                   </label>
                   <select
@@ -1071,7 +1238,7 @@ export default function TrangTroLyHocTap() {
                         }
                       }
                     }}
-                    className="mt-1.5 w-full rounded border border-input bg-background px-3 py-2 text-xs focus:border-primary focus:outline-none"
+                    className="mt-1.5 w-full rounded-[var(--radius)] border border-[var(--border)] bg-[var(--surface)] px-3 py-2 text-xs focus:border-[var(--accent)] focus:outline-none"
                   >
                     <option value="">Tất cả tài liệu của lớp học phần</option>
                     {danhSachTaiLieuLop.map((tl: any) => (
@@ -1085,13 +1252,13 @@ export default function TrangTroLyHocTap() {
 
               <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
                 <div>
-                  <label className="text-xs font-semibold text-foreground">
+                  <label className="text-xs font-semibold text-[var(--text)]">
                     Loại nội dung cần biên soạn *
                   </label>
                   <select
                     value={loaiBanNhap}
                     onChange={(e) => setLoaiBanNhap(e.target.value as LoaiBanNhapAI)}
-                    className="mt-1.5 w-full rounded border border-input bg-background px-3 py-2 text-xs focus:border-primary focus:outline-none"
+                    className="mt-1.5 w-full rounded-[var(--radius)] border border-[var(--border)] bg-[var(--surface)] px-3 py-2 text-xs focus:border-[var(--accent)] focus:outline-none"
                   >
                     <option value={LoaiBanNhapAI.CAU_HOI}>Bộ câu hỏi / Đề kiểm tra</option>
                     <option value={LoaiBanNhapAI.TOM_TAT}>Giáo án / Kế hoạch bài giảng</option>
@@ -1100,11 +1267,11 @@ export default function TrangTroLyHocTap() {
                 </div>
 
                 <div>
-                  <label className="text-xs font-semibold text-foreground">Mức độ khó *</label>
+                  <label className="text-xs font-semibold text-[var(--text)]">Mức độ khó *</label>
                   <select
                     value={mucDoKhoBanNhap}
                     onChange={(e) => setMucDoKhoBanNhap(e.target.value as MucDoKho)}
-                    className="mt-1.5 w-full rounded border border-input bg-background px-3 py-2 text-xs focus:border-primary focus:outline-none"
+                    className="mt-1.5 w-full rounded-[var(--radius)] border border-[var(--border)] bg-[var(--surface)] px-3 py-2 text-xs focus:border-[var(--accent)] focus:outline-none"
                   >
                     <option value={MucDoKho.DE}>Dễ (Nhận biết & Thông hiểu)</option>
                     <option value={MucDoKho.TRUNG_BINH}>Trung bình (Vận dụng)</option>
@@ -1114,7 +1281,7 @@ export default function TrangTroLyHocTap() {
 
                 {loaiBanNhap === LoaiBanNhapAI.CAU_HOI && (
                   <div>
-                    <label className="text-xs font-semibold text-foreground">
+                    <label className="text-xs font-semibold text-[var(--text)]">
                       Số lượng câu hỏi (3 - 20)
                     </label>
                     <input
@@ -1123,14 +1290,14 @@ export default function TrangTroLyHocTap() {
                       max={20}
                       value={soLuongCauBanNhap}
                       onChange={(e) => setSoLuongCauBanNhap(Number(e.target.value))}
-                      className="mt-1.5 w-full rounded border border-input bg-background px-3 py-2 text-xs focus:border-primary focus:outline-none"
+                      className="mt-1.5 w-full rounded-[var(--radius)] border border-[var(--border)] bg-[var(--bg)] px-3 py-2 text-xs focus:border-[var(--accent)] focus:outline-none"
                     />
                   </div>
                 )}
               </div>
 
               <div className="space-y-2">
-                <label className="text-xs font-semibold text-foreground">
+                <label className="text-xs font-semibold text-[var(--text)]">
                   Chương / Chủ đề kiến thức trọng tâm *
                 </label>
                 <input
@@ -1139,12 +1306,12 @@ export default function TrangTroLyHocTap() {
                   value={chuDeBanNhap}
                   onChange={(e) => setChuDeBanNhap(e.target.value)}
                   placeholder="VD: Chương 1 - Tổng quan kiến thức hoặc chọn nhanh bên dưới..."
-                  className="w-full rounded border border-input bg-background px-3.5 py-2 text-xs focus:border-primary focus:outline-none"
+                  className="w-full rounded-[var(--radius)] border border-[var(--border)] bg-[var(--bg)] px-3.5 py-2 text-xs focus:border-[var(--accent)] focus:outline-none"
                 />
 
                 {/* Chọn nhanh chủ đề từ tài liệu của lớp hoặc mẫu học thuật */}
                 <div className="flex flex-wrap items-center gap-1.5 pt-1">
-                  <span className="text-[11px] font-mono text-muted-foreground">Chọn nhanh:</span>
+                  <span className="text-[11px] font-mono text-[var(--muted)]">Chọn nhanh:</span>
                   {danhSachTaiLieuLop.slice(0, 3).map((tl: any) => (
                     <button
                       key={tl.id}
@@ -1153,7 +1320,7 @@ export default function TrangTroLyHocTap() {
                         setIdTaiLieuBanNhap(tl.id);
                         setChuDeBanNhap(tl.tieuDe);
                       }}
-                      className="px-2 py-0.5 rounded border border-accent bg-accent-soft text-accent text-[11px] font-medium hover:bg-accent hover:text-white transition-colors cursor-pointer"
+                      className="px-2 py-0.5 rounded-[var(--radius)] border border-[var(--accent)] bg-[var(--accent-soft)] text-[var(--accent)] text-[11px] font-medium hover:bg-[var(--accent)] hover:text-white transition-colors cursor-pointer"
                     >
                       {tl.tieuDe}
                     </button>
@@ -1167,7 +1334,7 @@ export default function TrangTroLyHocTap() {
                       key={idx}
                       type="button"
                       onClick={() => setChuDeBanNhap(cdMau)}
-                      className="px-2 py-0.5 rounded border border-border bg-bg hover:border-accent text-[11px] text-muted-foreground hover:text-foreground transition-colors cursor-pointer"
+                      className="px-2 py-0.5 rounded-[var(--radius)] border border-[var(--border)] bg-[var(--bg)] hover:border-[var(--accent)] text-[11px] text-[var(--muted)] hover:text-[var(--text)] transition-colors cursor-pointer"
                     >
                       {cdMau}
                     </button>
@@ -1175,11 +1342,11 @@ export default function TrangTroLyHocTap() {
                 </div>
               </div>
 
-              <div className="flex items-center justify-end gap-3 pt-3 border-t border-border">
+              <div className="flex items-center justify-end gap-3 pt-3 border-t border-[var(--border)]">
                 <button
                   type="button"
                   onClick={() => setMoModalBanNhap(false)}
-                  className="rounded border border-input px-4 py-2 text-xs font-semibold text-muted-foreground hover:text-foreground cursor-pointer"
+                  className="rounded-[var(--radius)] border border-[var(--border)] px-4 py-2 text-xs font-semibold text-[var(--muted)] hover:text-[var(--text)] cursor-pointer"
                 >
                   Hủy
                 </button>
@@ -1190,7 +1357,7 @@ export default function TrangTroLyHocTap() {
                     !idLopBanNhap ||
                     mutationSinhBanNhapTuTaiLieu.isPending
                   }
-                  className="inline-flex items-center gap-2 rounded bg-primary px-4 py-2 text-xs font-semibold text-primary-foreground hover:bg-primary/90 disabled:opacity-50 cursor-pointer"
+                  className="inline-flex items-center gap-2 rounded-[var(--radius)] bg-[var(--accent)] px-4 py-2 text-xs font-semibold text-white hover:bg-[var(--accent-hover)] disabled:opacity-50 cursor-pointer"
                 >
                   {mutationSinhBanNhapTuTaiLieu.isPending ? (
                     <>
@@ -1216,8 +1383,8 @@ export default function TrangTroLyHocTap() {
               className="space-y-4"
             >
               {/* Điền mẫu nhanh 1 chạm */}
-              <div className="flex flex-wrap items-center gap-1.5 bg-bg p-2.5 rounded border border-border">
-                <span className="text-[11px] font-mono text-muted-foreground mr-1">
+              <div className="flex flex-wrap items-center gap-1.5 bg-[var(--bg)] p-2.5 rounded-[var(--radius)] border border-[var(--border)]">
+                <span className="text-[11px] font-mono text-[var(--muted)] mr-1">
                   Điền mẫu nhanh:
                 </span>
                 <button
@@ -1229,7 +1396,7 @@ export default function TrangTroLyHocTap() {
                       '1. Tóm tắt các khái niệm trọng tâm đã học trong bài giảng.\n2. Viết chương trình / giải bài toán minh họa cho cấu trúc vừa học kèm giải thích từng bước.\n3. Nộp bài trước hạn quy định trên hệ thống.',
                     );
                   }}
-                  className="px-2 py-1 rounded border border-border bg-surface hover:border-accent text-[11px] font-medium text-foreground transition-colors cursor-pointer"
+                  className="px-2 py-1 rounded-[var(--radius)] border border-[var(--border)] bg-[var(--surface)] hover:border-[var(--accent)] text-[11px] font-medium text-[var(--text)] transition-colors cursor-pointer"
                 >
                   Mẫu Bài tập về nhà
                 </button>
@@ -1242,7 +1409,7 @@ export default function TrangTroLyHocTap() {
                       'Câu 1: Trình bày khái niệm và ưu nhược điểm của phương pháp trong bài học.\nCâu 2: Phân tích độ phức tạp và cho ví dụ minh họa thực tế.',
                     );
                   }}
-                  className="px-2 py-1 rounded border border-border bg-surface hover:border-accent text-[11px] font-medium text-foreground transition-colors cursor-pointer"
+                  className="px-2 py-1 rounded-[var(--radius)] border border-[var(--border)] bg-[var(--surface)] hover:border-[var(--accent)] text-[11px] font-medium text-[var(--text)] transition-colors cursor-pointer"
                 >
                   Mẫu Câu hỏi ôn tập
                 </button>
@@ -1255,19 +1422,19 @@ export default function TrangTroLyHocTap() {
                       '- Mục tiêu bài học: Nắm vững lý thuyết cốt lõi và vận dụng vào bài tập.\n- Nội dung trọng tâm: Lý thuyết nền tảng, ví dụ mẫu và bài tập thực hành.\n- Yêu cầu chuẩn bị: Đọc trước tài liệu học tập trên lớp.',
                     );
                   }}
-                  className="px-2 py-1 rounded border border-border bg-surface hover:border-accent text-[11px] font-medium text-foreground transition-colors cursor-pointer"
+                  className="px-2 py-1 rounded-[var(--radius)] border border-[var(--border)] bg-[var(--surface)] hover:border-[var(--accent)] text-[11px] font-medium text-[var(--text)] transition-colors cursor-pointer"
                 >
                   Mẫu Giáo án tóm tắt
                 </button>
               </div>
 
               <div>
-                <label className="text-xs font-semibold text-foreground">Lớp học phần *</label>
+                <label className="text-xs font-semibold text-[var(--text)]">Lớp học phần *</label>
                 <select
                   required
                   value={idLopBanNhap}
                   onChange={(e) => setIdLopBanNhap(e.target.value)}
-                  className="mt-1.5 w-full rounded border border-input bg-background px-3.5 py-2 text-xs focus:border-primary focus:outline-none"
+                  className="mt-1.5 w-full rounded-[var(--radius)] border border-[var(--border)] bg-[var(--surface)] px-3.5 py-2 text-xs focus:border-[var(--accent)] focus:outline-none"
                 >
                   <option value="">Chọn lớp học phần</option>
                   {danhSachLop.map((lop) => (
@@ -1279,11 +1446,11 @@ export default function TrangTroLyHocTap() {
               </div>
 
               <div>
-                <label className="text-xs font-semibold text-foreground">Loại nội dung *</label>
+                <label className="text-xs font-semibold text-[var(--text)]">Loại nội dung *</label>
                 <select
                   value={loaiBanNhap}
                   onChange={(e) => setLoaiBanNhap(e.target.value as LoaiBanNhapAI)}
-                  className="mt-1.5 w-full rounded border border-input bg-background px-3.5 py-2 text-xs focus:border-primary focus:outline-none"
+                  className="mt-1.5 w-full rounded-[var(--radius)] border border-[var(--border)] bg-[var(--surface)] px-3.5 py-2 text-xs focus:border-[var(--accent)] focus:outline-none"
                 >
                   <option value={LoaiBanNhapAI.BAI_TAP}>Bài tập về nhà</option>
                   <option value={LoaiBanNhapAI.CAU_HOI}>Câu hỏi kiểm tra</option>
@@ -1292,41 +1459,43 @@ export default function TrangTroLyHocTap() {
               </div>
 
               <div>
-                <label className="text-xs font-semibold text-foreground">Tiêu đề *</label>
+                <label className="text-xs font-semibold text-[var(--text)]">Tiêu đề *</label>
                 <input
                   type="text"
                   required
                   value={tieuDeBanNhap}
                   onChange={(e) => setTieuDeBanNhap(e.target.value)}
                   placeholder="VD: Bài tập luyện tập cấu trúc rẽ nhánh"
-                  className="mt-1.5 w-full rounded border border-input bg-background px-3.5 py-2 text-xs focus:border-primary focus:outline-none"
+                  className="mt-1.5 w-full rounded-[var(--radius)] border border-[var(--border)] bg-[var(--bg)] px-3.5 py-2 text-xs focus:border-[var(--accent)] focus:outline-none"
                 />
               </div>
 
               <div>
-                <label className="text-xs font-semibold text-foreground">Nội dung chi tiết *</label>
+                <label className="text-xs font-semibold text-[var(--text)]">
+                  Nội dung chi tiết *
+                </label>
                 <textarea
                   required
                   rows={4}
                   value={noiDungBanNhap}
                   onChange={(e) => setNoiDungBanNhap(e.target.value)}
                   placeholder="Nội dung bài tập, câu hỏi hoặc kế hoạch bài giảng..."
-                  className="mt-1.5 w-full rounded border border-input bg-background px-3.5 py-2 text-xs focus:border-primary focus:outline-none resize-none"
+                  className="mt-1.5 w-full rounded-[var(--radius)] border border-[var(--border)] bg-[var(--bg)] px-3.5 py-2 text-xs focus:border-[var(--accent)] focus:outline-none resize-none"
                 />
               </div>
 
-              <div className="flex items-center justify-end gap-3 pt-3 border-t border-border">
+              <div className="flex items-center justify-end gap-3 pt-3 border-t border-[var(--border)]">
                 <button
                   type="button"
                   onClick={() => setMoModalBanNhap(false)}
-                  className="rounded border border-input px-4 py-2 text-xs font-semibold text-muted-foreground hover:text-foreground cursor-pointer"
+                  className="rounded-[var(--radius)] border border-[var(--border)] px-4 py-2 text-xs font-semibold text-[var(--muted)] hover:text-[var(--text)] cursor-pointer"
                 >
                   Hủy
                 </button>
                 <button
                   type="submit"
                   disabled={!tieuDeBanNhap.trim() || !idLopBanNhap || mutationTaoBanNhap.isPending}
-                  className="inline-flex items-center gap-2 rounded bg-primary px-4 py-2 text-xs font-semibold text-primary-foreground hover:bg-primary/90 disabled:opacity-50 cursor-pointer"
+                  className="inline-flex items-center gap-2 rounded-[var(--radius)] bg-[var(--accent)] px-4 py-2 text-xs font-semibold text-white hover:bg-[var(--accent-hover)] disabled:opacity-50 cursor-pointer"
                 >
                   {mutationTaoBanNhap.isPending ? 'Đang lưu...' : 'Lưu bản nháp'}
                 </button>
@@ -1358,7 +1527,7 @@ export default function TrangTroLyHocTap() {
           <div className="space-y-4 text-xs">
             {/* Nội dung văn bản / Kế hoạch bài giảng / Bài tập */}
             {Boolean((banNhapXemChiTiet.duLieuJson as any)?.noiDung) && (
-              <div className="rounded bg-bg border border-border p-4 leading-relaxed max-h-[50vh] overflow-y-auto">
+              <div className="rounded-[var(--radius)] bg-[var(--bg)] border border-[var(--border)] p-4 leading-relaxed max-h-[50vh] overflow-y-auto">
                 <DinhDangMarkdown
                   noiDung={String((banNhapXemChiTiet.duLieuJson as any)?.noiDung || '')}
                 />
@@ -1372,19 +1541,19 @@ export default function TrangTroLyHocTap() {
                   (ch, idx) => (
                     <div
                       key={idx}
-                      className="rounded border border-border bg-bg p-3.5 space-y-2"
+                      className="rounded-[var(--radius)] border border-[var(--border)] bg-[var(--bg)] p-3.5 space-y-2"
                     >
-                      <p className="font-bold text-text">
+                      <p className="font-bold text-[var(--text)]">
                         Câu {idx + 1}: {ch.noiDung}
                       </p>
                       <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
                         {(ch.cacPhuongAn || []).map((pa: any) => (
                           <div
                             key={pa.ma}
-                            className={`p-2 rounded border ${
+                            className={`p-2 rounded-[var(--radius)] border ${
                               pa.ma === ch.dapAnDung
-                                ? 'border-accent bg-accent-soft text-accent font-semibold'
-                                : 'border-border bg-surface text-text'
+                                ? 'border-[var(--accent)] bg-[var(--accent-soft)] text-[var(--accent)] font-semibold'
+                                : 'border-[var(--border)] bg-[var(--surface)] text-[var(--text)]'
                             }`}
                           >
                             <span className="font-mono font-bold mr-1.5">{pa.ma}.</span>
@@ -1393,7 +1562,7 @@ export default function TrangTroLyHocTap() {
                         ))}
                       </div>
                       {ch.giaiThich && (
-                        <p className="text-[11px] text-muted pt-1">
+                        <p className="text-[11px] text-[var(--muted)] pt-1">
                           <strong>Giải thích:</strong> {ch.giaiThich}
                         </p>
                       )}
@@ -1403,11 +1572,11 @@ export default function TrangTroLyHocTap() {
               </div>
             )}
 
-            <div className="flex items-center justify-end gap-2.5 pt-3 border-t border-border">
+            <div className="flex items-center justify-end gap-2.5 pt-3 border-t border-[var(--border)]">
               <button
                 type="button"
                 onClick={() => setBanNhapXemChiTiet(null)}
-                className="rounded border border-border px-4 py-2 text-xs font-semibold text-text hover:bg-bg cursor-pointer"
+                className="rounded-[var(--radius)] border border-[var(--border)] px-4 py-2 text-xs font-semibold text-[var(--text)] hover:bg-[var(--bg)] cursor-pointer"
               >
                 Đóng
               </button>
@@ -1421,7 +1590,7 @@ export default function TrangTroLyHocTap() {
                         trangThai: TrangThaiBanNhapAI.TU_CHOI,
                       })
                     }
-                    className="rounded border border-danger text-danger hover:bg-danger-soft px-4 py-2 text-xs font-semibold cursor-pointer"
+                    className="rounded-[var(--radius)] border border-[var(--danger)] text-[var(--danger)] hover:bg-[var(--danger-soft)] px-4 py-2 text-xs font-semibold cursor-pointer"
                   >
                     Từ chối bản nháp
                   </button>
@@ -1433,7 +1602,7 @@ export default function TrangTroLyHocTap() {
                         trangThai: TrangThaiBanNhapAI.DA_DUYET,
                       })
                     }
-                    className="inline-flex items-center gap-1.5 rounded bg-accent text-white px-4 py-2 text-xs font-semibold cursor-pointer"
+                    className="inline-flex items-center gap-1.5 rounded-[var(--radius)] bg-[var(--accent)] text-white px-4 py-2 text-xs font-semibold cursor-pointer"
                   >
                     <CheckCircle2 className="w-3.5 h-3.5" />
                     {nhanNutDuyet(banNhapXemChiTiet.loaiBanNhap)}
@@ -1456,7 +1625,7 @@ export default function TrangTroLyHocTap() {
         <div className="space-y-5 text-xs">
           {/* 4 thẻ chỉ số KPI */}
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
-            <div className="rounded border border-[var(--border)] bg-[var(--bg)] p-3.5">
+            <div className="rounded-[var(--radius)] border border-[var(--border)] bg-[var(--bg)] p-3.5">
               <p className="eyebrow">Lượt gọi hôm nay</p>
               <p className="text-xl font-mono font-bold text-[var(--accent)] mt-1">
                 {(thongKeSuDung?.tongLuotHomNay ?? 0).toLocaleString('vi-VN')}
@@ -1467,7 +1636,7 @@ export default function TrangTroLyHocTap() {
               </p>
             </div>
 
-            <div className="rounded border border-[var(--border)] bg-[var(--bg)] p-3.5">
+            <div className="rounded-[var(--radius)] border border-[var(--border)] bg-[var(--bg)] p-3.5">
               <p className="eyebrow">Tổng Token xử lý</p>
               <p className="text-xl font-mono font-bold text-[var(--text)] mt-1">
                 {(thongKeSuDung?.tongTokenToanThoiGian ?? 0).toLocaleString('vi-VN')}
@@ -1477,23 +1646,25 @@ export default function TrangTroLyHocTap() {
               </p>
             </div>
 
-            <div className="rounded border border-[var(--border)] bg-[var(--bg)] p-3.5">
+            <div className="rounded-[var(--radius)] border border-[var(--border)] bg-[var(--bg)] p-3.5">
               <p className="eyebrow">Chi phí ước tính</p>
               <p className="text-xl font-mono font-bold text-[var(--accent)] mt-1">
                 {(thongKeSuDung?.chiPhiToanThoiGianVnd ?? 0).toLocaleString('vi-VN')} ₫
               </p>
               <p className="text-[11px] text-[var(--muted)] mt-1">
-                Hôm nay: {(thongKeSuDung?.chiPhiHomNayVnd ?? 0).toLocaleString('vi-VN')} ₫ (~12 ₫/1K token)
+                Hôm nay: {(thongKeSuDung?.chiPhiHomNayVnd ?? 0).toLocaleString('vi-VN')} ₫ (~12 ₫/1K
+                token)
               </p>
             </div>
 
-            <div className="rounded border border-[var(--border)] bg-[var(--bg)] p-3.5">
+            <div className="rounded-[var(--radius)] border border-[var(--border)] bg-[var(--bg)] p-3.5">
               <p className="eyebrow">Độ trễ TB / Hạn mức</p>
               <p className="text-xl font-mono font-bold text-[var(--text)] mt-1">
                 {thongKeSuDung?.doTreTrungBinhMs ?? 0} ms
               </p>
               <p className="text-[11px] text-[var(--muted)] mt-1">
-                GV: {thongKeSuDung?.gioiHanGiaoVien ?? 100} • SV: {thongKeSuDung?.gioiHanHocSinh ?? 30} lượt/ngày
+                GV: {thongKeSuDung?.gioiHanGiaoVien ?? 100} • SV:{' '}
+                {thongKeSuDung?.gioiHanHocSinh ?? 30} lượt/ngày
               </p>
             </div>
           </div>
@@ -1509,7 +1680,7 @@ export default function TrangTroLyHocTap() {
                   {thongKeSuDung.phanBoTheoTacVu.map((item: any) => (
                     <div
                       key={item.loaiTacVu}
-                      className="flex items-center justify-between rounded border border-[var(--border)] bg-[var(--surface)] px-3 py-2.5"
+                      className="flex items-center justify-between rounded-[var(--radius)] border border-[var(--border)] bg-[var(--surface)] px-3 py-2.5"
                     >
                       <div>
                         <p className="font-mono font-semibold text-[var(--text)] text-[11px]">
@@ -1533,7 +1704,7 @@ export default function TrangTroLyHocTap() {
             <h4 className="font-semibold text-[var(--text)]">
               Nhật ký truy vấn & tiêu thụ Token gần đây
             </h4>
-            <div className="max-h-[260px] overflow-y-auto rounded border border-[var(--border)]">
+            <div className="max-h-[260px] overflow-y-auto rounded-[var(--radius)] border border-[var(--border)]">
               <table className="w-full text-left border-collapse">
                 <thead className="bg-[var(--bg)] border-b border-[var(--border)] sticky top-0">
                   <tr>
@@ -1592,7 +1763,7 @@ export default function TrangTroLyHocTap() {
             <button
               type="button"
               onClick={() => setMoModalGiamSat(false)}
-              className="rounded border border-[var(--border)] px-4 py-2 text-xs font-semibold text-[var(--text)] hover:bg-[var(--bg)] cursor-pointer"
+              className="rounded-[var(--radius)] border border-[var(--border)] px-4 py-2 text-xs font-semibold text-[var(--text)] hover:bg-[var(--bg)] cursor-pointer"
             >
               Đóng
             </button>

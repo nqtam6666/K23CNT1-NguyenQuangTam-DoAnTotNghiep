@@ -1,0 +1,495 @@
+<!doctype html>
+<html lang="vi" data-theme="light">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>SmartClass AI · Đợt 3 · Lớp học phần và Trợ lý học tập</title>
+<!--
+  Đợt 3 — Lớp học phần và Trợ lý học tập (cùng token và khung với Đợt 2)
+  Giả định:
+  - Màn 1 Danh sách lớp: thẻ lớp có dải màu nhận diện, buổi tới và việc sắp đến hạn để sinh viên biết vào lớp nào trước.
+  - Màn 2 Chi tiết lớp: đầu trang gọn (mã lớp, tên, giảng viên, học kỳ, sĩ số) + nút vào phòng học,
+    thanh tab gạch chân có số đếm. Tab Bảng tin chia 8/4: bài đăng bên trái, "Sắp tới" và tài liệu mới bên phải.
+  - Màn 3 Trợ lý: 3 cột. Cột phải hiện nguồn trích dẫn của câu trả lời đang chọn để đối chiếu với giáo trình,
+    thay vì chỉ có thẻ nhỏ dưới câu trả lời.
+  - Các tab khác của lớp dùng chung token nên tự đổi theo; chỉnh sâu từng tab ở bước sau.
+-->
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;700&family=Be+Vietnam+Pro:wght@400;500;600&display=swap">
+<style>
+:root{
+  --bg:#FAF8F4; --surface:#FFFDF8; --surface-2:#F2EFE8; --border:#E5E2DA; --border-strong:#D3CEC2;
+  --text:#2B2A27; --muted:#6F6B62;
+  --accent:#0F766E; --accent-hover:#0B5F58; --accent-soft:#E3F0EC; --on-accent:#FFFFFF;
+  --warn:#B45309; --warn-soft:#FAEFDF; --ok:#15803D; --ok-soft:#E4F2E7; --bad:#B91C1C; --bad-soft:#FBE8E6;
+  --info:#0E7490; --info-soft:#E0F2F5;
+  --radius:8px; --shadow:0 1px 2px rgba(43,42,39,.06);
+  --font-sans:"Be Vietnam Pro",system-ui,sans-serif; --font-mono:"JetBrains Mono",ui-monospace,Menlo,monospace;
+}
+[data-theme="dark"]{
+  --bg:#1A1916; --surface:#22211D; --surface-2:#2C2A24; --border:#38362F; --border-strong:#4A473F;
+  --text:#EDEAE2; --muted:#9A968B;
+  --accent:#2DD4BF; --accent-hover:#5EEAD4; --accent-soft:#113632; --on-accent:#0A2622;
+  --warn:#FBBF24; --warn-soft:#38280B; --ok:#4ADE80; --ok-soft:#143321; --bad:#F87171; --bad-soft:#3A1F1D;
+  --info:#38BDF8; --info-soft:#14313A; --shadow:none;
+}
+*{box-sizing:border-box} html,body{margin:0;height:100%}
+body{background:var(--bg);color:var(--text);font-family:var(--font-sans);font-size:14px;line-height:1.65;-webkit-font-smoothing:antialiased}
+a{color:inherit;text-decoration:none} button{font:inherit;color:inherit;background:none;border:0;padding:0;cursor:pointer} input,textarea,select{font:inherit;color:inherit}
+h1,h2,h3{margin:0;font-weight:600;letter-spacing:-.01em} p{margin:0} [hidden]{display:none !important}
+.i{width:16px;height:16px;fill:none;stroke:currentColor;stroke-width:1.5;stroke-linecap:round;stroke-linejoin:round;flex:none}.i-sm{width:14px;height:14px}
+.mono{font-family:var(--font-mono);font-variant-numeric:tabular-nums}
+.muted{color:var(--muted)}
+.btn{display:inline-flex;align-items:center;gap:8px;height:36px;padding:0 14px;border-radius:var(--radius);font-size:13px;font-weight:600;border:1px solid transparent;transition:background-color .15s,border-color .15s,color .15s;white-space:nowrap}
+.btn-primary{background:var(--accent);color:var(--on-accent)}.btn-primary:hover{background:var(--accent-hover)}
+.btn-ghost{background:var(--surface);border-color:var(--border)}.btn-ghost:hover{border-color:var(--accent);color:var(--accent)}
+.btn-sm{height:28px;padding:0 10px;font-size:12px}
+.link{color:var(--accent);font-size:12px;font-weight:600}.link:hover{text-decoration:underline}
+.chip{display:inline-flex;align-items:center;gap:6px;height:22px;padding:0 8px;border-radius:4px;font-family:var(--font-mono);font-size:11px;font-weight:500;white-space:nowrap}
+.chip-ok{background:var(--ok-soft);color:var(--ok)}.chip-warn{background:var(--warn-soft);color:var(--warn)}.chip-muted{background:var(--surface-2);color:var(--muted)}.chip-accent{background:var(--accent-soft);color:var(--accent)}
+.card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);box-shadow:var(--shadow)}
+.card-hd{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:14px 16px;border-bottom:1px solid var(--border)}
+.card-title{font-size:15px;font-weight:600}.card-sub{font-family:var(--font-mono);font-size:11px;color:var(--muted)}
+.row{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:12px 16px;border-bottom:1px solid var(--border)}.row:last-child{border-bottom:0}
+.row-name{font-size:13px;font-weight:600;line-height:1.35}.row-sub{font-family:var(--font-mono);font-size:11px;color:var(--muted)}
+
+/* Khung */
+.app{display:flex;height:100vh;overflow:hidden}
+.side{width:64px;flex:none;background:var(--surface);border-right:1px solid var(--border);display:flex;flex-direction:column;align-items:center;padding:14px 0;gap:6px}
+.mark{width:34px;height:34px;border-radius:var(--radius);background:var(--accent);color:var(--on-accent);display:grid;place-items:center;font-family:var(--font-mono);font-weight:700;font-size:13px;margin-bottom:10px}
+.side a{width:40px;height:40px;display:grid;place-items:center;border-radius:var(--radius);color:var(--muted);transition:background-color .15s,color .15s}
+.side a:hover{background:var(--surface-2)} .side a.active{background:var(--accent-soft);color:var(--accent)}
+.side hr{width:28px;border:0;border-top:1px solid var(--border);margin:6px 0}
+.main{flex:1;display:flex;flex-direction:column;min-width:0}
+.top{height:64px;flex:none;background:var(--surface);border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;padding:0 24px;gap:16px}
+.crumb{display:flex;align-items:center;gap:8px;font-size:13px;color:var(--muted)}.crumb b{color:var(--text);font-weight:600}
+.icon-btn{width:34px;height:34px;display:grid;place-items:center;border:1px solid var(--border);border-radius:var(--radius);background:var(--surface);color:var(--muted)}
+.content{flex:1;overflow-y:auto}
+.page{max-width:1180px;margin:0 auto;padding:28px 28px 48px}
+.hello{display:flex;align-items:flex-end;justify-content:space-between;gap:16px;margin-bottom:20px}
+.hello h1{font-size:22px;line-height:1.3;letter-spacing:-.02em}.hello p{margin-top:4px;color:var(--muted);font-size:13px}
+
+/* Danh sách lớp */
+.toolbar{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:16px}
+.search{display:flex;align-items:center;gap:8px;height:36px;padding:0 12px;border:1px solid var(--border);border-radius:var(--radius);background:var(--surface);color:var(--muted);width:320px}
+.search input{border:0;outline:0;background:none;flex:1;font-size:13px;color:var(--text)}
+.seg{display:inline-flex;padding:3px;border:1px solid var(--border);border-radius:var(--radius);background:var(--surface-2);gap:2px}
+.seg button{height:28px;padding:0 12px;border-radius:6px;font-size:12px;font-weight:600;color:var(--muted);transition:background-color .15s,color .15s}
+.seg button[aria-pressed="true"]{background:var(--surface);color:var(--text);box-shadow:var(--shadow)}
+.classes{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:16px}
+.cls{display:flex;flex-direction:column;overflow:hidden;transition:border-color .15s}
+.cls:hover{border-color:var(--border-strong)}
+.cls .band{height:4px}
+.cls-bd{padding:16px;display:flex;flex-direction:column;gap:6px;flex:1}
+.cls-name{font-size:15px;font-weight:600;line-height:1.35}
+.cls-meta{font-size:12px;color:var(--muted)}
+.cls-next{margin-top:8px;display:flex;flex-direction:column;gap:6px;padding-top:10px;border-top:1px dashed var(--border)}
+.cls-next div{display:flex;align-items:center;gap:8px;font-size:12px}
+.cls-next .i{color:var(--muted)}
+.cls-ft{display:flex;align-items:center;justify-content:space-between;gap:8px;padding:10px 16px;border-top:1px solid var(--border);background:var(--bg)}
+
+/* Chi tiết lớp */
+.cls-head{display:flex;justify-content:space-between;align-items:flex-start;gap:20px;margin-bottom:18px}
+.cls-head h1{font-size:24px;letter-spacing:-.02em;line-height:1.25;margin-top:6px}
+.cls-head .meta{margin-top:8px;display:flex;flex-wrap:wrap;gap:6px 18px;font-size:13px;color:var(--muted)}
+.cls-head .meta span{display:inline-flex;align-items:center;gap:6px}
+.cls-head .meta b{color:var(--text);font-weight:500}
+.join-code{display:inline-flex;align-items:center;gap:8px;height:36px;padding:0 12px;border:1px dashed var(--border-strong);border-radius:var(--radius);font-size:12px;color:var(--muted)}
+.join-code b{font-family:var(--font-mono);font-size:14px;letter-spacing:.12em;color:var(--text)}
+.tabs{display:flex;gap:2px;border-bottom:1px solid var(--border);margin-bottom:20px;overflow-x:auto}
+.tab{height:42px;padding:0 12px;font-size:13px;font-weight:500;color:var(--muted);border-bottom:2px solid transparent;margin-bottom:-1px;display:flex;align-items:center;gap:8px;white-space:nowrap;transition:color .15s,border-color .15s}
+.tab:hover{color:var(--text)} .tab[aria-selected="true"]{color:var(--text);border-bottom-color:var(--accent)}
+.tab .n{font-family:var(--font-mono);font-size:11px;padding:0 6px;border-radius:4px;background:var(--surface-2);color:var(--muted)}
+.tab[aria-selected="true"] .n{background:var(--accent-soft);color:var(--accent)}
+.grid{display:grid;grid-template-columns:minmax(0,8fr) minmax(0,4fr);gap:20px;align-items:start}
+.stack{display:flex;flex-direction:column;gap:16px}
+.composer{padding:14px 16px;display:flex;gap:12px;align-items:flex-start}
+.composer textarea{flex:1;min-height:44px;resize:vertical;padding:10px 12px;border:1px solid var(--border);border-radius:var(--radius);background:var(--bg);font-size:13px;outline:none}
+.composer textarea:focus{border-color:var(--accent)}
+.avatar{width:32px;height:32px;border-radius:50%;background:var(--accent-soft);color:var(--accent);display:grid;place-items:center;font-size:11px;font-weight:600;flex:none}
+.post{padding:16px}
+.post-hd{display:flex;align-items:center;gap:10px}
+.post-hd b{font-size:13px} .post-hd span{font-family:var(--font-mono);font-size:11px;color:var(--muted)}
+.post-bd{margin-top:10px;font-size:14px}
+.post-att{margin-top:10px;display:flex;align-items:center;gap:10px;padding:10px 12px;border:1px solid var(--border);border-radius:var(--radius);background:var(--bg);font-size:13px}
+.post-ft{margin-top:12px;padding-top:10px;border-top:1px solid var(--border);display:flex;gap:16px;font-size:12px;color:var(--muted)}
+.post-ft span{display:inline-flex;align-items:center;gap:6px}
+.pin{display:inline-flex;align-items:center;gap:4px;font-family:var(--font-mono);font-size:10px;font-weight:700;color:var(--accent);text-transform:uppercase;letter-spacing:.1em}
+
+/* Trợ lý */
+.chat-wrap{display:grid;grid-template-columns:248px minmax(0,1fr) 320px;height:100%;min-height:0}
+.sess{border-right:1px solid var(--border);background:var(--surface);display:flex;flex-direction:column;min-height:0}
+.sess-hd{padding:14px;display:flex;flex-direction:column;gap:10px;border-bottom:1px solid var(--border)}
+.sess-list{flex:1;overflow-y:auto;padding:8px}
+.sess-group{padding:8px 8px 4px;font-family:var(--font-mono);font-size:11px;text-transform:uppercase;letter-spacing:.12em;color:var(--muted)}
+.sess-item{display:block;padding:9px 10px;border-radius:var(--radius);transition:background-color .15s}
+.sess-item:hover{background:var(--surface-2)} .sess-item.active{background:var(--accent-soft)}
+.sess-item b{display:block;font-size:13px;font-weight:500;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.sess-item.active b{color:var(--accent)}
+.sess-item span{font-family:var(--font-mono);font-size:11px;color:var(--muted)}
+.chat{display:flex;flex-direction:column;min-height:0;min-width:0}
+.chat-hd{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:12px 20px;border-bottom:1px solid var(--border);background:var(--surface)}
+.chat-hd h2{font-size:15px}
+.chat-hd select{height:32px;padding:0 8px;border:1px solid var(--border);border-radius:var(--radius);background:var(--bg);font-size:12px}
+.msgs{flex:1;overflow-y:auto;padding:24px 20px;display:flex;flex-direction:column;gap:18px}
+.msg-u{align-self:flex-end;max-width:72%;padding:10px 14px;border-radius:var(--radius);background:var(--accent);color:var(--on-accent);font-size:14px}
+.msg-a{max-width:88%;display:flex;gap:12px}
+.msg-a .who{width:30px;height:30px;border-radius:var(--radius);background:var(--accent-soft);color:var(--accent);display:grid;place-items:center;flex:none}
+.msg-a .body{font-size:14px;padding:14px 16px;border:1px solid var(--border);border-radius:var(--radius);background:var(--surface)}
+.msg-a .body.sel{border-color:var(--accent)}
+.msg-a .body ul{margin:8px 0 0;padding-left:18px} .msg-a .body li{margin:4px 0}
+.ref{display:inline-grid;place-items:center;min-width:18px;height:18px;padding:0 4px;margin:0 1px;border-radius:4px;background:var(--accent-soft);color:var(--accent);font-family:var(--font-mono);font-size:10px;font-weight:700;vertical-align:1px;cursor:pointer}
+.msg-meta{margin-top:10px;padding-top:10px;border-top:1px solid var(--border);display:flex;justify-content:space-between;gap:8px;font-family:var(--font-mono);font-size:11px;color:var(--muted)}
+.followups{display:flex;flex-wrap:wrap;gap:6px;margin-left:42px}
+.followups button{font-size:12px;padding:6px 10px;border:1px solid var(--border);border-radius:var(--radius);background:var(--surface);transition:border-color .15s}
+.followups button:hover{border-color:var(--accent);color:var(--accent)}
+.refuse{display:flex;gap:10px;padding:12px 14px;border-radius:var(--radius);background:var(--info-soft);color:var(--info);font-size:13px}.refuse p{color:var(--text)}
+.composer-chat{padding:12px 20px 16px;border-top:1px solid var(--border);background:var(--surface)}
+.composer-chat .box{display:flex;gap:8px;align-items:flex-end;padding:8px;border:1px solid var(--border);border-radius:var(--radius);background:var(--bg)}
+.composer-chat textarea{flex:1;border:0;outline:0;background:none;resize:none;font-size:14px;min-height:40px;padding:4px 6px}
+.composer-chat .hint{margin-top:6px;display:flex;justify-content:space-between;font-size:11px;color:var(--muted);font-family:var(--font-mono)}
+.src{border-left:1px solid var(--border);background:var(--surface);display:flex;flex-direction:column;min-height:0}
+.src-hd{padding:14px 16px;border-bottom:1px solid var(--border)}
+.src-list{flex:1;overflow-y:auto;padding:12px;display:flex;flex-direction:column;gap:10px}
+.src-item{padding:12px;border:1px solid var(--border);border-radius:var(--radius);background:var(--bg);transition:border-color .15s}
+.src-item.hl{border-color:var(--accent)}
+.src-item .t{display:flex;align-items:center;gap:8px;font-size:13px;font-weight:600}
+.src-item .t .ref{cursor:default}
+.src-item .m{margin-top:2px;font-family:var(--font-mono);font-size:11px;color:var(--muted)}
+.src-item q{display:block;margin-top:8px;font-size:12px;color:var(--text);quotes:none;border-left:2px solid var(--border-strong);padding-left:8px}
+.sim{margin-top:8px;display:flex;align-items:center;gap:8px;font-family:var(--font-mono);font-size:11px;color:var(--muted)}
+.sim .bar{flex:1;height:4px;border-radius:2px;background:var(--surface-2);overflow:hidden}.sim .bar i{display:block;height:100%;background:var(--accent)}
+
+.tw-btn{position:fixed;right:20px;bottom:20px;z-index:50;height:32px;padding:0 12px;border-radius:var(--radius);border:1px solid var(--border);background:var(--surface);font-family:var(--font-mono);font-size:11px;color:var(--muted)}
+.tw{position:fixed;right:20px;bottom:60px;z-index:50;width:280px;padding:14px;background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);box-shadow:0 2px 8px rgba(43,42,39,.08);display:flex;flex-direction:column;gap:12px}
+.tw label{display:block;font-family:var(--font-mono);font-size:11px;color:var(--muted);margin-bottom:6px}
+.tw .seg{width:100%}.tw .seg button{flex:1;padding:0 6px}
+@media (max-width:1180px){.classes{grid-template-columns:repeat(2,minmax(0,1fr))}.chat-wrap{grid-template-columns:220px minmax(0,1fr)}.src{display:none}.grid{grid-template-columns:1fr}}
+</style>
+</head>
+<body>
+<svg width="0" height="0" style="position:absolute" aria-hidden="true">
+  <symbol id="i-home" viewBox="0 0 24 24"><rect width="7" height="9" x="3" y="3" rx="1"/><rect width="7" height="5" x="14" y="3" rx="1"/><rect width="7" height="9" x="14" y="12" rx="1"/><rect width="7" height="5" x="3" y="16" rx="1"/></symbol>
+  <symbol id="i-user" viewBox="0 0 24 24"><path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></symbol>
+  <symbol id="i-book" viewBox="0 0 24 24"><path d="M12 7v14"/><path d="M3 18a1 1 0 0 1-1-1V4a1 1 0 0 1 1-1h5a4 4 0 0 1 4 4 4 4 0 0 1 4-4h5a1 1 0 0 1 1 1v13a1 1 0 0 1-1 1h-6a3 3 0 0 0-3 3 3 3 0 0 0-3-3z"/></symbol>
+  <symbol id="i-calendar" viewBox="0 0 24 24"><path d="M8 2v4"/><path d="M16 2v4"/><rect width="18" height="18" x="3" y="4" rx="2"/><path d="M3 10h18"/></symbol>
+  <symbol id="i-bot" viewBox="0 0 24 24"><path d="M12 8V4H8"/><rect width="16" height="12" x="4" y="8" rx="2"/><path d="M2 14h2"/><path d="M20 14h2"/><path d="M15 13v2"/><path d="M9 13v2"/></symbol>
+  <symbol id="i-users" viewBox="0 0 24 24"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></symbol>
+  <symbol id="i-search" viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></symbol>
+  <symbol id="i-moon" viewBox="0 0 24 24"><path d="M12 3a6 6 0 0 0 9 9 9 9 0 1 1-9-9Z"/></symbol>
+  <symbol id="i-video" viewBox="0 0 24 24"><path d="m16 13 5.223 3.482a.5.5 0 0 0 .777-.416V7.87a.5.5 0 0 0-.752-.432L16 10.5"/><rect x="2" y="6" width="14" height="12" rx="2"/></symbol>
+  <symbol id="i-plus" viewBox="0 0 24 24"><path d="M5 12h14"/><path d="M12 5v14"/></symbol>
+  <symbol id="i-key" viewBox="0 0 24 24"><path d="M2.586 17.414A2 2 0 0 0 2 18.828V21a1 1 0 0 0 1 1h3a1 1 0 0 0 1-1v-1a1 1 0 0 1 1-1h1a1 1 0 0 0 1-1v-1a1 1 0 0 1 1-1h.172a2 2 0 0 0 1.414-.586l.814-.814a6.5 6.5 0 1 0-4-4z"/><circle cx="16.5" cy="7.5" r=".5"/></symbol>
+  <symbol id="i-clock" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></symbol>
+  <symbol id="i-file" viewBox="0 0 24 24"><path d="M15 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7Z"/><path d="M14 2v4a2 2 0 0 0 2 2h4"/><path d="M16 13H8"/><path d="M16 17H8"/></symbol>
+  <symbol id="i-msg" viewBox="0 0 24 24"><path d="M7.9 20A9 9 0 1 0 4 16.1L2 22Z"/></symbol>
+  <symbol id="i-copy" viewBox="0 0 24 24"><rect width="14" height="14" x="8" y="8" rx="2"/><path d="M4 16c-1.1 0-2-.9-2-2V4c0-1.1.9-2 2-2h10c1.1 0 2 .9 2 2"/></symbol>
+  <symbol id="i-send" viewBox="0 0 24 24"><path d="M14.536 21.686a.5.5 0 0 0 .937-.024l6.5-19a.496.496 0 0 0-.635-.635l-19 6.5a.5.5 0 0 0-.024.937l7.93 3.18a2 2 0 0 1 1.112 1.11z"/><path d="m21.854 2.147-10.94 10.939"/></symbol>
+  <symbol id="i-info" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4"/><path d="M12 8h.01"/></symbol>
+  <symbol id="i-layers" viewBox="0 0 24 24"><path d="m12.83 2.18a2 2 0 0 0-1.66 0L2.6 6.08a1 1 0 0 0 0 1.83l8.58 3.91a2 2 0 0 0 1.66 0l8.58-3.9a1 1 0 0 0 0-1.83Z"/><path d="m22 17.65-9.17 4.16a2 2 0 0 1-1.66 0L2 17.65"/><path d="m22 12.65-9.17 4.16a2 2 0 0 1-1.66 0L2 12.65"/></symbol>
+</svg>
+
+<div class="app">
+  <nav class="side" aria-label="Thanh điều hướng chính">
+    <span class="mark">SC</span>
+    <a href="#" title="Tổng quan"><svg class="i"><use href="#i-home"></use></svg></a>
+    <a href="#" title="Hồ sơ cá nhân"><svg class="i"><use href="#i-user"></use></svg></a>
+    <hr>
+    <a href="#" title="Lớp học phần" data-nav="lop"><svg class="i"><use href="#i-book"></use></svg></a>
+    <a href="#" title="Thời khóa biểu"><svg class="i"><use href="#i-calendar"></use></svg></a>
+    <a href="#" title="Trợ lý học tập" data-nav="ai"><svg class="i"><use href="#i-bot"></use></svg></a>
+  </nav>
+
+  <div class="main">
+    <header class="top">
+      <div class="crumb" data-crumb></div>
+      <button class="icon-btn" data-theme-toggle aria-label="Đổi giao diện sáng / tối"><svg class="i"><use href="#i-moon"></use></svg></button>
+    </header>
+
+    <div class="content">
+      <!-- ================= MÀN 1: DANH SÁCH LỚP ================= -->
+      <div class="page" data-screen="list" data-screen-label="01 Danh sách lớp">
+        <div class="hello">
+          <div>
+            <h1>Lớp học phần</h1>
+            <p>Học kỳ 1 (2025–2026) · <span data-v="sv">4 lớp đã ghi danh</span><span data-v="gv">3 lớp đang giảng dạy</span></p>
+          </div>
+          <button class="btn btn-primary" data-v="sv"><svg class="i"><use href="#i-key"></use></svg>Tham gia bằng mã</button>
+          <button class="btn btn-primary" data-v="gv"><svg class="i"><use href="#i-plus"></use></svg>Tạo lớp học phần</button>
+        </div>
+        <div class="toolbar">
+          <label class="search"><svg class="i"><use href="#i-search"></use></svg><input placeholder="Tìm theo mã hoặc tên lớp"></label>
+          <div class="seg"><button aria-pressed="true">Đang học</button><button aria-pressed="false">Đã kết thúc</button><button aria-pressed="false">Tất cả</button></div>
+        </div>
+        <div class="classes">
+          <article class="card cls">
+            <div class="band" style="background:var(--accent)"></div>
+            <div class="cls-bd">
+              <div style="display:flex;justify-content:space-between;align-items:center"><span class="chip chip-accent">LHP-PY101-02</span><span class="mono muted" style="font-size:11px">3 tín chỉ</span></div>
+              <a href="#" class="cls-name" data-go="detail">Lập trình Python cơ bản</a>
+              <span class="cls-meta">ThS. Trần Văn Giảng Viên · 42 sinh viên</span>
+              <div class="cls-next">
+                <div><svg class="i i-sm"><use href="#i-clock"></use></svg><span>Hôm nay <b class="mono">13:30</b> · Trực tuyến</span><span class="chip chip-ok" style="margin-left:auto">Đang diễn ra</span></div>
+                <div><svg class="i i-sm"><use href="#i-file"></use></svg><span>Bài tập Chương 3 · hạn <b class="mono">05/11</b></span><span class="chip chip-warn" style="margin-left:auto">Còn 2 ngày</span></div>
+              </div>
+            </div>
+            <div class="cls-ft"><a href="#" class="link" data-go="detail">Vào lớp</a><a href="#" class="btn btn-primary btn-sm"><svg class="i i-sm"><use href="#i-video"></use></svg>Phòng học</a></div>
+          </article>
+          <article class="card cls">
+            <div class="band" style="background:var(--warn)"></div>
+            <div class="cls-bd">
+              <div style="display:flex;justify-content:space-between;align-items:center"><span class="chip chip-accent">LHP-CSDL-01</span><span class="mono muted" style="font-size:11px">3 tín chỉ</span></div>
+              <a href="#" class="cls-name" data-go="detail">Cơ sở dữ liệu</a>
+              <span class="cls-meta">TS. Ngô Thu Hà · 40 sinh viên</span>
+              <div class="cls-next">
+                <div><svg class="i i-sm"><use href="#i-clock"></use></svg><span>Hôm nay <b class="mono">15:45</b> · Phòng B1-204</span></div>
+                <div><svg class="i i-sm"><use href="#i-file"></use></svg><span>Kiểm tra luyện tập · còn 2 lượt</span></div>
+              </div>
+            </div>
+            <div class="cls-ft"><a href="#" class="link" data-go="detail">Vào lớp</a><a href="#" class="btn btn-ghost btn-sm"><svg class="i i-sm"><use href="#i-video"></use></svg>Phòng học</a></div>
+          </article>
+          <article class="card cls">
+            <div class="band" style="background:var(--info)"></div>
+            <div class="cls-bd">
+              <div style="display:flex;justify-content:space-between;align-items:center"><span class="chip chip-accent">LHP-MMT-01</span><span class="mono muted" style="font-size:11px">3 tín chỉ</span></div>
+              <a href="#" class="cls-name" data-go="detail">Mạng máy tính</a>
+              <span class="cls-meta">TS. Phạm Minh · 38 sinh viên</span>
+              <div class="cls-next">
+                <div><svg class="i i-sm"><use href="#i-clock"></use></svg><span>Thứ Năm <b class="mono">07:30</b> · Phòng A2-301</span></div>
+                <div><svg class="i i-sm"><use href="#i-file"></use></svg><span>Không có bài tập sắp đến hạn</span></div>
+              </div>
+            </div>
+            <div class="cls-ft"><a href="#" class="link" data-go="detail">Vào lớp</a><a href="#" class="btn btn-ghost btn-sm"><svg class="i i-sm"><use href="#i-video"></use></svg>Phòng học</a></div>
+          </article>
+          <article class="card cls">
+            <div class="band" style="background:var(--muted)"></div>
+            <div class="cls-bd">
+              <div style="display:flex;justify-content:space-between;align-items:center"><span class="chip chip-accent">LHP-KTPM-02</span><span class="mono muted" style="font-size:11px">2 tín chỉ</span></div>
+              <a href="#" class="cls-name" data-go="detail">Kiểm thử phần mềm</a>
+              <span class="cls-meta">ThS. Vũ Đức Long · 35 sinh viên</span>
+              <div class="cls-next">
+                <div><svg class="i i-sm"><use href="#i-clock"></use></svg><span>Thứ Sáu <b class="mono">09:45</b> · Phòng C3-105</span></div>
+                <div><svg class="i i-sm"><use href="#i-file"></use></svg><span>Báo cáo nhóm · hạn <b class="mono">20/11</b></span></div>
+              </div>
+            </div>
+            <div class="cls-ft"><a href="#" class="link" data-go="detail">Vào lớp</a><a href="#" class="btn btn-ghost btn-sm"><svg class="i i-sm"><use href="#i-video"></use></svg>Phòng học</a></div>
+          </article>
+        </div>
+      </div>
+
+      <!-- ================= MÀN 2: CHI TIẾT LỚP ================= -->
+      <div class="page" data-screen="detail" data-screen-label="02 Chi tiết lớp" hidden>
+        <div class="cls-head">
+          <div>
+            <div style="display:flex;align-items:center;gap:8px"><span class="chip chip-accent">LHP-PY101-02</span><span class="mono muted" style="font-size:11px">Lập trình Python · 3 tín chỉ</span></div>
+            <h1>Lập trình Python cơ bản</h1>
+            <div class="meta">
+              <span><svg class="i i-sm"><use href="#i-user"></use></svg><b>ThS. Trần Văn Giảng Viên</b></span>
+              <span><svg class="i i-sm"><use href="#i-calendar"></use></svg>Học kỳ 1 (2025–2026)</span>
+              <span><svg class="i i-sm"><use href="#i-users"></use></svg><b class="mono">42</b> sinh viên</span>
+            </div>
+          </div>
+          <div style="display:flex;gap:8px;align-items:center;flex:none">
+            <span class="join-code" data-v="gv">Mã tham gia <b>7KZ9A2</b><button aria-label="Sao chép mã"><svg class="i i-sm"><use href="#i-copy"></use></svg></button></span>
+            <a href="#" class="btn btn-primary"><svg class="i"><use href="#i-video"></use></svg>Vào phòng học</a>
+          </div>
+        </div>
+
+        <div class="tabs" role="tablist">
+          <button class="tab" role="tab" aria-selected="true">Bảng tin</button>
+          <button class="tab" role="tab" aria-selected="false">Tài liệu <span class="n">12</span></button>
+          <button class="tab" role="tab" aria-selected="false">Bài tập <span class="n">6</span></button>
+          <button class="tab" role="tab" aria-selected="false">Kiểm tra <span class="n">3</span></button>
+          <button class="tab" role="tab" aria-selected="false">Điểm danh</button>
+          <button class="tab" role="tab" aria-selected="false">Sổ điểm</button>
+          <button class="tab" role="tab" aria-selected="false">Lịch học</button>
+          <button class="tab" role="tab" aria-selected="false">Thành viên <span class="n">42</span></button>
+        </div>
+
+        <div class="grid">
+          <div class="stack">
+            <div class="card composer">
+              <span class="avatar" data-avatar>LH</span>
+              <textarea placeholder="Đăng câu hỏi hoặc trao đổi với lớp" data-composer></textarea>
+              <button class="btn btn-primary btn-sm" style="height:36px">Đăng</button>
+            </div>
+            <article class="card post">
+              <div class="pin" style="margin-bottom:8px">Đã ghim</div>
+              <div class="post-hd"><span class="avatar">TV</span><div><b style="display:block">Trần Văn Giảng Viên</b><span>Giảng viên · 2 giờ trước</span></div></div>
+              <p class="post-bd">Buổi học chiều nay (13:30) học trực tuyến. Các bạn đọc trước Chương 3 và làm thử 3 câu đầu của bài tập để thảo luận trong giờ.</p>
+              <div class="post-att"><svg class="i" style="color:var(--accent)"><use href="#i-file"></use></svg><span>Chương 3 - Vòng lặp.pdf</span><span class="mono muted" style="margin-left:auto;font-size:11px">PDF · 2,4 MB</span></div>
+              <div class="post-ft"><span><svg class="i i-sm"><use href="#i-msg"></use></svg>8 bình luận</span><span>Xem bởi 36/42</span></div>
+            </article>
+            <article class="card post">
+              <div class="post-hd"><span class="avatar">NA</span><div><b style="display:block">Nguyễn Văn An</b><span>Sinh viên · Hôm qua</span></div></div>
+              <p class="post-bd">Cho em hỏi bài 2 Chương 3 có được dùng <span class="mono">while True</span> kèm <span class="mono">break</span> không ạ?</p>
+              <div class="post-ft"><span><svg class="i i-sm"><use href="#i-msg"></use></svg>3 bình luận</span><span style="color:var(--accent)">Giảng viên đã trả lời</span></div>
+            </article>
+          </div>
+          <div class="stack">
+            <section class="card">
+              <div class="card-hd"><div class="card-title">Sắp tới</div><a href="#" class="link">Lịch học</a></div>
+              <div class="row"><div><div class="row-name">Buổi 9: Vòng lặp lồng nhau</div><div class="row-sub">Hôm nay · 13:30–15:30 · Trực tuyến</div></div><span class="chip chip-ok">Đang diễn ra</span></div>
+              <div class="row"><div><div class="row-name">Bài tập Chương 3</div><div class="row-sub">Hạn 23:59 05/11</div></div><span class="chip chip-warn">Còn 2 ngày</span></div>
+              <div class="row"><div><div class="row-name">Kiểm tra giữa kỳ</div><div class="row-sub">Thứ Ba 17/11 · 45 phút</div></div><span class="chip chip-muted">14 ngày</span></div>
+            </section>
+            <section class="card">
+              <div class="card-hd"><div class="card-title">Tài liệu mới</div><a href="#" class="link">Tất cả</a></div>
+              <div class="row"><div><div class="row-name">Chương 3 - Vòng lặp.pdf</div><div class="row-sub">Phiên bản 2 · 2 giờ trước</div></div></div>
+              <div class="row"><div><div class="row-name">Slide tuần 8.pptx</div><div class="row-sub">Phiên bản 1 · 5 ngày trước</div></div></div>
+            </section>
+            <a href="#" data-nav="ai" class="card" style="display:flex;gap:12px;padding:14px 16px;align-items:center">
+              <span class="avatar" style="border-radius:var(--radius)"><svg class="i"><use href="#i-bot"></use></svg></span>
+              <span><b style="display:block;font-size:13px">Hỏi trợ lý về lớp này</b><span class="muted" style="font-size:12px">Trả lời theo 12 tài liệu của lớp</span></span>
+            </a>
+          </div>
+        </div>
+      </div>
+
+      <!-- ================= MÀN 3: TRỢ LÝ ================= -->
+      <div data-screen="ai" data-screen-label="03 Trợ lý học tập" style="height:100%" hidden>
+        <div class="chat-wrap">
+          <aside class="sess">
+            <div class="sess-hd">
+              <button class="btn btn-primary" style="justify-content:center"><svg class="i"><use href="#i-plus"></use></svg>Hội thoại mới</button>
+              <label class="search" style="width:auto;height:32px"><svg class="i i-sm"><use href="#i-search"></use></svg><input placeholder="Tìm hội thoại"></label>
+            </div>
+            <div class="sess-list">
+              <div class="sess-group">Hôm nay</div>
+              <a href="#" class="sess-item active"><b>Khóa chính và khóa ngoại</b><span>CSDL · 4 tin nhắn</span></a>
+              <a href="#" class="sess-item"><b>for và while khác nhau</b><span>Python · 6 tin nhắn</span></a>
+              <div class="sess-group">7 ngày qua</div>
+              <a href="#" class="sess-item"><b>Mô hình OSI 7 tầng</b><span>MMT · 3 tin nhắn</span></a>
+              <a href="#" class="sess-item"><b>Chuẩn hóa dạng 3NF</b><span>CSDL · 8 tin nhắn</span></a>
+            </div>
+            <div style="padding:12px 14px;border-top:1px solid var(--border)" data-v="gv">
+              <a href="#" class="btn btn-ghost" style="width:100%;justify-content:space-between"><span style="display:inline-flex;gap:8px;align-items:center"><svg class="i"><use href="#i-layers"></use></svg>Bản nháp chờ duyệt</span><span class="chip chip-warn">2</span></a>
+            </div>
+          </aside>
+
+          <section class="chat">
+            <div class="chat-hd">
+              <div style="min-width:0"><h2>Khóa chính và khóa ngoại</h2><p class="mono muted" style="font-size:11px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">Trả lời theo tài liệu của lớp</p></div>
+              <div style="display:flex;gap:8px;align-items:center;flex:none">
+                <select aria-label="Lớp học phần"><option>LHP-CSDL-01 · Cơ sở dữ liệu</option><option>Tất cả lớp của tôi</option></select>
+                <div class="seg" role="group" aria-label="Mức độ giải thích"><button aria-pressed="false">Cơ bản</button><button aria-pressed="true">Trung bình</button><button aria-pressed="false">Nâng cao</button></div>
+                <span class="chip chip-accent" title="Hạn mức hôm nay">4/30</span>
+                <button class="btn btn-ghost btn-sm" data-v="gv" style="height:32px"><svg class="i i-sm"><use href="#i-layers"></use></svg>Biên soạn từ tài liệu</button>
+              </div>
+            </div>
+
+            <div class="msgs">
+              <div class="msg-u">Khóa chính và khóa ngoại khác nhau thế nào?</div>
+              <div class="msg-a">
+                <span class="who"><svg class="i"><use href="#i-bot"></use></svg></span>
+                <div class="body sel">
+                  <p>Khóa chính xác định duy nhất mỗi bản ghi, không trùng lặp và không nhận giá trị rỗng <span class="ref" data-ref="1">1</span>. Khóa ngoại tham chiếu đến khóa chính của một quan hệ khác để bảo đảm toàn vẹn tham chiếu <span class="ref" data-ref="2">2</span>.</p>
+                  <ul>
+                    <li>Mỗi bảng chỉ có một khóa chính, có thể gồm nhiều cột <span class="ref" data-ref="1">1</span>.</li>
+                    <li>Một bảng có thể có nhiều khóa ngoại.</li>
+                    <li>Giá trị khóa ngoại phải tồn tại ở bảng được tham chiếu <span class="ref" data-ref="3">3</span>.</li>
+                  </ul>
+                  <div class="msg-meta"><span>3 nguồn · Mức trung bình</span><span>1,8 giây</span></div>
+                </div>
+              </div>
+              <div class="followups">
+                <button>Cho ví dụ bảng SinhVien và GhiDanh</button>
+                <button>ON DELETE CASCADE hoạt động thế nào?</button>
+                <button>Tạo 3 câu trắc nghiệm tự kiểm tra</button>
+              </div>
+              <div class="msg-u">Đề thi cuối kỳ năm nay có những câu nào?</div>
+              <div class="msg-a">
+                <span class="who"><svg class="i"><use href="#i-bot"></use></svg></span>
+                <div class="body">
+                  <div class="refuse"><svg class="i"><use href="#i-info"></use></svg><p>Tài liệu của lớp chưa có nội dung này nên trợ lý không trả lời để tránh suy đoán. Bạn có thể hỏi giảng viên phụ trách hoặc xem thông báo của lớp.</p></div>
+                  <div class="msg-meta"><span>Không tìm thấy nguồn phù hợp</span><span>0,6 giây</span></div>
+                </div>
+              </div>
+            </div>
+
+            <div class="composer-chat">
+              <div class="box"><textarea placeholder="Hỏi về nội dung môn học"></textarea><button class="btn btn-primary" aria-label="Gửi"><svg class="i"><use href="#i-send"></use></svg></button></div>
+              <div class="hint"><span>Enter để gửi · Shift+Enter xuống dòng</span><span>Còn 26 lượt hôm nay</span></div>
+            </div>
+          </section>
+
+          <aside class="src">
+            <div class="src-hd"><div class="card-title">Nguồn trích dẫn</div><p class="mono muted" style="font-size:11px">Của câu trả lời đang chọn</p></div>
+            <div class="src-list">
+              <div class="src-item" data-src="1">
+                <div class="t"><span class="ref">1</span>Giáo trình Cơ sở dữ liệu</div>
+                <div class="m">Chương 2 · Đoạn 5</div>
+                <q>Khóa chính (primary key) là một hoặc một tập thuộc tính xác định duy nhất mỗi bộ trong quan hệ, không được trùng và không nhận giá trị NULL.</q>
+                <div class="sim"><span class="bar"><i style="width:94%"></i></span>94% khớp</div>
+              </div>
+              <div class="src-item" data-src="2">
+                <div class="t"><span class="ref">2</span>Slide tuần 3</div>
+                <div class="m">Trang 12</div>
+                <q>Khóa ngoại: thuộc tính tham chiếu tới khóa chính của quan hệ khác, dùng để liên kết và đảm bảo toàn vẹn tham chiếu.</q>
+                <div class="sim"><span class="bar"><i style="width:88%"></i></span>88% khớp</div>
+              </div>
+              <div class="src-item" data-src="3">
+                <div class="t"><span class="ref">3</span>Giáo trình Cơ sở dữ liệu</div>
+                <div class="m">Chương 2 · Đoạn 7</div>
+                <q>Mọi giá trị của khóa ngoại phải xuất hiện trong khóa chính của quan hệ được tham chiếu, hoặc là NULL nếu cho phép.</q>
+                <div class="sim"><span class="bar"><i style="width:81%"></i></span>81% khớp</div>
+              </div>
+            </div>
+          </aside>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<button class="tw-btn" data-tw-toggle>Tweaks</button>
+<div class="tw" data-tw hidden>
+  <div><label>Màn hình</label><div class="seg" data-tw-screen><button data-v2="list">Danh sách</button><button data-v2="detail">Chi tiết lớp</button><button data-v2="ai">Trợ lý</button></div></div>
+  <div><label>Vai trò</label><div class="seg" data-tw-role><button data-v2="sv">Sinh viên</button><button data-v2="gv">Giảng viên</button></div></div>
+  <div><label>Giao diện</label><div class="seg" data-tw-theme><button data-v2="light">Sáng</button><button data-v2="dark">Tối</button></div></div>
+</div>
+
+<script>
+(function () {
+  var st = { screen: 'list', role: 'sv', theme: 'light' };
+  try { Object.assign(st, JSON.parse(localStorage.getItem('sc-web-dot-3') || '{}')); } catch (e) {}
+  var q = new URLSearchParams(location.search);
+  ['screen', 'role', 'theme'].forEach(function (k) { if (q.has(k)) st[k] = q.get(k); });
+  function $(s){return document.querySelector(s);} function $$(s){return Array.prototype.slice.call(document.querySelectorAll(s));}
+  var CRUMB = {
+    list: '<span>Trang chủ</span><span>/</span><b>Lớp học phần</b>',
+    detail: '<span>Trang chủ</span><span>/</span><span>Lớp học phần</span><span>/</span><b class="mono">LHP-PY101-02</b>',
+    ai: '<span>Trang chủ</span><span>/</span><b>Trợ lý học tập</b>'
+  };
+  function render() {
+    document.documentElement.setAttribute('data-theme', st.theme);
+    $$('[data-screen]').forEach(function (s) { s.hidden = s.getAttribute('data-screen') !== st.screen; });
+    $$('[data-v]').forEach(function (el) { el.hidden = el.getAttribute('data-v') !== st.role; });
+    $('[data-crumb]').innerHTML = CRUMB[st.screen];
+    $$('.side a').forEach(function (a) { a.classList.toggle('active', (st.screen === 'ai' ? 'ai' : 'lop') === a.getAttribute('data-nav')); });
+    $('[data-avatar]').textContent = st.role === 'gv' ? 'TV' : 'LH';
+    $('[data-composer]').placeholder = st.role === 'gv' ? 'Đăng thông báo cho lớp' : 'Đăng câu hỏi hoặc trao đổi với lớp';
+    [['[data-tw-screen]', 'screen'], ['[data-tw-role]', 'role'], ['[data-tw-theme]', 'theme']].forEach(function (p) {
+      $$(p[0] + ' button').forEach(function (b) { b.setAttribute('aria-pressed', String(b.dataset.v2 === st[p[1]])); });
+    });
+    try { localStorage.setItem('sc-web-dot-3', JSON.stringify(st)); } catch (e) {}
+  }
+  document.addEventListener('click', function (e) {
+    var go = e.target.closest('[data-go]'); if (go) { e.preventDefault(); st.screen = go.dataset.go; render(); return; }
+    var nav = e.target.closest('[data-nav]'); if (nav) { e.preventDefault(); st.screen = nav.dataset.nav === 'ai' ? 'ai' : 'list'; render(); return; }
+    var ref = e.target.closest('.msg-a .ref'); if (ref) {
+      $$('.src-item').forEach(function (s) { s.classList.toggle('hl', s.dataset.src === ref.dataset.ref); });
+      var t = $('.src-item[data-src="' + ref.dataset.ref + '"]'); if (t) t.scrollIntoView({ block: 'nearest' });
+    }
+  });
+  $('[data-theme-toggle]').addEventListener('click', function () { st.theme = st.theme === 'dark' ? 'light' : 'dark'; render(); });
+  $('[data-tw-toggle]').addEventListener('click', function () { var p = $('[data-tw]'); p.hidden = !p.hidden; });
+  [['[data-tw-screen]', 'screen'], ['[data-tw-role]', 'role'], ['[data-tw-theme]', 'theme']].forEach(function (p) {
+    $$(p[0] + ' button').forEach(function (b) { b.addEventListener('click', function () { st[p[1]] = b.dataset.v2; render(); }); });
+  });
+  render();
+})();
+</script>
+</body>
+</html>

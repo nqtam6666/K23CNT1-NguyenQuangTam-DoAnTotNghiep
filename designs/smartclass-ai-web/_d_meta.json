@@ -8,15 +8,6 @@
         {
           "path": "Trang chu va Dang nhap.html",
           "createdAt": "2026-11-03T07:44:50.050Z",
-          "status": "needs-review"
-        }
-      ]
-    },
-    "Trang chu va Dang nhap": {
-      "versions": [
-        {
-          "path": "Trang chu va Dang nhap.html",
-          "createdAt": "2026-11-03T08:10:41.464Z",
           "status": "approved"
         }
       ]
@@ -26,20 +17,20 @@
         {
           "path": "Bang dieu khien.html",
           "createdAt": "2026-11-03T08:16:50.259Z",
-          "status": "needs-review"
+          "status": "approved"
         }
       ]
     },
-    "Bang dieu khien": {
+    "Dot 3 - Lop hoc phan va Tro ly": {
       "versions": [
         {
-          "path": "Bang dieu khien.html",
-          "createdAt": "2026-11-03T08:38:02.580Z",
+          "path": "Lop hoc phan va Tro ly.html",
+          "createdAt": "2026-11-03T08:45:03.485Z",
           "status": "approved"
         }
       ]
     }
   },
   "createdAt": "2026-11-03T07:44:50.050Z",
-  "updatedAt": "2026-11-03T08:38:02.581Z"
+  "updatedAt": "2026-11-03T08:56:00.000Z"
 }

@@ -707,11 +707,11 @@ p{margin:0}
           </div>
 
           <div class="field">
-            <label for="matKhau">Mật khẩu <a href="#" data-action="forgot">Quên mật khẩu?</a></label>
+            <label for="matKhau">Mật khẩu <a href="#" data-action="forgot" tabindex="-1">Quên mật khẩu?</a></label>
             <div class="ctl">
               <svg class="i"><use href="#i-lock"></use></svg>
               <input id="matKhau" name="matKhau" type="password" autocomplete="current-password" placeholder="Nhập mật khẩu">
-              <button type="button" class="peek" data-peek aria-label="Hiện mật khẩu"><svg class="i"><use href="#i-eye"></use></svg></button>
+              <button type="button" class="peek" tabindex="-1" data-peek aria-label="Hiện mật khẩu"><svg class="i"><use href="#i-eye"></use></svg></button>
             </div>
             <div class="err" data-err="matKhau" hidden></div>
           </div>

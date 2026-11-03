@@ -210,7 +210,11 @@ export default function TrangDangNhap() {
                 <label htmlFor="matKhau" className="text-[13px] font-semibold">
                   Mật khẩu
                 </label>
-                <Link href="/quen-mat-khau" className="text-[13px] font-medium text-[var(--accent)] hover:underline">
+                <Link
+                  href="/quen-mat-khau"
+                  tabIndex={-1}
+                  className="text-[13px] font-medium text-[var(--accent)] hover:underline"
+                >
                   Quên mật khẩu?
                 </Link>
               </div>
@@ -227,6 +231,7 @@ export default function TrangDangNhap() {
                 />
                 <button
                   type="button"
+                  tabIndex={-1}
                   onClick={() => setHienMatKhau((v) => !v)}
                   aria-label={hienMatKhau ? 'Ẩn mật khẩu' : 'Hiện mật khẩu'}
                   className="absolute right-1.5 w-[30px] h-[30px] grid place-items-center rounded-[4px] text-[var(--muted)] hover:text-[var(--text)] cursor-pointer"

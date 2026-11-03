@@ -1,5 +1,12 @@
 import { Injectable } from '@nestjs/common';
-import { PayloadJwt, VaiTro, TienIchBangDieuKhien, ViecCanXuLy } from '@lms/chung';
+import {
+  PayloadJwt,
+  VaiTro,
+  TienIchBangDieuKhien,
+  ViecCanXuLy,
+  BuoiHocHomNay,
+  TomTatLopHocPhan,
+} from '@lms/chung';
 import { PrismaService } from '../../../cot-loi/csdl/prisma.service';
 import { NhaCungCapTienIch } from '../so-dang-ky-tien-ich.registry';
 
@@ -16,7 +23,7 @@ export class TienIchHocSinhProvider implements NhaCungCapTienIch {
   async cungCapTienIch(nguoiDung: PayloadJwt): Promise<TienIchBangDieuKhien[]> {
     const ketQua: TienIchBangDieuKhien[] = [];
 
-    // Tìm hồ sơ học sinh
+    // Tìm hồ sơ sinh viên. Mọi truy vấn bên dưới chỉ lấy dữ liệu của các lớp sinh viên đã ghi danh.
     const hoSoHocSinh = await this.prisma.hoSoHocSinh.findUnique({
       where: { idNguoiDung: nguoiDung.id },
       include: {
@@ -30,52 +37,99 @@ export class TienIchHocSinhProvider implements NhaCungCapTienIch {
 
     const danhSachIdLop = hoSoHocSinh.danhSachGhiDanh.map((gd) => gd.idLopHocPhan);
 
-    // 1. Thẻ lịch học hôm nay
     const dauNgay = new Date();
     dauNgay.setHours(0, 0, 0, 0);
     const cuoiNgay = new Date();
     cuoiNgay.setHours(23, 59, 59, 999);
 
-    const soBuoiHocHomNay = await this.prisma.buoiHoc.count({
+    // 1. Lịch học hôm nay (danh sách buổi kèm trạng thái điểm danh của chính sinh viên)
+    const cacBuoiHomNay = await this.prisma.buoiHoc.findMany({
       where: {
         idLopHocPhan: { in: danhSachIdLop },
         thoiGianBD: { gte: dauNgay, lte: cuoiNgay },
       },
+      orderBy: { thoiGianBD: 'asc' },
+      select: {
+        id: true,
+        idLopHocPhan: true,
+        chuDe: true,
+        thoiGianBD: true,
+        thoiGianKT: true,
+        trangThai: true,
+        lopHocPhan: {
+          select: {
+            maLopHocPhan: true,
+            tenLopHocPhan: true,
+            giaoVien: { select: { nguoiDung: { select: { hoTen: true } } } },
+          },
+        },
+        banGhiDiemDanh: {
+          where: { idHocSinh: hoSoHocSinh.id },
+          select: { trangThai: true },
+        },
+      },
     });
+
+    const lichHomNay: BuoiHocHomNay[] = cacBuoiHomNay.map((b) => ({
+      id: b.id,
+      idLopHocPhan: b.idLopHocPhan,
+      maLopHocPhan: b.lopHocPhan.maLopHocPhan,
+      tenLopHocPhan: b.lopHocPhan.tenLopHocPhan,
+      chuDe: b.chuDe,
+      thoiGianBD: b.thoiGianBD.toISOString(),
+      thoiGianKT: b.thoiGianKT.toISOString(),
+      trangThai: b.trangThai,
+      tenGiangVien: b.lopHocPhan.giaoVien?.nguoiDung?.hoTen,
+      trangThaiDiemDanh: b.banGhiDiemDanh[0]?.trangThai ?? null,
+    }));
 
     ketQua.push({
       id: 'the-lich-hoc-hom-nay',
       loai: 'THE_THONG_KE',
       tieuDe: 'Lịch học hôm nay',
-      moTa: soBuoiHocHomNay > 0 ? `${soBuoiHocHomNay} buổi học theo thời khóa biểu` : 'Hôm nay không có buổi học',
+      moTa: lichHomNay.length > 0 ? `${lichHomNay.length} buổi học theo thời khóa biểu` : 'Hôm nay không có buổi học',
       duongDanChiTiet: '/thoi-khoa-bieu',
       trangThai: 'THANH_CONG',
       duLieu: {
         id: 'the-lich-hoc-hom-nay',
         tieuDe: 'Lịch học hôm nay',
-        giaTri: soBuoiHocHomNay,
+        giaTri: lichHomNay.length,
         donVi: 'buổi',
         moTa: 'Theo dõi ca học và phòng trực tuyến',
         bieuTuong: 'Calendar',
-        mauSac: 'xanh_duong',
         duongDanChiTiet: '/thoi-khoa-bieu',
       },
     });
 
-    // 2. Thẻ bài tập sắp đến hạn (trong vòng 7 ngày tới)
+    ketQua.push({
+      id: 'lich-hom-nay',
+      loai: 'LICH_HOM_NAY',
+      tieuDe: 'Lịch học hôm nay',
+      duongDanChiTiet: '/thoi-khoa-bieu',
+      trangThai: 'THANH_CONG',
+      duLieu: lichHomNay,
+    });
+
+    // 2. Bài tập sắp đến hạn (trong 7 ngày tới, chưa nộp)
     const bayNgayToi = new Date();
     bayNgayToi.setDate(bayNgayToi.getDate() + 7);
 
-    // Lấy bài tập chưa nộp
     const cacBaiTapSapHan = await this.prisma.baiTap.findMany({
       where: {
         idLopHocPhan: { in: danhSachIdLop },
         hanNop: { gte: new Date(), lte: bayNgayToi },
         cacBaiNop: {
-          none: { idNguoiDung: nguoiDung.id, trangThai: { in: ['DA_NOP', 'DA_CHAM'] } },
+          none: { idNguoiDung: nguoiDung.id, trangThai: { in: ['DA_NOP', 'DA_CHAM', 'NOP_MUON', 'DA_TRA'] } },
         },
       },
-      select: { id: true, tieuDe: true, hanNop: true, idLopHocPhan: true },
+      orderBy: { hanNop: 'asc' },
+      select: {
+        id: true,
+        tieuDe: true,
+        hanNop: true,
+        idLopHocPhan: true,
+        lopHocPhan: { select: { maLopHocPhan: true } },
+      },
     });
 
     ketQua.push({
@@ -92,46 +146,81 @@ export class TienIchHocSinhProvider implements NhaCungCapTienIch {
         donVi: 'bài tập',
         moTa: cacBaiTapSapHan.length > 0 ? 'Hạn nộp trong 7 ngày tới' : 'Không có bài tập trễ hạn',
         bieuTuong: 'BookOpen',
-        mauSac: cacBaiTapSapHan.length > 0 ? 'cam' : 'xanh_la',
         duongDanChiTiet: '/lop-hoc-phan',
       },
     });
 
-    // 3. Thẻ chuyên cần của tôi
+    // 3. Chuyên cần tổng và theo từng lớp
     const banGhiDiemDanh = await this.prisma.banGhiDiemDanh.findMany({
       where: { idHocSinh: hoSoHocSinh.id },
-      select: { trangThai: true },
+      select: { trangThai: true, buoiHoc: { select: { idLopHocPhan: true } } },
     });
 
+    const laCoMat = (t: string) => t === 'CO_MAT' || t === 'DI_MUON';
     const tongSoBuoi = banGhiDiemDanh.length;
-    const soBuoiCoMat = banGhiDiemDanh.filter((bg) => bg.trangThai === 'CO_MAT').length;
+    const soBuoiCoMat = banGhiDiemDanh.filter((bg) => laCoMat(bg.trangThai)).length;
     const tyLeChuyenCan = tongSoBuoi > 0 ? Math.round((soBuoiCoMat / tongSoBuoi) * 100) : 100;
 
     ketQua.push({
       id: 'the-chuyen-can-cua-toi',
       loai: 'THE_THONG_KE',
       tieuDe: 'Chuyên cần của tôi',
-      moTa: `Có mặt ${soBuoiCoMat}/${tongSoBuoi || 1} buổi học đã diễn ra`,
+      moTa: `Có mặt ${soBuoiCoMat}/${tongSoBuoi} buổi học đã điểm danh`,
       duongDanChiTiet: '/lop-hoc-phan',
       trangThai: 'THANH_CONG',
       duLieu: {
         id: 'the-chuyen-can-cua-toi',
         tieuDe: 'Chuyên cần của tôi',
         giaTri: `${tyLeChuyenCan}%`,
-        moTa: `Có mặt ${soBuoiCoMat}/${tongSoBuoi || 1} buổi học`,
+        moTa: `Có mặt ${soBuoiCoMat}/${tongSoBuoi} buổi học`,
         bieuTuong: 'UserCheck',
-        mauSac: tyLeChuyenCan >= 80 ? 'xanh_la' : 'do',
         duongDanChiTiet: '/lop-hoc-phan',
       },
     });
 
-    // 4. Khối Việc cần xử lý cho Học sinh
+    // 4. Tóm tắt các lớp học phần đã ghi danh
+    const cacLop = await this.prisma.lopHocPhan.findMany({
+      where: { id: { in: danhSachIdLop } },
+      orderBy: { maLopHocPhan: 'asc' },
+      select: {
+        id: true,
+        maLopHocPhan: true,
+        tenLopHocPhan: true,
+        giaoVien: { select: { nguoiDung: { select: { hoTen: true } } } },
+        _count: { select: { danhSachGhiDanh: true } },
+      },
+    });
+
+    const tomTatLop: TomTatLopHocPhan[] = cacLop.map((lop) => {
+      const banGhiLop = banGhiDiemDanh.filter((bg) => bg.buoiHoc.idLopHocPhan === lop.id);
+      return {
+        id: lop.id,
+        maLopHocPhan: lop.maLopHocPhan,
+        tenLopHocPhan: lop.tenLopHocPhan,
+        tenGiangVien: lop.giaoVien?.nguoiDung?.hoTen,
+        siSo: lop._count.danhSachGhiDanh,
+        soBuoiCoMat: banGhiLop.filter((bg) => laCoMat(bg.trangThai)).length,
+        soBuoiDaDiemDanh: banGhiLop.length,
+      };
+    });
+
+    ketQua.push({
+      id: 'tom-tat-lop',
+      loai: 'TOM_TAT_LOP',
+      tieuDe: 'Lớp học phần của tôi',
+      duongDanChiTiet: '/lop-hoc-phan',
+      trangThai: 'THANH_CONG',
+      duLieu: tomTatLop,
+    });
+
+    // 5. Việc cần xử lý
     const danhSachViec: ViecCanXuLy[] = cacBaiTapSapHan.map((bt) => ({
       id: `nop-bai-${bt.id}`,
       tieuDe: `Nộp bài tập: ${bt.tieuDe}`,
-      moTa: `Hạn nộp: ${new Date(bt.hanNop).toLocaleString('vi-VN')}`,
+      moTa: bt.lopHocPhan.maLopHocPhan,
       loai: 'NOP_BAI' as const,
       mucDoUuTien: 'CAO' as const,
+      thoiHan: bt.hanNop.toISOString(),
       duongDan: `/lop-hoc-phan/${bt.idLopHocPhan}`,
     }));
 

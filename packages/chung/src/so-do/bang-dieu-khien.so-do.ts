@@ -6,6 +6,10 @@ export const loaiTienIchSchema = z.enum([
   'HOAT_DONG_GAN_DAY',
   'VIEC_CAN_XU_LY',
   'LOI_TAT',
+  'LICH_HOM_NAY',
+  'TOM_TAT_LOP',
+  'CANH_BAO_SOM',
+  'HANG_CHO_XU_LY',
 ]);
 
 export const trangThaiTienIchSchema = z.enum(['THANH_CONG', 'LOI']);

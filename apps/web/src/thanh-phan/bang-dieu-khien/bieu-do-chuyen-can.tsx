@@ -2,43 +2,47 @@
 
 import {
   ResponsiveContainer,
-  AreaChart,
-  Area,
+  BarChart,
+  Bar,
   XAxis,
   YAxis,
   CartesianGrid,
   Tooltip,
 } from 'recharts';
-import { TrendingUp } from 'lucide-react';
-import { TheKhung } from '../the-khung';
-import { HuyHieu } from '../huy-hieu';
 
 interface Props {
   tieuDe?: string;
   duLieu: Array<{ ngay: string; tyLe: number; tongSo?: number; coMat?: number }>;
 }
 
-export function BieuDoChuyenCan({ tieuDe = 'Tỷ lệ chuyên cần 7 ngày gần nhất', duLieu }: Props) {
+/**
+ * Biểu đồ cột chuyên cần 7 ngày: một chuỗi, một màu (accent), có tooltip khi rê chuột.
+ */
+export function BieuDoChuyenCan({ tieuDe = 'Chuyên cần 7 ngày', duLieu }: Props) {
   if (!duLieu || duLieu.length === 0) {
     return null;
   }
 
+  // Ngày không có buổi học (tongSo = 0) không được vẽ thành cột 100%
+  const duLieuVe = duLieu.map((d) => ({ ...d, giaTriVe: d.tongSo === 0 ? 0 : d.tyLe }));
+  const ngayCoDuLieu = duLieu.filter((d) => d.tongSo === undefined || d.tongSo > 0);
+  const trungBinh =
+    ngayCoDuLieu.length > 0
+      ? `TB ${Math.round(ngayCoDuLieu.reduce((t, d) => t + d.tyLe, 0) / ngayCoDuLieu.length)}%`
+      : 'Chưa có buổi học';
+
   return (
-    <TheKhung
-      icon={TrendingUp}
-      eyebrow="THỐNG KÊ CHUYÊN CẦN"
-      tieuDe={tieuDe}
-      moTa="Theo dõi tỷ lệ sinh viên có mặt theo ngày"
-      hanhDong={
-        <HuyHieu loai="accent">
-          <span className="w-1.5 h-1.5 rounded-full bg-[var(--accent)]" />
-          Thời gian thực
-        </HuyHieu>
-      }
-    >
-      <div className="h-64 sm:h-72 w-full">
+    <section className="bg-[var(--surface)] border border-[var(--border)] rounded-[var(--radius)] shadow-xs">
+      <div className="flex items-center justify-between gap-3 px-4 py-3.5 border-b border-[var(--border)]">
+        <div>
+          <h2 className="text-[15px] font-semibold text-[var(--text)]">{tieuDe}</h2>
+          <p className="font-mono text-[11px] text-[var(--muted)]">Tỷ lệ có mặt toàn trường</p>
+        </div>
+        <span className="font-mono text-[11px] text-[var(--muted)]">{trungBinh}</span>
+      </div>
+      <div className="h-[240px] w-full px-2 pt-4 pb-2">
         <ResponsiveContainer width="100%" height="100%">
-          <AreaChart data={duLieu} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
+          <BarChart data={duLieuVe} margin={{ top: 4, right: 12, left: -12, bottom: 0 }} barCategoryGap="30%">
             <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="var(--border)" />
             <XAxis
               dataKey="ngay"
@@ -48,45 +52,42 @@ export function BieuDoChuyenCan({ tieuDe = 'Tỷ lệ chuyên cần 7 ngày gầ
             />
             <YAxis
               domain={[0, 100]}
+              ticks={[0, 50, 100]}
               tickLine={false}
               axisLine={false}
-              tick={{ fontSize: 11, fill: 'var(--muted)', fontFamily: 'var(--font-mono)' }}
-              tickFormatter={(val) => `${val}%`}
+              tick={{ fontSize: 10, fill: 'var(--muted)', fontFamily: 'var(--font-mono)' }}
+              tickFormatter={(v) => `${v}%`}
             />
             <Tooltip
+              cursor={{ fill: 'var(--active-bg)' }}
               content={({ active, payload }) => {
-                if (active && payload && payload.length) {
-                  const item = payload[0].payload;
+                if (!active || !payload?.length) return null;
+                const muc = payload[0].payload;
+                if (muc.tongSo === 0) {
                   return (
-                    <div className="bg-[var(--surface)] text-[var(--text)] border border-[var(--border)] rounded-[var(--radius)] p-3 text-xs">
-                      <p className="font-mono font-semibold text-[var(--muted)]">Ngày {item.ngay}</p>
-                      <p className="mt-1 font-mono text-[var(--accent)] font-bold text-sm">
-                        Tỷ lệ: {item.tyLe}%
-                      </p>
-                      {item.tongSo !== undefined && (
-                        <p className="font-mono text-[11px] text-[var(--muted)] mt-0.5">
-                          Có mặt: {item.coMat}/{item.tongSo} sinh viên
-                        </p>
-                      )}
+                    <div className="bg-[var(--text)] text-[var(--bg)] rounded-[4px] px-2 py-1.5 text-xs">
+                      <p className="font-mono">{muc.ngay} · Không có buổi học</p>
                     </div>
                   );
                 }
-                return null;
+                return (
+                  <div className="bg-[var(--text)] text-[var(--bg)] rounded-[4px] px-2 py-1.5 text-xs">
+                    <p className="font-mono">
+                      {muc.ngay} · {muc.tyLe}%
+                    </p>
+                    {muc.tongSo !== undefined && (
+                      <p className="font-mono opacity-80">
+                        Có mặt {muc.coMat}/{muc.tongSo}
+                      </p>
+                    )}
+                  </div>
+                );
               }}
             />
-            <Area
-              type="monotone"
-              dataKey="tyLe"
-              stroke="var(--accent)"
-              strokeWidth={2}
-              fillOpacity={1}
-              fill="var(--accent-soft)"
-              dot={{ r: 3, fill: 'var(--accent)', strokeWidth: 1.5, stroke: 'var(--surface)' }}
-              activeDot={{ r: 5, fill: 'var(--accent)' }}
-            />
-          </AreaChart>
+            <Bar dataKey="giaTriVe" fill="var(--accent)" radius={[4, 4, 0, 0]} maxBarSize={34} />
+          </BarChart>
         </ResponsiveContainer>
       </div>
-    </TheKhung>
+    </section>
   );
 }

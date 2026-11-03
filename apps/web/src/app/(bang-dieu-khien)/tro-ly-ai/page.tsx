@@ -70,6 +70,12 @@ export default function TrangTroLyHocTap() {
 
   const cuonCuoiTrangRef = useRef<HTMLDivElement>(null);
 
+  // Điền sẵn câu hỏi khi được chuyển từ ô hỏi nhanh ở Bảng điều khiển (?cauHoi=...)
+  useEffect(() => {
+    const cauHoiTuUrl = new URLSearchParams(window.location.search).get('cauHoi');
+    if (cauHoiTuUrl) setCauHoiNhap(cauHoiTuUrl.slice(0, 2000));
+  }, []);
+
   // 1. Lấy thông tin người dùng hiện tại
   const { data: nguoiDung } = useQuery({
     queryKey: ['ho-so-hien-tai'],

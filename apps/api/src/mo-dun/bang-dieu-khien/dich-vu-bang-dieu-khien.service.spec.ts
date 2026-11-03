@@ -181,7 +181,7 @@ describe('DichVuBangDieuKhien (Dashboard Service)', () => {
     expect(tienIchLoi?.thongDiepLoi).toContain('Không thể tải dữ liệu');
   });
 
-  it('4. Phân quyền vai trò: Giáo viên không nhận tiện ích quản trị tổng quan', async () => {
+  it('4. Phân quyền vai trò: Giảng viên không nhận tiện ích quản trị tổng quan', async () => {
     const nguoiDungGiaoVien: PayloadJwt = {
       sub: 'user-gv-1',
       id: 'user-gv-1',

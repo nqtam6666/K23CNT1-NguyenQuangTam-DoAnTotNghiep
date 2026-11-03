@@ -109,8 +109,8 @@ export class TienIchTongQuanProvider implements NhaCungCapTienIch {
       QUAN_TRI_VIEN: 'Quản trị viên',
       BAN_GIAM_HIEU: 'Ban giám hiệu',
       GIAO_VU: 'Giáo vụ',
-      GIAO_VIEN: 'Giáo viên',
-      HOC_SINH: 'Học sinh',
+      GIAO_VIEN: 'Giảng viên',
+      HOC_SINH: 'Sinh viên',
       PHU_HUYNH: 'Phụ huynh',
     };
 

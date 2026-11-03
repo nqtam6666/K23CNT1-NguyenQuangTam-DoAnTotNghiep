@@ -11,8 +11,35 @@
           "status": "needs-review"
         }
       ]
+    },
+    "Trang chu va Dang nhap": {
+      "versions": [
+        {
+          "path": "Trang chu va Dang nhap.html",
+          "createdAt": "2026-11-03T08:10:41.464Z",
+          "status": "approved"
+        }
+      ]
+    },
+    "Dot 2 - Bang dieu khien": {
+      "versions": [
+        {
+          "path": "Bang dieu khien.html",
+          "createdAt": "2026-11-03T08:16:50.259Z",
+          "status": "needs-review"
+        }
+      ]
+    },
+    "Bang dieu khien": {
+      "versions": [
+        {
+          "path": "Bang dieu khien.html",
+          "createdAt": "2026-11-03T08:38:02.580Z",
+          "status": "approved"
+        }
+      ]
     }
   },
   "createdAt": "2026-11-03T07:44:50.050Z",
-  "updatedAt": "2026-11-03T07:44:50.050Z"
+  "updatedAt": "2026-11-03T08:38:02.581Z"
 }

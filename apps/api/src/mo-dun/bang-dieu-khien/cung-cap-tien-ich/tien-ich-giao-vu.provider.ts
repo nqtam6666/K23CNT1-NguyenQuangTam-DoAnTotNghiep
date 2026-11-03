@@ -28,7 +28,7 @@ export class TienIchGiaoVuProvider implements NhaCungCapTienIch {
       id: 'the-lop-chua-phan-cong',
       loai: 'THE_THONG_KE',
       tieuDe: 'Lớp chưa phân công',
-      moTa: soLopChuaPhanCong > 0 ? `${soLopChuaPhanCong} lớp cần gán giảng viên` : 'Tất cả lớp đã có giáo viên',
+      moTa: soLopChuaPhanCong > 0 ? `${soLopChuaPhanCong} lớp cần gán giảng viên` : 'Tất cả lớp đã có giảng viên',
       duongDanChiTiet: '/lop-hoc-phan',
       trangThai: 'THANH_CONG',
       duLieu: {
@@ -36,7 +36,7 @@ export class TienIchGiaoVuProvider implements NhaCungCapTienIch {
         tieuDe: 'Lớp chưa phân công',
         giaTri: soLopChuaPhanCong,
         donVi: 'lớp',
-        moTa: soLopChuaPhanCong > 0 ? 'Cần bổ nhiệm giáo viên' : 'Đã đủ giáo viên',
+        moTa: soLopChuaPhanCong > 0 ? 'Cần bổ nhiệm giảng viên' : 'Đã đủ giảng viên',
         bieuTuong: 'UserCheck',
         mauSac: soLopChuaPhanCong > 0 ? 'cam' : 'xanh_la',
         duongDanChiTiet: '/lop-hoc-phan',
@@ -154,7 +154,7 @@ export class TienIchGiaoVuProvider implements NhaCungCapTienIch {
     if (danhSachViec.length === 0) {
       danhSachViec.push({
         id: 'viec-kiem-tra-dinh-ky',
-        tieuDe: 'Rà soát danh sách học sinh và thời khóa biểu',
+        tieuDe: 'Rà soát danh sách sinh viên và thời khóa biểu',
         moTa: 'Tất cả dữ liệu học vụ hiện tại đang ở trạng thái chuẩn mực.',
         loai: 'KHAC',
         mucDoUuTien: 'THAP',

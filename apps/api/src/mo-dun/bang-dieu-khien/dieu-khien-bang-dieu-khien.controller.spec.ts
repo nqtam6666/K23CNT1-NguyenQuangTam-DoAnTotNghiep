@@ -119,13 +119,13 @@ describe('DieuKhienBangDieuKhien (Controller)', () => {
     expect(res.tienIch.some((t) => t.id === 'the-buoi-day-hom-nay')).toBe(false);
   });
 
-  it('2. Giáo viên chỉ nhận tiện ích giảng dạy, không có tiện ích quản trị', async () => {
+  it('2. Giảng viên chỉ nhận tiện ích giảng dạy, không có tiện ích quản trị', async () => {
     const nguoiDungGiaoVien: PayloadJwt = {
       sub: 'gv-id',
       id: 'gv-id',
       email: 'giaovien@lms.edu.vn',
       vaiTro: VaiTro.GIAO_VIEN,
-      hoTen: 'Giáo viên 1',
+      hoTen: 'Giảng viên 1',
     };
 
     const res = await controller.layDuLieuBangDieuKhien(nguoiDungGiaoVien);

@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+    <group android:checkableBehavior="single">
+        <item
+            android:id="@+id/nav_bang_dieu_khien"
+            android:icon="@drawable/ic_bang_dieu_khien"
+            android:title="Tổng quan &amp; Thông báo" />
+        <item
+            android:id="@+id/nav_lop_hoc_phan"
+            android:icon="@drawable/ic_lop_hoc"
+            android:title="Lớp học phần" />
+        <item
+            android:id="@+id/nav_thoi_khoa_bieu"
+            android:icon="@drawable/ic_thoi_khoa_bieu"
+            android:title="Thời khóa biểu &amp; Điểm danh" />
+        <item
+            android:id="@+id/nav_phong_truc_tuyen"
+            android:icon="@drawable/ic_phong_truc_tuyen"
+            android:title="Phòng học trực tuyến" />
+        <item
+            android:id="@+id/nav_tro_ly_ai"
+            android:icon="@drawable/ic_tro_ly_ai"
+            android:title="Trợ lý học tập AI" />
+        <item
+            android:id="@+id/nav_nguoi_dung"
+            android:icon="@drawable/ic_nguoi_dung"
+            android:title="Quản lý Người dùng" />
+        <item
+            android:id="@+id/nav_hoc_vu"
+            android:icon="@drawable/ic_hoc_vu"
+            android:title="Quản lý Học vụ" />
+        <item
+            android:id="@+id/nav_bao_loi"
+            android:icon="@drawable/ic_bao_loi"
+            android:title="Góp ý &amp; Báo lỗi" />
+        <item
+            android:id="@+id/nav_ho_so"
+            android:icon="@drawable/ic_ho_so"
+            android:title="Hồ sơ &amp; Phiên thiết bị" />
+    </group>
+
+    <item android:title="Phiên làm việc">
+        <menu>
+            <item
+                android:id="@+id/nav_dang_xuat"
+                android:icon="@drawable/ic_dang_xuat"
+                android:title="Đăng xuất tài khoản" />
+        </menu>
+    </item>
+</menu>

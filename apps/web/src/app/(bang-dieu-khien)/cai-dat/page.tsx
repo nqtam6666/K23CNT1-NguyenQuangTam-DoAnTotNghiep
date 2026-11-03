@@ -679,7 +679,18 @@ export default function TrangCaiDatHeThong() {
     staleTime: 30 * 1000,
   });
 
-  // Hợp nhất danh mục chuẩn 64 cài đặt + các khóa mở rộng phát sinh trong DB (nếu có)
+  // Truy vấn thống kê lưu lượng & chi phí Trợ lý AI khi mở nhóm Trợ lý AI
+  const { data: thongKeSuDungAi } = useQuery<any>({
+    queryKey: ['thong-ke-su-dung-ai'],
+    queryFn: async () => {
+      const res = await mayKhachApi.get('/tro-ly-ai/thong-ke-su-dung');
+      return res.data?.duLieu || res.data;
+    },
+    enabled: nhomHienTai === 'tro_ly_ai',
+    staleTime: 15 * 1000,
+  });
+
+  // Hợp nhất danh mục chuẩn 74 cài đặt + các khóa mở rộng phát sinh trong DB (nếu có)
   const danhSachDinhNghiaToanBo = useMemo<DinhNghiaKhoaCaiDat[]>(() => {
     const ketQua: DinhNghiaKhoaCaiDat[] = [...DANH_MUC_CAI_DAT_HE_THONG];
     const tapKhoaDaCo = new Set<string>();
@@ -1956,7 +1967,7 @@ export default function TrangCaiDatHeThong() {
             <div className="px-3.5 py-1.5 border-b border-[var(--border)] flex items-center justify-between">
               <span className="eyebrow">PHÂN HỆ CẤU HÌNH</span>
               <span className="font-mono text-xs text-[var(--muted)] tabular-nums">
-                {danhSachDinhNghiaToanBo.length} mục
+                Tổng {danhSachDinhNghiaToanBo.length} mục
               </span>
             </div>
 
@@ -2041,7 +2052,7 @@ export default function TrangCaiDatHeThong() {
                     <p className="eyebrow">
                       {dangTimKiem
                         ? `TÌM KIẾM TRÊN TOÀN BỘ HỆ THỐNG · ${danhSachMucHienThi.length} KẾT QUẢ`
-                        : `${thongTinNhomHienTai.eyebrow} · ${danhSachMucHienThi.length} CÀI ĐẶT`}
+                        : `${thongTinNhomHienTai.eyebrow} · ${danhSachMucHienThi.length} CÀI ĐẶT TRONG NHÓM`}
                     </p>
                     <h2 className="font-mono text-[17px] font-bold text-[var(--text)]">
                       {dangTimKiem
@@ -2153,27 +2164,76 @@ export default function TrangCaiDatHeThong() {
 
                 {/* Liên kết lấy mã khóa API miễn phí ở nhóm Trợ lý AI */}
                 {!dangTimKiem && nhomHienTai === 'tro_ly_ai' && (
-                  <div className="px-3 py-2 rounded-[var(--radius)] bg-[var(--bg)] border border-[var(--border)] text-xs text-[var(--muted)] flex flex-wrap items-center justify-between gap-2">
-                    <span>Hỗ trợ Google Gemini, Groq Cloud, OpenAI và máy chủ Ollama nội bộ.</span>
-                    <div className="flex items-center gap-3 shrink-0">
-                      <a
-                        href="https://aistudio.google.com/app/apikey"
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="inline-flex items-center gap-1 font-semibold text-[var(--accent)] hover:underline"
-                      >
-                        Khóa Google Gemini <ExternalLink className="w-3 h-3 stroke-[1.5]" />
-                      </a>
-                      <span>·</span>
-                      <a
-                        href="https://console.groq.com/keys"
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="inline-flex items-center gap-1 font-semibold text-[var(--accent)] hover:underline"
-                      >
-                        Khóa Groq Cloud <ExternalLink className="w-3 h-3 stroke-[1.5]" />
-                      </a>
+                  <div className="space-y-3">
+                    <div className="px-3 py-2 rounded-[var(--radius)] bg-[var(--bg)] border border-[var(--border)] text-xs text-[var(--muted)] flex flex-wrap items-center justify-between gap-2">
+                      <span>Hỗ trợ Google Gemini, Groq Cloud, OpenAI và máy chủ Ollama nội bộ.</span>
+                      <div className="flex items-center gap-3 shrink-0">
+                        <a
+                          href="https://aistudio.google.com/app/apikey"
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="inline-flex items-center gap-1 font-semibold text-[var(--accent)] hover:underline"
+                        >
+                          Khóa Google Gemini <ExternalLink className="w-3 h-3 stroke-[1.5]" />
+                        </a>
+                        <span>·</span>
+                        <a
+                          href="https://console.groq.com/keys"
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="inline-flex items-center gap-1 font-semibold text-[var(--accent)] hover:underline"
+                        >
+                          Khóa Groq Cloud <ExternalLink className="w-3 h-3 stroke-[1.5]" />
+                        </a>
+                      </div>
                     </div>
+
+                    {/* Bảng chỉ số giám sát lưu lượng, hạn mức & chi phí vận hành AI */}
+                    {thongKeSuDungAi && (
+                      <div className="grid grid-cols-2 lg:grid-cols-4 gap-2.5">
+                        <div className="rounded-[var(--radius)] border border-[var(--border)] bg-[var(--bg)] p-3">
+                          <p className="eyebrow">Lượt truy vấn hôm nay</p>
+                          <p className="text-base font-mono font-bold text-[var(--accent)] mt-0.5 tabular-nums">
+                            {(thongKeSuDungAi.tongLuotHomNay ?? 0).toLocaleString('vi-VN')} lượt
+                          </p>
+                          <p className="text-[11px] text-[var(--muted)] mt-0.5">
+                            7 ngày: {(thongKeSuDungAi.tongLuot7Ngay ?? 0).toLocaleString('vi-VN')} • Tổng:{' '}
+                            {(thongKeSuDungAi.tongLuotToanThoiGian ?? 0).toLocaleString('vi-VN')}
+                          </p>
+                        </div>
+
+                        <div className="rounded-[var(--radius)] border border-[var(--border)] bg-[var(--bg)] p-3">
+                          <p className="eyebrow">Sản lượng Token xử lý</p>
+                          <p className="text-base font-mono font-bold text-[var(--text)] mt-0.5 tabular-nums">
+                            {(thongKeSuDungAi.tongTokenToanThoiGian ?? 0).toLocaleString('vi-VN')}
+                          </p>
+                          <p className="text-[11px] text-[var(--muted)] mt-0.5">
+                            Hôm nay: {(thongKeSuDungAi.tongTokenHomNay ?? 0).toLocaleString('vi-VN')} token
+                          </p>
+                        </div>
+
+                        <div className="rounded-[var(--radius)] border border-[var(--border)] bg-[var(--bg)] p-3">
+                          <p className="eyebrow">Chi phí ước tính</p>
+                          <p className="text-base font-mono font-bold text-[var(--accent)] mt-0.5 tabular-nums">
+                            {(thongKeSuDungAi.chiPhiToanThoiGianVnd ?? 0).toLocaleString('vi-VN')} ₫
+                          </p>
+                          <p className="text-[11px] text-[var(--muted)] mt-0.5">
+                            Hôm nay: {(thongKeSuDungAi.chiPhiHomNayVnd ?? 0).toLocaleString('vi-VN')} ₫
+                          </p>
+                        </div>
+
+                        <div className="rounded-[var(--radius)] border border-[var(--border)] bg-[var(--bg)] p-3">
+                          <p className="eyebrow">Độ trễ phản hồi TB</p>
+                          <p className="text-base font-mono font-bold text-[var(--text)] mt-0.5 tabular-nums">
+                            {thongKeSuDungAi.doTreTrungBinhMs ?? 0} ms
+                          </p>
+                          <p className="text-[11px] text-[var(--muted)] mt-0.5">
+                            Hạn mức GV: {thongKeSuDungAi.gioiHanGiaoVien ?? 100} / SV:{' '}
+                            {thongKeSuDungAi.gioiHanHocSinh ?? 30}
+                          </p>
+                        </div>
+                      </div>
+                    )}
                   </div>
                 )}
 

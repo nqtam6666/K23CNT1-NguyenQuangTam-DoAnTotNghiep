@@ -53,12 +53,12 @@ export function HoatDongGanDayComponent({ danhSach }: Props) {
         <div className="divide-y divide-[var(--border)]">
           {danhSach.map((item) => (
             <div key={item.id} className="py-3 flex items-start gap-3 first:pt-0 last:pb-0">
-              <div className="w-8 h-8 rounded-[var(--radius)] border border-[var(--border)] bg-[var(--bg)] text-[var(--accent)] flex items-center justify-center shrink-0 mt-0.5">
-                <Shield strokeWidth={1.5} className="w-4 h-4" />
+              <div className="w-8 h-8 rounded-[var(--radius)] bg-[var(--accent-soft)] text-[var(--accent)] flex items-center justify-center shrink-0 mt-0.5">
+                <Shield strokeWidth={1.75} className="w-4 h-4" />
               </div>
 
               <div className="flex-1 min-w-0">
-                <p className="font-mono text-xs font-semibold text-[var(--text)] truncate">
+                <p className="font-sans text-[13px] font-semibold text-[var(--text)] truncate">
                   {dinhDangHanhDong(item.hanhDong)}
                 </p>
                 <div className="flex items-center gap-2 mt-0.5 text-[11px] text-[var(--muted)]">

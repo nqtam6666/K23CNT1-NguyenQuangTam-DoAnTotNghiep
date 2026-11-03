@@ -17,6 +17,8 @@
     "kiem-tra-dinh-dang": "prettier --check \"**/*.{ts,tsx,js,jsx,json,md}\"",
     "prisma:sinh": "turbo run prisma:sinh",
     "prisma:chuyen-doi": "turbo run prisma:chuyen-doi",
+    "docs:usecase": "node .agents/skills/ve-so-do-usecase-uml/scripts/ve-usecase-uml.mjs",
+    "docs:activity-sequence": "node .agents/skills/ve-so-do-activity-sequence-uml/scripts/ve-activity-sequence-uml.mjs",
     "ha-tang:bat": "docker-compose up -d",
     "ha-tang:tat": "docker-compose down"
   },

@@ -9,6 +9,11 @@ export class KhoTaiLieuRepository {
   async layDanhSachTheoLop(idLopHocPhan: string) {
     return this.prisma.taiLieu.findMany({
       where: { idLopHocPhan },
+      include: {
+        _count: {
+          select: { cacDoanRAG: true },
+        },
+      },
       orderBy: { ngayTao: 'desc' },
     });
   }
@@ -18,6 +23,9 @@ export class KhoTaiLieuRepository {
       where: { id },
       include: {
         lopHocPhan: true,
+        _count: {
+          select: { cacDoanRAG: true },
+        },
       },
     });
   }
@@ -31,6 +39,21 @@ export class KhoTaiLieuRepository {
     kichThuocTep: number;
   }) {
     return this.prisma.taiLieu.create({
+      data: duLieu,
+    });
+  }
+
+  async capNhatTaiLieu(
+    id: string,
+    duLieu: {
+      tieuDe?: string;
+      moTa?: string | null;
+      duongDanTep?: string;
+      kichThuocTep?: number;
+    },
+  ) {
+    return this.prisma.taiLieu.update({
+      where: { id },
       data: duLieu,
     });
   }

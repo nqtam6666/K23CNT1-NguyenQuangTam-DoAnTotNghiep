@@ -5,13 +5,15 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import {
   GraduationCap,
   RefreshCw,
-  Sparkles,
+  Bot,
   Plus,
   Save,
   CheckCircle2,
   AlertTriangle,
   Award,
   TrendingUp,
+  TrendingDown,
+  BookOpen,
   Loader2,
   Trash2,
 } from 'lucide-react';
@@ -23,6 +25,8 @@ import {
   CotDiem,
   DongBangDiemHocSinh,
   KetQuaNhanXetHocPhanAI,
+  PhanTichHocTapLop,
+  MucDoCanhBao,
   PayloadJwt,
   VaiTro,
 } from '@lms/chung';
@@ -64,6 +68,15 @@ export function TabSoDiem({ idLopHocPhan, nguoiDung, laGiaoVienLop }: ThuocTinhT
     },
   });
 
+  // 2. Lấy dữ liệu Phân tích học tập (Learning Analytics - Nhóm 4)
+  const { data: phanTichHocTap } = useQuery<PhanTichHocTapLop>({
+    queryKey: ['phan-tich-hoc-tap-lop', idLopHocPhan],
+    queryFn: async () => {
+      const res = await mayKhachApi.get(`/so-diem/lop/${idLopHocPhan}/phan-tich-hoc-tap`);
+      return res.data?.duLieu || res.data;
+    },
+  });
+
   // Đồng bộ dữ liệu điểm vào state chỉnh sửa
   useEffect(() => {
     if (!duLieuSoDiem) return;
@@ -87,8 +100,9 @@ export function TabSoDiem({ idLopHocPhan, nguoiDung, laGiaoVienLop }: ThuocTinhT
     },
     onSuccess: (data) => {
       queryClient.invalidateQueries({ queryKey: ['so-diem-lop', idLopHocPhan] });
+      queryClient.invalidateQueries({ queryKey: ['phan-tich-hoc-tap-lop', idLopHocPhan] });
       thongBao.thanhCong(
-        'Đồng bộ kết quả học phần thành công!',
+        'Đồng bộ kết quả học phần thành công',
         data?.thongDiep || 'Đã cập nhật điểm chuyên cần, luyện tập và thi thử.',
       );
     },
@@ -121,6 +135,7 @@ export function TabSoDiem({ idLopHocPhan, nguoiDung, laGiaoVienLop }: ThuocTinhT
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['so-diem-lop', idLopHocPhan] });
+      queryClient.invalidateQueries({ queryKey: ['phan-tich-hoc-tap-lop', idLopHocPhan] });
       setCoThayDoiDiem(false);
       thongBao.thanhCong('Đã lưu sổ điểm học phần thành công.');
     },
@@ -199,10 +214,10 @@ export function TabSoDiem({ idLopHocPhan, nguoiDung, laGiaoVienLop }: ThuocTinhT
       <div className="flex flex-wrap items-center justify-between gap-4 bg-card rounded border border-border/80 p-5 shadow-sm">
         <div>
           <h3 className="text-base font-semibold text-foreground">
-            Quản lý kết quả học phần & Phân tích năng lực
+            Quản lý kết quả học phần & Phân tích học tập
           </h3>
           <p className="text-xs text-muted-foreground mt-0.5">
-            Tổng hợp điểm thành phần, quy đổi thang điểm tín chỉ (Hệ 10, Hệ 4, Điểm chữ) và tư vấn lộ trình học tập cá nhân hóa
+            Tổng hợp điểm thành phần, quy đổi thang điểm tín chỉ, cảnh báo sớm tiến độ và đề xuất nội dung ôn tập từ câu trả lời sai
           </p>
         </div>
 
@@ -254,28 +269,28 @@ export function TabSoDiem({ idLopHocPhan, nguoiDung, laGiaoVienLop }: ThuocTinhT
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
             <div className="bg-card rounded border border-border/80 p-5 shadow-sm">
               <span className="text-xs text-muted-foreground">Điểm trung bình học phần</span>
-              <p className="text-2xl font-extrabold text-primary mt-1">
+              <p className="text-2xl font-mono font-bold text-primary mt-1">
                 {duLieuSoDiem.thongKe.diemTrungBinhLop} / 10
               </p>
             </div>
 
             <div className="bg-card rounded border border-border/80 p-5 shadow-sm">
               <span className="text-xs text-muted-foreground">Tỷ lệ hoàn thành học phần (Qua môn)</span>
-              <p className="text-2xl font-extrabold text-accent mt-1">
+              <p className="text-2xl font-mono font-bold text-accent mt-1">
                 {duLieuSoDiem.thongKe.tyLeQuaMon}%
               </p>
             </div>
 
             <div className="bg-card rounded border border-border/80 p-5 shadow-sm">
               <span className="text-xs text-muted-foreground">Phân loại Điểm A & Điểm B</span>
-              <p className="text-2xl font-extrabold text-accent mt-1">
+              <p className="text-2xl font-mono font-bold text-accent mt-1">
                 {duLieuSoDiem.thongKe.phanBoDiemChu.A + duLieuSoDiem.thongKe.phanBoDiemChu.B} học sinh
               </p>
             </div>
 
             <div className="bg-card rounded border border-border/80 p-5 shadow-sm">
               <span className="text-xs text-muted-foreground">Cần hỗ trợ phụ đạo (Điểm D / F)</span>
-              <p className="text-2xl font-extrabold text-danger mt-1">
+              <p className="text-2xl font-mono font-bold text-danger mt-1">
                 {duLieuSoDiem.thongKe.phanBoDiemChu.D + duLieuSoDiem.thongKe.phanBoDiemChu.F} học sinh
               </p>
             </div>
@@ -345,10 +360,10 @@ export function TabSoDiem({ idLopHocPhan, nguoiDung, laGiaoVienLop }: ThuocTinhT
                                 setCoThayDoiDiem(true);
                               }}
                               placeholder="—"
-                              className="w-20 text-center rounded-lg border border-input bg-background px-2 py-1 text-xs font-semibold focus:border-primary focus:outline-none"
+                              className="w-20 text-center rounded border border-input bg-background px-2 py-1 text-xs font-mono font-semibold focus:border-primary focus:outline-none"
                             />
                           ) : (
-                            <span className="font-semibold text-foreground">
+                            <span className="font-mono font-semibold text-foreground">
                               {diemHienTai !== null && diemHienTai !== undefined
                                 ? diemHienTai
                                 : '—'}
@@ -358,15 +373,15 @@ export function TabSoDiem({ idLopHocPhan, nguoiDung, laGiaoVienLop }: ThuocTinhT
                       );
                     })}
 
-                    <td className="py-3 px-3 text-center font-bold text-foreground">
+                    <td className="py-3 px-3 text-center font-mono font-bold text-foreground">
                       {hs.diemTrungBinhHe10 !== null ? hs.diemTrungBinhHe10 : '—'}
                     </td>
-                    <td className="py-3 px-3 text-center font-semibold text-accent">
+                    <td className="py-3 px-3 text-center font-mono font-semibold text-accent">
                       {hs.diemTrungBinhHe4 !== null ? hs.diemTrungBinhHe4 : '—'}
                     </td>
                     <td className="py-3 px-3 text-center">
                       {hs.diemChu && hs.diemChu !== 'CHUA_XEP_LOAI' ? (
-                        <span className="px-2 py-0.5 rounded-md bg-primary/10 text-primary font-bold">
+                        <span className="px-2 py-0.5 rounded bg-primary/10 text-primary font-mono font-bold">
                           {hs.diemChu}
                         </span>
                       ) : (
@@ -377,11 +392,11 @@ export function TabSoDiem({ idLopHocPhan, nguoiDung, laGiaoVienLop }: ThuocTinhT
                       {hs.datQuaMon === null ? (
                         <span className="text-muted-foreground">Chưa xét</span>
                       ) : hs.datQuaMon ? (
-                        <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-accent/10 text-accent font-semibold">
+                        <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded bg-accent/10 text-accent font-semibold">
                           <CheckCircle2 className="w-3 h-3" /> Qua môn
                         </span>
                       ) : (
-                        <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-danger/10 text-danger font-semibold">
+                        <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded bg-danger/10 text-danger font-semibold">
                           <AlertTriangle className="w-3 h-3" /> Học lại
                         </span>
                       )}
@@ -391,12 +406,12 @@ export function TabSoDiem({ idLopHocPhan, nguoiDung, laGiaoVienLop }: ThuocTinhT
                         type="button"
                         disabled={idHocSinhDangPhanTich === hs.idHocSinh}
                         onClick={() => phanTichAIMutation.mutate(hs.idHocSinh)}
-                        className="inline-flex items-center gap-1 rounded-lg bg-accent/10 hover:bg-accent/20 text-accent px-2.5 py-1 text-[11px] font-semibold transition-colors cursor-pointer"
+                        className="inline-flex items-center gap-1 rounded bg-accent/10 hover:bg-accent/20 text-accent px-2.5 py-1 text-[11px] font-semibold transition-colors cursor-pointer"
                       >
                         {idHocSinhDangPhanTich === hs.idHocSinh ? (
                           <Loader2 className="w-3 h-3 animate-spin" />
                         ) : (
-                          <Sparkles className="w-3 h-3" />
+                          <Bot className="w-3 h-3" />
                         )}
                         Nhận xét năng lực
                       </button>
@@ -406,6 +421,173 @@ export function TabSoDiem({ idLopHocPhan, nguoiDung, laGiaoVienLop }: ThuocTinhT
               </tbody>
             </table>
           </div>
+
+          {/* KHU VỰC NHÓM 4: PHÂN TÍCH HỌC TẬP (LEARNING ANALYTICS) - CẢNH BÁO SỚM & ĐỀ XUẤT ÔN TẬP */}
+          {phanTichHocTap && (
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+              {/* Khối 1: Cảnh báo sớm sinh viên chậm tiến độ / giảm điểm */}
+              <div className="bg-card rounded border border-border/80 p-5 shadow-sm space-y-4">
+                <div className="flex flex-wrap items-center justify-between gap-2">
+                  <div>
+                    <h4 className="text-sm font-mono font-bold text-foreground flex items-center gap-2">
+                      <AlertTriangle className="w-4 h-4 text-danger" />
+                      Cảnh báo sớm tiến độ & Kết quả học tập
+                    </h4>
+                    <p className="text-xs text-muted-foreground mt-0.5">
+                      Phát hiện sớm học sinh vắng học, chậm nộp bài tập hoặc điểm kiểm tra giảm sút
+                    </p>
+                  </div>
+                  <div className="flex items-center gap-1.5 text-[11px] font-mono">
+                    <span className="px-2 py-0.5 rounded bg-danger-soft text-danger font-semibold">
+                      Nguy cơ cao: {phanTichHocTap.tongQuanCanhBao.soHocSinhNghiemTrong}
+                    </span>
+                    <span className="px-2 py-0.5 rounded bg-info-soft text-info font-semibold">
+                      Cần lưu ý: {phanTichHocTap.tongQuanCanhBao.soHocSinhCanLuuY}
+                    </span>
+                  </div>
+                </div>
+
+                <div className="space-y-3 max-h-[420px] overflow-y-auto pr-1">
+                  {phanTichHocTap.danhSachCanhBao.map((cb) => {
+                    const laNghiemTrong = cb.mucDoCanhBao === MucDoCanhBao.NGHIEM_TRONG;
+                    const laCanLuuY = cb.mucDoCanhBao === MucDoCanhBao.CAN_LUU_Y;
+
+                    return (
+                      <div
+                        key={cb.idHocSinh}
+                        className={`rounded border p-3.5 space-y-2 text-xs ${
+                          laNghiemTrong
+                            ? 'border-danger bg-danger-soft/40'
+                            : laCanLuuY
+                              ? 'border-border bg-bg'
+                              : 'border-border/60 bg-surface'
+                        }`}
+                      >
+                        <div className="flex flex-wrap items-center justify-between gap-2">
+                          <div className="flex items-center gap-2">
+                            <span className="font-mono font-bold text-primary">
+                              {cb.maHocSinh}
+                            </span>
+                            <span className="font-semibold text-foreground">{cb.hoTen}</span>
+                          </div>
+
+                          <div className="flex items-center gap-2">
+                            {cb.xuHuongDiem === 'GIAM' && (
+                              <span className="inline-flex items-center gap-1 text-[10px] font-semibold text-danger">
+                                <TrendingDown className="w-3 h-3" />
+                                Điểm giảm
+                              </span>
+                            )}
+                            {cb.xuHuongDiem === 'TANG' && (
+                              <span className="inline-flex items-center gap-1 text-[10px] font-semibold text-accent">
+                                <TrendingUp className="w-3 h-3" />
+                                Điểm tăng
+                              </span>
+                            )}
+                            <span
+                              className={`px-2 py-0.5 rounded text-[10px] font-semibold ${
+                                laNghiemTrong
+                                  ? 'bg-danger text-white'
+                                  : laCanLuuY
+                                    ? 'bg-info-soft text-info'
+                                    : 'bg-accent-soft text-accent'
+                              }`}
+                            >
+                              {laNghiemTrong
+                                ? 'Cần can thiệp ngay'
+                                : laCanLuuY
+                                  ? 'Cần lưu ý'
+                                  : 'Ổn định'}
+                            </span>
+                          </div>
+                        </div>
+
+                        <div className="flex flex-wrap items-center gap-4 text-[11px] font-mono text-muted-foreground">
+                          <span>Chuyên cần: {cb.tyLeChuyenCan}%</span>
+                          <span>
+                            Bài tập: {cb.soBaiTapDaNop}/{cb.tongSoBaiTap}
+                          </span>
+                          <span>
+                            ĐTB: {cb.diemTrungBinhHe10 !== null ? `${cb.diemTrungBinhHe10}/10` : '—'}
+                          </span>
+                        </div>
+
+                        <ul className="list-disc pl-4 space-y-0.5 text-[11px] text-foreground">
+                          {cb.lyDoCanhBao.map((lyDo, i) => (
+                            <li key={i}>{lyDo}</li>
+                          ))}
+                        </ul>
+
+                        <p className="text-[11px] text-muted-foreground pt-1 border-t border-border/60">
+                          <strong>Khuyến nghị:</strong> {cb.khuyenNghiCanThiep}
+                        </p>
+                      </div>
+                    );
+                  })}
+                </div>
+              </div>
+
+              {/* Khối 2: Đề xuất nội dung ôn tập dựa trên các câu hỏi trả lời sai */}
+              <div className="bg-card rounded border border-border/80 p-5 shadow-sm space-y-4">
+                <div>
+                  <h4 className="text-sm font-mono font-bold text-foreground flex items-center gap-2">
+                    <BookOpen className="w-4 h-4 text-accent" />
+                    Đề xuất nội dung ôn tập từ câu trả lời sai
+                  </h4>
+                  <p className="text-xs text-muted-foreground mt-0.5">
+                    Tổng hợp các câu hỏi và chủ đề có tỷ lệ trả lời sai cao trong các bài kiểm tra để định hướng ôn luyện
+                  </p>
+                </div>
+
+                {phanTichHocTap.deXuatOnTapTheoChuDe.length === 0 ? (
+                  <div className="rounded border border-dashed border-border p-8 text-center text-xs text-muted-foreground">
+                    Chưa ghi nhận câu trả lời sai nào trong các lượt làm bài kiểm tra của lớp học phần.
+                  </div>
+                ) : (
+                  <div className="space-y-3 max-h-[420px] overflow-y-auto pr-1">
+                    {phanTichHocTap.deXuatOnTapTheoChuDe.map((dx, idx) => (
+                      <div
+                        key={dx.idCauHoi || idx}
+                        className="rounded border border-border bg-bg p-3.5 space-y-2 text-xs"
+                      >
+                        <div className="flex items-start justify-between gap-2">
+                          <span className="text-[11px] font-mono font-semibold text-primary">
+                            {dx.tieuDeBaiKiemTra}
+                          </span>
+                          <span className="shrink-0 px-2 py-0.5 rounded bg-danger-soft text-danger font-mono text-[10px] font-bold">
+                            Tỷ lệ sai: {dx.tyLeSai}% ({dx.soLuotTraLoiSai}/{dx.tongSoLuotLam} lượt)
+                          </span>
+                        </div>
+
+                        <p className="font-semibold text-foreground">{dx.noiDungCauHoi}</p>
+
+                        <p className="text-[11px] text-accent bg-accent-soft p-2.5 rounded border border-accent/40">
+                          <strong>Đáp án đúng ({dx.dapAnDung}) & Trọng tâm ôn tập:</strong>{' '}
+                          {dx.giaiThichOnTap}
+                        </p>
+
+                        {dx.taiLieuKhuyenNghi && dx.taiLieuKhuyenNghi.length > 0 && (
+                          <div className="flex flex-wrap items-center gap-1.5 pt-1">
+                            <span className="text-[10px] font-mono text-muted-foreground uppercase">
+                              Học liệu cần xem lại:
+                            </span>
+                            {dx.taiLieuKhuyenNghi.map((tl) => (
+                              <span
+                                key={tl.idTaiLieu}
+                                className="px-2 py-0.5 rounded border border-border bg-surface text-[11px] font-medium text-foreground"
+                              >
+                                {tl.tieuDeTaiLieu}
+                              </span>
+                            ))}
+                          </div>
+                        )}
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </div>
+            </div>
+          )}
         </>
       ) : null}
 
@@ -535,7 +717,7 @@ export function TabSoDiem({ idLopHocPhan, nguoiDung, laGiaoVienLop }: ThuocTinhT
               <button
                 type="button"
                 onClick={() => setKetQuaAI(null)}
-                className="rounded bg-surface hover:bg-surface px-4 py-2 text-xs font-semibold text-white cursor-pointer"
+                className="rounded border border-border bg-surface hover:bg-active-bg px-4 py-2 text-xs font-semibold text-text cursor-pointer"
               >
                 Đóng báo cáo
               </button>

@@ -4,7 +4,7 @@ import { MaLoiNghiepVu } from '@lms/chung';
 
 @Injectable()
 export class ZodValidationPipe implements PipeTransform {
-  constructor(private schema: ZodSchema) {}
+  constructor(public readonly schema: ZodSchema) {}
 
   transform(value: unknown) {
     try {
@@ -12,14 +12,18 @@ export class ZodValidationPipe implements PipeTransform {
       return parsedValue;
     } catch (error) {
       if (error instanceof ZodError) {
+        const chiTietLoi = error.errors.map((e) => ({
+          truong: e.path.join('.'),
+          thongBao: e.message,
+        }));
+        const thongDiepChiTiet =
+          chiTietLoi.map((c) => c.thongBao).filter(Boolean).join('; ') ||
+          'Dữ liệu đầu vào không hợp lệ';
         throw new BadRequestException({
           thanhCong: false,
           maLoi: MaLoiNghiepVu.DU_LIEU_KHONG_HOP_LE,
-          thongDiep: 'Dữ liệu đầu vào không hợp lệ',
-          chiTiet: error.errors.map((e) => ({
-            truong: e.path.join('.'),
-            thongBao: e.message,
-          })),
+          thongDiep: thongDiepChiTiet,
+          chiTiet: chiTietLoi,
         });
       }
       throw new BadRequestException('Dữ liệu không hợp lệ');

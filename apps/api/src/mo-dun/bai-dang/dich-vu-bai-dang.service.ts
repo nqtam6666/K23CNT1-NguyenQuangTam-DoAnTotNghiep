@@ -11,13 +11,25 @@ import { DichVuCaiDatService } from '../cai-dat/dich-vu-cai-dat.service';
 import {
   PayloadJwt,
   VaiTro,
+  ChuDeBaiDang,
   TaoBaiDangInput,
   TaoBinhLuanInput,
+  DanhDauGiaiDapInput,
   MaLoiNghiepVu,
 } from '@lms/chung';
 
+interface MetaBaiDangDienDan {
+  tieuDe?: string | null;
+  chuDe?: ChuDeBaiDang;
+  nhanChuong?: string | null;
+  daGiaiDap?: boolean;
+  idBinhLuanGiaiDap?: string | null;
+}
+
 @Injectable()
 export class DichVuBaiDangService {
+  private readonly boNhoMetaBaiDang = new Map<string, MetaBaiDangDienDan>();
+
   constructor(
     private readonly khoBaiDang: KhoBaiDangRepository,
     private readonly prisma: PrismaService,
@@ -115,13 +127,117 @@ export class DichVuBaiDangService {
     });
   }
 
+  private suyLuanChuDeMacDinh(baiDang: any): MetaBaiDangDienDan {
+    const noiDung = String(baiDang.noiDung || '');
+    if (noiDung.startsWith('[Kế hoạch bài giảng')) {
+      return {
+        tieuDe: 'Kế hoạch bài giảng & Nội dung ôn tập',
+        chuDe: ChuDeBaiDang.CHIA_SE_TAI_LIEU,
+        nhanChuong: null,
+        daGiaiDap: false,
+        idBinhLuanGiaiDap: null,
+      };
+    }
+    if (baiDang.ghimDauTrang || baiDang.nguoiDang?.vaiTro === VaiTro.GIAO_VIEN) {
+      return {
+        tieuDe: null,
+        chuDe: ChuDeBaiDang.THONG_BAO,
+        nhanChuong: null,
+        daGiaiDap: false,
+        idBinhLuanGiaiDap: null,
+      };
+    }
+    if (noiDung.includes('?')) {
+      return {
+        tieuDe: null,
+        chuDe: ChuDeBaiDang.HOI_DAP_BAI_HOC,
+        nhanChuong: null,
+        daGiaiDap: false,
+        idBinhLuanGiaiDap: null,
+      };
+    }
+    return {
+      tieuDe: null,
+      chuDe: ChuDeBaiDang.THAO_LUAN_BAI_TAP,
+      nhanChuong: null,
+      daGiaiDap: false,
+      idBinhLuanGiaiDap: null,
+    };
+  }
+
   // ==========================================
-  // BÀI ĐĂNG
+  // BÀI ĐĂNG & DIỄN ĐÀN HỎI ĐÁP PHÂN LOẠI CHỦ ĐỀ
   // ==========================================
 
   async layDanhSachBaiDang(idLopHocPhan: string, nguoiDung: PayloadJwt) {
     await this.kiemTraQuyenTruyCapLop(idLopHocPhan, nguoiDung);
-    return this.khoBaiDang.layDanhSachTheoLop(idLopHocPhan);
+    const danhSach = await this.khoBaiDang.layDanhSachTheoLop(idLopHocPhan);
+    if (!danhSach || danhSach.length === 0) {
+      return [];
+    }
+
+    const danhSachId = danhSach.map((b: any) => b.id);
+    const banDoMeta = new Map<string, MetaBaiDangDienDan>();
+
+    for (const [id, meta] of this.boNhoMetaBaiDang.entries()) {
+      if (danhSachId.includes(id)) {
+        banDoMeta.set(id, { ...meta });
+      }
+    }
+
+    if ((this.prisma as any).nhatKyHeThong?.findMany) {
+      const cacBanGhiMeta = await (this.prisma as any).nhatKyHeThong.findMany({
+        where: {
+          thucThe: 'BaiDang',
+          idThucThe: { in: danhSachId },
+          hanhDong: { in: ['TAO_BAI_DANG_DIEN_DAN', 'CAP_NHAT_GIAI_DAP_BAI_DANG'] },
+        },
+        orderBy: { ngayTao: 'asc' },
+      });
+
+      for (const bg of cacBanGhiMeta) {
+        if (!bg.idThucThe || !bg.chiTiet) continue;
+        const hienTai = banDoMeta.get(bg.idThucThe) || {};
+        const chiTiet = bg.chiTiet as Record<string, any>;
+        banDoMeta.set(bg.idThucThe, {
+          ...hienTai,
+          ...(chiTiet.tieuDe !== undefined ? { tieuDe: chiTiet.tieuDe } : {}),
+          ...(chiTiet.chuDe !== undefined ? { chuDe: chiTiet.chuDe } : {}),
+          ...(chiTiet.nhanChuong !== undefined ? { nhanChuong: chiTiet.nhanChuong } : {}),
+          ...(chiTiet.daGiaiDap !== undefined ? { daGiaiDap: Boolean(chiTiet.daGiaiDap) } : {}),
+          ...(chiTiet.idBinhLuanGiaiDap !== undefined
+            ? { idBinhLuanGiaiDap: chiTiet.idBinhLuanGiaiDap }
+            : {}),
+        });
+      }
+    }
+
+    return danhSach.map((bai: any) => {
+      const macDinh = this.suyLuanChuDeMacDinh(bai);
+      const meta = {
+        ...macDinh,
+        ...(banDoMeta.get(bai.id) || {}),
+      };
+
+      const cacBinhLuan = Array.isArray(bai.cacBinhLuan)
+        ? bai.cacBinhLuan.map((bl: any) => ({
+            ...bl,
+            laCauTraLoiChapNhan: Boolean(
+              meta.idBinhLuanGiaiDap && bl.id === meta.idBinhLuanGiaiDap,
+            ),
+          }))
+        : bai.cacBinhLuan;
+
+      return {
+        ...bai,
+        tieuDe: meta.tieuDe ?? null,
+        chuDe: meta.chuDe || ChuDeBaiDang.THONG_BAO,
+        nhanChuong: meta.nhanChuong ?? null,
+        daGiaiDap: Boolean(meta.daGiaiDap),
+        idBinhLuanGiaiDap: meta.idBinhLuanGiaiDap ?? null,
+        cacBinhLuan,
+      };
+    });
   }
 
   async taoBaiDang(
@@ -137,12 +253,41 @@ export class DichVuBaiDangService {
       ghimDauTrang = false;
     }
 
+    const chuDe =
+      duLieu.chuDe ||
+      (nguoiDung.vaiTro === VaiTro.HOC_SINH
+        ? ChuDeBaiDang.HOI_DAP_BAI_HOC
+        : ChuDeBaiDang.THONG_BAO);
+    const tieuDe = duLieu.tieuDe?.trim() || null;
+    const nhanChuong = duLieu.nhanChuong?.trim() || null;
+
     const baiDangMoi = await this.khoBaiDang.taoBaiDang({
       idLopHocPhan,
       idNguoiDung: nguoiDung.sub,
       noiDung: duLieu.noiDung.trim(),
       ghimDauTrang,
     });
+
+    const meta: MetaBaiDangDienDan = {
+      tieuDe,
+      chuDe,
+      nhanChuong,
+      daGiaiDap: false,
+      idBinhLuanGiaiDap: null,
+    };
+    this.boNhoMetaBaiDang.set(baiDangMoi.id, meta);
+
+    if ((this.prisma as any).nhatKyHeThong?.create) {
+      await (this.prisma as any).nhatKyHeThong.create({
+        data: {
+          idNguoiDung: nguoiDung.sub,
+          hanhDong: 'TAO_BAI_DANG_DIEN_DAN',
+          thucThe: 'BaiDang',
+          idThucThe: baiDangMoi.id,
+          chiTiet: meta as any,
+        },
+      });
+    }
 
     const tomTat =
       duLieu.noiDung.trim().length > 160
@@ -154,13 +299,96 @@ export class DichVuBaiDangService {
       idNguoiTao: nguoiDung.sub,
       tieuDe: ghimDauTrang
         ? `Thông báo ghim mới · ${lop.tenLopHocPhan}`
-        : `Thông báo mới · ${lop.tenLopHocPhan}`,
+        : tieuDe
+          ? `${tieuDe} · ${lop.tenLopHocPhan}`
+          : `Thảo luận mới · ${lop.tenLopHocPhan}`,
       noiDung: tomTat,
-      duongDan: `/lop-hoc/${idLopHocPhan}`,
+      duongDan: `/lop-hoc-phan/${idLopHocPhan}`,
       loaiSuKien: 'BAI_DANG',
     });
 
-    return baiDangMoi;
+    return {
+      ...baiDangMoi,
+      ...meta,
+    };
+  }
+
+  async danhDauGiaiDap(
+    idBaiDang: string,
+    duLieu: DanhDauGiaiDapInput,
+    nguoiDung: PayloadJwt,
+  ) {
+    const baiDang = await this.khoBaiDang.timTheoId(idBaiDang);
+    if (!baiDang) {
+      throw new NotFoundException({
+        thanhCong: false,
+        maLoi: MaLoiNghiepVu.KHONG_TIM_THAY_TAI_NGUYEN,
+        thongDiep: 'Không tìm thấy bài đăng câu hỏi',
+      });
+    }
+
+    const laAdmin =
+      nguoiDung.vaiTro === VaiTro.QUAN_TRI_VIEN ||
+      nguoiDung.vaiTro === VaiTro.BAN_GIAM_HIEU;
+    const laNguoiDang = baiDang.idNguoiDung === nguoiDung.sub;
+
+    let laGiaoVienLop = false;
+    if (nguoiDung.vaiTro === VaiTro.GIAO_VIEN) {
+      const hoSo = await this.prisma.hoSoGiaoVien.findUnique({
+        where: { idNguoiDung: nguoiDung.sub },
+      });
+      laGiaoVienLop = !!hoSo && baiDang.lopHocPhan.idGiaoVien === hoSo.id;
+    }
+
+    if (!laAdmin && !laNguoiDang && !laGiaoVienLop) {
+      throw new ForbiddenException({
+        thanhCong: false,
+        maLoi: MaLoiNghiepVu.KHONG_CO_QUYEN_TRUY_CAP,
+        thongDiep: 'Chỉ giảng viên phụ trách hoặc người đặt câu hỏi mới có quyền xác nhận câu trả lời đã giải đáp',
+      });
+    }
+
+    if (duLieu.idBinhLuanGiaiDap) {
+      const binhLuanHopLe = (baiDang as any).cacBinhLuan?.some(
+        (bl: any) => bl.id === duLieu.idBinhLuanGiaiDap,
+      );
+      if ((baiDang as any).cacBinhLuan && !binhLuanHopLe) {
+        throw new BadRequestException({
+          thanhCong: false,
+          maLoi: MaLoiNghiepVu.DU_LIEU_KHONG_HOP_LE,
+          thongDiep: 'Bình luận được chọn không thuộc về bài đăng này',
+        });
+      }
+    }
+
+    const hienTai = this.boNhoMetaBaiDang.get(idBaiDang) || {};
+    const capNhat: MetaBaiDangDienDan = {
+      ...hienTai,
+      daGiaiDap: duLieu.daGiaiDap,
+      idBinhLuanGiaiDap: duLieu.daGiaiDap ? (duLieu.idBinhLuanGiaiDap ?? null) : null,
+    };
+    this.boNhoMetaBaiDang.set(idBaiDang, capNhat);
+
+    if ((this.prisma as any).nhatKyHeThong?.create) {
+      await (this.prisma as any).nhatKyHeThong.create({
+        data: {
+          idNguoiDung: nguoiDung.sub,
+          hanhDong: 'CAP_NHAT_GIAI_DAP_BAI_DANG',
+          thucThe: 'BaiDang',
+          idThucThe: idBaiDang,
+          chiTiet: {
+            daGiaiDap: capNhat.daGiaiDap,
+            idBinhLuanGiaiDap: capNhat.idBinhLuanGiaiDap,
+          },
+        },
+      });
+    }
+
+    return {
+      id: idBaiDang,
+      daGiaiDap: capNhat.daGiaiDap,
+      idBinhLuanGiaiDap: capNhat.idBinhLuanGiaiDap,
+    };
   }
 
   async xoaBaiDang(idBaiDang: string, nguoiDung: PayloadJwt) {
@@ -200,6 +428,7 @@ export class DichVuBaiDangService {
     }
 
     await this.khoBaiDang.xoaBaiDang(idBaiDang);
+    this.boNhoMetaBaiDang.delete(idBaiDang);
     return { thanhCong: true, thongDiep: 'Đã xóa bài đăng thành công' };
   }
 

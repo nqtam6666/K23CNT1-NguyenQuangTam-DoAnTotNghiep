@@ -1,20 +1,20 @@
 import {
+  LayoutDashboard,
   Users,
   UserCheck,
   BookOpen,
   Calendar,
-  Video,
   Settings,
   GraduationCap,
   HeartHandshake,
   Info,
-  Sparkles,
+  Bot,
   LifeBuoy,
   LucideIcon,
 } from 'lucide-react';
 import { VaiTro, DoiTuong, HanhDong } from '@lms/chung';
 
-export type NhomMenu = 'QUAN_TRI' | 'HOC_TAP' | 'CA_NHAN';
+export type NhomMenu = 'QUAN_TRI' | 'HOC_TAP' | 'CA_NHAN' | 'TRO_GIUP';
 
 export interface MucMenuCauHinh {
   id: string;
@@ -31,18 +31,19 @@ export interface MucMenuCauHinh {
 }
 
 export const NHOM_MENU_INFO: Record<NhomMenu, { tenNhom: string }> = {
-  QUAN_TRI: { tenNhom: 'Quản trị' },
-  HOC_TAP: { tenNhom: 'Học tập' },
   CA_NHAN: { tenNhom: 'Cá nhân' },
+  HOC_TAP: { tenNhom: 'Học tập' },
+  QUAN_TRI: { tenNhom: 'Quản trị' },
+  TRO_GIUP: { tenNhom: 'Trợ giúp' },
 };
 
 export const DANH_MUC_MENU_CAU_HINH: MucMenuCauHinh[] = [
-  // Nhóm Cá nhân & Tổng quan
+  // Nhóm Cá nhân
   {
     id: 'bang-dieu-khien',
     tieuDe: 'Tổng quan',
     duongDan: '/bang-dieu-khien',
-    bieuTuong: BookOpen,
+    bieuTuong: LayoutDashboard,
     nhom: 'CA_NHAN',
     vaiTroChoPhep: [
       VaiTro.QUAN_TRI_VIEN,
@@ -68,43 +69,13 @@ export const DANH_MUC_MENU_CAU_HINH: MucMenuCauHinh[] = [
       VaiTro.PHU_HUYNH,
     ],
   },
-  {
-    id: 'gioi-thieu',
-    tieuDe: 'Giới thiệu hệ thống',
-    duongDan: '/gioi-thieu',
-    bieuTuong: Info,
-    nhom: 'CA_NHAN',
-    vaiTroChoPhep: [
-      VaiTro.QUAN_TRI_VIEN,
-      VaiTro.BAN_GIAM_HIEU,
-      VaiTro.GIAO_VU,
-      VaiTro.GIAO_VIEN,
-      VaiTro.HOC_SINH,
-      VaiTro.PHU_HUYNH,
-    ],
-  },
-  {
-    id: 'bao-loi-dong-gop',
-    tieuDe: 'Báo lỗi & Đóng góp',
-    duongDan: '/bao-loi-dong-gop',
-    bieuTuong: LifeBuoy,
-    nhom: 'CA_NHAN',
-    vaiTroChoPhep: [
-      VaiTro.QUAN_TRI_VIEN,
-      VaiTro.BAN_GIAM_HIEU,
-      VaiTro.GIAO_VU,
-      VaiTro.GIAO_VIEN,
-      VaiTro.HOC_SINH,
-      VaiTro.PHU_HUYNH,
-    ],
-  },
 
   // Nhóm Học tập
   {
     id: 'lop-hoc-phan',
     tieuDe: 'Lớp học phần',
     duongDan: '/lop-hoc-phan',
-    bieuTuong: Video,
+    bieuTuong: BookOpen,
     nhom: 'HOC_TAP',
     vaiTroChoPhep: [
       VaiTro.QUAN_TRI_VIEN,
@@ -134,7 +105,7 @@ export const DANH_MUC_MENU_CAU_HINH: MucMenuCauHinh[] = [
     id: 'tro-ly-ai',
     tieuDe: 'Trợ lý học tập',
     duongDan: '/tro-ly-ai',
-    bieuTuong: Sparkles,
+    bieuTuong: Bot,
     nhom: 'HOC_TAP',
     vaiTroChoPhep: [
       VaiTro.QUAN_TRI_VIEN,
@@ -194,6 +165,38 @@ export const DANH_MUC_MENU_CAU_HINH: MucMenuCauHinh[] = [
       hanhDong: HanhDong.QuanLy,
       doiTuong: DoiTuong.CaiDatHeThong,
     },
+  },
+
+  // Nhóm Trợ giúp (luôn nằm ở cuối Sidebar)
+  {
+    id: 'gioi-thieu',
+    tieuDe: 'Giới thiệu hệ thống',
+    duongDan: '/gioi-thieu',
+    bieuTuong: Info,
+    nhom: 'TRO_GIUP',
+    vaiTroChoPhep: [
+      VaiTro.QUAN_TRI_VIEN,
+      VaiTro.BAN_GIAM_HIEU,
+      VaiTro.GIAO_VU,
+      VaiTro.GIAO_VIEN,
+      VaiTro.HOC_SINH,
+      VaiTro.PHU_HUYNH,
+    ],
+  },
+  {
+    id: 'bao-loi-dong-gop',
+    tieuDe: 'Báo lỗi & Đóng góp',
+    duongDan: '/bao-loi-dong-gop',
+    bieuTuong: LifeBuoy,
+    nhom: 'TRO_GIUP',
+    vaiTroChoPhep: [
+      VaiTro.QUAN_TRI_VIEN,
+      VaiTro.BAN_GIAM_HIEU,
+      VaiTro.GIAO_VU,
+      VaiTro.GIAO_VIEN,
+      VaiTro.HOC_SINH,
+      VaiTro.PHU_HUYNH,
+    ],
   },
 ];
 

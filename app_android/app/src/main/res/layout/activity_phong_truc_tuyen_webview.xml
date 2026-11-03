@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/bg"
+    android:orientation="vertical">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="52dp"
+        android:background="@color/surface"
+        android:gravity="center_vertical"
+        android:orientation="horizontal"
+        android:paddingHorizontal="12dp">
+
+        <ImageButton
+            android:id="@+id/btnDongPhongWeb"
+            android:layout_width="36dp"
+            android:layout_height="36dp"
+            android:background="@drawable/bg_nut_phu"
+            android:contentDescription="Đóng phòng"
+            android:padding="8dp"
+            android:src="@drawable/ic_quay_lai" />
+
+        <TextView
+            android:id="@+id/tvTieuDePhongWeb"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="10dp"
+            android:layout_weight="1"
+            android:ellipsize="end"
+            android:fontFamily="monospace"
+            android:maxLines="1"
+            android:text="Phòng học trực tuyến"
+            android:textColor="@color/text"
+            android:textSize="14sp"
+            android:textStyle="bold" />
+
+        <TextView
+            android:id="@+id/tvVaiTroPhongWeb"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:background="@drawable/bg_nhan_accent"
+            android:fontFamily="monospace"
+            android:paddingHorizontal="8dp"
+            android:paddingVertical="3dp"
+            android:text="TRỰC TUYẾN"
+            android:textColor="@color/accent"
+            android:textSize="10.5sp"
+            android:textStyle="bold" />
+    </LinearLayout>
+
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:background="@color/border" />
+
+    <WebView
+        android:id="@+id/webViewPhongHoc"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1" />
+</LinearLayout>

@@ -35,31 +35,33 @@ interface Props {
 }
 
 /**
- * Thành phần <TheThongKeComponent> (tương đương <x-stat-card>)
- * - Eyebrow (mono 11px uppercase letter-spacing 0.12em màu muted)
- * - Số liệu lớn mono 20-24px màu accent
- * - Icon Lucide 20px stroke 1.5px trong ô viền 1px
+ * Thành phần <TheThongKeComponent> theo diện mạo SOFT:
+ * - Nhãn tiêu đề: Be Vietnam Pro (font-sans 13px font-medium màu muted)
+ * - Số liệu lớn: JetBrains Mono (font-mono 24-26px tabular-nums)
+ * - Icon trong ô nền accent-soft dịu mắt, bo góc 8px (var(--radius))
  */
 export function TheThongKeComponent({ duLieu }: Props) {
   const BieuTuong = BAN_DO_BIEU_TUONG[duLieu.bieuTuong] || BookOpen;
 
   const NoiDungThe = (
     <div
-      className={`p-5 rounded-[var(--radius)] bg-[var(--surface)] border border-[var(--border)] transition-colors duration-150 ${
+      className={`p-5 rounded-[var(--radius)] bg-[var(--surface)] border border-[var(--border)] shadow-xs transition-colors duration-150 ${
         duLieu.duongDanChiTiet
-          ? 'hover:border-[var(--accent)] hover:bg-[var(--active-bg)]/40 group cursor-pointer'
+          ? 'hover:border-[var(--accent)] group cursor-pointer'
           : ''
       }`}
     >
       <div className="flex items-start justify-between gap-3">
-        <span className="eyebrow">{duLieu.tieuDe}</span>
+        <span className="font-sans text-[13px] font-medium text-[var(--muted)] leading-snug">
+          {duLieu.tieuDe}
+        </span>
         <div className="flex items-center gap-1.5 shrink-0">
-          <div className="w-9 h-9 rounded-[var(--radius)] border border-[var(--border)] bg-[var(--bg)] text-[var(--accent)] flex items-center justify-center">
-            <BieuTuong strokeWidth={1.5} className="w-[20px] h-[20px]" />
+          <div className="w-9 h-9 rounded-[var(--radius)] bg-[var(--accent-soft)] text-[var(--accent)] flex items-center justify-center">
+            <BieuTuong strokeWidth={1.75} className="w-[18px] h-[18px]" />
           </div>
           {duLieu.duongDanChiTiet && (
             <ArrowUpRight
-              strokeWidth={1.5}
+              strokeWidth={1.75}
               className="w-4 h-4 text-[var(--muted)] group-hover:text-[var(--accent)] transition-colors"
             />
           )}
@@ -67,11 +69,11 @@ export function TheThongKeComponent({ duLieu }: Props) {
       </div>
 
       <div className="mt-3 flex items-baseline gap-2">
-        <span className="font-mono text-[22px] sm:text-[24px] font-bold text-[var(--accent)] tracking-tight leading-none">
+        <span className="font-mono text-[24px] sm:text-[26px] font-bold text-[var(--text)] tabular-nums tracking-tight leading-none">
           {duLieu.giaTri}
         </span>
         {duLieu.donVi && (
-          <span className="font-mono text-xs font-medium text-[var(--muted)]">{duLieu.donVi}</span>
+          <span className="font-sans text-xs font-medium text-[var(--muted)]">{duLieu.donVi}</span>
         )}
       </div>
 
@@ -85,12 +87,12 @@ export function TheThongKeComponent({ duLieu }: Props) {
         <div className="mt-3 pt-2.5 border-t border-[var(--border)] flex items-center gap-2 text-xs">
           {duLieu.xuHuong.huong === 'TANG' ? (
             <span className="inline-flex items-center gap-1 font-mono text-[11px] font-semibold bg-[var(--accent-soft)] text-[var(--accent)] px-2 py-0.5 rounded-[var(--radius)]">
-              <TrendingUp strokeWidth={1.5} className="w-3 h-3" />
+              <TrendingUp strokeWidth={1.75} className="w-3 h-3" />
               {duLieu.xuHuong.giaTriPhanTram ? `+${duLieu.xuHuong.giaTriPhanTram}%` : 'Tăng'}
             </span>
           ) : duLieu.xuHuong.huong === 'GIAM' ? (
             <span className="inline-flex items-center gap-1 font-mono text-[11px] font-semibold bg-[var(--danger-soft)] text-[var(--danger)] px-2 py-0.5 rounded-[var(--radius)]">
-              <TrendingDown strokeWidth={1.5} className="w-3 h-3" />
+              <TrendingDown strokeWidth={1.75} className="w-3 h-3" />
               {duLieu.xuHuong.giaTriPhanTram ? `-${duLieu.xuHuong.giaTriPhanTram}%` : 'Giảm'}
             </span>
           ) : null}

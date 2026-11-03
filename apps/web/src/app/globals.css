@@ -13,17 +13,40 @@
   --surface: #FFFDF8;
   --border: #E5E2DA;
   --text: #2B2A27;
-  --muted: #7A766D;
-  --accent: var(--custom-accent-light, #059669);
-  --accent-soft: var(--custom-accent-soft-light, #E6F6EF);
-  --active-bg: #F3EDE4;
-  --danger: #DC2626;
-  --danger-soft: #FCE8E6;
-  --info: #0EA5C6;
-  --info-soft: #E6F6F8;
+  --muted: #6F6B62;
+  --accent: var(--custom-accent-light, #0F766E);
+  --accent-soft: var(--custom-accent-soft-light, #E6F4F1);
+  --active-bg: #F2EFE8;
+  --ok: #15803D;
+  --ok-soft: #EAF6EE;
+  --warn: #B45309;
+  --warn-soft: #FEF3C7;
+  --bad: #B91C1C;
+  --bad-soft: #FDECEC;
+  --danger: #B91C1C;
+  --danger-soft: #FDECEC;
+  --info: #0E7490;
+  --info-soft: #E0F2FE;
   --warning: #B45309;
   --warning-soft: #FEF3C7;
-  --radius: 4px;
+  --radius: 8px;
+
+  /* Bảng 8 màu lớp học dịu mắt (không tím) cho dải màu & ô viết tắt lớp */
+  --lop-1: #0F766E;
+  --lop-2: #B45309;
+  --lop-3: #1D4ED8;
+  --lop-4: #BE123C;
+  --lop-5: #4D7C0F;
+  --lop-6: #0E7490;
+  --lop-7: #A16207;
+  --lop-8: #57534E;
+
+  /* Token Phòng học trực tuyến (luôn tối cố định ở mọi chế độ sáng/tối) */
+  --phong-bg: #14130F;
+  --phong-surface: #1E1D19;
+  --phong-border: #38362F;
+  --phong-text: #EDEAE2;
+  --phong-muted: #9A968B;
 
   /* Ánh xạ biến hệ thống shadcn/ui sang tokens chuẩn */
   --background: var(--bg);
@@ -37,7 +60,7 @@
   --secondary: var(--active-bg);
   --secondary-foreground: var(--text);
   --muted-foreground: var(--muted);
-  --accent-foreground: var(--accent);
+  --accent-foreground: #FFFFFF;
   --destructive: var(--danger);
   --destructive-foreground: #FFFFFF;
   --input: var(--border);
@@ -78,15 +101,29 @@
     --border: #38362F;
     --text: #EDEAE2;
     --muted: #9A968B;
-    --accent: var(--custom-accent-dark, #34D399);
-    --accent-soft: var(--custom-accent-soft-dark, #12372B);
+    --accent: var(--custom-accent-dark, #2DD4BF);
+    --accent-soft: var(--custom-accent-soft-dark, #113632);
     --active-bg: #2C2A24;
+    --ok: #4ADE80;
+    --ok-soft: #143321;
+    --warn: #FBBF24;
+    --warn-soft: #38280B;
+    --bad: #F87171;
+    --bad-soft: #3A1818;
     --danger: #F87171;
     --danger-soft: #3A1F1D;
     --info: #38BDF8;
     --info-soft: #14313A;
     --warning: #FBBF24;
     --warning-soft: #3B2A14;
+    --lop-1: #2DD4BF;
+    --lop-2: #FBBF24;
+    --lop-3: #60A5FA;
+    --lop-4: #FB7185;
+    --lop-5: #A3E635;
+    --lop-6: #22D3EE;
+    --lop-7: #FACC15;
+    --lop-8: #A8A29E;
   }
 }
 
@@ -98,15 +135,29 @@
   --border: #38362F;
   --text: #EDEAE2;
   --muted: #9A968B;
-  --accent: var(--custom-accent-dark, #34D399);
-  --accent-soft: var(--custom-accent-soft-dark, #12372B);
+  --accent: var(--custom-accent-dark, #2DD4BF);
+  --accent-soft: var(--custom-accent-soft-dark, #113632);
   --active-bg: #2C2A24;
+  --ok: #4ADE80;
+  --ok-soft: #143321;
+  --warn: #FBBF24;
+  --warn-soft: #38280B;
+  --bad: #F87171;
+  --bad-soft: #3A1818;
   --danger: #F87171;
   --danger-soft: #3A1F1D;
   --info: #38BDF8;
   --info-soft: #14313A;
   --warning: #FBBF24;
   --warning-soft: #3B2A14;
+  --lop-1: #2DD4BF;
+  --lop-2: #FBBF24;
+  --lop-3: #60A5FA;
+  --lop-4: #FB7185;
+  --lop-5: #A3E635;
+  --lop-6: #22D3EE;
+  --lop-7: #FACC15;
+  --lop-8: #A8A29E;
 
   --background: var(--bg);
   --foreground: var(--text);
@@ -119,7 +170,7 @@
   --secondary: var(--active-bg);
   --secondary-foreground: var(--text);
   --muted-foreground: var(--muted);
-  --accent-foreground: var(--accent);
+  --accent-foreground: #1A1916;
   --destructive: var(--danger);
   --destructive-foreground: #1A1916;
   --input: var(--border);
@@ -143,7 +194,7 @@
 
   --font-mono: var(--font-mono), "JetBrains Mono", ui-monospace, Menlo, monospace;
   --font-sans: var(--font-sans), "Be Vietnam Pro", system-ui, sans-serif;
-  --font-heading: var(--font-mono), "JetBrains Mono", ui-monospace, Menlo, monospace;
+  --font-heading: var(--font-sans), "Be Vietnam Pro", system-ui, sans-serif;
 
   --color-bg: var(--bg);
   --color-surface: var(--surface);
@@ -277,7 +328,13 @@
     min-height: 100vh;
   }
 
-  h1, h2, h3, h4, th {
+  h1, h2, h3, h4 {
+    font-family: var(--font-heading), "Be Vietnam Pro", system-ui, sans-serif !important;
+    color: var(--text);
+    letter-spacing: -0.015em;
+  }
+
+  th {
     font-family: var(--font-mono), "JetBrains Mono", ui-monospace, Menlo, monospace;
     color: var(--text);
   }
@@ -291,14 +348,14 @@
 
   h1 {
     font-size: 22px;
-    font-weight: 700;
+    font-weight: 600;
     line-height: 1.35;
-    letter-spacing: -0.01em;
+    letter-spacing: -0.015em;
   }
 
   h2 {
     font-size: 17px;
-    font-weight: 700;
+    font-weight: 600;
     line-height: 1.4;
   }
 
@@ -307,29 +364,40 @@
   }
 }
 
-/* Tiện ích Eyebrow chuẩn Developer-Tool Aesthetic */
+/* Tiện ích Eyebrow chuẩn SOFT */
 .eyebrow {
-  font-family: var(--font-mono), "JetBrains Mono", ui-monospace, Menlo, monospace;
+  font-family: var(--font-sans), "Be Vietnam Pro", system-ui, sans-serif;
   font-size: 11px;
-  font-weight: 400;
+  font-weight: 600;
   text-transform: uppercase;
-  letter-spacing: 0.12em;
-  color: var(--muted);
+  letter-spacing: 0.08em;
+  color: var(--accent);
   line-height: 1.4;
 }
 
 /* ==========================================================
-   UTILITY CLASSES THEO DESIGN TOKENS
+   UTILITY CLASSES THEO DESIGN TOKENS (PRESET SOFT)
    ========================================================== */
+.bg-muted,
+.hover\:bg-muted:hover {
+  background-color: var(--active-bg) !important;
+}
+
+.rounded-\[4px\],
+.rounded,
+.rounded-md,
 .rounded-lg {
   border-radius: var(--radius) !important;
 }
 
 .shadow-xs,
 .shadow-2xs,
-.shadow-sm,
+.shadow-sm {
+  box-shadow: 0 1px 3px 0 rgba(43, 42, 39, 0.05), 0 1px 2px -1px rgba(43, 42, 39, 0.03) !important;
+}
+
 .shadow-md {
-  box-shadow: none !important;
+  box-shadow: 0 4px 12px -2px rgba(43, 42, 39, 0.07), 0 2px 4px -2px rgba(43, 42, 39, 0.04) !important;
 }
 
 .shadow-accent {

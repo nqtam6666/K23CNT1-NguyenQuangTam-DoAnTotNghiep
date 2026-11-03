@@ -2,8 +2,8 @@ import {
   Controller,
   Get,
   Post,
-  Delete,
   Patch,
+  Delete,
   Param,
   Body,
   UseGuards,
@@ -24,51 +24,47 @@ import {
   GuiTinNhanTroLyInput,
   taoBanNhapAISchema,
   TaoBanNhapAIInput,
+  sinhBanNhapTuTaiLieuSchema,
+  SinhBanNhapTuTaiLieuInput,
+  goiYNhanXetBaiNopSchema,
+  GoiYNhanXetBaiNopInput,
   duyetBanNhapAISchema,
   DuyetBanNhapAIInput,
-  kiemTraKetNoiAISchema,
-  KiemTraKetNoiAIInput,
+  CauHinhLlm,
 } from '@lms/chung';
 
-@ApiTags('Trợ lý AI & Tìm kiếm tri thức RAG (pgvector)')
+@ApiTags('Trợ lý học tập & Biên soạn học liệu')
 @ApiBearerAuth('JWT-auth')
 @UseGuards(XacThucJwtGuard, PhanQuyenCaslGuard)
 @Controller('tro-ly-ai')
 export class DieuKhienTroLyAiController {
   constructor(private readonly dichVuTroLyAi: DichVuTroLyAiService) {}
 
-  // ==========================================
-  // HỎI ĐÁP RAG & PHIÊN TRÒ CHUYỆN
-  // ==========================================
-
   @Post('kiem-tra-ket-noi')
-  @ApiOperation({ summary: 'Kiểm tra kết nối tới nhà cung cấp mô hình AI (Admin)' })
-  @KiemTraQuyen(HanhDong.Sua, DoiTuong.CaiDatHeThong)
-  async kiemTraKetNoi(
-    @Body(new ZodValidationPipe(kiemTraKetNoiAISchema)) duLieu: KiemTraKetNoiAIInput,
-  ) {
-    return this.dichVuTroLyAi.kiemTraKetNoiAI(duLieu);
+  @ApiOperation({ summary: 'Kiểm tra kết nối tới dịch vụ mô hình ngôn ngữ đã cấu hình' })
+  @KiemTraQuyen(HanhDong.QuanLy, DoiTuong.TatCa)
+  async kiemTraKetNoi(@Body() cauHinh?: CauHinhLlm) {
+    return this.dichVuTroLyAi.kiemTraKetNoiAI(cauHinh);
   }
 
-  @Post('hoi-dap')
-  @ApiOperation({ summary: 'Gửi câu hỏi tới Trợ lý AI (Truy hồi tài liệu có lọc quyền Pre-filtering)' })
-  @KiemTraQuyen(HanhDong.Tao, DoiTuong.PhienTroLy)
-  async hoiDap(
-    @Body(new ZodValidationPipe(guiTinNhanTroLySchema)) duLieu: GuiTinNhanTroLyInput,
-    @NguoiDungHienTai() nguoiDung: PayloadJwt,
-  ) {
-    return this.dichVuTroLyAi.hoiDap(duLieu, nguoiDung);
+  @Get('thong-ke-su-dung')
+  @ApiOperation({
+    summary: 'Lấy thống kê lưu lượng, hạn mức lượt hỏi mỗi ngày và chi phí sử dụng Trợ lý AI',
+  })
+  @KiemTraQuyen(HanhDong.Doc, DoiTuong.PhienTroLy)
+  async layThongKeSuDung(@NguoiDungHienTai() nguoiDung: PayloadJwt) {
+    return this.dichVuTroLyAi.layThongKeSuDungAI(nguoiDung);
   }
 
   @Get('phien')
-  @ApiOperation({ summary: 'Lấy danh sách các phiên trò chuyện của người dùng' })
+  @ApiOperation({ summary: 'Lấy danh sách phiên hội thoại của người dùng' })
   @KiemTraQuyen(HanhDong.Doc, DoiTuong.PhienTroLy)
   async layDanhSachPhien(@NguoiDungHienTai() nguoiDung: PayloadJwt) {
     return this.dichVuTroLyAi.layDanhSachPhien(nguoiDung);
   }
 
   @Get('phien/:id')
-  @ApiOperation({ summary: 'Lấy lịch sử tin nhắn của một phiên trò chuyện' })
+  @ApiOperation({ summary: 'Lấy chi tiết lịch sử tin nhắn và trích dẫn trong phiên' })
   @KiemTraQuyen(HanhDong.Doc, DoiTuong.PhienTroLy)
   async layChiTietPhien(
     @Param('id', ParseUUIDPipe) id: string,
@@ -78,14 +74,14 @@ export class DieuKhienTroLyAiController {
   }
 
   @Delete('phien')
-  @ApiOperation({ summary: 'Xóa toàn bộ lịch sử các phiên trò chuyện của người dùng hiện tại' })
+  @ApiOperation({ summary: 'Xóa toàn bộ lịch sử phiên hội thoại của người dùng hiện tại' })
   @KiemTraQuyen(HanhDong.Xoa, DoiTuong.PhienTroLy)
   async xoaTatCaPhien(@NguoiDungHienTai() nguoiDung: PayloadJwt) {
     return this.dichVuTroLyAi.xoaTatCaPhien(nguoiDung);
   }
 
   @Delete('phien/:id')
-  @ApiOperation({ summary: 'Xóa một phiên trò chuyện' })
+  @ApiOperation({ summary: 'Xóa một phiên hội thoại' })
   @KiemTraQuyen(HanhDong.Xoa, DoiTuong.PhienTroLy)
   async xoaPhien(
     @Param('id', ParseUUIDPipe) id: string,
@@ -94,12 +90,22 @@ export class DieuKhienTroLyAiController {
     return this.dichVuTroLyAi.xoaPhien(id, nguoiDung);
   }
 
-  // ==========================================
-  // NẠP TÀI LIỆU VÀO PGVECTOR
-  // ==========================================
+  @Post('hoi-dap')
+  @ApiOperation({
+    summary: 'Gửi câu hỏi tra cứu học liệu kèm tùy chọn mức độ giải thích và gợi ý ôn tập',
+  })
+  @KiemTraQuyen(HanhDong.Tao, DoiTuong.PhienTroLy)
+  async hoiDap(
+    @Body(new ZodValidationPipe(guiTinNhanTroLySchema)) duLieu: GuiTinNhanTroLyInput,
+    @NguoiDungHienTai() nguoiDung: PayloadJwt,
+  ) {
+    return this.dichVuTroLyAi.hoiDap(duLieu, nguoiDung);
+  }
 
   @Post('nap-tai-lieu/:idTaiLieu')
-  @ApiOperation({ summary: 'Nạp và phân tích tài liệu môn học vào không gian vector pgvector' })
+  @ApiOperation({
+    summary: 'Xử lý và lập chỉ mục nội dung tài liệu học tập phục vụ tra cứu học thuật',
+  })
   @KiemTraQuyen(HanhDong.Tao, DoiTuong.TaiLieu)
   async napTaiLieu(
     @Param('idTaiLieu', ParseUUIDPipe) idTaiLieu: string,
@@ -108,12 +114,10 @@ export class DieuKhienTroLyAiController {
     return this.dichVuTroLyAi.napTaiLieuVaoKhoVector(idTaiLieu, nguoiDung);
   }
 
-  // ==========================================
-  // BẢN NHÁP AI (HUMAN-IN-THE-LOOP)
-  // ==========================================
-
   @Post('ban-nhap')
-  @ApiOperation({ summary: 'Tạo bản nháp nội dung gợi ý từ AI (chỉ tạo bản nháp theo Rule 04)' })
+  @ApiOperation({
+    summary: 'Tạo bản nháp học liệu chờ giảng viên phê duyệt',
+  })
   @KiemTraQuyen(HanhDong.Tao, DoiTuong.BanNhapAI)
   async taoBanNhap(
     @Body(new ZodValidationPipe(taoBanNhapAISchema)) duLieu: TaoBanNhapAIInput,
@@ -122,8 +126,32 @@ export class DieuKhienTroLyAiController {
     return this.dichVuTroLyAi.taoBanNhapAI(duLieu, nguoiDung);
   }
 
+  @Post('ban-nhap/sinh-tu-tai-lieu')
+  @ApiOperation({
+    summary: 'Sinh tự động bản nháp (Câu hỏi kiểm tra, Kế hoạch bài giảng, Bài tập) từ tài liệu theo chương và độ khó',
+  })
+  @KiemTraQuyen(HanhDong.Tao, DoiTuong.BanNhapAI)
+  async sinhBanNhapTuTaiLieu(
+    @Body(new ZodValidationPipe(sinhBanNhapTuTaiLieuSchema)) duLieu: SinhBanNhapTuTaiLieuInput,
+    @NguoiDungHienTai() nguoiDung: PayloadJwt,
+  ) {
+    return this.dichVuTroLyAi.sinhBanNhapTuTaiLieu(duLieu, nguoiDung);
+  }
+
+  @Post('ban-nhap/goi-y-nhan-xet-bai-nop')
+  @ApiOperation({
+    summary: 'Sinh gợi ý nhận xét và điểm đề xuất cho bài nộp của sinh viên',
+  })
+  @KiemTraQuyen(HanhDong.Tao, DoiTuong.BanNhapAI)
+  async goiYNhanXetBaiNop(
+    @Body(new ZodValidationPipe(goiYNhanXetBaiNopSchema)) duLieu: GoiYNhanXetBaiNopInput,
+    @NguoiDungHienTai() nguoiDung: PayloadJwt,
+  ) {
+    return this.dichVuTroLyAi.goiYNhanXetBaiNop(duLieu, nguoiDung);
+  }
+
   @Get('ban-nhap/lop/:idLop')
-  @ApiOperation({ summary: 'Lấy danh sách bản nháp AI của lớp học phần' })
+  @ApiOperation({ summary: 'Lấy danh sách các bản nháp học liệu của lớp học phần' })
   @KiemTraQuyen(HanhDong.Doc, DoiTuong.BanNhapAI)
   async layDanhSachBanNhap(
     @Param('idLop', ParseUUIDPipe) idLop: string,
@@ -133,8 +161,10 @@ export class DieuKhienTroLyAiController {
   }
 
   @Patch('ban-nhap/:id/duyet')
-  @ApiOperation({ summary: 'Giáo viên phê duyệt / từ chối bản nháp AI (Human-in-the-loop)' })
-  @KiemTraQuyen(HanhDong.Duyet, DoiTuong.BanNhapAI)
+  @ApiOperation({
+    summary: 'Giảng viên duyệt hoặc từ chối bản nháp học liệu (Đề kiểm tra / Bài tập / Kế hoạch bài giảng / Nhận xét)',
+  })
+  @KiemTraQuyen(HanhDong.Sua, DoiTuong.BanNhapAI)
   async duyetBanNhap(
     @Param('id', ParseUUIDPipe) id: string,
     @Body(new ZodValidationPipe(duyetBanNhapAISchema)) duLieu: DuyetBanNhapAIInput,

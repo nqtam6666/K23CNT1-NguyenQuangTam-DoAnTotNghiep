@@ -241,15 +241,29 @@ export default function TrangLopHocPhan() {
         <KhungXuongThe soLuong={6} />
       ) : danhSachLop?.duLieu && danhSachLop.duLieu.length > 0 ? (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
-          {danhSachLop.duLieu.map((lop: any) => (
+          {danhSachLop.duLieu.map((lop: any, idx: number) => {
+            const bienMauLop = `var(--lop-${(idx % 8) + 1})`;
+            return (
             <div
               key={lop.id}
-              className="bg-[var(--surface)] border border-[var(--border)] rounded-[4px] overflow-hidden hover:border-[var(--accent)] transition-colors flex flex-col group"
+              className="bg-[var(--surface)] border border-[var(--border)] rounded-[var(--radius)] shadow-xs overflow-hidden hover:border-[var(--accent)] transition-colors flex flex-col group"
             >
+              {/* Dải màu 4px nhận diện lớp học phần */}
+              <div
+                className="h-[4px] w-full shrink-0"
+                style={{ backgroundColor: bienMauLop }}
+              />
               {/* Card Banner */}
-              <div className="bg-[var(--bg)] border-b border-[var(--border)] p-5">
+              <div className="bg-[var(--surface)] border-b border-[var(--border)] p-5">
                 <div className="flex items-start justify-between gap-2">
-                  <span className="px-2 py-0.5 bg-[var(--surface)] border border-[var(--border)] rounded-[4px] text-[11px] font-mono font-bold tracking-wider uppercase text-[var(--accent)]">
+                  <span
+                    className="px-2.5 py-0.5 border rounded-[var(--radius)] text-[11px] font-mono font-bold tracking-wider uppercase"
+                    style={{
+                      color: bienMauLop,
+                      borderColor: `color-mix(in srgb, ${bienMauLop} 35%, var(--border))`,
+                      backgroundColor: `color-mix(in srgb, ${bienMauLop} 10%, var(--surface))`,
+                    }}
+                  >
                     {lop.maLopHocPhan}
                   </span>
                   <div className="flex items-center gap-1.5">
@@ -259,27 +273,27 @@ export default function TrangLopHocPhan() {
                           type="button"
                           onClick={() => moModalSuaLop(lop)}
                           title="Chỉnh sửa lớp học phần"
-                          className="p-1 text-[var(--muted)] hover:text-[var(--accent)] hover:bg-[var(--accent-soft)] rounded-[4px] transition-colors cursor-pointer"
+                          className="p-1 text-[var(--muted)] hover:text-[var(--accent)] hover:bg-[var(--accent-soft)] rounded-[var(--radius)] transition-colors cursor-pointer"
                         >
-                          <Edit2 className="w-3.5 h-3.5" strokeWidth={1.5} />
+                          <Edit2 className="w-3.5 h-3.5" strokeWidth={1.75} />
                         </button>
                         <button
                           type="button"
                           onClick={() => setLopCanXoa(lop)}
                           title="Xóa lớp học phần"
-                          className="p-1 text-[var(--muted)] hover:text-[var(--danger)] hover:bg-[var(--danger-soft)] rounded-[4px] transition-colors cursor-pointer"
+                          className="p-1 text-[var(--muted)] hover:text-[var(--danger)] hover:bg-[var(--danger-soft)] rounded-[var(--radius)] transition-colors cursor-pointer"
                         >
-                          <Trash2 className="w-3.5 h-3.5" strokeWidth={1.5} />
+                          <Trash2 className="w-3.5 h-3.5" strokeWidth={1.75} />
                         </button>
                       </>
                     )}
-                    <span className="inline-flex items-center gap-1.5 text-[11px] font-mono font-semibold bg-[var(--accent-soft)] text-[var(--accent)] border border-[var(--border)] px-2 py-0.5 rounded-[4px]">
+                    <span className="inline-flex items-center gap-1.5 text-[11px] font-sans font-semibold bg-[var(--accent-soft)] text-[var(--accent)] px-2.5 py-0.5 rounded-[var(--radius)]">
                       <span className="w-1.5 h-1.5 rounded-full bg-[var(--accent)]"></span>
-                      Sẵn sàng
+                      Đang mở
                     </span>
                   </div>
                 </div>
-                <h3 className="font-mono font-bold text-[16px] text-[var(--text)] mt-3 line-clamp-1 group-hover:text-[var(--accent)] transition-colors">
+                <h3 className="font-sans font-semibold text-[16px] text-[var(--text)] mt-3 line-clamp-1 group-hover:text-[var(--accent)] transition-colors">
                   {lop.tenLopHocPhan}
                 </h3>
                 <p className="text-xs text-[var(--muted)] mt-1 flex items-center gap-1.5">
@@ -348,7 +362,8 @@ export default function TrangLopHocPhan() {
                 </Link>
               </div>
             </div>
-          ))}
+            );
+          })}
         </div>
       ) : (
         <div className="text-center py-14 bg-[var(--surface)] border border-dashed border-[var(--border)] rounded-[4px]">

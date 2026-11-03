@@ -40,7 +40,7 @@ export const GIA_TRI_MAC_DINH: BanDoCaiDat = {
   URL_LOGO: '',
   URL_FAVICON: '',
   URL_ICON: '',
-  MAU_CHU_DAO: '#059669',
+  MAU_CHU_DAO: '#0F766E',
 };
 
 /**
@@ -54,7 +54,7 @@ export function apDungCauHinhGiaoDienVaoDom(
   const root = document.documentElement;
 
   const mauChuDao =
-    banDo['giao_dien.mau_chu_dao'] || banDo['MAU_CHU_DAO'] || '#059669';
+    banDo['giao_dien.mau_chu_dao'] || banDo['MAU_CHU_DAO'] || '#0F766E';
   const bangMau = tinhBangMauChuDaoTuHex(mauChuDao);
 
   root.style.setProperty('--custom-accent-light', bangMau.maHex);
@@ -62,8 +62,8 @@ export function apDungCauHinhGiaoDienVaoDom(
   root.style.setProperty('--custom-accent-soft-light', bangMau.nenNhatSang);
   root.style.setProperty('--custom-accent-soft-dark', bangMau.nenNhatToi);
 
-  const doBoGoc = banDo['giao_dien.do_bo_goc_px'] || '4';
-  const radiusHopLe = ['0', '2', '4', '6'].includes(String(doBoGoc)) ? String(doBoGoc) : '4';
+  const doBoGoc = banDo['giao_dien.do_bo_goc_px'] || '8';
+  const radiusHopLe = ['0', '2', '4', '6', '8', '10'].includes(String(doBoGoc)) ? String(doBoGoc) : '8';
   root.style.setProperty('--radius', `${radiusHopLe}px`);
 
   const coChu = banDo['giao_dien.co_chu_co_ban_px'] || '14';

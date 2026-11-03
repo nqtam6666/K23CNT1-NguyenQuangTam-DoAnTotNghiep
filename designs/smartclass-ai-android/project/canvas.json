@@ -1,0 +1,71 @@
+{
+  "v": 3,
+  "createdOnFiles": {
+    "v": 1,
+    "at": "2026-11-03T07:30:00Z"
+  },
+  "title": "SmartClass AI — Thiết kế Ứng dụng Android (Warm Minimal)",
+  "launch": {
+    "view": "canvas"
+  },
+  "pages": [],
+  "boards": {
+    "Main.dc.html": {
+      "x": 0,
+      "y": 0,
+      "w": 390,
+      "h": 844,
+      "title": "01 · Đăng nhập & 6 Vai trò",
+      "is_interactive": true
+    },
+    "BangDieuKhien.dc.html": {
+      "x": 470,
+      "y": 0,
+      "w": 390,
+      "h": 844,
+      "title": "02 · Tổng quan & Thông báo",
+      "is_interactive": true
+    },
+    "KhongGianLop.dc.html": {
+      "x": 940,
+      "y": 0,
+      "w": 390,
+      "h": 844,
+      "title": "03 · Lớp học phần (5 Tab)",
+      "is_interactive": true
+    },
+    "DiemDanhPin.dc.html": {
+      "x": 1410,
+      "y": 0,
+      "w": 390,
+      "h": 844,
+      "title": "04 · Lịch học & Điểm danh PIN",
+      "is_interactive": true
+    },
+    "TroLyAiRag.dc.html": {
+      "x": 1880,
+      "y": 0,
+      "w": 390,
+      "h": 844,
+      "title": "05 · Trợ lý Học tập AI (RAG)",
+      "is_interactive": true
+    }
+  },
+  "order": [
+    "Main.dc.html",
+    "BangDieuKhien.dc.html",
+    "KhongGianLop.dc.html",
+    "DiemDanhPin.dc.html",
+    "TroLyAiRag.dc.html"
+  ],
+  "notes": {
+    "title_row": {
+      "x": 0,
+      "y": -240,
+      "text": "SmartClass AI · Hệ thống Lớp học số Android",
+      "kind": "title1",
+      "maxW": 2270
+    }
+  },
+  "designSystems": []
+}

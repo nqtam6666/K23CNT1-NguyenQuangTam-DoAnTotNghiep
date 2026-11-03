@@ -110,3 +110,28 @@ export enum TrangThaiLuotLam {
   DA_CHAM = 'DA_CHAM',
 }
 
+export enum MucDoGiaiThich {
+  CO_BAN = 'CO_BAN',
+  TRUNG_BINH = 'TRUNG_BINH',
+  NANG_CAO = 'NANG_CAO',
+}
+
+export enum MucDoKho {
+  DE = 'DE',
+  TRUNG_BINH = 'TRUNG_BINH',
+  KHO = 'KHO',
+}
+
+export enum MucDoCanhBao {
+  NGHIEM_TRONG = 'NGHIEM_TRONG',
+  CAN_LUU_Y = 'CAN_LUU_Y',
+  ON_DINH = 'ON_DINH',
+}
+
+export enum ChuDeBaiDang {
+  THONG_BAO = 'THONG_BAO',
+  HOI_DAP_BAI_HOC = 'HOI_DAP_BAI_HOC',
+  THAO_LUAN_BAI_TAP = 'THAO_LUAN_BAI_TAP',
+  ON_THI = 'ON_THI',
+  CHIA_SE_TAI_LIEU = 'CHIA_SE_TAI_LIEU',
+}

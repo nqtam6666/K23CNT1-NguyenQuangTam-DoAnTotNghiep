@@ -1,0 +1,348 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/bg"
+    android:fillViewport="true">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:padding="20dp">
+
+        <!-- Eyebrow & Tiêu đề chuẩn baoyu-design / Warm Minimal -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center_vertical"
+            android:orientation="horizontal">
+
+            <TextView
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:fontFamily="monospace"
+                android:letterSpacing="0.12"
+                android:text="HỆ THỐNG LỚP HỌC SỐ"
+                android:textAllCaps="true"
+                android:textColor="@color/muted"
+                android:textSize="11sp" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:background="@drawable/bg_nhan_accent"
+                android:fontFamily="monospace"
+                android:paddingHorizontal="8dp"
+                android:paddingVertical="3dp"
+                android:text="ANDROID · v1.0"
+                android:textColor="@color/accent"
+                android:textSize="10.5sp"
+                android:textStyle="bold" />
+        </LinearLayout>
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="6dp"
+            android:fontFamily="monospace"
+            android:text="SmartClass AI"
+            android:textColor="@color/text"
+            android:textSize="22sp"
+            android:textStyle="bold" />
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="4dp"
+            android:lineSpacingMultiplier="1.25"
+            android:text="Quản lý lớp học phần, điểm danh thông minh, kiểm tra trắc nghiệm và tra cứu học liệu."
+            android:textColor="@color/muted"
+            android:textSize="13.5sp" />
+
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:layout_marginTop="14dp"
+            android:background="@color/border" />
+
+        <!-- Biểu mẫu Đăng nhập -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="16dp"
+            android:background="@drawable/bg_the_be_mat"
+            android:orientation="vertical"
+            android:padding="16dp">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:fontFamily="monospace"
+                android:text="ĐĂNG NHẬP TÀI KHOẢN"
+                android:textColor="@color/text"
+                android:textSize="15sp"
+                android:textStyle="bold" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="12dp"
+                android:text="Địa chỉ Email"
+                android:textColor="@color/text"
+                android:textSize="13sp"
+                android:textStyle="bold" />
+
+            <EditText
+                android:id="@+id/edtEmail"
+                android:layout_width="match_parent"
+                android:layout_height="44dp"
+                android:layout_marginTop="6dp"
+                android:background="@drawable/bg_o_nhap"
+                android:fontFamily="monospace"
+                android:hint="hocsinh1@lms.edu.vn"
+                android:inputType="textEmailAddress"
+                android:paddingHorizontal="12dp"
+                android:textColor="@color/text"
+                android:textColorHint="@color/muted"
+                android:textSize="13sp" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="12dp"
+                android:text="Mật khẩu"
+                android:textColor="@color/text"
+                android:textSize="13sp"
+                android:textStyle="bold" />
+
+            <EditText
+                android:id="@+id/edtMatKhau"
+                android:layout_width="match_parent"
+                android:layout_height="44dp"
+                android:layout_marginTop="6dp"
+                android:background="@drawable/bg_o_nhap"
+                android:hint="Nhập mật khẩu"
+                android:inputType="textPassword"
+                android:paddingHorizontal="12dp"
+                android:textColor="@color/text"
+                android:textColorHint="@color/muted"
+                android:textSize="14sp" />
+
+            <ProgressBar
+                android:id="@+id/thanhTienTrinh"
+                android:layout_width="28dp"
+                android:layout_height="28dp"
+                android:layout_gravity="center_horizontal"
+                android:layout_marginTop="12dp"
+                android:visibility="gone" />
+
+            <androidx.appcompat.widget.AppCompatButton
+                android:id="@+id/btnDangNhap"
+                android:layout_width="match_parent"
+                android:layout_height="44dp"
+                android:layout_marginTop="16dp"
+                android:background="@drawable/bg_nut_chinh"
+                android:stateListAnimator="@null"
+                android:text="Đăng nhập vào hệ thống"
+                android:textAllCaps="false"
+                android:textColor="@color/white"
+                android:textSize="13.5sp"
+                android:textStyle="bold" />
+
+            <androidx.appcompat.widget.AppCompatButton
+                android:id="@+id/btnMoDangKy"
+                android:layout_width="match_parent"
+                android:layout_height="44dp"
+                android:layout_marginTop="8dp"
+                android:background="@drawable/bg_nut_phu"
+                android:stateListAnimator="@null"
+                android:text="Chưa có tài khoản? Đăng ký mới"
+                android:textAllCaps="false"
+                android:textColor="@color/text"
+                android:textSize="13sp" />
+        </LinearLayout>
+
+        <!-- Chọn nhanh 6 vai trò Demo -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="16dp"
+            android:background="@drawable/bg_the_be_mat"
+            android:orientation="vertical"
+            android:padding="16dp">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:fontFamily="monospace"
+                android:letterSpacing="0.08"
+                android:text="CHỌN NHANH TÀI KHOẢN DEMO (6 VAI TRÒ)"
+                android:textColor="@color/muted"
+                android:textSize="11sp" />
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="4dp"
+                android:text="Chạm vào một vai trò để điền tự động thông tin đăng nhập:"
+                android:textColor="@color/muted"
+                android:textSize="12.5sp" />
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="10dp"
+                android:orientation="horizontal">
+
+                <TextView
+                    android:id="@+id/btnDemoHocSinh"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_marginEnd="6dp"
+                    android:layout_weight="1"
+                    android:background="@drawable/bg_nhan_accent"
+                    android:fontFamily="monospace"
+                    android:gravity="start|center_vertical"
+                    android:minHeight="52dp"
+                    android:paddingHorizontal="10dp"
+                    android:paddingVertical="8dp"
+                    android:text="Học sinh\nhocsinh1@lms"
+                    android:textColor="@color/accent"
+                    android:textSize="11.5sp"
+                    android:textStyle="bold" />
+
+                <TextView
+                    android:id="@+id/btnDemoGiaoVien"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="6dp"
+                    android:layout_weight="1"
+                    android:background="@drawable/bg_nhan_info"
+                    android:fontFamily="monospace"
+                    android:gravity="start|center_vertical"
+                    android:minHeight="52dp"
+                    android:paddingHorizontal="10dp"
+                    android:paddingVertical="8dp"
+                    android:text="Giáo viên\ngiaovien1@lms"
+                    android:textColor="@color/info"
+                    android:textSize="11.5sp"
+                    android:textStyle="bold" />
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="8dp"
+                android:orientation="horizontal">
+
+                <TextView
+                    android:id="@+id/btnDemoPhuHuynh"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_marginEnd="6dp"
+                    android:layout_weight="1"
+                    android:background="@drawable/bg_nut_phu"
+                    android:fontFamily="monospace"
+                    android:gravity="start|center_vertical"
+                    android:minHeight="52dp"
+                    android:paddingHorizontal="10dp"
+                    android:paddingVertical="8dp"
+                    android:text="Phụ huynh\nphuhuynh1@lms"
+                    android:textColor="@color/text"
+                    android:textSize="11.5sp"
+                    android:textStyle="bold" />
+
+                <TextView
+                    android:id="@+id/btnDemoGiaoVu"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="6dp"
+                    android:layout_weight="1"
+                    android:background="@drawable/bg_nut_phu"
+                    android:fontFamily="monospace"
+                    android:gravity="start|center_vertical"
+                    android:minHeight="52dp"
+                    android:paddingHorizontal="10dp"
+                    android:paddingVertical="8dp"
+                    android:text="Giáo vụ\ngiaovu@lms"
+                    android:textColor="@color/text"
+                    android:textSize="11.5sp"
+                    android:textStyle="bold" />
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="8dp"
+                android:orientation="horizontal">
+
+                <TextView
+                    android:id="@+id/btnDemoBanGiamHieu"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_marginEnd="6dp"
+                    android:layout_weight="1"
+                    android:background="@drawable/bg_nut_phu"
+                    android:fontFamily="monospace"
+                    android:gravity="start|center_vertical"
+                    android:minHeight="52dp"
+                    android:paddingHorizontal="10dp"
+                    android:paddingVertical="8dp"
+                    android:text="Ban giám hiệu\nbangiamhieu@lms"
+                    android:textColor="@color/text"
+                    android:textSize="11.5sp"
+                    android:textStyle="bold" />
+
+                <TextView
+                    android:id="@+id/btnDemoAdmin"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="6dp"
+                    android:layout_weight="1"
+                    android:background="@drawable/bg_nut_phu"
+                    android:fontFamily="monospace"
+                    android:gravity="start|center_vertical"
+                    android:minHeight="52dp"
+                    android:paddingHorizontal="10dp"
+                    android:paddingVertical="8dp"
+                    android:text="Quản trị viên\nadmin@lms"
+                    android:textColor="@color/text"
+                    android:textSize="11.5sp"
+                    android:textStyle="bold" />
+            </LinearLayout>
+        </LinearLayout>
+
+        <!-- Chân trang học vụ -->
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:layout_marginTop="18dp"
+            android:background="@color/border" />
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="10dp"
+            android:orientation="horizontal">
+
+            <TextView
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:fontFamily="monospace"
+                android:text="TRƯỜNG ĐH NGUYỄN TRÃI"
+                android:textColor="@color/muted"
+                android:textSize="10.5sp" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:fontFamily="monospace"
+                android:text="K23CNT1 · ĐỒ ÁN TỐT NGHIỆP"
+                android:textColor="@color/muted"
+                android:textSize="10.5sp" />
+        </LinearLayout>
+    </LinearLayout>
+</ScrollView>

@@ -12,7 +12,7 @@ import {
   Trash2,
   BookOpen,
   ArrowLeft,
-  Sparkles,
+  CalendarPlus,
   School,
   AlertCircle,
   CheckCircle2,
@@ -583,7 +583,7 @@ export default function TrangChiTietLopHocPhan({ params }: { params: Promise<{ i
                     disabled={sinhBuoiHocMutation.isPending}
                     className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-accent-soft hover:bg-accent-soft text-accent text-xs font-semibold rounded-lg transition-colors border border-accent"
                   >
-                    <Sparkles className="w-3.5 h-3.5" />
+                    <CalendarPlus className="w-3.5 h-3.5" />
                     {sinhBuoiHocMutation.isPending ? 'Đang sinh...' : 'Tự động sinh buổi học'}
                   </button>
                   <button

@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+    <item
+        android:id="@+id/nav_bang_dieu_khien"
+        android:icon="@drawable/ic_bang_dieu_khien"
+        android:title="Tổng quan" />
+    <item
+        android:id="@+id/nav_lop_hoc_phan"
+        android:icon="@drawable/ic_lop_hoc"
+        android:title="Lớp học" />
+    <item
+        android:id="@+id/nav_thoi_khoa_bieu"
+        android:icon="@drawable/ic_thoi_khoa_bieu"
+        android:title="Lịch học" />
+    <item
+        android:id="@+id/nav_tro_ly_ai"
+        android:icon="@drawable/ic_tro_ly_ai"
+        android:title="Trợ lý AI" />
+</menu>

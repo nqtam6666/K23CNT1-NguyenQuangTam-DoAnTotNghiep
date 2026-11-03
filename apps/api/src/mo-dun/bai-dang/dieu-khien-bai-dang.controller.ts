@@ -2,6 +2,7 @@ import {
   Controller,
   Get,
   Post,
+  Patch,
   Delete,
   Param,
   Body,
@@ -23,9 +24,11 @@ import {
   TaoBaiDangInput,
   taoBinhLuanSchema,
   TaoBinhLuanInput,
+  danhDauGiaiDapSchema,
+  DanhDauGiaiDapInput,
 } from '@lms/chung';
 
-@ApiTags('Bảng tin & Thảo luận Lớp học phần')
+@ApiTags('Bảng tin & Diễn đàn hỏi đáp Lớp học phần')
 @ApiBearerAuth('JWT-auth')
 @UseGuards(XacThucJwtGuard, PhanQuyenCaslGuard)
 @Controller('bai-dang')
@@ -33,7 +36,7 @@ export class DieuKhienBaiDangController {
   constructor(private readonly dichVuBaiDang: DichVuBaiDangService) {}
 
   @Get('lop/:idLop')
-  @ApiOperation({ summary: 'Lấy danh sách bài đăng trên bảng tin của lớp học phần' })
+  @ApiOperation({ summary: 'Lấy danh sách bài đăng và chủ đề hỏi đáp trên bảng tin của lớp học phần' })
   @KiemTraQuyen(HanhDong.Doc, DoiTuong.BaiDang)
   async layDanhSachTheoLop(
     @Param('idLop', ParseUUIDPipe) idLop: string,
@@ -43,7 +46,7 @@ export class DieuKhienBaiDangController {
   }
 
   @Post('lop/:idLop')
-  @ApiOperation({ summary: 'Đăng bài thông báo hoặc bài thảo luận mới lên lớp học phần' })
+  @ApiOperation({ summary: 'Đăng bài thông báo hoặc câu hỏi thảo luận phân loại theo chủ đề lên lớp học phần' })
   @KiemTraQuyen(HanhDong.Tao, DoiTuong.BaiDang)
   async taoBaiDang(
     @Param('idLop', ParseUUIDPipe) idLop: string,
@@ -51,6 +54,17 @@ export class DieuKhienBaiDangController {
     @NguoiDungHienTai() nguoiDung: PayloadJwt,
   ) {
     return this.dichVuBaiDang.taoBaiDang(idLop, duLieu, nguoiDung);
+  }
+
+  @Patch(':id/giai-dap')
+  @ApiOperation({ summary: 'Đánh dấu câu hỏi đã được giải đáp và chọn bình luận trả lời chuẩn' })
+  @KiemTraQuyen(HanhDong.Doc, DoiTuong.BaiDang)
+  async danhDauGiaiDap(
+    @Param('id', ParseUUIDPipe) id: string,
+    @Body(new ZodValidationPipe(danhDauGiaiDapSchema)) duLieu: DanhDauGiaiDapInput,
+    @NguoiDungHienTai() nguoiDung: PayloadJwt,
+  ) {
+    return this.dichVuBaiDang.danhDauGiaiDap(id, duLieu, nguoiDung);
   }
 
   @Delete(':id')
@@ -64,7 +78,7 @@ export class DieuKhienBaiDangController {
   }
 
   @Post(':id/binh-luan')
-  @ApiOperation({ summary: 'Thêm bình luận vào bài đăng' })
+  @ApiOperation({ summary: 'Thêm bình luận trả lời vào bài đăng' })
   @KiemTraQuyen(HanhDong.Tao, DoiTuong.BinhLuan)
   async taoBinhLuan(
     @Param('id', ParseUUIDPipe) id: string,

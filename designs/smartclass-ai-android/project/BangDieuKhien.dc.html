@@ -1,0 +1,116 @@
+<!doctype html>
+<html lang="vi">
+<head>
+<meta charset="utf-8">
+<title>02 · Tổng quan &amp; Thông báo</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600&amp;family=JetBrains+Mono:wght@400;500;700&amp;display=swap">
+<style>
+body { margin: 0; background: #FAF8F4; color: #2B2A27; font-family: 'Be Vietnam Pro', system-ui, sans-serif; }
+a { color: #059669; text-decoration: none; }
+a:hover { color: #047857; }
+</style>
+</helmet>
+<div style="width: 390px; min-height: 844px; box-sizing: border-box; background: #FAF8F4; color: #2B2A27; display: flex; flex-direction: column; justify-content: space-between">
+  <div style="display: flex; flex-direction: column; gap: 14px; padding: 16px">
+    <div style="background: #FFFDF8; border: 1px solid #E5E2DA; border-radius: 4px; padding: 12px 14px; display: flex; align-items: center; justify-content: space-between; gap: 10px">
+      <div style="display: flex; flex-direction: column; gap: 2px">
+        <span style="font-family: 'JetBrains Mono', monospace; font-size: 11px; letter-spacing: 0.12em; text-transform: uppercase; color: #57534A">BẢNG ĐIỀU KHIỂN HỌC VỤ</span>
+        <span style="font-family: 'JetBrains Mono', monospace; font-size: 16px; font-weight: 700; color: #2B2A27">Trần Văn Giáo Viên</span>
+      </div>
+      <span style="font-family: 'JetBrains Mono', monospace; font-size: 11px; font-weight: 700; color: #047857; background: #E6F6EF; border: 1px solid #059669; border-radius: 4px; padding: 4px 8px">GIÁO VIÊN</span>
+    </div>
+
+    <div style="display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px">
+      <sc-for list="{{thongKe}}" as="tk" hint-placeholder-count="4">
+        <div style="background: #FFFDF8; border: 1px solid #E5E2DA; border-radius: 4px; padding: 12px 14px; display: flex; flex-direction: column; gap: 6px">
+          <span style="font-family: 'JetBrains Mono', monospace; font-size: 11px; letter-spacing: 0.08em; text-transform: uppercase; color: #57534A">{{tk.nhan}}</span>
+          <div style="display: flex; align-items: baseline; justify-content: space-between; gap: 8px">
+            <span style="font-family: 'JetBrains Mono', monospace; font-size: 22px; font-weight: 700; font-variant-numeric: tabular-nums; color: {{accent}}">{{tk.giaTri}}</span>
+            <span style="font-family: 'JetBrains Mono', monospace; font-size: 11px; color: #57534A">{{tk.phu}}</span>
+          </div>
+        </div>
+      </sc-for>
+    </div>
+
+    <div style="background: #FFFDF8; border: 1px solid #E5E2DA; border-radius: 4px; padding: 14px; display: flex; flex-direction: column; gap: 10px">
+      <div style="display: flex; align-items: center; justify-content: space-between; gap: 8px">
+        <span style="font-family: 'JetBrains Mono', monospace; font-size: 11px; letter-spacing: 0.12em; text-transform: uppercase; color: #57534A">LỚP HỌC PHẦN ĐANG GIẢNG DẠY</span>
+        <a href="KhongGianLop.dc.html" style="font-family: 'JetBrains Mono', monospace; font-size: 11px; font-weight: 700; color: #047857; padding: 6px 8px">XEM TẤT CẢ →</a>
+      </div>
+
+      <sc-for list="{{dsLop}}" as="lop" hint-placeholder-count="2">
+        <a href="KhongGianLop.dc.html" style="background: #FAF8F4; border: 1px solid #E5E2DA; border-radius: 4px; padding: 12px; display: flex; flex-direction: column; gap: 6px">
+          <div style="display: flex; align-items: center; justify-content: space-between; gap: 8px">
+            <span style="font-family: 'JetBrains Mono', monospace; font-size: 11px; font-weight: 700; color: #047857; background: #E6F6EF; border: 1px solid #059669; border-radius: 4px; padding: 2px 6px">{{lop.ma}}</span>
+            <span style="font-family: 'JetBrains Mono', monospace; font-size: 11px; font-variant-numeric: tabular-nums; color: #57534A">Sĩ số: {{lop.siSo}}</span>
+          </div>
+          <span style="font-family: 'JetBrains Mono', monospace; font-size: 14px; font-weight: 700; color: #2B2A27">{{lop.ten}}</span>
+          <span style="font-size: 12.5px; color: #57534A">{{lop.lich}}</span>
+        </a>
+      </sc-for>
+    </div>
+
+    <div style="background: #FFFDF8; border: 1px solid #E5E2DA; border-radius: 4px; padding: 14px; display: flex; flex-direction: column; gap: 10px">
+      <div style="display: flex; align-items: center; justify-content: space-between; gap: 8px">
+        <span style="font-family: 'JetBrains Mono', monospace; font-size: 11px; letter-spacing: 0.12em; text-transform: uppercase; color: #57534A">THÔNG BÁO MỚI ({{soChuaDoc}} CHƯA ĐỌC)</span>
+        <button type="button" onClick="{{docTatCa}}" style="min-height: 44px; padding: 0 10px; background: #F3EDE4; border: 1px solid #E5E2DA; border-radius: 4px; font-family: 'Be Vietnam Pro', sans-serif; font-size: 12px; font-weight: 600; color: #2B2A27; cursor: pointer">Đánh dấu đã đọc</button>
+      </div>
+
+      <sc-for list="{{dsThongBao}}" as="tb" hint-placeholder-count="3">
+        <div style="background: {{tb.bg}}; border: 1px solid #E5E2DA; border-radius: 4px; padding: 10px 12px; display: flex; flex-direction: column; gap: 4px">
+          <div style="display: flex; align-items: center; justify-content: space-between; gap: 8px">
+            <span style="font-family: 'JetBrains Mono', monospace; font-size: 12.5px; font-weight: 700; color: #2B2A27">{{tb.tieuDe}}</span>
+            <span style="font-family: 'JetBrains Mono', monospace; font-size: 11px; color: #57534A">{{tb.gio}}</span>
+          </div>
+          <span style="font-size: 12.5px; line-height: 1.45; color: #57534A">{{tb.noiDung}}</span>
+        </div>
+      </sc-for>
+    </div>
+  </div>
+
+  <nav aria-label="Điều hướng chính" style="background: #FFFDF8; border-top: 1px solid #E5E2DA; padding: 6px 8px; display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 6px">
+    <a href="BangDieuKhien.dc.html" style="min-height: 48px; background: #F3EDE4; border: 1px solid #E5E2DA; border-radius: 4px; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 2px; font-family: 'JetBrains Mono', monospace; font-size: 11px; font-weight: 700; color: #047857">Tổng quan</a>
+    <a href="KhongGianLop.dc.html" style="min-height: 48px; border-radius: 4px; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 2px; font-family: 'JetBrains Mono', monospace; font-size: 11px; color: #57534A">Lớp học</a>
+    <a href="DiemDanhPin.dc.html" style="min-height: 48px; border-radius: 4px; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 2px; font-family: 'JetBrains Mono', monospace; font-size: 11px; color: #57534A">Lịch học</a>
+    <a href="TroLyAiRag.dc.html" style="min-height: 48px; border-radius: 4px; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 2px; font-family: 'JetBrains Mono', monospace; font-size: 11px; color: #57534A">Trợ lý AI</a>
+  </nav>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"accent":{"editor":"color","default":"#059669"},"$preview":{"width":390,"height":844}}'>
+class Component extends DCLogic {
+  constructor(props) {
+    super(props);
+    this.state = { daDocHet: false };
+  }
+  renderVals() {
+    const accent = this.props.accent ?? '#059669';
+    return {
+      accent,
+      soChuaDoc: this.state.daDocHet ? 0 : 2,
+      docTatCa: () => this.setState({ daDocHet: true }),
+      thongKe: [
+        { nhan: 'LỚP PHỤ TRÁCH', giaTri: '04', phu: 'HK2 · 25-26' },
+        { nhan: 'BÀI CHỜ CHẤM', giaTri: '12', phu: 'Cần duyệt' },
+        { nhan: 'CHUYÊN CẦN TB', giaTri: '96.4%', phu: '+1.2% tuần' },
+        { nhan: 'ĐỀ KIỂM TRA', giaTri: '08', phu: 'Đang mở 2' }
+      ],
+      dsLop: [
+        { ma: 'LHP-IT101-01', ten: 'Lập trình hướng đối tượng Java', siSo: '42 SV', lich: 'Thứ Hai (Tiết 1-3) · Phòng A302' },
+        { ma: 'LHP-AI204-02', ten: 'Trí tuệ nhân tạo & Ứng dụng RAG', siSo: '38 SV', lich: 'Thứ Tư (Tiết 4-6) · Phòng Lab 2' }
+      ],
+      dsThongBao: [
+        { tieuDe: 'Học sinh nộp bài tập Tuần 5', gio: '10:15', noiDung: 'Nguyễn Minh Quân vừa nộp bài thực hành Kế thừa và Đa hình.', bg: this.state.daDocHet ? '#FAF8F4' : '#E6F6EF' },
+        { tieuDe: 'Đơn xin nghỉ phép chờ duyệt', gio: '08:40', noiDung: 'Lê Thu Hà gửi đơn xin nghỉ buổi học ngày 04/11/2026.', bg: this.state.daDocHet ? '#FAF8F4' : '#E6F6EF' },
+        { tieuDe: 'Đã nạp học liệu vào kho RAG', gio: 'Hôm qua', noiDung: 'Giáo trình Chương 4 (28 đoạn trích dẫn) đã sẵn sàng tra cứu.', bg: '#FAF8F4' }
+      ]
+    };
+  }
+}
+</script>
+</body>
+</html>

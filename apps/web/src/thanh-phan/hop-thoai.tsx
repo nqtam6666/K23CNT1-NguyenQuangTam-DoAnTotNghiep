@@ -25,7 +25,7 @@ const banDoKichThuoc = {
  * Thành phần Hộp Thoại (Modal / Dialog) chuẩn Warm Minimal + Monospace
  * - 100% sử dụng React createPortal vào document.body (Quy tắc 07)
  * - Đóng bằng nút (×) góc phải trên, phím Esc và click ra ngoài (có chống đóng nhầm khi kéo bôi đen)
- * - Trap focus bên trong hộp thoại cho điều hướng bàn phím (WCAG AA)
+ * - Giữ ổn định focus khi gõ phím trong input/textarea (chỉ chạy hiệu ứng mở/đóng theo cờ `mo`)
  */
 export function HopThoai({
   mo,
@@ -39,12 +39,18 @@ export function HopThoai({
   const [daGanVaoDom, setDaGanVaoDom] = useState(false);
   const chuotNhanVaoNenRef = useRef(false);
   const hopThoaiRef = useRef<HTMLDivElement>(null);
+  const noiDungRef = useRef<HTMLDivElement>(null);
+  const onDongRef = useRef(onDong);
+
+  useEffect(() => {
+    onDongRef.current = onDong;
+  }, [onDong]);
 
   useEffect(() => {
     setDaGanVaoDom(true);
   }, []);
 
-  // Bắt phím Escape, Trap Focus và khóa cuộn chuột
+  // Bắt phím Escape, Trap Focus và khóa cuộn chuột (CHỈ phụ thuộc vào `mo`)
   useEffect(() => {
     if (!mo) return;
 
@@ -53,7 +59,7 @@ export function HopThoai({
     const xuLyNhanPhim = (e: KeyboardEvent) => {
       if (e.key === 'Escape') {
         e.stopPropagation();
-        onDong();
+        onDongRef.current();
         return;
       }
 
@@ -67,12 +73,18 @@ export function HopThoai({
         const cuoiCung = cacPhanTuFocusable[cacPhanTuFocusable.length - 1];
 
         if (e.shiftKey) {
-          if (document.activeElement === dauTien || !hopThoaiRef.current.contains(document.activeElement)) {
+          if (
+            document.activeElement === dauTien ||
+            !hopThoaiRef.current.contains(document.activeElement)
+          ) {
             e.preventDefault();
             cuoiCung.focus();
           }
         } else {
-          if (document.activeElement === cuoiCung || !hopThoaiRef.current.contains(document.activeElement)) {
+          if (
+            document.activeElement === cuoiCung ||
+            !hopThoaiRef.current.contains(document.activeElement)
+          ) {
             e.preventDefault();
             dauTien.focus();
           }
@@ -84,12 +96,16 @@ export function HopThoai({
     document.body.style.overflow = 'hidden';
     window.addEventListener('keydown', xuLyNhanPhim);
 
-    // Tự động đưa focus vào phần tử nhập liệu đầu tiên hoặc nút đóng
+    // Tự động đưa focus vào phần tử nhập liệu đầu tiên trong thân modal khi vừa mở
     const timer = setTimeout(() => {
       if (hopThoaiRef.current && !hopThoaiRef.current.contains(document.activeElement)) {
-        const oNhapDau = hopThoaiRef.current.querySelector<HTMLElement>(
-          'input:not([disabled]), textarea:not([disabled]), select:not([disabled]), button:not([disabled])',
-        );
+        const oNhapDau =
+          noiDungRef.current?.querySelector<HTMLElement>(
+            'input:not([disabled]), textarea:not([disabled]), select:not([disabled])',
+          ) ||
+          hopThoaiRef.current.querySelector<HTMLElement>(
+            'input:not([disabled]), textarea:not([disabled]), select:not([disabled]), button:not([disabled])',
+          );
         oNhapDau?.focus();
       }
     }, 30);
@@ -102,7 +118,7 @@ export function HopThoai({
         phanTuTruocDo.focus();
       }
     };
-  }, [mo, onDong]);
+  }, [mo]);
 
   if (!daGanVaoDom || !mo) return null;
 
@@ -119,7 +135,7 @@ export function HopThoai({
           e.target === e.currentTarget && (chuotNhanVaoNenRef.current || e.detail === 0);
 
         if (laClickHopLe) {
-          onDong();
+          onDongRef.current();
         }
         chuotNhanVaoNenRef.current = false;
       }}
@@ -141,7 +157,7 @@ export function HopThoai({
 
           <button
             type="button"
-            onClick={onDong}
+            onClick={() => onDongRef.current()}
             aria-label="Đóng hộp thoại"
             className="p-1.5 text-[var(--muted)] hover:text-[var(--text)] hover:bg-[var(--active-bg)] rounded-[var(--radius)] transition-colors cursor-pointer shrink-0"
           >
@@ -150,7 +166,9 @@ export function HopThoai({
         </div>
 
         {/* Nội dung bên trong hộp thoại */}
-        <div className="flex-1 overflow-y-auto p-5 sm:p-6 space-y-4">{children}</div>
+        <div ref={noiDungRef} className="flex-1 overflow-y-auto p-5 sm:p-6 space-y-4">
+          {children}
+        </div>
       </div>
     </div>,
     document.body,

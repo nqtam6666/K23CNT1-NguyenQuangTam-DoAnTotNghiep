@@ -51,7 +51,7 @@ export function ViecCanXuLyComponent({ danhSach }: Props) {
             >
               <div className="space-y-1 min-w-0 flex-1">
                 <div className="flex items-center gap-2 flex-wrap">
-                  <span className="font-mono text-xs font-semibold text-[var(--text)] truncate">
+                  <span className="font-sans text-[13px] font-semibold text-[var(--text)] truncate">
                     {item.tieuDe}
                   </span>
                   {layBadgeUuTien(item.mucDoUuTien)}
@@ -64,7 +64,7 @@ export function ViecCanXuLyComponent({ danhSach }: Props) {
               <Link
                 href={item.duongDan}
                 prefetch={true}
-                className="shrink-0 inline-flex items-center gap-1.5 px-3 py-1.5 rounded-[var(--radius)] font-mono text-xs font-semibold bg-[var(--surface)] text-[var(--text)] hover:bg-[var(--accent-soft)] hover:text-[var(--accent)] transition-colors border border-[var(--border)]"
+                className="shrink-0 inline-flex items-center gap-1.5 px-3 py-1.5 rounded-[var(--radius)] font-sans text-xs font-semibold bg-[var(--accent-soft)] text-[var(--accent)] hover:bg-[var(--accent)] hover:text-white transition-colors"
               >
                 <span>Xử lý</span>
                 <ArrowRight strokeWidth={1.5} className="w-3.5 h-3.5" />

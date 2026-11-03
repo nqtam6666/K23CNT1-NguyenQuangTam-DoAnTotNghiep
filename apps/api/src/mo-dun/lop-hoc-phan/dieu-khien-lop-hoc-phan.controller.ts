@@ -62,7 +62,7 @@ export class DieuKhienLopHocPhanController {
   }
 
   @Get(':id')
-  @ApiOperation({ summary: 'Xem chi tiết lớp học phần (kiểm tra quyền sở hữu ABAC)' })
+  @ApiOperation({ summary: 'Xem chi tiết lớp học phần' })
   @KiemTraQuyen(HanhDong.Doc, DoiTuong.LopHocPhan)
   async layChiTiet(
     @Param('id', ParseUUIDPipe) id: string,

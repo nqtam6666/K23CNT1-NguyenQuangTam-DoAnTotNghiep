@@ -25,7 +25,7 @@ import {
   LuuBangDiemHangLoatInput,
 } from '@lms/chung';
 
-@ApiTags('Quản lý Kết quả học phần & Sổ điểm thông minh')
+@ApiTags('Quản lý Kết quả học phần & Sổ điểm')
 @ApiBearerAuth('JWT-auth')
 @UseGuards(XacThucJwtGuard, PhanQuyenCaslGuard)
 @Controller('so-diem')
@@ -123,6 +123,22 @@ export class DieuKhienSoDiemController {
     return {
       thanhCong: true,
       thongDiep: `Đã phân tích kết quả học phần cho ${duLieu.hoTen}`,
+      duLieu,
+    };
+  }
+
+  @Get('lop/:idLop/phan-tich-hoc-tap')
+  @KiemTraQuyen(HanhDong.Doc, DoiTuong.SoDiem)
+  @ApiOperation({
+    summary: 'Phân tích học tập (Learning Analytics): Cảnh báo sớm sinh viên chậm tiến độ / giảm điểm và đề xuất nội dung ôn tập từ câu trả lời sai',
+  })
+  async layPhanTichHocTapLop(
+    @Param('idLop', ParseUUIDPipe) idLop: string,
+    @NguoiDungHienTai() nguoiDung: PayloadJwt,
+  ) {
+    const duLieu = await this.dichVuSoDiem.layPhanTichHocTapLop(idLop, nguoiDung);
+    return {
+      thanhCong: true,
       duLieu,
     };
   }

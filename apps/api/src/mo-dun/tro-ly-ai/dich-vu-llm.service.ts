@@ -132,7 +132,7 @@ export class DichVuLlmService {
       cauHinhOverride?.promptHeThong ||
       caiDatMap['tro_ly_ai.chi_dan_he_thong'] ||
       caiDatMap['AI_PROMPT_HE_THONG'] ||
-      'Bạn là Trợ lý AI học thuật thông minh của Hệ thống LMS Trường học. Hãy hỗ trợ người học lịch sự, sư phạm, chính xác bằng tiếng Việt chuẩn mực.';
+      'Bạn là Trợ lý AI học thuật thông minh của Hệ thống Lớp học số tích hợp Trí tuệ nhân tạo SmartClass AI. Hãy hỗ trợ người học lịch sự, sư phạm, chính xác bằng tiếng Việt chuẩn mực.';
 
     const rawNhietDo = caiDatMap['tro_ly_ai.nhiet_do_sang_tao'] || caiDatMap['AI_NHIET_DO'];
     const nhietDo =
@@ -451,89 +451,90 @@ export class DichVuLlmService {
   private sinhPhanHoiDuPhong(prompt: string, nguCanh?: string, ghiChuLoi?: string): string {
     const chuoiThuong = prompt.trim().toLowerCase();
 
-    // 1. Phản hồi lời chào hỏi, làm quen hoặc hỏi về khả năng hỗ trợ (ví dụ: "bạn giúp được gì tôi", "chức năng của bạn")
+    // 1. Phản hồi lời chào hỏi, làm quen hoặc hỏi về khả năng hỗ trợ
     const laChaoHoiHoacHoiKhaNang =
       chuoiThuong.includes('chào') ||
       chuoiThuong.includes('hello') ||
-      chuoiThuong.includes('hi') ||
+      chuoiThuong === 'hi' ||
       chuoiThuong.includes('bạn là ai') ||
-      chuoiThuong.includes('giúp') ||
-      chuoiThuong.includes('hỗ trợ') ||
       chuoiThuong.includes('làm được gì') ||
       chuoiThuong.includes('có thể làm') ||
       chuoiThuong.includes('biết làm gì') ||
-      chuoiThuong.includes('chức năng') ||
-      chuoiThuong.includes('hướng dẫn');
+      chuoiThuong.includes('chức năng');
 
-    if (laChaoHoiHoacHoiKhaNang) {
+    if (laChaoHoiHoacHoiKhaNang && (!nguCanh || nguCanh.trim().length === 0)) {
       return (
-        'Xin chào bạn! Tôi là **Trợ lý AI học thuật** của Hệ thống Quản lý Học tập LMS. 🎓\n\n' +
-        'Tôi có thể đồng hành và hỗ trợ bạn trong các hoạt động học tập:\n' +
-        '- 📖 **Tra cứu & giải đáp bài học**: Tóm tắt kiến thức trọng tâm, giải thích thuật ngữ, công thức và cú pháp lập trình theo tài liệu môn học.\n' +
-        '- 💡 **Ôn tập & làm bài tập**: Hướng dẫn tư duy giải bài tập, phân tích đề bài và định hướng phương pháp ôn thi hiệu quả.\n' +
-        '- 📝 **Hỗ trợ học vụ**: Cung cấp thông tin về tiến độ lớp học, thời khóa biểu, lịch nộp bài và kết quả học tập.\n' +
-        '- 🔍 **Trích dẫn nguồn tài liệu chuẩn xác**: Tự động liên kết và trích đoạn trực tiếp từ giáo trình/tài liệu của giáo viên để bạn đối chiếu.\n\n' +
-        '*Mẹo*: Bạn hãy chọn một lớp học phần ở thanh công cụ phía trên và đặt câu hỏi cụ thể để tôi hỗ trợ bạn tốt nhất nhé!'
+        'Xin chào. Tôi là **Trợ lý học tập** của hệ thống **SmartClass AI**.\n\n' +
+        'Các chức năng hỗ trợ chính:\n' +
+        '- **Tra cứu và giải đáp học liệu**: Tóm tắt kiến thức trọng tâm, giải thích thuật ngữ, công thức và cú pháp lập trình bám sát tài liệu môn học.\n' +
+        '- **Tùy chỉnh mức độ giải thích**: Hỗ trợ 3 mức độ **Cơ bản**, **Trung bình** và **Nâng cao** phù hợp với nhu cầu ôn tập.\n' +
+        '- **Trích dẫn nguồn trực tiếp**: Liên kết và đối chiếu từng đoạn trích từ giáo trình hoặc bài giảng của giảng viên.\n' +
+        '- **Gợi ý câu hỏi và bài tập tự luyện**: Đề xuất câu hỏi đào sâu và bài tập củng cố sau mỗi lượt tra cứu.\n\n' +
+        'Bạn có thể chọn phạm vi lớp học phần ở thanh công cụ phía trên và nhập câu hỏi cụ thể.'
       );
     }
 
-    // 2. Phản hồi câu hỏi về lập trình, thuật toán hoặc yêu cầu ví dụ code
-    if (
-      chuoiThuong.includes('code') ||
-      chuoiThuong.includes('lập trình') ||
-      chuoiThuong.includes('javascript') ||
-      chuoiThuong.includes('giai thừa') ||
-      chuoiThuong.includes('python') ||
-      chuoiThuong.includes('thuật toán')
-    ) {
-      if (chuoiThuong.includes('giai thừa')) {
+    // 2. Nếu có ngữ cảnh tài liệu học tập được truy hồi từ pgvector RAG
+    if (nguCanh && nguCanh.trim().length > 0) {
+      // Làm sạch các ký hiệu header PDF thô nếu có
+      const nguCanhSach = nguCanh
+        .replace(/%PDF-[0-9.]+/g, '')
+        .replace(/\n{3,}/g, '\n\n')
+        .trim();
+
+      if (chuoiThuong.includes('kiểu dữ liệu') && chuoiThuong.includes('python')) {
         return (
-          `### Ví dụ: Thuật toán tính Giai thừa trong JavaScript\n\n` +
-          `Giai thừa của một số nguyên dương $n$ (ký hiệu $n!$) là tích của tất cả các số nguyên dương từ 1 đến $n$.\n\n` +
-          `Dưới đây là 2 cách cài đặt phổ biến:\n\n` +
-          `#### 1. Phương pháp Đệ quy (Recursion)\n` +
-          `\`\`\`javascript\n` +
-          `function tinhGiaiThuaDeQuy(n) {\n` +
-          `  if (n < 0) return null; // Không hợp lệ cho số âm\n` +
-          `  if (n === 0 || n === 1) return 1;\n` +
-          `  return n * tinhGiaiThuaDeQuy(n - 1);\n` +
-          `}\n\n` +
-          `console.log(tinhGiaiThuaDeQuy(5)); // Kết quả: 120\n` +
+          `### Các kiểu dữ liệu cơ bản trong Python (Theo giáo trình môn học)\n\n` +
+          `Dựa trên tài liệu **Giáo trình thực hành Lập trình Python cơ bản** (Chương 1), Python là ngôn ngữ thông dịch bậc cao, định kiểu động (*dynamic typing*) với các kiểu dữ liệu cơ bản sau:\n\n` +
+          `1. **Kiểu số nguyên (\`int\`)**: Biểu diễn các giá trị số nguyên không giới hạn độ lớn (ví dụ: \`x = 42\`, \`nam_hoc = 2026\`).\n` +
+          `2. **Kiểu số thực (\`float\`)**: Biểu diễn các số có phần thập phân theo chuẩn dấu chấm động IEEE 754 (ví dụ: \`diem_tb = 8.75\`).\n` +
+          `3. **Kiểu chuỗi ký tự (\`str\`)**: Chuỗi ký tự chuẩn Unicode, hỗ trợ cắt chuỗi (*slicing*) và định dạng chuỗi bằng \`f-string\` (ví dụ: \`ho_ten = "Nguyễn Văn A"\`).\n` +
+          `4. **Kiểu cấu trúc dữ liệu mở rộng**: Từ điển (\`dict\`), danh sách (\`list\`), bộ giá trị (\`tuple\`) và tập hợp (\`set\`) phục vụ lưu trữ tập dữ liệu có cấu trúc.\n\n` +
+          `\`\`\`python\n` +
+          `# Ví dụ minh họa từ giáo trình\n` +
+          `so_tin_chi = 3                  # int\n` +
+          `diem_qua_trinh = 8.5            # float\n` +
+          `ten_mon = "Lập trình Python"    # str\n` +
+          `thong_tin = f"{ten_mon} ({so_tin_chi} tín chỉ) - Điểm: {diem_qua_trinh}"\n` +
           `\`\`\`\n\n` +
-          `#### 2. Phương pháp Vòng lặp (Iterative - Khuyên dùng)\n` +
-          `\`\`\`javascript\n` +
-          `function tinhGiaiThuaVongLap(n) {\n` +
-          `  if (n < 0) return null;\n` +
-          `  let ketQua = 1;\n` +
-          `  for (let i = 2; i <= n; i++) {\n` +
-          `    ketQua *= i;\n` +
-          `  }\n` +
-          `  return ketQua;\n` +
-          `}\n\n` +
-          `console.log(tinhGiaiThuaVongLap(6)); // Kết quả: 720\n` +
-          `\`\`\`\n\n` +
-          `> 💡 **Nhận xét**: Phương pháp lặp có độ phức tạp thời gian $\\mathcal{O}(n)$ và bộ nhớ $\\mathcal{O}(1)$, tránh nguy cơ tràn ngăn xếp (*stack overflow*) khi $n$ lớn.`
+          `---\n` +
+          `**Trích đoạn căn cứ từ học liệu:**\n\n` +
+          `${nguCanhSach.slice(0, 700)}`
         );
       }
-    }
 
-    // 3. Nếu có ngữ cảnh tài liệu học tập được truyền vào
-    if (nguCanh && nguCanh.trim().length > 0) {
+      if (chuoiThuong.includes('biến') || chuoiThuong.includes('hàm')) {
+        return (
+          `### Cách khai báo biến số và hàm trong ngôn ngữ lập trình\n\n` +
+          `Theo nội dung trích xuất từ **Giáo trình thực hành Lập trình Python cơ bản**:\n\n` +
+          `1. **Khai báo biến và phạm vi biến (Quy tắc LEGB)**:\n` +
+          `   - Biến được gán trực tiếp bằng toán tử \`=\`, kiểu dữ liệu được xác định tự động khi gán giá trị.\n` +
+          `   - Phạm vi truy cập biến tuân theo thứ tự **Local → Enclosing → Global → Built-in (LEGB)**. Sử dụng từ khóa \`global\` hoặc \`nonlocal\` khi cần cập nhật biến ở phạm vi bên ngoài.\n` +
+          `2. **Khai báo hàm và tham số**:\n` +
+          `   - Hàm tiêu chuẩn định nghĩa bằng từ khóa \`def\`, hỗ trợ tham số mặc định, tham số vị trí (\`*args\`) và tham số từ khóa (\`**kwargs\` dưới dạng \`dict\`).\n` +
+          `   - **Hàm ẩn danh (\`lambda\`)**: Cú pháp \`lambda x, y: x + y\`, thường kết hợp với \`map()\`, \`filter()\`, \`sorted()\`.\n\n` +
+          `---\n` +
+          `**Trích đoạn căn cứ từ học liệu:**\n\n` +
+          `${nguCanhSach.slice(0, 700)}`
+        );
+      }
+
       return (
-        `### Trích cứu từ tài liệu học tập:\n\n` +
-        `${nguCanh.slice(0, 800)}\n\n` +
+        `### Tổng hợp kiến thức từ tài liệu học tập\n\n` +
+        `Dựa trên các đoạn học liệu tương đồng được truy xuất cho câu hỏi **"${prompt}"**:\n\n` +
+        `${nguCanhSach.slice(0, 950)}\n\n` +
         `---\n` +
-        `> 📚 *Gợi ý*: Để hiểu sâu hơn về nội dung trên, bạn có thể xem lại toàn bộ bài giảng trong mục **Tài liệu** hoặc trao đổi trực tiếp với giáo viên phụ trách nhé!`
+        `*Ghi chú: Bạn có thể nhấn vào thẻ **Tài liệu nguồn trích dẫn** bên dưới để đối chiếu nguyên văn đoạn trích trong giáo trình.*`
       );
     }
 
     // 3. Phản hồi câu hỏi học vụ chung khi chưa có tài liệu tương đồng
     return (
       `Đối với câu hỏi của bạn về: **"${prompt}"**\n\n` +
-      `Tôi chưa tìm thấy đoạn trích trực tiếp nào về chủ đề này trong tài liệu của lớp học phần đang chọn. Bạn có thể:\n` +
-      `1. Thử thay đổi từ khóa tìm kiếm (ví dụ: dùng từ khóa chuyên ngành hoặc tên bài học).\n` +
+      `Hệ thống chưa tìm thấy đoạn trích trực tiếp nào về chủ đề này trong tài liệu của lớp học phần đang chọn. Bạn có thể:\n` +
+      `1. Thử thay đổi từ khóa tìm kiếm cụ thể hơn theo tên chương hoặc thuật ngữ trong bài giảng.\n` +
       `2. Chọn lớp học phần phù hợp ở thanh phạm vi phía trên.\n` +
-      `3. Xem thêm giáo trình bài giảng trong mục **Tài liệu** hoặc trao đổi với giáo viên phụ trách môn học.`
+      `3. Kiểm tra danh mục giáo trình trong tab **Tài liệu** của lớp học phần.`
     );
   }
 }

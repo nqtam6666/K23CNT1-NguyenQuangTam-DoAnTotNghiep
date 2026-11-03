@@ -3,7 +3,6 @@
 import { useState, useEffect } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import {
-  Sparkles,
   BrainCircuit,
   Clock,
   CheckCircle2,
@@ -28,6 +27,7 @@ import {
   CauHoi,
   CheDoKiemTra,
   TrangThaiBaiKiemTra,
+  MucDoKho,
   LuotLamBai,
   PayloadJwt,
   VaiTro,
@@ -54,6 +54,8 @@ export function TabKiemTra({ idLopHocPhan, nguoiDung, laGiaoVienLop }: ThuocTinh
   const [moModalSinhDeAI, setMoModalSinhDeAI] = useState(false);
   const [tieuDeAI, setTieuDeAI] = useState('');
   const [chuDeAI, setChuDeAI] = useState('');
+  const [idTaiLieuAI, setIdTaiLieuAI] = useState('');
+  const [mucDoKhoAI, setMucDoKhoAI] = useState<MucDoKho>(MucDoKho.TRUNG_BINH);
   const [cheDoAI, setCheDoAI] = useState<CheDoKiemTra>(CheDoKiemTra.LUYEN_TAP);
   const [soLuongCauAI, setSoLuongCauAI] = useState(5);
   const [thoiGianLamPhutAI, setThoiGianLamPhutAI] = useState(15);
@@ -75,6 +77,16 @@ export function TabKiemTra({ idLopHocPhan, nguoiDung, laGiaoVienLop }: ThuocTinh
       const res = await mayKhachApi.get(`/kiem-tra/lop/${idLopHocPhan}`);
       return res.data?.duLieu || res.data || [];
     },
+  });
+
+  // Lấy danh sách tài liệu của lớp để giáo viên chọn tài liệu/chương khi biên soạn đề
+  const { data: danhSachTaiLieuLop = [] } = useQuery<any[]>({
+    queryKey: ['tai-lieu-lop', idLopHocPhan],
+    queryFn: async () => {
+      const res = await mayKhachApi.get(`/tai-lieu/lop/${idLopHocPhan}`);
+      return res.data?.duLieu || res.data || [];
+    },
+    enabled: coQuyenQuanLy,
   });
 
   // 2. Lấy chi tiết 1 bài kiểm tra (khi GV xem câu hỏi/bảng điểm)
@@ -109,6 +121,8 @@ export function TabKiemTra({ idLopHocPhan, nguoiDung, laGiaoVienLop }: ThuocTinh
       const res = await mayKhachApi.post(`/kiem-tra/lop/${idLopHocPhan}/sinh-bang-ai`, {
         tieuDe: tieuDeAI.trim() || `${cheDoAI === CheDoKiemTra.THI_THU ? 'Thi thử' : 'Luyện tập'}: ${chuDeAI.trim()}`,
         chuDe: chuDeAI.trim(),
+        idTaiLieu: idTaiLieuAI || undefined,
+        mucDoKho: mucDoKhoAI,
         cheDo: cheDoAI,
         soLuongCau: Number(soLuongCauAI),
         thoiGianLamPhut: Number(thoiGianLamPhutAI),
@@ -303,7 +317,7 @@ export function TabKiemTra({ idLopHocPhan, nguoiDung, laGiaoVienLop }: ThuocTinh
               onClick={() => setMoModalSinhDeAI(true)}
               className="inline-flex items-center gap-2 rounded bg-accent hover:bg-accent px-4 py-2.5 text-xs font-semibold text-white shadow-sm transition-all cursor-pointer"
             >
-              <Sparkles className="w-4 h-4" />
+              <BrainCircuit className="w-4 h-4" />
               Biên soạn đề thông minh từ Tài liệu
             </button>
           )}
@@ -417,7 +431,7 @@ export function TabKiemTra({ idLopHocPhan, nguoiDung, laGiaoVienLop }: ThuocTinh
                         <button
                           type="button"
                           onClick={() => setIdBaiXemChiTiet(bai.id)}
-                          className="inline-flex items-center gap-1.5 rounded bg-muted hover:bg-muted/80 px-3 py-1.5 text-xs font-semibold text-foreground transition-colors cursor-pointer"
+                          className="inline-flex items-center gap-1.5 rounded bg-active-bg hover:bg-bg border border-border px-3 py-1.5 text-xs font-semibold text-text transition-colors cursor-pointer"
                         >
                           <Eye className="w-3.5 h-3.5" />
                           Xem đề & Kết quả
@@ -544,6 +558,41 @@ export function TabKiemTra({ idLopHocPhan, nguoiDung, laGiaoVienLop }: ThuocTinh
             />
           </div>
 
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+            <div>
+              <label className="block text-xs font-semibold text-foreground mb-1">
+                Tài liệu / Chương giáo trình nguồn
+              </label>
+              <select
+                value={idTaiLieuAI}
+                onChange={(e) => setIdTaiLieuAI(e.target.value)}
+                className="w-full rounded border border-input bg-background px-3 py-2 text-sm focus:border-primary focus:outline-none"
+              >
+                <option value="">Toàn bộ học liệu của lớp học phần</option>
+                {danhSachTaiLieuLop.map((tl: any) => (
+                  <option key={tl.id} value={tl.id}>
+                    {tl.tieuDe}
+                  </option>
+                ))}
+              </select>
+            </div>
+
+            <div>
+              <label className="block text-xs font-semibold text-foreground mb-1">
+                Mức độ khó của câu hỏi
+              </label>
+              <select
+                value={mucDoKhoAI}
+                onChange={(e) => setMucDoKhoAI(e.target.value as MucDoKho)}
+                className="w-full rounded border border-input bg-background px-3 py-2 text-sm focus:border-primary focus:outline-none"
+              >
+                <option value={MucDoKho.DE}>Dễ (Nhận biết & Thông hiểu)</option>
+                <option value={MucDoKho.TRUNG_BINH}>Trung bình (Vận dụng chuẩn)</option>
+                <option value={MucDoKho.KHO}>Khó (Vận dụng cao & Phân tích)</option>
+              </select>
+            </div>
+          </div>
+
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
             <div>
               <label className="block text-xs font-semibold text-foreground mb-1">
@@ -608,7 +657,7 @@ export function TabKiemTra({ idLopHocPhan, nguoiDung, laGiaoVienLop }: ThuocTinh
                 </>
               ) : (
                 <>
-                  <Sparkles className="w-3.5 h-3.5" />
+                  <BrainCircuit className="w-3.5 h-3.5" />
                   Biên soạn đề kiểm tra
                 </>
               )}
@@ -639,7 +688,7 @@ export function TabKiemTra({ idLopHocPhan, nguoiDung, laGiaoVienLop }: ThuocTinh
               <div className="rounded bg-accent-soft border border-accent p-4 space-y-2">
                 <div className="flex flex-wrap items-center justify-between gap-2">
                   <span className="inline-flex items-center gap-1.5 text-xs font-bold text-accent">
-                    <Sparkles className="w-4 h-4" />
+                    <BrainCircuit className="w-4 h-4" />
                     Đánh giá kết quả & Định hướng ôn tập
                   </span>
                   <span className="px-3 py-1 rounded-full bg-accent text-white text-xs font-extrabold">

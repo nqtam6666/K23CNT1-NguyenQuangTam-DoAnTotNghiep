@@ -26,6 +26,7 @@ export class KhoBaiDangRepository {
                 hoTen: true,
                 email: true,
                 anhDaiDien: true,
+                vaiTro: true,
               },
             },
           },
@@ -42,6 +43,7 @@ export class KhoBaiDangRepository {
       include: {
         nguoiDang: true,
         lopHocPhan: true,
+        cacBinhLuan: true,
       },
     });
   }
@@ -89,6 +91,7 @@ export class KhoBaiDangRepository {
             hoTen: true,
             email: true,
             anhDaiDien: true,
+            vaiTro: true,
           },
         },
       },

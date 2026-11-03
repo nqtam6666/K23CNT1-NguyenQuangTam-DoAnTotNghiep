@@ -35,19 +35,19 @@ import {
   DuyetDonXinNghiInput,
 } from '@lms/chung';
 
-@ApiTags('Phòng học trực tuyến & Điểm danh thông minh')
+@ApiTags('Phòng học trực tuyến & Điểm danh')
 @Controller('phong-hoc-truc-tuyen')
 export class DieuKhienPhongHoc {
   constructor(private readonly dichVuPhongHoc: DichVuPhongHoc) {}
 
   /**
-   * Cấp AccessToken ngắn hạn tham gia phòng học trực tuyến LiveKit
+   * Cấp AccessToken ngắn hạn tham gia phòng học trực tuyến
    */
   @Post('lop/:idLop/token')
   @ApiBearerAuth('JWT-auth')
   @UseGuards(XacThucJwtGuard, PhanQuyenCaslGuard)
   @KiemTraQuyen(HanhDong.ThamGia, DoiTuong.PhongTrucTuyen)
-  @ApiOperation({ summary: 'Cấp token LiveKit tham gia phòng học trực tuyến' })
+  @ApiOperation({ summary: 'Cấp mã phiên truy cập phòng học trực tuyến' })
   async layTokenPhongHoc(
     @Param('idLop', ParseUUIDPipe) idLop: string,
     @Body('idBuoiHoc') idBuoiHoc: string | undefined,
@@ -88,7 +88,7 @@ export class DieuKhienPhongHoc {
    * Endpoint nhận Webhook tự động từ LiveKit Server
    */
   @Post('webhook')
-  @ApiOperation({ summary: 'Nhận sự kiện Webhook từ LiveKit Server' })
+  @ApiOperation({ summary: 'Nhận sự kiện đồng bộ trạng thái phòng học trực tuyến' })
   async nhanWebhookLiveKit(@Headers('authorization') authHeader: string, @Req() req: Request) {
     const bodyRaw =
       typeof req.body === 'string' || Buffer.isBuffer(req.body)

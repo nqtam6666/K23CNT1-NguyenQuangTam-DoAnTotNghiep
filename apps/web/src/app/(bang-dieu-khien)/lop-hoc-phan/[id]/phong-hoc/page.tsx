@@ -1,43 +1,38 @@
 'use client';
 
-import { useState, use, useEffect } from 'react';
+import { useState, use } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import dynamic from 'next/dynamic';
-import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import { useQuery } from '@tanstack/react-query';
+import {
+  ArrowLeft,
+  Users,
+  ShieldAlert,
+  Loader2,
+  LogOut,
+} from 'lucide-react';
+import { mayKhachApi } from '../../../../../tien-ich/may-khach-api';
+import { thongBao } from '../../../../../tien-ich/thong-bao';
+import { HopThoai } from '../../../../../thanh-phan/hop-thoai';
+import { KetQuaTokenLiveKit, LopHocPhan, PayloadJwt } from '@lms/chung';
 
 const ThanhPhanPhongHocLiveKit = dynamic(() => import('./thanh-phan-phong-hoc'), {
   ssr: false,
   loading: () => (
-    <div className="h-full w-full flex flex-col items-center justify-center space-y-3 bg-surface text-muted">
+    <div className="h-full w-full flex flex-col items-center justify-center space-y-3 bg-[var(--phong-bg)] text-[var(--phong-muted)]">
       <Loader2 className="w-8 h-8 animate-spin text-accent" />
-      <p className="text-sm font-medium">Đang tải giao diện phòng học LiveKit...</p>
+      <p className="text-sm font-medium">Đang tải giao diện phòng học trực tuyến...</p>
     </div>
   ),
 });
-import {
-  ArrowLeft,
-  Video,
-  Radio,
-  Users,
-  ShieldAlert,
-  Loader2,
-  CheckCircle2,
-  Calendar,
-  Clock,
-  ExternalLink,
-  Sparkles,
-} from 'lucide-react';
-import { mayKhachApi } from '../../../../../tien-ich/may-khach-api';
-import { thongBao } from '../../../../../tien-ich/thong-bao';
-import { KetQuaTokenLiveKit, LopHocPhan, PayloadJwt, VaiTro } from '@lms/chung';
 
 export default function TrangPhongHocTrucTuyen({ params }: { params: Promise<{ id: string }> }) {
   const { id } = use(params);
   const router = useRouter();
-  const queryClient = useQueryClient();
 
   const [moNhatKy, setMoNhatKy] = useState(false);
+  const [moHopThoaiRoiPhong, setMoHopThoaiRoiPhong] = useState(false);
 
   // 1. Lấy thông tin lớp học phần
   const {
@@ -101,7 +96,8 @@ export default function TrangPhongHocTrucTuyen({ params }: { params: Promise<{ i
     enabled: moNhatKy,
   });
 
-  const xuLyRoiPhong = () => {
+  const xuLyRoiPhongNgay = () => {
+    setMoHopThoaiRoiPhong(false);
     thongBao.thanhCong('Đã rời khỏi phòng học trực tuyến');
     router.push(`/lop-hoc-phan/${id}`);
   };
@@ -131,7 +127,7 @@ export default function TrangPhongHocTrucTuyen({ params }: { params: Promise<{ i
       'Bạn không có quyền tham gia phòng học trực tuyến của lớp này. Vui lòng kiểm tra lại tài khoản hoặc liên hệ giảng viên.';
 
     return (
-      <div className="max-w-md mx-auto my-16 p-8 bg-surface rounded shadow-sm border border-border text-center space-y-5">
+      <div className="max-w-md mx-auto my-16 p-8 bg-surface rounded-[var(--radius)] border border-border text-center space-y-5">
         <div className="w-16 h-16 bg-danger-soft text-danger rounded-full flex items-center justify-center mx-auto">
           <ShieldAlert className="w-8 h-8" />
         </div>
@@ -142,13 +138,13 @@ export default function TrangPhongHocTrucTuyen({ params }: { params: Promise<{ i
         <div className="pt-2 flex flex-col gap-2">
           <button
             onClick={() => layLaiToken()}
-            className="w-full px-4 py-2.5 bg-accent hover:bg-accent text-white rounded text-sm font-semibold transition-colors shadow-sm"
+            className="w-full px-4 py-2.5 bg-accent hover:opacity-95 text-white rounded-[var(--radius)] text-sm font-semibold transition-colors cursor-pointer"
           >
             Thử lại kết nối
           </button>
           <Link
             href={`/lop-hoc-phan/${id}`}
-            className="w-full px-4 py-2.5 bg-active-bg hover:bg-active-bg text-text rounded text-sm font-medium transition-colors"
+            className="w-full px-4 py-2.5 bg-active-bg hover:opacity-90 text-text rounded-[var(--radius)] text-sm font-medium transition-colors"
           >
             Quay lại thông tin lớp học
           </Link>
@@ -158,31 +154,32 @@ export default function TrangPhongHocTrucTuyen({ params }: { params: Promise<{ i
   }
 
   return (
-    <div className="flex flex-col h-[calc(100vh-5rem)] bg-surface text-text rounded overflow-hidden border border-border">
-      {/* THANH ĐIỀU KHIỂN ĐẦU PHÒNG HỌC */}
-      <header className="px-5 py-3 bg-surface border-b border-border flex items-center justify-between gap-4 z-20">
+    <div className="flex flex-col h-[calc(100vh-5rem)] bg-[var(--phong-bg)] text-[var(--phong-text)] rounded-[var(--radius)] overflow-hidden border border-[var(--phong-border)]">
+      {/* THANH ĐIỀU KHIỂN ĐẦU PHÒNG HỌC (LUÔN TỐI THEO TOKEN --phong-*) */}
+      <header className="px-5 py-3 bg-[var(--phong-surface)] border-b border-[var(--phong-border)] flex items-center justify-between gap-4 z-20">
         <div className="flex items-center gap-3 min-w-0">
           <button
-            onClick={xuLyRoiPhong}
-            className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-surface hover:bg-active-bg text-muted hover:text-text rounded-lg text-xs font-medium transition-colors"
-            title="Quay lại lớp học"
+            type="button"
+            onClick={() => setMoHopThoaiRoiPhong(true)}
+            className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-[var(--phong-bg)] hover:bg-[var(--danger-soft)] text-[var(--phong-muted)] hover:text-[var(--danger)] border border-[var(--phong-border)] hover:border-[var(--danger)] rounded-[var(--radius)] text-xs font-semibold transition-colors cursor-pointer"
+            title="Rời phòng học trực tuyến"
           >
-            <ArrowLeft className="w-4 h-4" />
+            <ArrowLeft className="w-4 h-4 stroke-[1.5]" />
             <span className="hidden sm:inline">Rời phòng</span>
           </button>
 
           <div className="min-w-0">
             <div className="flex items-center gap-2">
-              <h2 className="font-bold text-sm sm:text-base text-text truncate">
+              <h2 className="font-mono font-bold text-sm sm:text-base text-[var(--phong-text)] truncate">
                 {lopHocPhan?.tenLopHocPhan || 'Lớp học phần'}
               </h2>
-              <span className="inline-flex items-center gap-1.5 px-2 py-0.5 rounded-full text-[11px] font-semibold bg-accent/10 text-accent border border-accent">
-                <span className="w-2 h-2 rounded-full bg-accent-soft animate-pulse" />
+              <span className="inline-flex items-center gap-1.5 px-2 py-0.5 rounded-[var(--radius)] text-[11px] font-mono font-semibold bg-accent/15 text-accent border border-accent">
+                <span className="w-2 h-2 rounded-full bg-accent" />
                 Trực tiếp
               </span>
             </div>
-            <p className="text-xs text-muted truncate hidden sm:block">
-              Mã phòng: <span className="font-mono text-muted">{duLieuToken.tenPhong}</span>
+            <p className="text-xs text-[var(--phong-muted)] truncate hidden sm:block">
+              Mã phòng: <span className="font-mono text-[var(--phong-muted)]">{duLieuToken.tenPhong}</span>
             </p>
           </div>
         </div>
@@ -190,7 +187,7 @@ export default function TrangPhongHocTrucTuyen({ params }: { params: Promise<{ i
         {/* Thông tin vai trò & Tiện ích */}
         <div className="flex items-center gap-2 sm:gap-3 shrink-0">
           <div className="text-right hidden md:block">
-            <span className="text-xs text-muted">Tham gia với vai trò:</span>
+            <span className="text-xs text-[var(--phong-muted)]">Tham gia với vai trò:</span>
             <p className="text-xs font-semibold text-accent">
               {duLieuToken.vaiTroTrongPhong === 'CHU_TRI'
                 ? 'Chủ trì (Giáo viên)'
@@ -199,41 +196,43 @@ export default function TrangPhongHocTrucTuyen({ params }: { params: Promise<{ i
           </div>
 
           <button
+            type="button"
             onClick={() => setMoNhatKy(!moNhatKy)}
-            className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold transition-colors border ${
+            className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-[var(--radius)] text-xs font-semibold transition-colors border cursor-pointer ${
               moNhatKy
                 ? 'bg-accent text-white border-accent'
-                : 'bg-surface text-muted border-border hover:bg-active-bg hover:text-text'
+                : 'bg-[var(--phong-bg)] text-[var(--phong-muted)] border-[var(--phong-border)] hover:text-[var(--phong-text)]'
             }`}
           >
-            <Users className="w-4 h-4" />
+            <Users className="w-4 h-4 stroke-[1.5]" />
             <span className="hidden sm:inline">Nhật ký điểm danh</span>
           </button>
         </div>
       </header>
 
       {/* KHÔNG GIAN PHÒNG HỌC LIVEKIT ROOM */}
-      <div className="flex-1 relative flex overflow-hidden">
+      <div className="flex-1 relative flex overflow-hidden bg-[var(--phong-bg)]">
         <div className="flex-1 h-full w-full">
           <ThanhPhanPhongHocLiveKit
             urlMayChuLiveKit={duLieuToken.urlMayChuLiveKit}
             token={duLieuToken.token}
-            onLeaveRoom={xuLyRoiPhong}
+            onLeaveRoom={xuLyRoiPhongNgay}
             onReloadToken={() => layLaiToken()}
           />
         </div>
 
         {/* SIDEBAR NHẬT KÝ ĐIỂM DANH */}
         {moNhatKy && (
-          <aside className="w-80 sm:w-96 bg-surface border-l border-border flex flex-col h-full z-10">
-            <div className="p-4 border-b border-border flex items-center justify-between">
-              <h3 className="font-bold text-sm text-text flex items-center gap-2">
-                <Users className="w-4 h-4 text-accent" />
+          <aside className="w-80 sm:w-96 bg-[var(--phong-surface)] border-l border-[var(--phong-border)] flex flex-col h-full z-10 text-[var(--phong-text)]">
+            <div className="p-4 border-b border-[var(--phong-border)] flex items-center justify-between">
+              <h3 className="font-mono font-bold text-sm text-[var(--phong-text)] flex items-center gap-2">
+                <Users className="w-4 h-4 text-accent stroke-[1.5]" />
                 Nhật ký có mặt & Điểm danh
               </h3>
               <button
+                type="button"
                 onClick={() => setMoNhatKy(false)}
-                className="text-muted hover:text-text text-xs"
+                className="text-[var(--phong-muted)] hover:text-[var(--phong-text)] text-xs cursor-pointer"
               >
                 Đóng
               </button>
@@ -241,68 +240,105 @@ export default function TrangPhongHocTrucTuyen({ params }: { params: Promise<{ i
 
             <div className="flex-1 overflow-y-auto p-4 space-y-4 text-xs">
               <div>
-                <p className="text-muted font-medium mb-2">Thành viên có mặt gần nhất:</p>
+                <p className="text-[var(--phong-muted)] font-medium mb-2">Thành viên có mặt gần nhất:</p>
                 {baoCaoDiemDanh?.danhSachNhatKy && baoCaoDiemDanh.danhSachNhatKy.length > 0 ? (
                   <div className="space-y-2">
                     {baoCaoDiemDanh.danhSachNhatKy.map((nk: any) => (
                       <div
                         key={nk.id}
-                        className="p-2.5 rounded-lg bg-surface border border-border flex items-center justify-between"
+                        className="p-2.5 rounded-[var(--radius)] bg-[var(--phong-bg)] border border-[var(--phong-border)] flex items-center justify-between"
                       >
                         <div>
-                          <p className="font-semibold text-text">
+                          <p className="font-semibold text-[var(--phong-text)]">
                             {nk.idNguoiDung === nguoiDungHienTai?.id
                               ? `${nguoiDungHienTai?.hoTen} (Bạn)`
                               : nk.idNguoiDung}
                           </p>
-                          <span className="text-[11px] text-muted">
+                          <span className="text-[11px] font-mono text-[var(--phong-muted)]">
                             Vào lúc: {new Date(nk.thoiGianVao).toLocaleTimeString('vi-VN')}
                           </span>
                         </div>
-                        <span className="px-2 py-0.5 rounded text-[10px] font-semibold bg-accent/20 text-accent border border-accent">
+                        <span className="px-2 py-0.5 rounded-[var(--radius)] text-[10px] font-mono font-semibold bg-accent/20 text-accent border border-accent">
                           {nk.thoiGianRa ? 'Đã rời' : 'Đang trong phòng'}
                         </span>
                       </div>
                     ))}
                   </div>
                 ) : (
-                  <div className="p-4 rounded-lg bg-surface border border-border text-center text-muted">
+                  <div className="p-4 rounded-[var(--radius)] bg-[var(--phong-bg)] border border-[var(--phong-border)] text-center text-[var(--phong-muted)]">
                     Chưa có nhật ký tham gia được ghi nhận
                   </div>
                 )}
               </div>
 
               <div>
-                <p className="text-muted font-medium mb-2">Danh sách điểm danh tự động:</p>
+                <p className="text-[var(--phong-muted)] font-medium mb-2">Danh sách điểm danh tự động:</p>
                 {baoCaoDiemDanh?.danhSachDiemDanh && baoCaoDiemDanh.danhSachDiemDanh.length > 0 ? (
                   <div className="space-y-2">
                     {baoCaoDiemDanh.danhSachDiemDanh.map((dd: any) => (
                       <div
                         key={dd.id}
-                        className="p-2.5 rounded-lg bg-surface border border-border flex items-center justify-between"
+                        className="p-2.5 rounded-[var(--radius)] bg-[var(--phong-bg)] border border-[var(--phong-border)] flex items-center justify-between"
                       >
                         <div>
-                          <p className="font-semibold text-text">
+                          <p className="font-semibold text-[var(--phong-text)]">
                             {dd.hocSinh?.nguoiDung?.hoTen || 'Học sinh'}
                           </p>
-                          <p className="text-[11px] text-muted font-mono">
+                          <p className="text-[11px] text-[var(--phong-muted)] font-mono">
                             {dd.hocSinh?.maHocSinh}
                           </p>
                         </div>
-                        <span className="px-2 py-0.5 rounded text-[10px] font-semibold bg-accent/20 text-accent border border-accent">
+                        <span className="px-2 py-0.5 rounded-[var(--radius)] text-[10px] font-mono font-semibold bg-accent/20 text-accent border border-accent">
                           {dd.trangThai === 'CO_MAT' ? 'Có mặt' : dd.trangThai}
                         </span>
                       </div>
                     ))}
                   </div>
                 ) : (
-                  <p className="text-muted text-center py-2">Chưa có bản ghi điểm danh</p>
+                  <p className="text-[var(--phong-muted)] text-center py-2">Chưa có bản ghi điểm danh</p>
                 )}
               </div>
             </div>
           </aside>
         )}
       </div>
+
+      {/* HỘP THOẠI XÁC NHẬN RỜI PHÒNG HỌC TRỰC TUYẾN */}
+      <HopThoai
+        mo={moHopThoaiRoiPhong}
+        onDong={() => setMoHopThoaiRoiPhong(false)}
+        tieuDe="Rời khỏi phòng học trực tuyến?"
+        moTa="Phiên kết nối âm thanh và hình ảnh của bạn sẽ kết thúc. Bạn vẫn có thể tham gia lại phòng học này nếu buổi học chưa đóng."
+        kichThuoc="nho"
+      >
+        <div className="space-y-4">
+          <div className="p-3 rounded-[var(--radius)] bg-surface border border-border text-xs text-muted leading-relaxed">
+            Lớp học phần:{' '}
+            <strong className="text-text font-semibold">
+              {lopHocPhan?.tenLopHocPhan || 'Lớp học phần'}
+            </strong>{' '}
+            (<span className="font-mono">{duLieuToken.tenPhong}</span>)
+          </div>
+
+          <div className="flex items-center justify-end gap-2.5 pt-2 border-t border-border">
+            <button
+              type="button"
+              onClick={() => setMoHopThoaiRoiPhong(false)}
+              className="px-4 py-2 text-xs font-semibold text-text bg-surface border border-border rounded-[var(--radius)] hover:bg-active-bg transition-colors cursor-pointer"
+            >
+              Ở lại phòng học
+            </button>
+            <button
+              type="button"
+              onClick={xuLyRoiPhongNgay}
+              className="inline-flex items-center gap-1.5 px-4 py-2 text-xs font-semibold text-white bg-danger rounded-[var(--radius)] hover:opacity-90 transition-opacity cursor-pointer"
+            >
+              <LogOut className="w-3.5 h-3.5 stroke-[1.5]" />
+              Xác nhận rời phòng
+            </button>
+          </div>
+        </div>
+      </HopThoai>
     </div>
   );
 }

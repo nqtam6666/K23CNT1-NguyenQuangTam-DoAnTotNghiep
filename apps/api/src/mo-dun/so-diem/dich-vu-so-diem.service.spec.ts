@@ -7,7 +7,9 @@ import { DichVuLlmService } from '../tro-ly-ai/dich-vu-llm.service';
 import {
   VaiTro,
   TrangThaiDiemDanh,
+  TrangThaiBaiNop,
   CheDoKiemTra,
+  MucDoCanhBao,
   PayloadJwt,
 } from '@lms/chung';
 
@@ -281,6 +283,83 @@ describe('DichVuSoDiemService (Kiểm thử Unit & Chống IDOR Quản lý Kết
         }),
       );
       expect(mockPrisma.banNhapAI.create).toHaveBeenCalled();
+    });
+  });
+
+  describe('4. Phân tích học tập (Learning Analytics - Nhóm 4): Cảnh báo sớm & Đề xuất ôn tập từ câu sai', () => {
+    it('Phát hiện sớm học sinh chậm tiến độ / giảm điểm và tổng hợp chủ đề cần ôn tập từ các câu trả lời sai', async () => {
+      mockPrisma.lopHocPhan.findUnique.mockResolvedValue({
+        ...lopDayDuMau,
+        cacBaiTap: [
+          {
+            id: 'bt-1',
+            tieuDe: 'Bài tập 1',
+            cacBaiNop: [
+              { idNguoiDung: 'user-hs-1', trangThai: TrangThaiBaiNop.DA_CHAM, diemSo: 9 },
+            ],
+          },
+          {
+            id: 'bt-2',
+            tieuDe: 'Bài tập 2',
+            cacBaiNop: [
+              { idNguoiDung: 'user-hs-1', trangThai: TrangThaiBaiNop.DA_NOP, diemSo: null },
+            ],
+          },
+        ],
+        cacBaiKiemTra: [
+          {
+            id: 'bkt-1',
+            tieuDe: 'Kiểm tra Chương 1: Tìm kiếm mù và Heuristic',
+            cacCauHoi: [
+              {
+                id: 'ch-1',
+                noiDung: 'Thuật toán A* sử dụng hàm đánh giá nào?',
+                dapAnDung: 'A',
+                giaiThich: 'Hàm f(n) = g(n) + h(n) kết hợp chi phí thực tế và ước lượng Heuristic.',
+              },
+            ],
+            cacLuotLam: [
+              {
+                id: 'luot-1',
+                idHocSinh: 'hs-2',
+                diemSo: 4.0,
+                thoiGianNop: new Date('2026-10-01T08:00:00Z'),
+                chiTietTraLoi: [
+                  {
+                    idCauHoi: 'ch-1',
+                    noiDungCauHoi: 'Thuật toán A* sử dụng hàm đánh giá nào?',
+                    dapAnChon: 'B',
+                    dapAnDung: 'A',
+                    dungHaySai: false,
+                    giaiThich: 'Hàm f(n) = g(n) + h(n) kết hợp chi phí thực tế và ước lượng Heuristic.',
+                  },
+                ],
+              },
+            ],
+          },
+        ],
+        cacTaiLieu: [
+          { id: 'tl-1', tieuDe: 'Giáo trình Trí tuệ nhân tạo - Chương 1' },
+        ],
+      });
+      mockKhoSoDiem.layCotDiemTheoLop.mockResolvedValue(cotDiemMau);
+
+      const phanTich = await service.layPhanTichHocTapLop('lop-1', gvPhuTrach);
+
+      expect(phanTich.tongQuanCanhBao.tongSoHocSinh).toBe(2);
+      expect(phanTich.tongQuanCanhBao.soHocSinhNghiemTrong).toBeGreaterThanOrEqual(1);
+      // Học sinh hs-2 vắng không phép (0% chuyên cần), chưa nộp bài tập và điểm TB 3.75 -> NGHIEM_TRONG
+      const canhBaoHs2 = phanTich.danhSachCanhBao.find((cb) => cb.idHocSinh === 'hs-2');
+      expect(canhBaoHs2?.mucDoCanhBao).toBe(MucDoCanhBao.NGHIEM_TRONG);
+      expect(canhBaoHs2?.lyDoCanhBao.length).toBeGreaterThan(0);
+
+      // Đề xuất ôn tập từ câu trả lời sai ch-1
+      expect(phanTich.deXuatOnTapTheoChuDe).toHaveLength(1);
+      expect(phanTich.deXuatOnTapTheoChuDe[0].idCauHoi).toBe('ch-1');
+      expect(phanTich.deXuatOnTapTheoChuDe[0].tyLeSai).toBe(100);
+      expect(phanTich.deXuatOnTapTheoChuDe[0].taiLieuKhuyenNghi[0].tieuDeTaiLieu).toContain(
+        'Giáo trình Trí tuệ nhân tạo',
+      );
     });
   });
 });

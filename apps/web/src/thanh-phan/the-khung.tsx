@@ -38,7 +38,7 @@ export function TheKhung({
   return (
     <section
       className={cn(
-        'bg-[var(--surface)] text-[var(--text)] border border-[var(--border)] rounded-[var(--radius)] overflow-hidden',
+        'bg-[var(--surface)] text-[var(--text)] border border-[var(--border)] rounded-[var(--radius)] shadow-xs overflow-hidden',
         className,
       )}
     >
@@ -46,14 +46,14 @@ export function TheKhung({
         <header className="flex items-center justify-between gap-4 px-5 py-4 border-b border-[var(--border)] flex-wrap">
           <div className="flex items-center gap-3.5 min-w-0">
             {BieuTuong && (
-              <div className="w-[44px] h-[44px] rounded-[var(--radius)] border border-[var(--border)] bg-[var(--bg)] flex items-center justify-center text-[var(--accent)] shrink-0">
-                <BieuTuong strokeWidth={1.5} className="w-[20px] h-[20px]" />
+              <div className="w-10 h-10 rounded-[var(--radius)] bg-[var(--accent-soft)] flex items-center justify-center text-[var(--accent)] shrink-0">
+                <BieuTuong strokeWidth={1.75} className="w-5 h-5" />
               </div>
             )}
             <div className="min-w-0 space-y-0.5">
               {eyebrow && <p className="eyebrow">{eyebrow}</p>}
               {tieuDe && (
-                <h2 className="font-mono text-[16px] sm:text-[17px] font-bold text-[var(--text)] truncate">
+                <h2 className="font-sans text-[16px] sm:text-[17px] font-semibold text-[var(--text)] truncate">
                   {tieuDe}
                 </h2>
               )}

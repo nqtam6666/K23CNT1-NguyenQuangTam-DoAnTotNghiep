@@ -26,13 +26,10 @@ export interface ThuocTinhMucThanhBen {
 }
 
 /**
- * Thành phần <MucThanhBen> (tương đương <x-sidebar-item :active :icon :danger>)
- * - Mặc định: màu muted, border-left: 3px solid transparent, padding 11px 18px, gap 12px.
- * - Hover: chữ chuyển sang màu text.
- * - Active: nền accent-soft, chữ accent, viền trái 3px accent, kèm chấm tròn 6px accent bên phải.
- * - Hỗ trợ bọc trong <AnimatedBackground> (NenTabDong) để hiệu ứng nền trượt mượt giữa các mục.
- * - Danger (Đăng xuất): nền danger-soft, chữ và viền trái màu danger.
- * - Dưới 720px (md) hoặc khi thuGon=true: thu về 64px chỉ hiển thị icon 18px.
+ * Thành phần <MucThanhBen> theo diện mạo SOFT:
+ * - Font Be Vietnam Pro (font-sans), bo góc 8px (var(--radius)), khoảng đệm thoáng dễ bấm.
+ * - Active: nền accent-soft, chữ accent đậm vừa (font-semibold), chấm tròn 6px bên phải.
+ * - Danger (Đăng xuất): nền danger-soft nhẹ khi hover, chữ danger.
  */
 export function MucThanhBen({
   href,
@@ -45,7 +42,6 @@ export function MucThanhBen({
   active = false,
   icon: BieuTuong,
   danger = false,
-  laTongQuan = false,
   thuGon = false,
   huyHieu,
   title,
@@ -58,26 +54,23 @@ export function MucThanhBen({
   const dangKichHoat = active || dataChecked === 'true';
 
   const lopPhongCach = cn(
-    'group relative w-full flex items-center font-mono text-[14px] leading-snug transition-colors duration-150 select-none cursor-pointer rounded-r-[var(--radius)]',
-    dungNenDong ? 'border-l-0' : 'border-l-[3px]',
+    'group relative w-full flex items-center font-sans text-[13.5px] leading-snug transition-colors duration-150 select-none cursor-pointer rounded-[var(--radius)]',
     thuGon
-      ? 'justify-center px-0 py-[11px]'
-      : dungNenDong
-        ? 'justify-center px-0 py-[11px] md:justify-start md:gap-[10px] md:py-[11px] md:pl-[19px] md:pr-[14px]'
-        : 'justify-center px-0 py-[11px] md:justify-start md:gap-[10px] md:py-[11px] md:pl-[16px] md:pr-[14px]',
+      ? 'justify-center px-0 py-2.5'
+      : 'justify-center px-0 py-2.5 md:justify-start md:gap-3 md:py-2.5 md:px-3',
     dungNenDong &&
       (thuGon
         ? '[&_[data-slot=animated-tab-label]]:sr-only'
         : '[&_[data-slot=animated-tab-label]]:hidden md:[&_[data-slot=animated-tab-label]]:inline-flex md:[&_[data-slot=animated-tab-label]]:truncate'),
     danger
-      ? 'bg-[var(--danger-soft)] text-[var(--danger)] border-l-[var(--danger)] hover:brightness-95 font-medium'
+      ? 'text-[var(--danger)] hover:bg-[var(--danger-soft)] font-medium'
       : dungNenDong
         ? dangKichHoat
-          ? 'text-[var(--accent)] font-medium'
-          : 'text-[var(--muted)] hover:text-[var(--text)] hover:bg-[var(--active-bg)]/60 font-normal'
+          ? 'text-[var(--accent)] font-semibold'
+          : 'text-[var(--muted)] hover:text-[var(--text)] hover:bg-[var(--active-bg)]/70 font-medium'
         : dangKichHoat
-          ? 'bg-[var(--accent-soft)] text-[var(--accent)] border-l-[var(--accent)] font-medium'
-          : 'border-l-transparent text-[var(--muted)] hover:text-[var(--text)] hover:bg-[var(--active-bg)]/60 font-normal',
+          ? 'bg-[var(--accent-soft)] text-[var(--accent)] font-semibold'
+          : 'text-[var(--muted)] hover:text-[var(--text)] hover:bg-[var(--active-bg)]/70 font-medium',
     disabled && 'opacity-55 cursor-not-allowed pointer-events-none',
     className,
   );
@@ -85,7 +78,7 @@ export function MucThanhBen({
   const noiDung = (
     <>
       <BieuTuong
-        strokeWidth={1.5}
+        strokeWidth={1.75}
         className={cn(
           'relative z-10 w-[18px] h-[18px] shrink-0 transition-colors',
           danger
@@ -115,17 +108,16 @@ export function MucThanhBen({
         </span>
       )}
 
-      {/* Chấm tròn 6px accent bên phải cho mọi mục active (trừ Danger) */}
       {!thuGon && dangKichHoat && !danger && (
         <span
           aria-hidden="true"
-          className="relative z-10 hidden md:inline-block ml-auto w-[6px] h-[6px] rounded-full bg-[var(--accent)] shrink-0"
+          className="relative z-10 hidden md:inline-block ml-auto w-1.5 h-1.5 rounded-full bg-[var(--accent)] shrink-0"
         />
       )}
     </>
   );
 
-  if (href) {
+  if (href && !disabled) {
     return (
       <Link
         href={href}
@@ -137,8 +129,8 @@ export function MucThanhBen({
         data-checked={dataChecked}
         aria-selected={ariaSelected}
         aria-current={dangKichHoat ? 'page' : undefined}
-        aria-label={nhanAria}
-        title={nhanAria}
+        aria-label={thuGon ? nhanAria : undefined}
+        title={title || nhanAria}
         className={lopPhongCach}
       >
         {noiDung}
@@ -156,9 +148,8 @@ export function MucThanhBen({
       data-checked={dataChecked}
       aria-selected={ariaSelected}
       disabled={disabled}
-      aria-current={dangKichHoat ? 'page' : undefined}
-      aria-label={nhanAria}
-      title={nhanAria}
+      aria-label={thuGon ? nhanAria : undefined}
+      title={title || nhanAria}
       className={lopPhongCach}
     >
       {noiDung}

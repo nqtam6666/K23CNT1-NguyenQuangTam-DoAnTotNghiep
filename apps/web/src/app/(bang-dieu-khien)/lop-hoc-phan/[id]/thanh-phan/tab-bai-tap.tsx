@@ -9,15 +9,12 @@ import {
   Clock,
   CheckCircle2,
   AlertCircle,
-  FileText,
   Upload,
   UserCheck,
   Download,
   Award,
   Loader2,
-  Calendar,
-  MessageSquare,
-  HelpCircle,
+  Bot,
 } from 'lucide-react';
 import { mayKhachApi } from '../../../../../tien-ich/may-khach-api';
 import { thongBao } from '../../../../../tien-ich/thong-bao';
@@ -28,6 +25,7 @@ import {
   BaiNop,
   HinhThucNop,
   TrangThaiBaiNop,
+  KetQuaGoiYNhanXetBaiNop,
   PayloadJwt,
   VaiTro,
 } from '@lms/chung';
@@ -58,7 +56,7 @@ export function TabBaiTap({ idLopHocPhan, nguoiDung, laGiaoVienLop }: ThuocTinhT
   const [noiDung, setNoiDung] = useState('');
   const [hanNop, setHanNop] = useState(layNgayMacDinh);
   const [diemToiDa, setDiemToiDa] = useState(10);
-  const [hinhThucNop, setHinhThucNop] = useState<HinhThucNop>(HinhThucNop.TEP_TIN);
+  const [hinhThucNop] = useState<HinhThucNop>(HinhThucNop.TEP_TIN);
 
   // Form Nộp bài
   const [noiDungNop, setNoiDungNop] = useState('');
@@ -177,6 +175,31 @@ export function TabBaiTap({ idLopHocPhan, nguoiDung, laGiaoVienLop }: ThuocTinhT
     },
   });
 
+  // Mutation Gợi ý nhận xét & Điểm đề xuất bằng AI (Nhóm 3 - lưu BanNhapAI chờ duyệt)
+  const mutationGoiYNhanXet = useMutation({
+    mutationFn: async (idBaiNop: string) => {
+      const res = await mayKhachApi.post('/tro-ly-ai/ban-nhap/goi-y-nhan-xet-bai-nop', {
+        idBaiNop,
+      });
+      return (res.data?.duLieu || res.data) as KetQuaGoiYNhanXetBaiNop;
+    },
+    onSuccess: (data) => {
+      setDiemCham(data.diemGoiY);
+      setNhanXetCham(data.nhanXetGoiY);
+      queryClient.invalidateQueries({ queryKey: ['ban-nhap-ai-lop', idLopHocPhan] });
+      thongBao.thanhCong(
+        'Đã tạo gợi ý nhận xét',
+        'Giảng viên có thể chỉnh sửa điểm và nhận xét trước khi nhấn Lưu điểm.',
+      );
+    },
+    onError: (err: any) => {
+      thongBao.thatBai(
+        'Không thể tạo gợi ý nhận xét',
+        err.response?.data?.thongDiep || 'Vui lòng thử lại.',
+      );
+    },
+  });
+
   // Mutation Chấm điểm (Giáo viên)
   const mutationChamDiem = useMutation({
     mutationFn: async () => {
@@ -226,14 +249,14 @@ export function TabBaiTap({ idLopHocPhan, nguoiDung, laGiaoVienLop }: ThuocTinhT
         <div>
           <h3 className="text-base font-semibold text-foreground">Bài tập & Nhiệm vụ học tập</h3>
           <p className="text-xs text-muted-foreground mt-0.5">
-            Quản lý bài kiểm tra, bài tập về nhà, thời hạn nộp và nhận xét chấm điểm
+            Quản lý bài tập về nhà, thời hạn nộp và hỗ trợ gợi ý nhận xét bài nộp
           </p>
         </div>
 
         {coQuyenQuanLy && (
           <button
             onClick={() => setMoModalGiaoBai(true)}
-            className="inline-flex items-center gap-2 rounded bg-primary px-4 py-2.5 text-xs font-semibold text-primary-foreground shadow-sm hover:bg-primary/90 transition-all"
+            className="inline-flex items-center gap-2 rounded bg-primary px-4 py-2.5 text-xs font-semibold text-primary-foreground shadow-sm hover:bg-primary/90 transition-colors cursor-pointer"
           >
             <Plus className="w-4 h-4" />
             Giao bài tập mới
@@ -254,7 +277,7 @@ export function TabBaiTap({ idLopHocPhan, nguoiDung, laGiaoVienLop }: ThuocTinhT
           <h4 className="text-base font-semibold text-foreground">Chưa có bài tập nào</h4>
           <p className="text-sm text-muted-foreground mt-1 max-w-sm mx-auto">
             {coQuyenQuanLy
-              ? 'Lớp học chưa có bài tập nào. Hãy bấm "Giao bài tập mới" để giao việc cho học sinh.'
+              ? 'Lớp học chưa có bài tập nào. Hãy nhấn "Giao bài tập mới" để giao việc cho học sinh.'
               : 'Hiện tại bạn không có bài tập nào cần làm cho lớp học này.'}
           </p>
         </div>
@@ -267,7 +290,7 @@ export function TabBaiTap({ idLopHocPhan, nguoiDung, laGiaoVienLop }: ThuocTinhT
             return (
               <div
                 key={bt.id}
-                className="bg-card text-card-foreground rounded border border-border/80 p-5 shadow-sm hover:border-border transition-all flex flex-col md:flex-row md:items-center justify-between gap-5"
+                className="bg-card text-card-foreground rounded border border-border/80 p-5 shadow-sm hover:border-border transition-colors flex flex-col md:flex-row md:items-center justify-between gap-5"
               >
                 <div className="space-y-2 flex-1">
                   <div className="flex flex-wrap items-center gap-2.5">
@@ -281,28 +304,28 @@ export function TabBaiTap({ idLopHocPhan, nguoiDung, laGiaoVienLop }: ThuocTinhT
                       <>
                         {daNop ? (
                           daNop.trangThai === TrangThaiBaiNop.DA_CHAM ? (
-                            <span className="inline-flex items-center gap-1 rounded-md bg-accent/10 text-accent px-2 py-0.5 text-xs font-semibold">
+                            <span className="inline-flex items-center gap-1 rounded bg-accent/10 text-accent px-2 py-0.5 text-xs font-semibold">
                               <Award className="w-3.5 h-3.5" />
                               Điểm: {daNop.diemSo} / {bt.diemToiDa}
                             </span>
                           ) : daNop.trangThai === TrangThaiBaiNop.NOP_MUON ? (
-                            <span className="inline-flex items-center gap-1 rounded-md bg-accent/10 text-accent px-2 py-0.5 text-xs font-semibold">
+                            <span className="inline-flex items-center gap-1 rounded bg-accent/10 text-accent px-2 py-0.5 text-xs font-semibold">
                               <AlertCircle className="w-3.5 h-3.5" />
                               Nộp muộn
                             </span>
                           ) : (
-                            <span className="inline-flex items-center gap-1 rounded-md bg-accent/10 text-accent px-2 py-0.5 text-xs font-semibold">
+                            <span className="inline-flex items-center gap-1 rounded bg-accent/10 text-accent px-2 py-0.5 text-xs font-semibold">
                               <CheckCircle2 className="w-3.5 h-3.5" />
                               Đã nộp bài
                             </span>
                           )
                         ) : quaHan ? (
-                          <span className="inline-flex items-center gap-1 rounded-md bg-danger/10 text-danger px-2 py-0.5 text-xs font-semibold">
+                          <span className="inline-flex items-center gap-1 rounded bg-danger/10 text-danger px-2 py-0.5 text-xs font-semibold">
                             <AlertCircle className="w-3.5 h-3.5" />
                             Quá hạn nộp
                           </span>
                         ) : (
-                          <span className="inline-flex items-center gap-1 rounded-md bg-accent/10 text-accent px-2 py-0.5 text-xs font-semibold">
+                          <span className="inline-flex items-center gap-1 rounded bg-accent/10 text-accent px-2 py-0.5 text-xs font-semibold">
                             <Clock className="w-3.5 h-3.5" />
                             Chưa nộp
                           </span>
@@ -342,7 +365,7 @@ export function TabBaiTap({ idLopHocPhan, nguoiDung, laGiaoVienLop }: ThuocTinhT
                         setNoiDungNop(bt.baiNopCuaToi?.noiDung || '');
                         setMoModalNopBai(true);
                       }}
-                      className="inline-flex items-center gap-1.5 rounded bg-primary px-4 py-2 text-xs font-semibold text-primary-foreground shadow-sm hover:bg-primary/90 transition-all"
+                      className="inline-flex items-center gap-1.5 rounded bg-primary px-4 py-2 text-xs font-semibold text-primary-foreground shadow-sm hover:bg-primary/90 transition-colors cursor-pointer"
                     >
                       <Upload className="w-3.5 h-3.5" />
                       {daNop ? 'Xem / Nộp lại' : 'Nộp bài'}
@@ -356,7 +379,7 @@ export function TabBaiTap({ idLopHocPhan, nguoiDung, laGiaoVienLop }: ThuocTinhT
                           setBaiTapChon(bt);
                           setMoModalChamDiem(true);
                         }}
-                        className="inline-flex items-center gap-1.5 rounded bg-primary/10 hover:bg-primary/20 text-primary px-3.5 py-2 text-xs font-semibold transition-all"
+                        className="inline-flex items-center gap-1.5 rounded bg-primary/10 hover:bg-primary/20 text-primary px-3.5 py-2 text-xs font-semibold transition-colors cursor-pointer"
                       >
                         <UserCheck className="w-3.5 h-3.5" />
                         Xem bài nộp ({bt._count?.cacBaiNop || 0})
@@ -366,7 +389,7 @@ export function TabBaiTap({ idLopHocPhan, nguoiDung, laGiaoVienLop }: ThuocTinhT
                         onClick={() => mutationXoaBaiTap.mutate(bt.id)}
                         disabled={mutationXoaBaiTap.isPending}
                         title="Xóa bài tập"
-                        className="p-2 text-muted-foreground hover:text-destructive hover:bg-destructive/10 rounded transition-all"
+                        className="p-2 text-muted-foreground hover:text-destructive hover:bg-destructive/10 rounded transition-colors cursor-pointer"
                       >
                         <Trash2 className="w-4 h-4" />
                       </button>
@@ -402,31 +425,35 @@ export function TabBaiTap({ idLopHocPhan, nguoiDung, laGiaoVienLop }: ThuocTinhT
               value={tieuDe}
               onChange={(e) => setTieuDe(e.target.value)}
               placeholder="VD: Bài tập thực hành Chương 2 - Lập trình hướng đối tượng"
-              className="mt-1.5 w-full rounded border border-input bg-background px-3.5 py-2 text-sm focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary"
+              className="mt-1.5 w-full rounded border border-input bg-background px-3.5 py-2 text-sm focus:border-primary focus:outline-none"
             />
           </div>
 
           <div>
-            <label className="text-xs font-semibold text-foreground">Yêu cầu & Hướng dẫn làm bài *</label>
+            <label className="text-xs font-semibold text-foreground">
+              Yêu cầu & Hướng dẫn làm bài *
+            </label>
             <textarea
               required
               rows={4}
               value={noiDung}
               onChange={(e) => setNoiDung(e.target.value)}
               placeholder="Mô tả chi tiết câu hỏi, các đề mục cần hoàn thành, định dạng tệp yêu cầu..."
-              className="mt-1.5 w-full rounded border border-input bg-background px-3.5 py-2 text-sm focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary resize-none"
+              className="mt-1.5 w-full rounded border border-input bg-background px-3.5 py-2 text-sm focus:border-primary focus:outline-none resize-none"
             />
           </div>
 
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <div>
-              <label className="text-xs font-semibold text-foreground">Thời hạn nộp (Hạn chót) *</label>
+              <label className="text-xs font-semibold text-foreground">
+                Thời hạn nộp (Hạn chót) *
+              </label>
               <input
                 type="datetime-local"
                 required
                 value={hanNop}
                 onChange={(e) => setHanNop(e.target.value)}
-                className="mt-1.5 w-full rounded border border-input bg-background px-3.5 py-2 text-sm focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary"
+                className="mt-1.5 w-full rounded border border-input bg-background px-3.5 py-2 text-sm focus:border-primary focus:outline-none"
               />
             </div>
 
@@ -438,7 +465,7 @@ export function TabBaiTap({ idLopHocPhan, nguoiDung, laGiaoVienLop }: ThuocTinhT
                 max={100}
                 value={diemToiDa}
                 onChange={(e) => setDiemToiDa(Number(e.target.value))}
-                className="mt-1.5 w-full rounded border border-input bg-background px-3.5 py-2 text-sm focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary"
+                className="mt-1.5 w-full rounded border border-input bg-background px-3.5 py-2 text-sm focus:border-primary focus:outline-none"
               />
             </div>
           </div>
@@ -447,14 +474,14 @@ export function TabBaiTap({ idLopHocPhan, nguoiDung, laGiaoVienLop }: ThuocTinhT
             <button
               type="button"
               onClick={() => setMoModalGiaoBai(false)}
-              className="rounded border border-input px-4 py-2 text-xs font-semibold text-muted-foreground hover:text-foreground hover:bg-muted/50 transition-colors"
+              className="rounded border border-input px-4 py-2 text-xs font-semibold text-muted-foreground hover:text-foreground hover:bg-muted/50 transition-colors cursor-pointer"
             >
               Hủy
             </button>
             <button
               type="submit"
               disabled={!tieuDe.trim() || !noiDung.trim() || !hanNop || mutationTaoBaiTap.isPending}
-              className="inline-flex items-center gap-2 rounded bg-primary px-4 py-2 text-xs font-semibold text-primary-foreground shadow-sm hover:bg-primary/90 disabled:opacity-50 disabled:cursor-not-allowed transition-all"
+              className="inline-flex items-center gap-2 rounded bg-primary px-4 py-2 text-xs font-semibold text-primary-foreground shadow-sm hover:bg-primary/90 disabled:opacity-50 cursor-pointer"
             >
               {mutationTaoBaiTap.isPending ? (
                 <>
@@ -477,14 +504,13 @@ export function TabBaiTap({ idLopHocPhan, nguoiDung, laGiaoVienLop }: ThuocTinhT
         moTa={`Hạn nộp: ${baiTapChon ? dinhDangNgayGio(baiTapChon.hanNop) : ''}`}
       >
         <div className="space-y-4">
-          {/* Thông tin bài đã chấm (nếu có) */}
           {baiTapChon?.baiNopCuaToi?.trangThai === TrangThaiBaiNop.DA_CHAM && (
             <div className="rounded bg-accent/10 border border-accent p-4 space-y-1.5">
               <div className="flex items-center justify-between">
-                <span className="text-xs font-semibold text-accent ">
+                <span className="text-xs font-semibold text-accent">
                   Kết quả đánh giá từ giáo viên:
                 </span>
-                <span className="text-base font-bold text-accent ">
+                <span className="text-base font-bold text-accent">
                   {baiTapChon.baiNopCuaToi.diemSo} / {baiTapChon.diemToiDa} điểm
                 </span>
               </div>
@@ -496,7 +522,6 @@ export function TabBaiTap({ idLopHocPhan, nguoiDung, laGiaoVienLop }: ThuocTinhT
             </div>
           )}
 
-          {/* Hướng dẫn làm bài */}
           <div className="rounded bg-muted/40 p-3.5 text-xs text-muted-foreground whitespace-pre-line leading-relaxed border border-border/60">
             <span className="font-semibold text-foreground block mb-1">Yêu cầu từ giáo viên:</span>
             {baiTapChon?.noiDung}
@@ -518,7 +543,7 @@ export function TabBaiTap({ idLopHocPhan, nguoiDung, laGiaoVienLop }: ThuocTinhT
                 value={noiDungNop}
                 onChange={(e) => setNoiDungNop(e.target.value)}
                 placeholder="Nhập nội dung câu trả lời hoặc liên kết bài làm..."
-                className="mt-1.5 w-full rounded border border-input bg-background px-3.5 py-2 text-sm focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary resize-none"
+                className="mt-1.5 w-full rounded border border-input bg-background px-3.5 py-2 text-sm focus:border-primary focus:outline-none resize-none"
               />
             </div>
 
@@ -526,7 +551,7 @@ export function TabBaiTap({ idLopHocPhan, nguoiDung, laGiaoVienLop }: ThuocTinhT
               <label className="text-xs font-semibold text-foreground">Đính kèm tập tin bài làm</label>
               <div
                 onClick={() => inputTepNopRef.current?.click()}
-                className="mt-1.5 border-2 border-dashed border-border/80 hover:border-primary/50 rounded p-5 text-center cursor-pointer transition-all bg-muted/20 hover:bg-muted/40"
+                className="mt-1.5 border-2 border-dashed border-border/80 hover:border-primary/50 rounded p-5 text-center cursor-pointer transition-colors bg-muted/20 hover:bg-muted/40"
               >
                 <input
                   ref={inputTepNopRef}
@@ -545,7 +570,7 @@ export function TabBaiTap({ idLopHocPhan, nguoiDung, laGiaoVienLop }: ThuocTinhT
                 ) : baiTapChon?.baiNopCuaToi?.duongDanTep ? (
                   <div>
                     <p className="text-xs font-medium text-foreground">Đã có tệp nộp trước đó</p>
-                    <p className="text-[10px] text-muted-foreground">Bấm để thay thế tệp mới</p>
+                    <p className="text-[10px] text-muted-foreground">Nhấn để thay thế tệp mới</p>
                   </div>
                 ) : (
                   <div>
@@ -562,14 +587,14 @@ export function TabBaiTap({ idLopHocPhan, nguoiDung, laGiaoVienLop }: ThuocTinhT
               <button
                 type="button"
                 onClick={() => setMoModalNopBai(false)}
-                className="rounded border border-input px-4 py-2 text-xs font-semibold text-muted-foreground hover:text-foreground hover:bg-muted/50 transition-colors"
+                className="rounded border border-input px-4 py-2 text-xs font-semibold text-muted-foreground hover:text-foreground hover:bg-muted/50 transition-colors cursor-pointer"
               >
                 Đóng
               </button>
               <button
                 type="submit"
                 disabled={(!noiDungNop.trim() && !tepNop) || mutationNopBai.isPending}
-                className="inline-flex items-center gap-2 rounded bg-primary px-4 py-2 text-xs font-semibold text-primary-foreground shadow-sm hover:bg-primary/90 disabled:opacity-50 disabled:cursor-not-allowed transition-all"
+                className="inline-flex items-center gap-2 rounded bg-primary px-4 py-2 text-xs font-semibold text-primary-foreground shadow-sm hover:bg-primary/90 disabled:opacity-50 cursor-pointer"
               >
                 {mutationNopBai.isPending ? (
                   <>
@@ -600,7 +625,7 @@ export function TabBaiTap({ idLopHocPhan, nguoiDung, laGiaoVienLop }: ThuocTinhT
           {/* Khung chấm điểm chi tiết khi giáo viên chọn 1 học sinh */}
           {baiNopDangCham && (
             <div className="bg-primary/5 border border-primary/20 rounded p-4 space-y-3">
-              <div className="flex items-center justify-between">
+              <div className="flex flex-wrap items-center justify-between gap-2">
                 <div className="flex items-center gap-2.5">
                   <AnhDaiDien
                     url={baiNopDangCham.nguoiNop?.anhDaiDien}
@@ -616,13 +641,30 @@ export function TabBaiTap({ idLopHocPhan, nguoiDung, laGiaoVienLop }: ThuocTinhT
                   </div>
                 </div>
 
-                <button
-                  type="button"
-                  onClick={() => setBaiNopDangCham(null)}
-                  className="text-xs text-muted-foreground hover:text-foreground"
-                >
-                  Đóng chấm
-                </button>
+                <div className="flex items-center gap-2">
+                  {/* Nút Gợi ý nhận xét & Điểm đề xuất bằng AI (Nhóm 3) */}
+                  <button
+                    type="button"
+                    disabled={mutationGoiYNhanXet.isPending}
+                    onClick={() => mutationGoiYNhanXet.mutate(baiNopDangCham.id)}
+                    className="inline-flex items-center gap-1.5 rounded bg-accent-soft border border-accent text-accent px-3 py-1.5 text-xs font-semibold hover:bg-accent hover:text-white transition-colors cursor-pointer"
+                  >
+                    {mutationGoiYNhanXet.isPending ? (
+                      <Loader2 className="w-3.5 h-3.5 animate-spin" />
+                    ) : (
+                      <Bot className="w-3.5 h-3.5" />
+                    )}
+                    Gợi ý nhận xét & Điểm đề xuất
+                  </button>
+
+                  <button
+                    type="button"
+                    onClick={() => setBaiNopDangCham(null)}
+                    className="text-xs text-muted-foreground hover:text-foreground px-2 py-1 cursor-pointer"
+                  >
+                    Đóng chấm
+                  </button>
+                </div>
               </div>
 
               {/* Nội dung bài nộp */}
@@ -658,25 +700,27 @@ export function TabBaiTap({ idLopHocPhan, nguoiDung, laGiaoVienLop }: ThuocTinhT
                     step={0.25}
                     value={diemCham}
                     onChange={(e) => setDiemCham(Number(e.target.value))}
-                    className="mt-1 w-full rounded border border-input bg-background px-3 py-1.5 text-sm focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary font-bold"
+                    className="mt-1 w-full rounded border border-input bg-background px-3 py-1.5 text-sm focus:border-primary focus:outline-none font-mono font-bold"
                   />
                 </div>
 
                 <div className="sm:col-span-3">
-                  <label className="text-xs font-semibold text-foreground">Lời nhận xét</label>
+                  <label className="text-xs font-semibold text-foreground">
+                    Lời nhận xét (Giảng viên kiểm duyệt trước khi lưu)
+                  </label>
                   <div className="flex gap-2 mt-1">
                     <input
                       type="text"
                       value={nhanXetCham}
                       onChange={(e) => setNhanXetCham(e.target.value)}
                       placeholder="VD: Bài làm tốt, lập luận rõ ràng..."
-                      className="w-full rounded border border-input bg-background px-3 py-1.5 text-sm focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary"
+                      className="w-full rounded border border-input bg-background px-3 py-1.5 text-sm focus:border-primary focus:outline-none"
                     />
                     <button
                       type="button"
                       onClick={() => mutationChamDiem.mutate()}
                       disabled={mutationChamDiem.isPending}
-                      className="inline-flex items-center gap-1.5 rounded bg-primary px-4 py-1.5 text-xs font-semibold text-primary-foreground shadow-sm hover:bg-primary/90 disabled:opacity-50 transition-all shrink-0"
+                      className="inline-flex items-center gap-1.5 rounded bg-primary px-4 py-1.5 text-xs font-semibold text-primary-foreground shadow-sm hover:bg-primary/90 disabled:opacity-50 shrink-0 cursor-pointer"
                     >
                       {mutationChamDiem.isPending ? (
                         <Loader2 className="w-3.5 h-3.5 animate-spin" />
@@ -730,20 +774,20 @@ export function TabBaiTap({ idLopHocPhan, nguoiDung, laGiaoVienLop }: ThuocTinhT
                       <td className="p-3 text-muted-foreground">{dinhDangNgayGio(bn.ngayNop)}</td>
                       <td className="p-3">
                         {bn.trangThai === TrangThaiBaiNop.DA_CHAM ? (
-                          <span className="rounded-md bg-accent/10 text-accent px-2 py-0.5 text-[10px] font-semibold">
+                          <span className="rounded bg-accent/10 text-accent px-2 py-0.5 text-[10px] font-semibold">
                             Đã chấm điểm
                           </span>
                         ) : bn.trangThai === TrangThaiBaiNop.NOP_MUON ? (
-                          <span className="rounded-md bg-accent/10 text-accent px-2 py-0.5 text-[10px] font-semibold">
+                          <span className="rounded bg-accent/10 text-accent px-2 py-0.5 text-[10px] font-semibold">
                             Nộp muộn
                           </span>
                         ) : (
-                          <span className="rounded-md bg-accent/10 text-accent px-2 py-0.5 text-[10px] font-semibold">
+                          <span className="rounded bg-accent/10 text-accent px-2 py-0.5 text-[10px] font-semibold">
                             Đã nộp
                           </span>
                         )}
                       </td>
-                      <td className="p-3 font-semibold text-foreground">
+                      <td className="p-3 font-mono font-semibold text-foreground">
                         {bn.diemSo !== null && bn.diemSo !== undefined
                           ? `${bn.diemSo} / ${baiTapChon?.diemToiDa || 10}`
                           : '—'}
@@ -753,10 +797,12 @@ export function TabBaiTap({ idLopHocPhan, nguoiDung, laGiaoVienLop }: ThuocTinhT
                           type="button"
                           onClick={() => {
                             setBaiNopDangCham(bn);
-                            setDiemCham(bn.diemSo !== null && bn.diemSo !== undefined ? bn.diemSo : 10);
+                            setDiemCham(
+                              bn.diemSo !== null && bn.diemSo !== undefined ? bn.diemSo : 10,
+                            );
                             setNhanXetCham(bn.nhanXet || '');
                           }}
-                          className="rounded-lg bg-primary/10 hover:bg-primary/20 text-primary px-3 py-1.5 text-xs font-semibold transition-colors"
+                          className="rounded bg-primary/10 hover:bg-primary/20 text-primary px-3 py-1.5 text-xs font-semibold transition-colors cursor-pointer"
                         >
                           {bn.trangThai === TrangThaiBaiNop.DA_CHAM ? 'Chấm lại' : 'Chấm điểm'}
                         </button>

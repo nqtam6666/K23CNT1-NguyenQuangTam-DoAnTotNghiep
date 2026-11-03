@@ -82,19 +82,25 @@ export function ChiBaoSucKhoe({ vaiTroNguoiDung }: Props) {
 
   return (
     <div className="relative inline-block" ref={popoverRef}>
-      {/* Huy hiệu hiển thị trên Header */}
+      {/* Huy hiệu hiển thị trên Header: bình thường chỉ hiện chấm nhỏ kèm tooltip, chỉ nổi bật khi có sự cố */}
       <button
         type="button"
         onClick={() => setMoPopover(!moPopover)}
-        title="Bấm để xem trạng thái sức khỏe chi tiết của hạ tầng hệ thống"
+        title={
+          trangThaiTong === 'HOAT_DONG_TOT'
+            ? 'Trạng thái hệ thống: Bình thường (Bấm để xem chi tiết)'
+            : trangThaiTong === 'CANH_BAO'
+              ? 'Trạng thái hệ thống: Cảnh báo dịch vụ'
+              : 'Trạng thái hệ thống: Đang gặp sự cố'
+        }
         aria-label="Trạng thái sức khỏe hệ thống"
         aria-expanded={moPopover}
-        className={`hidden sm:inline-flex items-center gap-1.5 sm:gap-2 px-2.5 sm:px-3 py-1.5 rounded-[var(--radius)] font-mono text-xs font-semibold cursor-pointer transition-colors border whitespace-nowrap shrink-0 ${
+        className={`hidden sm:inline-flex items-center justify-center rounded-[var(--radius)] font-mono text-xs font-semibold cursor-pointer transition-colors border whitespace-nowrap shrink-0 ${
           trangThaiTong === 'HOAT_DONG_TOT'
-            ? 'bg-[var(--accent-soft)] text-[var(--accent)] border-[var(--accent)]/30'
+            ? 'p-2 bg-[var(--surface)] hover:bg-[var(--active-bg)] text-[var(--muted)] border-[var(--border)]'
             : trangThaiTong === 'CANH_BAO'
-              ? 'bg-[var(--warning-soft)] text-[var(--warning)] border-[var(--warning)]/30'
-              : 'bg-[var(--danger-soft)] text-[var(--danger)] border-[var(--danger)]/30'
+              ? 'gap-1.5 px-2.5 py-1.5 bg-[var(--warning-soft)] text-[var(--warning)] border-[var(--warning)]/30'
+              : 'gap-1.5 px-2.5 py-1.5 bg-[var(--danger-soft)] text-[var(--danger)] border-[var(--danger)]/30'
         }`}
       >
         <span
@@ -106,21 +112,14 @@ export function ChiBaoSucKhoe({ vaiTroNguoiDung }: Props) {
                 : 'bg-[var(--danger)]'
           }`}
         />
-        <span className="hidden xl:inline whitespace-nowrap">
-          {trangThaiTong === 'HOAT_DONG_TOT'
-            ? 'Hệ thống: Bình thường'
-            : trangThaiTong === 'CANH_BAO'
-              ? 'Hệ thống: Cảnh báo'
-              : 'Hệ thống: Sự cố'}
-        </span>
-        <span className="hidden md:inline xl:hidden whitespace-nowrap">
-          {trangThaiTong === 'HOAT_DONG_TOT'
-            ? 'Bình thường'
-            : trangThaiTong === 'CANH_BAO'
-              ? 'Cảnh báo'
-              : 'Sự cố'}
-        </span>
-        <Activity strokeWidth={1.5} className="w-3.5 h-3.5 opacity-80 shrink-0" />
+        {trangThaiTong !== 'HOAT_DONG_TOT' && (
+          <>
+            <span className="hidden md:inline whitespace-nowrap">
+              {trangThaiTong === 'CANH_BAO' ? 'Cảnh báo hạ tầng' : 'Sự cố hạ tầng'}
+            </span>
+            <Activity strokeWidth={1.5} className="w-3.5 h-3.5 opacity-80 shrink-0" />
+          </>
+        )}
       </button>
 
       {/* Popover chi tiết */}

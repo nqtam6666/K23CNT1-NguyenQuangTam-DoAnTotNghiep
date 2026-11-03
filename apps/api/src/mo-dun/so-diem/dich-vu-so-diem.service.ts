@@ -13,14 +13,19 @@ import {
   PayloadJwt,
   VaiTro,
   TrangThaiDiemDanh,
+  TrangThaiBaiNop,
   CheDoKiemTra,
   LoaiBanNhapAI,
   TrangThaiBanNhapAI,
+  MucDoCanhBao,
   TaoCotDiemInput,
   LuuBangDiemHangLoatInput,
   BangDiemLopHocPhan,
   DongBangDiemHocSinh,
   KetQuaNhanXetHocPhanAI,
+  CanhBaoHocSinh,
+  DeXuatOnTapChuDe,
+  PhanTichHocTapLop,
 } from '@lms/chung';
 
 @Injectable()
@@ -750,6 +755,302 @@ export class DichVuSoDiemService {
       diemManh,
       diemCanCaiThien,
       loTrinhDeXuat,
+    };
+  }
+
+  /**
+   * Nhóm 4 (Learning Analytics): Phân tích học tập, Cảnh báo sớm sinh viên chậm tiến độ / giảm điểm
+   * và Đề xuất nội dung ôn tập dựa trên các câu hỏi trả lời sai
+   */
+  async layPhanTichHocTapLop(
+    idLopHocPhan: string,
+    nguoiDung: PayloadJwt,
+  ): Promise<PhanTichHocTapLop> {
+    const bangDiem = await this.layBangDiemLopHocPhan(idLopHocPhan, nguoiDung);
+
+    const lopChiTiet = await this.prisma.lopHocPhan.findUnique({
+      where: { id: idLopHocPhan },
+      include: {
+        danhSachGhiDanh: {
+          include: {
+            hocSinh: {
+              select: {
+                id: true,
+                idNguoiDung: true,
+                maHocSinh: true,
+              },
+            },
+          },
+        },
+        cacBaiTap: {
+          include: {
+            cacBaiNop: true,
+          },
+        },
+        cacBaiKiemTra: {
+          include: {
+            cacCauHoi: true,
+            cacLuotLam: {
+              orderBy: { thoiGianNop: 'asc' },
+            },
+          },
+        },
+        cacTaiLieu: {
+          select: {
+            id: true,
+            tieuDe: true,
+          },
+          orderBy: { ngayTao: 'asc' },
+        },
+      },
+    });
+
+    const mapIdNguoiDungTheoHoSo = new Map<string, string>();
+    for (const gd of lopChiTiet?.danhSachGhiDanh || []) {
+      mapIdNguoiDungTheoHoSo.set(gd.hocSinh.id, gd.hocSinh.idNguoiDung);
+    }
+
+    const cacBaiTap = lopChiTiet?.cacBaiTap || [];
+    const cacBaiKiemTra = lopChiTiet?.cacBaiKiemTra || [];
+    const cacTaiLieu = lopChiTiet?.cacTaiLieu || [];
+    const tongSoBaiTap = cacBaiTap.length;
+
+    let soHocSinhNghiemTrong = 0;
+    let soHocSinhCanLuuY = 0;
+    let soHocSinhOnDinh = 0;
+    let tongTyLeBaiTap = 0;
+
+    const danhSachCanhBao: CanhBaoHocSinh[] = bangDiem.danhSachHocSinh.map((hs) => {
+      const idNguoiDungHS = mapIdNguoiDungTheoHoSo.get(hs.idHocSinh);
+
+      // 1. Thống kê tiến độ nộp bài tập
+      let soBaiTapDaNop = 0;
+      let soBaiNopMuon = 0;
+      for (const bt of cacBaiTap) {
+        const bn = bt.cacBaiNop.find((n) => n.idNguoiDung === idNguoiDungHS);
+        if (bn && bn.trangThai !== TrangThaiBaiNop.CHUA_NOP) {
+          soBaiTapDaNop++;
+          if (bn.trangThai === TrangThaiBaiNop.NOP_MUON) {
+            soBaiNopMuon++;
+          }
+        }
+      }
+
+      const tyLeNopBai =
+        tongSoBaiTap > 0 ? Math.round((soBaiTapDaNop / tongSoBaiTap) * 100) : 100;
+      tongTyLeBaiTap += tyLeNopBai;
+
+      // 2. Phân tích xu hướng điểm qua các lượt làm bài kiểm tra
+      const tatCaLuotCuaHS = cacBaiKiemTra
+        .flatMap((bkt) => bkt.cacLuotLam.filter((l) => l.idHocSinh === hs.idHocSinh))
+        .sort(
+          (a, b) =>
+            new Date(a.thoiGianNop).getTime() - new Date(b.thoiGianNop).getTime(),
+        );
+
+      const diemKiemTraGanNhat =
+        tatCaLuotCuaHS.length > 0
+          ? tatCaLuotCuaHS[tatCaLuotCuaHS.length - 1].diemSo
+          : null;
+
+      let xuHuongDiem: 'TANG' | 'GIAM' | 'ON_DINH' | 'CHUA_CO_DU_LIEU' = 'CHUA_CO_DU_LIEU';
+      if (tatCaLuotCuaHS.length >= 2) {
+        const diemTruoc = tatCaLuotCuaHS[tatCaLuotCuaHS.length - 2].diemSo;
+        const diemSau = tatCaLuotCuaHS[tatCaLuotCuaHS.length - 1].diemSo;
+        if (diemSau - diemTruoc <= -1.0) xuHuongDiem = 'GIAM';
+        else if (diemSau - diemTruoc >= 1.0) xuHuongDiem = 'TANG';
+        else xuHuongDiem = 'ON_DINH';
+      } else if (tatCaLuotCuaHS.length === 1) {
+        xuHuongDiem = 'ON_DINH';
+      }
+
+      // 3. Xác định các lý do cảnh báo sớm
+      const lyDoCanhBao: string[] = [];
+      let mucDo = MucDoCanhBao.ON_DINH;
+
+      if (hs.tyLeChuyenCan < 70) {
+        lyDoCanhBao.push(`Tỷ lệ chuyên cần ở mức nguy hiểm (${hs.tyLeChuyenCan}% < 70%)`);
+        mucDo = MucDoCanhBao.NGHIEM_TRONG;
+      } else if (hs.tyLeChuyenCan < 85) {
+        lyDoCanhBao.push(`Chuyên cần giảm (${hs.tyLeChuyenCan}%), cần theo dõi việc tham gia buổi học`);
+        if (mucDo === MucDoCanhBao.ON_DINH) mucDo = MucDoCanhBao.CAN_LUU_Y;
+      }
+
+      if (tongSoBaiTap > 0) {
+        const soBaiChuaNop = tongSoBaiTap - soBaiTapDaNop;
+        if (tyLeNopBai < 50) {
+          lyDoCanhBao.push(
+            `Chậm tiến độ bài tập nghiêm trọng (Còn thiếu ${soBaiChuaNop}/${tongSoBaiTap} bài tập)`,
+          );
+          mucDo = MucDoCanhBao.NGHIEM_TRONG;
+        } else if (soBaiChuaNop > 0 || soBaiNopMuon > 0) {
+          lyDoCanhBao.push(
+            `Tiến độ bài tập: Đã nộp ${soBaiTapDaNop}/${tongSoBaiTap} bài${soBaiNopMuon > 0 ? ` (${soBaiNopMuon} bài nộp muộn)` : ''}`,
+          );
+          if (mucDo === MucDoCanhBao.ON_DINH) mucDo = MucDoCanhBao.CAN_LUU_Y;
+        }
+      }
+
+      if (hs.diemTrungBinhHe10 !== null) {
+        if (hs.diemTrungBinhHe10 < 4.0) {
+          lyDoCanhBao.push(
+            `Điểm trung bình học phần dưới ngưỡng qua môn (${hs.diemTrungBinhHe10}/10 - Điểm F)`,
+          );
+          mucDo = MucDoCanhBao.NGHIEM_TRONG;
+        } else if (hs.diemTrungBinhHe10 < 5.5) {
+          lyDoCanhBao.push(
+            `Điểm trung bình học phần ở mức thấp (${hs.diemTrungBinhHe10}/10 - Điểm ${hs.diemChu})`,
+          );
+          if (mucDo === MucDoCanhBao.ON_DINH) mucDo = MucDoCanhBao.CAN_LUU_Y;
+        }
+      }
+
+      if (xuHuongDiem === 'GIAM') {
+        lyDoCanhBao.push(
+          `Kết quả làm bài kiểm tra gần nhất có xu hướng giảm sút (${diemKiemTraGanNhat}/10)`,
+        );
+        if (mucDo === MucDoCanhBao.ON_DINH) mucDo = MucDoCanhBao.CAN_LUU_Y;
+      } else if (diemKiemTraGanNhat !== null && diemKiemTraGanNhat < 5.0) {
+        lyDoCanhBao.push(`Điểm bài kiểm tra gần nhất đạt mức thấp (${diemKiemTraGanNhat}/10)`);
+        if (mucDo === MucDoCanhBao.ON_DINH) mucDo = MucDoCanhBao.CAN_LUU_Y;
+      }
+
+      if (mucDo === MucDoCanhBao.NGHIEM_TRONG) soHocSinhNghiemTrong++;
+      else if (mucDo === MucDoCanhBao.CAN_LUU_Y) soHocSinhCanLuuY++;
+      else soHocSinhOnDinh++;
+
+      const khuyenNghiCanThiep =
+        mucDo === MucDoCanhBao.NGHIEM_TRONG
+          ? 'Cần giảng viên nhắc nhở trực tiếp, yêu cầu hoàn thành bù bài tập và ôn luyện lại các chủ đề bị sai bên dưới.'
+          : mucDo === MucDoCanhBao.CAN_LUU_Y
+            ? 'Khuyến khích sinh viên xem lại học liệu các câu trả lời sai và làm lại đề luyện tập để cải thiện điểm quá trình.'
+            : 'Tiến độ học tập ổn định, tiếp tục duy trì chuyên cần và hoàn thành các bài thi thử.';
+
+      return {
+        idHocSinh: hs.idHocSinh,
+        maHocSinh: hs.maHocSinh,
+        hoTen: hs.hoTen,
+        email: hs.email,
+        mucDoCanhBao: mucDo,
+        tyLeChuyenCan: hs.tyLeChuyenCan,
+        soBaiTapDaNop,
+        tongSoBaiTap,
+        soBaiNopMuon,
+        diemTrungBinhHe10: hs.diemTrungBinhHe10,
+        diemKiemTraGanNhat,
+        xuHuongDiem,
+        lyDoCanhBao:
+          lyDoCanhBao.length > 0
+            ? lyDoCanhBao
+            : ['Đảm bảo tốt tiến độ chuyên cần và kết quả đánh giá hiện tại'],
+        khuyenNghiCanThiep,
+      };
+    });
+
+    const thuTuUuTien: Record<MucDoCanhBao, number> = {
+      [MucDoCanhBao.NGHIEM_TRONG]: 0,
+      [MucDoCanhBao.CAN_LUU_Y]: 1,
+      [MucDoCanhBao.ON_DINH]: 2,
+    };
+    danhSachCanhBao.sort(
+      (a, b) => thuTuUuTien[a.mucDoCanhBao] - thuTuUuTien[b.mucDoCanhBao],
+    );
+
+    // 4. Phân tích các câu hỏi trả lời sai để đề xuất nội dung ôn tập
+    const tapIdHocSinhPhanTich = new Set(bangDiem.danhSachHocSinh.map((d) => d.idHocSinh));
+    const thongKeCauSai = new Map<
+      string,
+      {
+        idCauHoi: string;
+        idBaiKiemTra: string;
+        tieuDeBaiKiemTra: string;
+        noiDungCauHoi: string;
+        soLuotTraLoiSai: number;
+        tongSoLuotLam: number;
+        dapAnDung: string;
+        giaiThichOnTap: string;
+      }
+    >();
+
+    for (const bkt of cacBaiKiemTra) {
+      const mapCauHoi = new Map(bkt.cacCauHoi.map((ch) => [ch.id, ch]));
+      const cacLuotPhuHop = bkt.cacLuotLam.filter((l) =>
+        tapIdHocSinhPhanTich.has(l.idHocSinh),
+      );
+
+      for (const luot of cacLuotPhuHop) {
+        const chiTiet = Array.isArray(luot.chiTietTraLoi)
+          ? (luot.chiTietTraLoi as any[])
+          : [];
+        for (const ct of chiTiet) {
+          const idCau = String(ct.idCauHoi || '');
+          if (!idCau) continue;
+          const cauGoc = mapCauHoi.get(idCau);
+          const hienTai = thongKeCauSai.get(idCau) || {
+            idCauHoi: idCau,
+            idBaiKiemTra: bkt.id,
+            tieuDeBaiKiemTra: bkt.tieuDe,
+            noiDungCauHoi: String(ct.noiDungCauHoi || cauGoc?.noiDung || 'Câu hỏi kiểm tra'),
+            soLuotTraLoiSai: 0,
+            tongSoLuotLam: 0,
+            dapAnDung: String(ct.dapAnDung || cauGoc?.dapAnDung || 'A'),
+            giaiThichOnTap: String(
+              ct.giaiThich ||
+                cauGoc?.giaiThich ||
+                `Ôn tập lại kiến thức thuộc bài "${bkt.tieuDe}" trong giáo trình môn học.`,
+            ),
+          };
+
+          hienTai.tongSoLuotLam += 1;
+          if (ct.dungHaySai === false) {
+            hienTai.soLuotTraLoiSai += 1;
+          }
+          thongKeCauSai.set(idCau, hienTai);
+        }
+      }
+    }
+
+    const taiLieuGoiYMacDinh = cacTaiLieu.slice(0, 2).map((tl) => ({
+      idTaiLieu: tl.id,
+      tieuDeTaiLieu: tl.tieuDe,
+    }));
+
+    const deXuatOnTapTheoChuDe: DeXuatOnTapChuDe[] = Array.from(thongKeCauSai.values())
+      .filter((item) => item.soLuotTraLoiSai > 0)
+      .map((item) => ({
+        idCauHoi: item.idCauHoi,
+        idBaiKiemTra: item.idBaiKiemTra,
+        tieuDeBaiKiemTra: item.tieuDeBaiKiemTra,
+        noiDungCauHoi: item.noiDungCauHoi,
+        soLuotTraLoiSai: item.soLuotTraLoiSai,
+        tongSoLuotLam: item.tongSoLuotLam,
+        tyLeSai:
+          item.tongSoLuotLam > 0
+            ? Math.round((item.soLuotTraLoiSai / item.tongSoLuotLam) * 100)
+            : 0,
+        dapAnDung: item.dapAnDung,
+        giaiThichOnTap: item.giaiThichOnTap,
+        taiLieuKhuyenNghi: taiLieuGoiYMacDinh,
+      }))
+      .sort((a, b) => b.tyLeSai - a.tyLeSai || b.soLuotTraLoiSai - a.soLuotTraLoiSai)
+      .slice(0, 6);
+
+    return {
+      idLopHocPhan: bangDiem.idLopHocPhan,
+      tenLopHocPhan: bangDiem.tenLopHocPhan,
+      maLopHocPhan: bangDiem.maLopHocPhan,
+      tongQuanCanhBao: {
+        tongSoHocSinh: danhSachCanhBao.length,
+        soHocSinhNghiemTrong,
+        soHocSinhCanLuuY,
+        soHocSinhOnDinh,
+        tyLeHoanThanhBaiTapTrungBinh:
+          danhSachCanhBao.length > 0
+            ? Math.round(tongTyLeBaiTap / danhSachCanhBao.length)
+            : 100,
+      },
+      danhSachCanhBao,
+      deXuatOnTapTheoChuDe,
     };
   }
 }

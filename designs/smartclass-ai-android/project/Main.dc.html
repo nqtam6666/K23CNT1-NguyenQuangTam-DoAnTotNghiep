@@ -1,0 +1,112 @@
+<!doctype html>
+<html lang="vi">
+<head>
+<meta charset="utf-8">
+<title>01 · Đăng nhập SmartClass AI</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600&amp;family=JetBrains+Mono:wght@400;500;700&amp;display=swap">
+<style>
+body { margin: 0; background: #FAF8F4; color: #2B2A27; font-family: 'Be Vietnam Pro', system-ui, sans-serif; }
+a { color: #059669; text-decoration: none; }
+a:hover { color: #047857; }
+</style>
+</helmet>
+<div style="width: 390px; min-height: 844px; box-sizing: border-box; background: #FAF8F4; color: #2B2A27; padding: 24px 20px; display: flex; flex-direction: column; justify-content: space-between; gap: 20px">
+  <div style="display: flex; flex-direction: column; gap: 18px">
+    <div style="display: flex; flex-direction: column; gap: 6px; border-bottom: 1px solid #E5E2DA; padding-bottom: 16px">
+      <div style="display: flex; align-items: center; justify-content: space-between; gap: 8px">
+        <span style="font-family: 'JetBrains Mono', monospace; font-size: 11px; letter-spacing: 0.12em; text-transform: uppercase; color: #7A766D">HỆ THỐNG LỚP HỌC SỐ</span>
+        <span style="font-family: 'JetBrains Mono', monospace; font-size: 11px; font-weight: 700; color: {{accent}}; background: #E6F6EF; border: 1px solid #059669; border-radius: 4px; padding: 2px 8px">ANDROID · v1.0</span>
+      </div>
+      <h1 style="margin: 0; font-family: 'JetBrains Mono', monospace; font-size: 22px; font-weight: 700; color: #2B2A27">SmartClass AI</h1>
+      <p style="margin: 0; font-size: 13.5px; line-height: 1.55; color: #7A766D">Quản lý lớp học phần, điểm danh thông minh, kiểm tra trắc nghiệm và tra cứu học liệu.</p>
+    </div>
+
+    <div style="background: #FFFDF8; border: 1px solid #E5E2DA; border-radius: 4px; padding: 16px; display: flex; flex-direction: column; gap: 14px">
+      <div style="display: flex; align-items: center; justify-content: space-between; gap: 8px">
+        <h2 style="margin: 0; font-family: 'JetBrains Mono', monospace; font-size: 15px; font-weight: 700; color: #2B2A27">ĐĂNG NHẬP TÀI KHOẢN</h2>
+        <span style="font-family: 'JetBrains Mono', monospace; font-size: 11px; color: #7A766D">{{vaiTroDangChon}}</span>
+      </div>
+
+      <div style="display: flex; flex-direction: column; gap: 6px">
+        <label for="email-input" style="font-size: 13px; font-weight: 600; color: #2B2A27">Địa chỉ Email</label>
+        <input id="email-input" type="email" value="{{emailHienTai}}" style="height: 44px; box-sizing: border-box; padding: 0 12px; background: #FFFDF8; border: 1px solid #E5E2DA; border-radius: 4px; font-family: 'JetBrains Mono', monospace; font-size: 13px; color: #2B2A27">
+      </div>
+
+      <div style="display: flex; flex-direction: column; gap: 6px">
+        <label for="password-input" style="font-size: 13px; font-weight: 600; color: #2B2A27">Mật khẩu</label>
+        <input id="password-input" type="password" value="MatKhau@123" style="height: 44px; box-sizing: border-box; padding: 0 12px; background: #FFFDF8; border: 1px solid #E5E2DA; border-radius: 4px; font-size: 14px; color: #2B2A27">
+      </div>
+
+      <div style="display: flex; flex-direction: column; gap: 8px; padding-top: 4px">
+        <a href="BangDieuKhien.dc.html" style="height: 44px; display: flex; align-items: center; justify-content: center; background: {{accent}}; color: #FFFFFF; border-radius: 4px; font-size: 13.5px; font-weight: 600">Đăng nhập vào hệ thống</a>
+        <button type="button" style="height: 44px; background: #F3EDE4; color: #2B2A27; border: 1px solid #E5E2DA; border-radius: 4px; font-family: 'Be Vietnam Pro', sans-serif; font-size: 13px; font-weight: 600; cursor: pointer">Chưa có tài khoản? Đăng ký mới</button>
+      </div>
+    </div>
+
+    <div style="background: #FFFDF8; border: 1px solid #E5E2DA; border-radius: 4px; padding: 16px; display: flex; flex-direction: column; gap: 12px">
+      <div style="display: flex; flex-direction: column; gap: 4px">
+        <span style="font-family: 'JetBrains Mono', monospace; font-size: 11px; letter-spacing: 0.12em; text-transform: uppercase; color: #7A766D">CHỌN NHANH TÀI KHOẢN DEMO (6 VAI TRÒ)</span>
+        <span style="font-size: 12.5px; color: #7A766D">Chạm vào một vai trò để điền tự động thông tin đăng nhập:</span>
+      </div>
+
+      <div style="display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px">
+        <sc-for list="{{danhSachVaiTro}}" as="item" hint-placeholder-count="6">
+          <button type="button" onClick="{{item.chon}}" style="min-height: 52px; padding: 8px 10px; background: {{item.bg}}; border: 1px solid {{item.border}}; border-radius: 4px; display: flex; flex-direction: column; align-items: flex-start; justify-content: center; gap: 2px; cursor: pointer; text-align: left">
+            <span style="font-size: 12.5px; font-weight: 600; color: {{item.text}}">{{item.ten}}</span>
+            <span style="font-family: 'JetBrains Mono', monospace; font-size: 11px; color: #57534A">{{item.taiKhoan}}</span>
+          </button>
+        </sc-for>
+      </div>
+    </div>
+  </div>
+
+  <div style="border-top: 1px solid #E5E2DA; padding-top: 12px; display: flex; align-items: center; justify-content: space-between; gap: 8px">
+    <span style="font-family: 'JetBrains Mono', monospace; font-size: 11px; color: #7A766D">TRƯỜNG ĐH NGUYỄN TRÃI</span>
+    <span style="font-family: 'JetBrains Mono', monospace; font-size: 11px; color: #7A766D">K23CNT1 · ĐỒ ÁN TỐT NGHIỆP</span>
+  </div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"accent":{"editor":"color","default":"#059669","options":["#059669","#0EA5C6","#B45309"]},"$preview":{"width":390,"height":844}}'>
+class Component extends DCLogic {
+  constructor(props) {
+    super(props);
+    this.state = {
+      selectedId: 'hocsinh1'
+    };
+  }
+  renderVals() {
+    const accent = this.props.accent ?? '#059669';
+    const raw = [
+      { id: 'hocsinh1', ten: 'Học sinh', taiKhoan: 'hocsinh1@lms.edu.vn' },
+      { id: 'giaovien1', ten: 'Giáo viên', taiKhoan: 'giaovien1@lms.edu.vn' },
+      { id: 'phuhuynh1', ten: 'Phụ huynh', taiKhoan: 'phuhuynh1@lms.edu.vn' },
+      { id: 'giaovu', ten: 'Giáo vụ', taiKhoan: 'giaovu@lms.edu.vn' },
+      { id: 'bangiamhieu', ten: 'Ban giám hiệu', taiKhoan: 'bangiamhieu@lms.edu.vn' },
+      { id: 'admin', ten: 'Quản trị viên', taiKhoan: 'admin@lms.edu.vn' }
+    ];
+    const current = raw.find((r) => r.id === this.state.selectedId) || raw[0];
+    return {
+      accent,
+      emailHienTai: current.taiKhoan,
+      vaiTroDangChon: current.ten,
+      danhSachVaiTro: raw.map((r) => {
+        const active = r.id === this.state.selectedId;
+        return {
+          ...r,
+          bg: active ? '#E6F6EF' : '#F3EDE4',
+          border: active ? accent : '#E5E2DA',
+          text: active ? '#047857' : '#2B2A27',
+          chon: () => this.setState({ selectedId: r.id })
+        };
+      })
+    };
+  }
+}
+</script>
+</body>
+</html>

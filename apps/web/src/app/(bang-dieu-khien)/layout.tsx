@@ -6,7 +6,7 @@ import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
 import {
   LogOut,
-  GraduationCap,
+  School,
   PanelLeftClose,
   PanelLeftOpen,
   Search,
@@ -71,7 +71,37 @@ export default function LayoutBangDieuKhien({ children }: { children: ReactNode 
   const [thongBaoHeThongMo, setThongBaoHeThongMo] = useState(false);
   const [xacNhanDangXuatMo, setXacNhanDangXuatMo] = useState(false);
   const [dangXuLyDangXuat, setDangXuLyDangXuat] = useState(false);
+  const [dangChuyenVaiTro, setDangChuyenVaiTro] = useState(false);
   const [cheDoSangToi, setCheDoSangToi] = useState<'sang' | 'toi'>('sang');
+
+  const chuyenNhanhTaiKhoan = async (emailMoi: string, nhanVaiTro: string) => {
+    if (!emailMoi || emailMoi === nguoiDung?.email || dangChuyenVaiTro) return;
+    setDangChuyenVaiTro(true);
+    try {
+      const phanHoi = await mayKhachApi.post('/xac-thuc/dang-nhap', {
+        email: emailMoi,
+        matKhau: 'MatKhau@123',
+      });
+      const nguoiDungMoi = phanHoi.data?.duLieu?.nguoiDung || phanHoi.data?.nguoiDung;
+      try {
+        sessionStorage.removeItem('lms_cache_bang_dieu_khien');
+        localStorage.removeItem('lms_cache_bang_dieu_khien');
+        if (nguoiDungMoi) {
+          const chuoi = JSON.stringify(nguoiDungMoi);
+          sessionStorage.setItem('lms_cache_ho_so', chuoi);
+          localStorage.setItem('lms_cache_ho_so', chuoi);
+        }
+      } catch {
+        // Bỏ qua
+      }
+      queryClient.clear();
+      thongBao.thanhCong(`Đã chuyển sang ${nhanVaiTro}`, `Tài khoản: ${emailMoi}`);
+      window.location.href = '/bang-dieu-khien';
+    } catch {
+      thongBao.thatBai('Không thể chuyển vai trò', 'Vui lòng thử lại.');
+      setDangChuyenVaiTro(false);
+    }
+  };
 
   const { layGiaTri } = useCaiDatHeThong();
   const tenHeThong = layGiaTri('TEN_HE_THONG', 'SmartClass AI');
@@ -149,15 +179,18 @@ export default function LayoutBangDieuKhien({ children }: { children: ReactNode 
     return () => window.removeEventListener('keydown', xuLyPhimTat);
   }, []);
 
-  // Khôi phục nhanh hồ sơ từ sessionStorage ngay sau khi hydrate để tránh lỗi Hydration #418
+  // Khôi phục nhanh hồ sơ từ sessionStorage / localStorage ngay sau khi hydrate để tránh lỗi Hydration #418
   useEffect(() => {
     try {
-      const raw = sessionStorage.getItem('lms_cache_ho_so');
+      const raw =
+        sessionStorage.getItem('lms_cache_ho_so') || localStorage.getItem('lms_cache_ho_so');
       if (raw && !queryClient.getQueryData(['ho-so-hien-tai'])) {
-        queryClient.setQueryData(['ho-so-hien-tai'], JSON.parse(raw) as PayloadJwt);
+        queryClient.setQueryData(['ho-so-hien-tai'], JSON.parse(raw) as PayloadJwt, {
+          updatedAt: 0,
+        });
       }
     } catch {
-      // Bỏ qua lỗi đọc sessionStorage
+      // Bỏ qua lỗi đọc bộ nhớ trình duyệt
     }
   }, [queryClient]);
 
@@ -173,13 +206,15 @@ export default function LayoutBangDieuKhien({ children }: { children: ReactNode 
       const res = await mayKhachApi.get('/xac-thuc/ho-so-hien-tai');
       const duLieu = res.data?.duLieu || res.data;
       try {
-        sessionStorage.setItem('lms_cache_ho_so', JSON.stringify(duLieu));
+        const chuoiHoSo = JSON.stringify(duLieu);
+        sessionStorage.setItem('lms_cache_ho_so', chuoiHoSo);
+        localStorage.setItem('lms_cache_ho_so', chuoiHoSo);
       } catch {
-        // Bỏ qua lỗi ghi sessionStorage
+        // Bỏ qua lỗi ghi bộ nhớ trình duyệt
       }
       return duLieu;
     },
-    staleTime: 30 * 1000,
+    staleTime: 15 * 1000,
     retry: (soLanThu, loi: any) => {
       // Không thử lại nếu là lỗi 401 (đã qua interceptor làm mới token mà vẫn thất bại)
       if (loi?.response?.status === 401) return false;
@@ -197,6 +232,8 @@ export default function LayoutBangDieuKhien({ children }: { children: ReactNode 
       try {
         sessionStorage.removeItem('lms_cache_ho_so');
         sessionStorage.removeItem('lms_cache_bang_dieu_khien');
+        localStorage.removeItem('lms_cache_ho_so');
+        localStorage.removeItem('lms_cache_bang_dieu_khien');
       } catch {
         // Bỏ qua
       }
@@ -250,6 +287,8 @@ export default function LayoutBangDieuKhien({ children }: { children: ReactNode 
       try {
         sessionStorage.removeItem('lms_cache_ho_so');
         sessionStorage.removeItem('lms_cache_bang_dieu_khien');
+        localStorage.removeItem('lms_cache_ho_so');
+        localStorage.removeItem('lms_cache_bang_dieu_khien');
       } catch {
         // Bỏ qua
       }
@@ -274,6 +313,7 @@ export default function LayoutBangDieuKhien({ children }: { children: ReactNode 
       CA_NHAN: [],
       HOC_TAP: [],
       QUAN_TRI: [],
+      TRO_GIUP: [],
     };
 
     menuTheoVaiTro.forEach((item) => {
@@ -285,7 +325,7 @@ export default function LayoutBangDieuKhien({ children }: { children: ReactNode 
     return nhomDanhSach;
   }, [menuTheoVaiTro]);
 
-  const thuTuNhom: NhomMenu[] = ['CA_NHAN', 'HOC_TAP', 'QUAN_TRI'];
+  const thuTuNhom: NhomMenu[] = ['CA_NHAN', 'HOC_TAP', 'QUAN_TRI', 'TRO_GIUP'];
 
   const duongDanActive = useMemo(() => {
     const khop = menuTheoVaiTro.find(
@@ -356,15 +396,15 @@ export default function LayoutBangDieuKhien({ children }: { children: ReactNode 
                 // eslint-disable-next-line @next/next/no-img-element
                 <img src={urlLogo || urlIcon} alt="Logo" className="w-full h-full object-cover" />
               ) : (
-                <GraduationCap strokeWidth={1.5} className="w-5 h-5" />
+                <School strokeWidth={1.5} className="w-5 h-5" />
               )}
             </div>
             {!thuGon && (
               <div className="hidden md:block truncate">
-                <p className="font-mono font-bold text-[var(--text)] leading-tight truncate text-[13px]">
+                <p className="font-sans font-semibold text-[var(--text)] leading-tight truncate text-[14px]">
                   {tenHeThong}
                 </p>
-                <p className="font-mono text-[11px] text-[var(--muted)] truncate">{moTaPhu}</p>
+                <p className="font-sans text-[11px] text-[var(--muted)] truncate">{moTaPhu}</p>
               </div>
             )}
           </Link>
@@ -373,10 +413,10 @@ export default function LayoutBangDieuKhien({ children }: { children: ReactNode 
         {/* Danh sách nhóm Menu Navigation */}
         <nav
           aria-label="Danh mục chức năng"
-          className="flex-1 py-3 space-y-4 overflow-y-auto overflow-x-hidden"
+          className="flex-1 py-3 px-2.5 space-y-4 overflow-y-auto overflow-x-hidden"
         >
           {isLoading || !nguoiDung ? (
-            <div className="space-y-2 px-2">
+            <div className="space-y-2 px-1">
               {[1, 2, 3, 4, 5].map((i) => (
                 <div
                   key={i}
@@ -400,20 +440,20 @@ export default function LayoutBangDieuKhien({ children }: { children: ReactNode 
               if (danhSachNhom.length === 0) return null;
 
               return (
-                <div key={maNhom} className="space-y-0.5">
+                <div key={maNhom} className="space-y-1">
                   {!thuGon && (
-                    <div className="hidden md:block px-[18px] pt-1 pb-1.5 eyebrow">
+                    <div className="hidden md:block px-3 pt-1 pb-1 text-[11px] font-sans font-semibold uppercase tracking-wider text-[var(--muted)]">
                       {NHOM_MENU_INFO[maNhom].tenNhom}
                     </div>
                   )}
 
-                  {thuGon && <div className="h-px bg-[var(--border)] my-1.5 mx-2" />}
+                  {thuGon && <div className="h-px bg-[var(--border)] my-1.5 mx-1" />}
 
                   <AnimatedBackground
                     layoutId="thanh-ben-chinh"
                     defaultValue={duongDanActive}
-                    className="bg-[var(--accent-soft)] border-l-[3px] border-l-[var(--accent)] rounded-r-[var(--radius)]"
-                    transition={{ type: 'spring', bounce: 0.15, duration: 0.25 }}
+                    className="bg-[var(--accent-soft)] rounded-[var(--radius)]"
+                    transition={{ type: 'spring', bounce: 0.12, duration: 0.22 }}
                   >
                     {danhSachNhom.map((item) => {
                       const laTrangHienTai = item.duongDan === duongDanActive;
@@ -441,14 +481,14 @@ export default function LayoutBangDieuKhien({ children }: { children: ReactNode 
         </nav>
 
         {/* Chân Sidebar: Ngăn cách bằng đường kẻ 1px, Thông tin cá nhân + Mục Đăng xuất (Danger) */}
-        <div className="border-t border-[var(--border)] bg-[var(--surface)] pt-2 pb-2 space-y-1.5">
+        <div className="border-t border-[var(--border)] bg-[var(--surface)] p-2.5 space-y-1.5">
           {!isLoading && nguoiDung && (
             <Link
               href="/ho-so"
               title={`${nguoiDung.hoTen} (${layNhanVaiTro(nguoiDung.vaiTro)})`}
               aria-label={`Hồ sơ của ${nguoiDung.hoTen}`}
-              className={`flex items-center hover:bg-[var(--active-bg)] transition-colors py-1.5 ${
-                thuGon ? 'justify-center px-0' : 'justify-center px-0 md:justify-start md:gap-2.5 md:px-[18px]'
+              className={`flex items-center rounded-[var(--radius)] bg-[var(--bg)] hover:bg-[var(--active-bg)] border border-[var(--border)] transition-colors py-2 ${
+                thuGon ? 'justify-center px-0' : 'justify-center px-0 md:justify-start md:gap-2.5 md:px-3'
               }`}
             >
               <AnhDaiDien
@@ -459,10 +499,10 @@ export default function LayoutBangDieuKhien({ children }: { children: ReactNode 
               />
               {!thuGon && (
                 <div className="hidden md:block truncate min-w-0">
-                  <p className="font-mono text-xs font-semibold text-[var(--text)] truncate">
+                  <p className="font-sans text-xs font-semibold text-[var(--text)] truncate">
                     {nguoiDung.hoTen}
                   </p>
-                  <span className="font-mono text-[10px] text-[var(--accent)] font-medium">
+                  <span className="font-sans text-[11px] text-[var(--accent)] font-medium">
                     {layNhanVaiTro(nguoiDung.vaiTro)}
                   </span>
                 </div>
@@ -470,7 +510,7 @@ export default function LayoutBangDieuKhien({ children }: { children: ReactNode 
             </Link>
           )}
 
-          {/* Mục Danger (Đăng xuất): nền danger-soft, chữ và viền trái màu danger */}
+          {/* Mục Danger (Đăng xuất) */}
           <MucThanhBen
             icon={LogOut}
             danger
@@ -498,22 +538,26 @@ export default function LayoutBangDieuKhien({ children }: { children: ReactNode 
               className="hidden md:inline-flex items-center justify-center p-2 text-[var(--muted)] hover:text-[var(--text)] hover:bg-[var(--active-bg)] rounded-[var(--radius)] cursor-pointer transition-colors shrink-0"
             >
               {thuGon ? (
-                <PanelLeftOpen strokeWidth={1.5} className="w-[18px] h-[18px] text-[var(--accent)]" />
+                <PanelLeftOpen strokeWidth={1.75} className="w-[18px] h-[18px] text-[var(--accent)]" />
               ) : (
-                <PanelLeftClose strokeWidth={1.5} className="w-[18px] h-[18px]" />
+                <PanelLeftClose strokeWidth={1.75} className="w-[18px] h-[18px]" />
               )}
             </button>
 
             {/* Breadcrumb đường dẫn */}
             <nav
               aria-label="Đường dẫn trang"
-              className="flex items-center gap-2 font-mono text-xs sm:text-sm text-[var(--muted)] min-w-0"
+              className="flex items-center gap-2 font-sans text-xs sm:text-sm text-[var(--muted)] min-w-0"
             >
-              <span className="hidden lg:inline whitespace-nowrap text-[var(--muted)]">
-                BẢNG ĐIỀU KHIỂN
-              </span>
+              <Link
+                href="/"
+                className="hidden lg:inline whitespace-nowrap text-[var(--muted)] hover:text-[var(--accent)] font-medium transition-colors"
+                title="Về Trang chủ cổng thông tin"
+              >
+                Trang chủ
+              </Link>
               <span className="hidden lg:inline text-[var(--border)] select-none">/</span>
-              <span className="font-mono font-bold text-[var(--text)] whitespace-nowrap truncate">
+              <span className="font-sans font-semibold text-[var(--text)] whitespace-nowrap truncate">
                 {layTieuDeTrang(pathname)}
               </span>
             </nav>
@@ -521,16 +565,37 @@ export default function LayoutBangDieuKhien({ children }: { children: ReactNode 
 
           {/* Nhóm công cụ phía phải Header */}
           <div className="flex items-center gap-1.5 sm:gap-2 shrink-0">
+            {/* Bộ chuyển nhanh vai trò trải nghiệm 1 chạm */}
+            {nguoiDung && (
+              <select
+                aria-label="Chuyển nhanh vai trò tài khoản"
+                disabled={dangChuyenVaiTro}
+                value={nguoiDung.email}
+                onChange={(e) => {
+                  const muc = e.target.options[e.target.selectedIndex];
+                  chuyenNhanhTaiKhoan(e.target.value, muc?.text || 'Tài khoản');
+                }}
+                title="Chuyển nhanh vai trò (Quản trị viên / Giảng viên / Sinh viên / Giáo vụ)"
+                className="hidden md:inline-block px-2.5 py-1.5 font-sans text-xs font-semibold text-[var(--accent)] bg-[var(--accent-soft)] border border-[var(--border)] rounded-[var(--radius)] focus:outline-none focus:border-[var(--accent)] cursor-pointer"
+              >
+                <option value="admin@lms.edu.vn">Vai trò: Quản trị viên</option>
+                <option value="giaovien1@lms.edu.vn">Vai trò: Giảng viên</option>
+                <option value="hocsinh1@lms.edu.vn">Vai trò: Sinh viên</option>
+                <option value="giaovu@lms.edu.vn">Vai trò: Giáo vụ</option>
+                <option value="phuhuynh1@lms.edu.vn">Vai trò: Phụ huynh</option>
+              </select>
+            )}
+
             {/* Nút tìm kiếm nhanh Command Palette (Ctrl+K) */}
             <button
               type="button"
               onClick={() => setTimKiemMo(true)}
               title="Tìm kiếm nhanh toàn hệ thống (Ctrl+K)"
               aria-label="Tìm kiếm nhanh (Ctrl+K)"
-              className="flex items-center gap-2 px-2.5 sm:px-3 py-1.5 font-mono text-xs text-[var(--muted)] hover:text-[var(--text)] bg-[var(--bg)] hover:bg-[var(--active-bg)] border border-[var(--border)] rounded-[var(--radius)] transition-colors cursor-pointer shrink-0"
+              className="flex items-center gap-2 px-2.5 sm:px-3 py-1.5 font-sans text-xs text-[var(--muted)] hover:text-[var(--text)] bg-[var(--bg)] hover:bg-[var(--active-bg)] border border-[var(--border)] rounded-[var(--radius)] transition-colors cursor-pointer shrink-0"
             >
-              <Search strokeWidth={1.5} className="w-3.5 h-3.5 text-[var(--muted)] shrink-0" />
-              <span className="hidden lg:inline whitespace-nowrap">Tìm kiếm...</span>
+              <Search strokeWidth={1.75} className="w-3.5 h-3.5 text-[var(--muted)] shrink-0" />
+              <span className="hidden lg:inline whitespace-nowrap">Tìm kiếm nhanh...</span>
               <kbd className="hidden xl:inline-block px-1.5 py-0.5 font-mono text-[10px] font-semibold bg-[var(--surface)] border border-[var(--border)] text-[var(--muted)] rounded-[var(--radius)] whitespace-nowrap">
                 Ctrl+K
               </kbd>
@@ -564,24 +629,6 @@ export default function LayoutBangDieuKhien({ children }: { children: ReactNode 
 
             {/* Bộ chuyển đổi giao diện Hệ thống / Sáng / Tối */}
             {choPhepDoiCheDoSangToi && <ToggleTheme />}
-
-            {/* Ảnh đại diện cá nhân trên Top Header */}
-            {nguoiDung && (
-              <Link
-                href="/ho-so"
-                title={`Hồ sơ cá nhân: ${nguoiDung.hoTen} (${layNhanVaiTro(nguoiDung.vaiTro)})`}
-                aria-label="Xem hồ sơ cá nhân"
-                className="flex items-center gap-1.5 pl-0.5 sm:pl-1 group cursor-pointer shrink-0"
-              >
-                <AnhDaiDien
-                  url={nguoiDung.anhDaiDien}
-                  hoTen={nguoiDung.hoTen}
-                  kichThuoc="sm"
-                  hienThiVien
-                  className="group-hover:ring-2 group-hover:ring-[var(--accent)] transition-all shrink-0"
-                />
-              </Link>
-            )}
           </div>
         </header>
 

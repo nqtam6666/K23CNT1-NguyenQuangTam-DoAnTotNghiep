@@ -21,7 +21,7 @@ import {
   Monitor,
   User,
   ShieldCheck,
-  Sparkles,
+  Lightbulb,
 } from 'lucide-react';
 import {
   LoaiBaoLoiDongGop,
@@ -51,7 +51,7 @@ const NHAN_LOAI: Record<LoaiBaoLoiDongGop, { nhan: string; moTa: string; mauSac:
     nhan: 'Đóng góp ý kiến',
     moTa: 'Đề xuất cải tiến trải nghiệm hoặc chức năng mới',
     mauSac: 'bg-accent-soft text-accent border-accent ',
-    icon: Sparkles,
+    icon: Lightbulb,
   },
   [LoaiBaoLoiDongGop.HO_TRO_KY_THUAT]: {
     nhan: 'Hỗ trợ kỹ thuật',

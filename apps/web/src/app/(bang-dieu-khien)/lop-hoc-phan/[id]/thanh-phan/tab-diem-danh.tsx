@@ -627,10 +627,10 @@ export function TabDiemDanh({
                                           },
                                         }))
                                       }
-                                      className={`px-2.5 py-1 rounded-lg text-[11px] font-semibold transition-all cursor-pointer ${
+                                      className={`px-2.5 py-1 rounded text-[11px] font-semibold transition-all cursor-pointer ${
                                         dongHienTai.trangThai === tt.ma
                                           ? tt.mau
-                                          : 'bg-muted text-muted-foreground hover:text-foreground'
+                                          : 'bg-active-bg text-text border border-border hover:border-accent'
                                       }`}
                                     >
                                       {tt.nhan}

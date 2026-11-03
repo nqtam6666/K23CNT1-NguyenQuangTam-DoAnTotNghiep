@@ -176,14 +176,14 @@ export function LoiTatTacVu({ vaiTro }: Props) {
                 className="flex items-center justify-between p-3.5 rounded-[var(--radius)] border border-[var(--border)] bg-[var(--bg)] hover:border-[var(--accent)] transition-colors group"
               >
                 <div className="flex items-center gap-3 min-w-0">
-                  <div className="w-9 h-9 rounded-[var(--radius)] border border-[var(--border)] bg-[var(--surface)] text-[var(--accent)] flex items-center justify-center shrink-0">
-                    <BieuTuong strokeWidth={1.5} className="w-[20px] h-[20px]" />
+                  <div className="w-9 h-9 rounded-[var(--radius)] bg-[var(--accent-soft)] text-[var(--accent)] flex items-center justify-center shrink-0">
+                    <BieuTuong strokeWidth={1.75} className="w-[18px] h-[18px]" />
                   </div>
                   <div className="truncate">
-                    <p className="font-mono text-xs font-semibold text-[var(--text)] truncate">
+                    <p className="font-sans text-[13px] font-semibold text-[var(--text)] truncate">
                       {item.tieuDe}
                     </p>
-                    <p className="text-[11px] text-[var(--muted)] truncate">{item.moTa}</p>
+                    <p className="text-xs text-[var(--muted)] truncate">{item.moTa}</p>
                   </div>
                 </div>
                 <ArrowRight

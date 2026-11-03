@@ -19,6 +19,8 @@ export interface KetQuaTruyHoiDoan {
 
 @Injectable()
 export class KhoTroLyAiRepository {
+  private daDongBoEnumBanNhap = false;
+
   constructor(private readonly prisma: PrismaService) {}
 
   // ==========================================
@@ -173,6 +175,21 @@ export class KhoTroLyAiRepository {
   // BẢN NHÁP AI (RULE 04: CHỈ TẠO BẢN NHÁP)
   // ==========================================
 
+  private async damBaoEnumBanNhap() {
+    if (this.daDongBoEnumBanNhap || !this.prisma.$executeRawUnsafe) return;
+    try {
+      await this.prisma.$executeRawUnsafe(
+        `ALTER TYPE "loai_ban_nhap_ai" ADD VALUE IF NOT EXISTS 'BAI_TAP'`,
+      );
+      await this.prisma.$executeRawUnsafe(
+        `ALTER TYPE "loai_ban_nhap_ai" ADD VALUE IF NOT EXISTS 'TOM_TAT'`,
+      );
+      this.daDongBoEnumBanNhap = true;
+    } catch {
+      this.daDongBoEnumBanNhap = true;
+    }
+  }
+
   async taoBanNhap(duLieu: {
     idLopHocPhan: string;
     idGiaoVien: string;
@@ -180,6 +197,7 @@ export class KhoTroLyAiRepository {
     tieuDe: string;
     duLieuJson: any;
   }) {
+    await this.damBaoEnumBanNhap();
     return this.prisma.banNhapAI.create({
       data: {
         idLopHocPhan: duLieu.idLopHocPhan,
@@ -238,7 +256,7 @@ export class KhoTroLyAiRepository {
   }
 
   // ==========================================
-  // NHẬT KÝ SỬ DỤNG AI (AUDIT LOGGING)
+  // NHẬT KÝ SỬ DỤNG AI (AUDIT LOGGING & COST MONITORING)
   // ==========================================
 
   async ghiNhatKy(duLieu: {
@@ -250,5 +268,87 @@ export class KhoTroLyAiRepository {
     return this.prisma.nhatKySuDungAI.create({
       data: duLieu,
     });
+  }
+
+  async layThongKeSuDung(idNguoiDung: string, laQuanTriHoacGiaoVien: boolean) {
+    const dauNgay = new Date();
+    dauNgay.setHours(0, 0, 0, 0);
+
+    const bayNgayTruoc = new Date(dauNgay);
+    bayNgayTruoc.setDate(bayNgayTruoc.getDate() - 6);
+
+    const [caNhanHomNay, tongHopHeThongHomNay, tongHopToanThoiGian, tongLuot7Ngay] =
+      await Promise.all([
+        this.prisma.nhatKySuDungAI.aggregate({
+          where: { idNguoiDung, ngayTao: { gte: dauNgay } },
+          _count: { id: true },
+          _sum: { soLuongToken: true },
+        }),
+        this.prisma.nhatKySuDungAI.aggregate({
+          where: { ngayTao: { gte: dauNgay } },
+          _count: { id: true },
+          _sum: { soLuongToken: true },
+        }),
+        this.prisma.nhatKySuDungAI.aggregate({
+          _count: { id: true },
+          _sum: { soLuongToken: true },
+          _avg: { doTreMs: true },
+        }),
+        this.prisma.nhatKySuDungAI.count({
+          where: { ngayTao: { gte: bayNgayTruoc } },
+        }),
+      ]);
+
+    let phanBoTheoTacVu: Array<{
+      loaiTacVu: string;
+      soLuot: number;
+      tongToken: number;
+    }> = [];
+    let nhatKyGanDay: any[] = [];
+
+    if (laQuanTriHoacGiaoVien) {
+      const [nhomTacVu, danhSachGanDay] = await Promise.all([
+        this.prisma.nhatKySuDungAI.groupBy({
+          by: ['loaiTacVu'],
+          _count: { id: true },
+          _sum: { soLuongToken: true },
+          orderBy: { _count: { id: 'desc' } },
+        }),
+        this.prisma.nhatKySuDungAI.findMany({
+          take: 15,
+          orderBy: { ngayTao: 'desc' },
+          include: {
+            nguoiDung: {
+              select: {
+                id: true,
+                hoTen: true,
+                email: true,
+                vaiTro: true,
+              },
+            },
+          },
+        }),
+      ]);
+
+      phanBoTheoTacVu = nhomTacVu.map((item) => ({
+        loaiTacVu: item.loaiTacVu,
+        soLuot: item._count.id,
+        tongToken: item._sum.soLuongToken ?? 0,
+      }));
+      nhatKyGanDay = danhSachGanDay;
+    }
+
+    return {
+      soLuotCaNhanHomNay: caNhanHomNay._count.id,
+      tongTokenCaNhanHomNay: caNhanHomNay._sum.soLuongToken ?? 0,
+      tongLuotHomNay: tongHopHeThongHomNay._count.id,
+      tongTokenHomNay: tongHopHeThongHomNay._sum.soLuongToken ?? 0,
+      tongLuot7Ngay,
+      tongLuotToanThoiGian: tongHopToanThoiGian._count.id,
+      tongTokenToanThoiGian: tongHopToanThoiGian._sum.soLuongToken ?? 0,
+      doTreTrungBinhMs: Math.round(tongHopToanThoiGian._avg.doTreMs ?? 0),
+      phanBoTheoTacVu,
+      nhatKyGanDay,
+    };
   }
 }

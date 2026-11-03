@@ -8,7 +8,7 @@ import {
   Check,
   Loader2,
   AlertCircle,
-  Sparkles,
+  Palette,
 } from 'lucide-react';
 import { useQueryClient } from '@tanstack/react-query';
 import { HopThoai } from './hop-thoai';
@@ -253,7 +253,7 @@ export function HopThoaiDoiAnhDaiDien({
                 : 'border-transparent text-muted hover:text-text '
             }`}
           >
-            <Sparkles className="w-3.5 h-3.5" />
+            <Palette className="w-3.5 h-3.5" />
             Bộ sưu tập học đường
           </button>
         </div>

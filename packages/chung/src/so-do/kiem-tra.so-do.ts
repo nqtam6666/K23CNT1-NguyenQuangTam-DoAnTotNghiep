@@ -3,6 +3,7 @@ import {
   CheDoKiemTra,
   LoaiCauHoi,
   TrangThaiBaiKiemTra,
+  MucDoKho,
 } from '../hang-so/trang-thai.hang-so';
 
 export const phuongAnCauHoiSchema = z.object({
@@ -45,6 +46,7 @@ export const sinhDeKiemTraAISchema = z.object({
   thoiGianLamPhut: z.number().int().min(5).max(180).default(20),
   soLuotToiDa: z.number().int().min(1).max(100).default(5),
   idTaiLieu: z.string().uuid().optional().nullable(),
+  mucDoKho: z.nativeEnum(MucDoKho).optional(),
 });
 
 export type SinhDeKiemTraAIInput = z.infer<typeof sinhDeKiemTraAISchema>;

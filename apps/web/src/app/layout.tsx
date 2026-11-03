@@ -42,6 +42,7 @@ export default function RootLayout({
   return (
     <html
       lang="vi"
+      data-preset="soft"
       suppressHydrationWarning
       className={cn('font-sans', beVietnamPro.variable, jetbrainsMono.variable)}
     >
@@ -53,7 +54,18 @@ export default function RootLayout({
                 var rawUi = localStorage.getItem('lms_ui_config');
                 var uiCfg = rawUi ? JSON.parse(rawUi) : null;
                 var rootEl = document.documentElement;
+                rootEl.setAttribute('data-preset', 'soft');
                 if (uiCfg) {
+                  if (uiCfg.accentLight === '#0097FF' || uiCfg.accentLight === '#059669') {
+                    uiCfg.accentLight = '#0F766E';
+                    uiCfg.accentDark = '#2DD4BF';
+                    uiCfg.accentSoftLight = '#E6F4F1';
+                    uiCfg.accentSoftDark = '#113632';
+                  }
+                  if (!uiCfg.radius || uiCfg.radius === '4px') {
+                    uiCfg.radius = '8px';
+                  }
+                  localStorage.setItem('lms_ui_config', JSON.stringify(uiCfg));
                   if (uiCfg.accentLight) rootEl.style.setProperty('--custom-accent-light', uiCfg.accentLight);
                   if (uiCfg.accentDark) rootEl.style.setProperty('--custom-accent-dark', uiCfg.accentDark);
                   if (uiCfg.accentSoftLight) rootEl.style.setProperty('--custom-accent-soft-light', uiCfg.accentSoftLight);

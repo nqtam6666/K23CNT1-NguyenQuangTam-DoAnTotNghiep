@@ -148,7 +148,7 @@ export function DinhDangMarkdown({
           thead: ({ node: _node, ...props }) => (
             <thead
               className={cn(
-                laNguoiDung ? 'bg-surface text-text' : 'bg-muted/70 text-foreground'
+                laNguoiDung ? 'bg-surface text-text' : 'bg-active-bg text-text'
               )}
               {...props}
             />
@@ -174,7 +174,7 @@ export function DinhDangMarkdown({
                   'rounded px-1.5 py-0.5 font-mono text-[11px]',
                   laNguoiDung
                     ? 'bg-surface text-accent border border-border'
-                    : 'bg-muted/80 text-foreground border border-border/50'
+                    : 'bg-active-bg text-text border border-border'
                 )}
                 {...props}
               >

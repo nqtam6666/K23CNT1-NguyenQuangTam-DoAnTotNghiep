@@ -1,4 +1,9 @@
-import { LoaiBanNhapAI, TrangThaiBanNhapAI, LoaiTaiLieu } from '../hang-so/trang-thai.hang-so';
+import {
+  LoaiBanNhapAI,
+  TrangThaiBanNhapAI,
+  LoaiTaiLieu,
+  MucDoGiaiThich,
+} from '../hang-so/trang-thai.hang-so';
 
 /**
  * Cấu trúc nguồn trích dẫn RAG
@@ -7,7 +12,7 @@ export interface NguonTrichDan {
   idDoan?: string;
   idTaiLieu?: string;
   tieuDeTaiLieu: string;
-  loaiTaiLieu?: LoaiTaiLieu;
+  loaiTaiLieu?: LoaiTaiLieu | string;
   soTrang?: number | null;
   soThuTu?: number;
   doTuongDong: number;
@@ -92,9 +97,24 @@ export interface NhatKySuDungAI {
  */
 export interface KetQuaHoiDapAI {
   idPhien: string;
+  tieuDePhien?: string;
   tinNhanNguoiDung: TinNhanTroLy;
   tinNhanTroLy: TinNhanTroLy;
+  tinNhanTraLoi?: TinNhanTroLy;
   danhSachTrichDan: NguonTrichDan[];
+  nguonTrichDan?: NguonTrichDan[];
+  mucDoGiaiThich?: MucDoGiaiThich;
+  goiYCauHoiTiepTheo?: string[];
+  goiYBaiTapLuyenTap?: string[];
+}
+
+export interface KetQuaGoiYNhanXetBaiNop {
+  idBanNhap: string;
+  idBaiNop: string;
+  diemGoiY: number;
+  nhanXetGoiY: string;
+  uuDiem: string[];
+  hanChe: string[];
 }
 
 /**
@@ -125,4 +145,3 @@ export interface KetQuaKiemTraKetNoiAI {
   model?: string;
   doTreMs?: number;
 }
-

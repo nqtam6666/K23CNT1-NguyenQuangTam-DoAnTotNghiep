@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="black">#FF000000</color>
+    <color name="white">#FFFFFFFF</color>
+
+    <!-- Design Tokens Warm Minimal (Dark Mode - Rule 09) -->
+    <color name="bg">#1A1916</color>
+    <color name="surface">#22211D</color>
+    <color name="border">#38362F</color>
+    <color name="text">#EDEAE2</color>
+    <color name="muted">#9A968B</color>
+    <color name="accent">#34D399</color>
+    <color name="accent_soft">#12372B</color>
+    <color name="active_bg">#2C2A24</color>
+    <color name="danger">#F87171</color>
+    <color name="danger_soft">#3A1F1D</color>
+    <color name="info">#38BDF8</color>
+    <color name="info_soft">#14313A</color>
+</resources>

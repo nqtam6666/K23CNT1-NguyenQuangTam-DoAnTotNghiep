@@ -125,7 +125,7 @@ export class DieuKhienHoSo {
 
   @Get('hoc-sinh/:id')
   @KiemTraQuyen(HanhDong.Doc, DoiTuong.HoSoHocSinh)
-  @ApiOperation({ summary: 'Xem chi tiết hồ sơ một học sinh (Kiểm tra chống IDOR)' })
+  @ApiOperation({ summary: 'Xem chi tiết hồ sơ một học sinh' })
   @ApiResponse({ status: 200, description: 'Hồ sơ học sinh trả về thành công' })
   async layChiTietHocSinh(
     @Param('id') id: string,

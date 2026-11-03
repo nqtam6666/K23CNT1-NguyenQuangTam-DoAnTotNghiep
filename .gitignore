@@ -1,13 +1,13 @@
 # ==========================================
-# 1. TỆP TÀI LIỆU MARKDOWN (.md)
+# 1. TỆP TÀI LIỆU MARKDOWN (.md) & THƯ MỤC DOCS
 # ==========================================
-# Bỏ qua toàn bộ file .md theo yêu cầu nhưng vẫn giữ lại README.md
+# Bỏ qua toàn bộ file .md và thư mục docs theo yêu cầu nhưng vẫn giữ lại README.md
 *.md
 *.MD
 !README.md
 !README.MD
 !readme.md
-!docs/**
+docs/
 
 
 # ==========================================
@@ -111,3 +111,13 @@ desktop.ini
 *.swp
 *.swo
 *~
+
+# ==========================================
+# 7. TÀI LIỆU BÁO CÁO WORD & SƠ ĐỒ DRAW.IO CÁ NHÂN
+# ==========================================
+*.drawio
+*.drawio.bkp
+.$*
+~$*
+*.docx
+docs/

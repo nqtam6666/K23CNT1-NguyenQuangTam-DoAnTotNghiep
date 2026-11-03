@@ -1,0 +1,142 @@
+<!doctype html>
+<html lang="vi">
+<head>
+<meta charset="utf-8">
+<title>03 · Không gian Lớp học phần</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600&amp;family=JetBrains+Mono:wght@400;500;700&amp;display=swap">
+<style>
+body { margin: 0; background: #FAF8F4; color: #2B2A27; font-family: 'Be Vietnam Pro', system-ui, sans-serif; }
+a { color: #059669; text-decoration: none; }
+a:hover { color: #047857; }
+</style>
+</helmet>
+<div style="width: 390px; min-height: 844px; box-sizing: border-box; background: #FAF8F4; color: #2B2A27; display: flex; flex-direction: column; justify-content: space-between">
+  <div style="display: flex; flex-direction: column">
+    <div style="background: #FFFDF8; border-bottom: 1px solid #E5E2DA; padding: 12px 14px; display: flex; align-items: center; justify-content: space-between; gap: 10px">
+      <div style="display: flex; align-items: center; gap: 10px">
+        <a href="BangDieuKhien.dc.html" aria-label="Quay lại Bảng điều khiển" style="width: 44px; height: 44px; background: #F3EDE4; border: 1px solid #E5E2DA; border-radius: 4px; display: flex; align-items: center; justify-content: center; font-family: 'JetBrains Mono', monospace; font-size: 16px; font-weight: 700; color: #2B2A27">←</a>
+        <div style="display: flex; flex-direction: column; gap: 2px">
+          <span style="font-family: 'JetBrains Mono', monospace; font-size: 11px; color: #57534A">LHP-IT101-01</span>
+          <span style="font-family: 'JetBrains Mono', monospace; font-size: 14.5px; font-weight: 700; color: #2B2A27">Lập trình hướng đối tượng Java</span>
+        </div>
+      </div>
+      <span style="font-family: 'JetBrains Mono', monospace; font-size: 11px; font-weight: 700; color: #047857; background: #E6F6EF; border: 1px solid #059669; border-radius: 4px; padding: 4px 8px">MÃ: JV2026</span>
+    </div>
+
+    <div style="background: #FFFDF8; border-bottom: 1px solid #E5E2DA; padding: 8px 12px; display: flex; flex-wrap: wrap; gap: 6px">
+      <sc-for list="{{danhSachTab}}" as="tab" hint-placeholder-count="5">
+        <button type="button" onClick="{{tab.chon}}" style="min-height: 44px; padding: 0 10px; background: {{tab.bg}}; color: {{tab.color}}; border: 1px solid {{tab.border}}; border-radius: 4px; font-family: 'JetBrains Mono', monospace; font-size: 11.5px; font-weight: 700; cursor: pointer">{{tab.nhan}}</button>
+      </sc-for>
+    </div>
+
+    <div style="padding: 16px; display: flex; flex-direction: column; gap: 12px">
+      <sc-if value="{{laTabKiemTra}}" hint-placeholder-val="{{true}}">
+        <div style="background: #FFFDF8; border: 1px solid #E5E2DA; border-radius: 4px; padding: 14px; display: flex; flex-direction: column; gap: 10px">
+          <div style="display: flex; align-items: center; justify-content: space-between; gap: 8px">
+            <span style="font-family: 'JetBrains Mono', monospace; font-size: 11px; letter-spacing: 0.12em; text-transform: uppercase; color: #57534A">NGÂN HÀNG ĐỀ KIỂM TRA TRẮC NGHIỆM</span>
+            <span style="font-family: 'JetBrains Mono', monospace; font-size: 11px; font-weight: 700; color: #047857; background: #E6F6EF; border: 1px solid #059669; border-radius: 4px; padding: 2px 6px">TỰ ĐỘNG CHẤM</span>
+          </div>
+          <p style="margin: 0; font-size: 13px; line-height: 1.5; color: #57534A">Khởi tạo đề trắc nghiệm từ học liệu lớp hoặc làm bài trực tiếp ngay trên điện thoại.</p>
+          <button type="button" style="min-height: 44px; background: {{accent}}; color: #FFFFFF; border: none; border-radius: 4px; font-family: 'Be Vietnam Pro', sans-serif; font-size: 13px; font-weight: 600; cursor: pointer">+ Tạo đề trắc nghiệm từ học liệu lớp</button>
+        </div>
+
+        <sc-for list="{{dsKiemTra}}" as="de" hint-placeholder-count="2">
+          <div style="background: #FFFDF8; border: 1px solid #E5E2DA; border-radius: 4px; padding: 14px; display: flex; flex-direction: column; gap: 10px">
+            <div style="display: flex; align-items: center; justify-content: space-between; gap: 8px">
+              <span style="font-family: 'JetBrains Mono', monospace; font-size: 14px; font-weight: 700; color: #2B2A27">{{de.tieuDe}}</span>
+              <span style="font-family: 'JetBrains Mono', monospace; font-size: 11px; font-weight: 700; color: #047857; background: #E6F6EF; border: 1px solid #059669; border-radius: 4px; padding: 2px 6px">{{de.thoiGian}}</span>
+            </div>
+            <div style="display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 8px; background: #FAF8F4; border: 1px solid #E5E2DA; border-radius: 4px; padding: 8px 10px">
+              <div style="display: flex; flex-direction: column; gap: 2px">
+                <span style="font-family: 'JetBrains Mono', monospace; font-size: 10px; color: #57534A">SỐ CÂU HỎI</span>
+                <span style="font-family: 'JetBrains Mono', monospace; font-size: 14px; font-weight: 700; font-variant-numeric: tabular-nums; color: #2B2A27">{{de.soCau}}</span>
+              </div>
+              <div style="display: flex; flex-direction: column; gap: 2px">
+                <span style="font-family: 'JetBrains Mono', monospace; font-size: 10px; color: #57534A">ĐÃ NỘP</span>
+                <span style="font-family: 'JetBrains Mono', monospace; font-size: 14px; font-weight: 700; font-variant-numeric: tabular-nums; color: #047857">{{de.daNop}}</span>
+              </div>
+              <div style="display: flex; flex-direction: column; gap: 2px">
+                <span style="font-family: 'JetBrains Mono', monospace; font-size: 10px; color: #57534A">ĐIỂM TB</span>
+                <span style="font-family: 'JetBrains Mono', monospace; font-size: 14px; font-weight: 700; font-variant-numeric: tabular-nums; color: #2B2A27">{{de.diemTb}}</span>
+              </div>
+            </div>
+            <button type="button" style="min-height: 44px; background: #F3EDE4; color: #2B2A27; border: 1px solid #E5E2DA; border-radius: 4px; font-family: 'Be Vietnam Pro', sans-serif; font-size: 13px; font-weight: 600; cursor: pointer">Vào làm bài / Xem chi tiết câu hỏi</button>
+          </div>
+        </sc-for>
+      </sc-if>
+
+      <sc-if value="{{laTabSoDiem}}" hint-placeholder-val="{{false}}">
+        <div style="background: #FFFDF8; border: 1px solid #E5E2DA; border-radius: 4px; padding: 14px; display: flex; flex-direction: column; gap: 10px">
+          <span style="font-family: 'JetBrains Mono', monospace; font-size: 11px; letter-spacing: 0.12em; text-transform: uppercase; color: #57534A">BẢNG ĐIỂM HỌC PHẦN (CHUẨN THANG 10)</span>
+          <sc-for list="{{dsBangDiem}}" as="hs" hint-placeholder-count="3">
+            <div style="background: #FAF8F4; border: 1px solid #E5E2DA; border-radius: 4px; padding: 10px 12px; display: flex; align-items: center; justify-content: space-between; gap: 8px">
+              <div style="display: flex; flex-direction: column; gap: 2px">
+                <span style="font-family: 'JetBrains Mono', monospace; font-size: 13px; font-weight: 700; color: #2B2A27">{{hs.hoTen}}</span>
+                <span style="font-family: 'JetBrains Mono', monospace; font-size: 11px; color: #57534A">{{hs.maSv}} · Chuyên cần: {{hs.cc}}</span>
+              </div>
+              <span style="font-family: 'JetBrains Mono', monospace; font-size: 18px; font-weight: 700; font-variant-numeric: tabular-nums; color: #047857">{{hs.tongKet}}</span>
+            </div>
+          </sc-for>
+        </div>
+      </sc-if>
+    </div>
+  </div>
+
+  <nav aria-label="Điều hướng chính" style="background: #FFFDF8; border-top: 1px solid #E5E2DA; padding: 6px 8px; display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 6px">
+    <a href="BangDieuKhien.dc.html" style="min-height: 48px; border-radius: 4px; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 2px; font-family: 'JetBrains Mono', monospace; font-size: 11px; color: #57534A">Tổng quan</a>
+    <a href="KhongGianLop.dc.html" style="min-height: 48px; background: #F3EDE4; border: 1px solid #E5E2DA; border-radius: 4px; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 2px; font-family: 'JetBrains Mono', monospace; font-size: 11px; font-weight: 700; color: #047857">Lớp học</a>
+    <a href="DiemDanhPin.dc.html" style="min-height: 48px; border-radius: 4px; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 2px; font-family: 'JetBrains Mono', monospace; font-size: 11px; color: #57534A">Lịch học</a>
+    <a href="TroLyAiRag.dc.html" style="min-height: 48px; border-radius: 4px; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 2px; font-family: 'JetBrains Mono', monospace; font-size: 11px; color: #57534A">Trợ lý AI</a>
+  </nav>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"accent":{"editor":"color","default":"#059669"},"$preview":{"width":390,"height":844}}'>
+class Component extends DCLogic {
+  constructor(props) {
+    super(props);
+    this.state = { tab: 'kiemtra' };
+  }
+  renderVals() {
+    const accent = this.props.accent ?? '#059669';
+    const tabs = [
+      { id: 'bangtin', nhan: '1.Bảng tin' },
+      { id: 'tailieu', nhan: '2.Tài liệu' },
+      { id: 'baitap', nhan: '3.Bài tập' },
+      { id: 'kiemtra', nhan: '4.Kiểm tra' },
+      { id: 'sodiem', nhan: '5.Sổ điểm' }
+    ];
+    const isSodiem = this.state.tab === 'sodiem';
+    return {
+      accent,
+      laTabKiemTra: !isSodiem,
+      laTabSoDiem: isSodiem,
+      danhSachTab: tabs.map((t) => {
+        const active = t.id === this.state.tab;
+        return {
+          ...t,
+          bg: active ? accent : '#F3EDE4',
+          color: active ? '#FFFFFF' : '#2B2A27',
+          border: active ? accent : '#E5E2DA',
+          chon: () => this.setState({ tab: t.id })
+        };
+      }),
+      dsKiemTra: [
+        { tieuDe: 'Kiểm tra giữa kỳ: Kế thừa & Đa hình', thoiGian: '45 PHÚT', soCau: '20 câu', daNop: '40/42', diemTb: '8.45' },
+        { tieuDe: 'Trắc nghiệm nhanh Tuần 6: Interface & Abstract', thoiGian: '15 PHÚT', soCau: '10 câu', daNop: '42/42', diemTb: '8.90' }
+      ],
+      dsBangDiem: [
+        { hoTen: 'Nguyễn Minh Quân', maSv: 'SV23001', cc: '10.0', tongKet: '9.2' },
+        { hoTen: 'Lê Thu Hà', maSv: 'SV23002', cc: '9.5', tongKet: '8.8' },
+        { hoTen: 'Phạm Hoàng Nam', maSv: 'SV23003', cc: '9.0', tongKet: '8.4' }
+      ]
+    };
+  }
+}
+</script>
+</body>
+</html>

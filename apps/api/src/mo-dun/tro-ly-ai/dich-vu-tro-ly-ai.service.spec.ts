@@ -8,9 +8,11 @@ import {
   VaiTro,
   LoaiBanNhapAI,
   TrangThaiBanNhapAI,
+  MucDoGiaiThich,
+  MucDoKho,
   PayloadJwt,
 } from '@lms/chung';
-import { ForbiddenException, NotFoundException } from '@nestjs/common';
+import { ForbiddenException } from '@nestjs/common';
 
 describe('DichVuTroLyAiService', () => {
   let service: DichVuTroLyAiService;
@@ -70,6 +72,9 @@ describe('DichVuTroLyAiService', () => {
       taiLieu: {
         findUnique: jest.fn(),
       },
+      doanTaiLieu: {
+        findMany: jest.fn().mockResolvedValue([]),
+      },
       hoSoGiaoVien: {
         findUnique: jest.fn(),
       },
@@ -81,6 +86,16 @@ describe('DichVuTroLyAiService', () => {
       },
       baiTap: {
         create: jest.fn(),
+      },
+      baiKiemTra: {
+        create: jest.fn(),
+      },
+      baiDang: {
+        create: jest.fn(),
+      },
+      baiNop: {
+        findUnique: jest.fn(),
+        update: jest.fn(),
       },
     };
 
@@ -138,7 +153,7 @@ describe('DichVuTroLyAiService', () => {
     it('chặn học sinh truy cập tài liệu của lớp mình chưa ghi danh', async () => {
       (prisma.lopHocPhan.findUnique as jest.Mock).mockResolvedValue({ id: 'lop-la-uuid' });
       (prisma.hoSoHocSinh.findUnique as jest.Mock).mockResolvedValue({ id: 'hs-profile-uuid' });
-      (prisma.ghiDanh.findFirst as jest.Mock).mockResolvedValue(null); // Chưa ghi danh
+      (prisma.ghiDanh.findFirst as jest.Mock).mockResolvedValue(null);
 
       await expect(
         service.layDanhSachIdLopDuocPhep(nguoiDungHocSinh, 'lop-la-uuid'),
@@ -155,7 +170,7 @@ describe('DichVuTroLyAiService', () => {
     });
   });
 
-  describe('hoiDap RAG', () => {
+  describe('hoiDap RAG (Nhóm 2: Mức độ giải thích, Từ chối suy đoán & Gợi ý học tập)', () => {
     it('ngăn chặn Prompt Injection và trả về cảnh báo an toàn mà không gọi vector search', async () => {
       khoTroLyAi.taoPhien.mockResolvedValue({ id: 'phien-1', idNguoiDung: 'hs-1', tieuDe: 'Test', ngayTao: new Date() });
       khoTroLyAi.taoTinNhan.mockImplementation(async (d: any) => ({
@@ -174,7 +189,7 @@ describe('DichVuTroLyAiService', () => {
       expect(khoTroLyAi.truyHoiDoanTuongDong).not.toHaveBeenCalled();
     });
 
-    it('trả về câu trả lời có trích dẫn nguồn khi tìm thấy đoạn tài liệu phù hợp', async () => {
+    it('trả về câu trả lời có trích dẫn nguồn kèm gợi ý câu hỏi tiếp theo và bài tập luyện tập', async () => {
       khoTroLyAi.taoPhien.mockResolvedValue({ id: 'phien-1', idNguoiDung: 'hs-1', tieuDe: 'Python', ngayTao: new Date() });
       khoTroLyAi.taoTinNhan.mockImplementation(async (d: any) => ({
         id: 'msg-1',
@@ -182,7 +197,6 @@ describe('DichVuTroLyAiService', () => {
         ngayTao: new Date(),
       }));
 
-      // Mock quyền
       (prisma.hoSoHocSinh.findUnique as jest.Mock).mockResolvedValue({
         id: 'hs-prof',
         danhSachGhiDanh: [{ idLopHocPhan: 'lop-tin-10' }],
@@ -203,14 +217,58 @@ describe('DichVuTroLyAiService', () => {
       ]);
 
       const ketQua = await service.hoiDap(
-        { noiDung: 'Kiểu dữ liệu int trong Python là gì?' },
+        {
+          noiDung: 'Kiểu dữ liệu int trong Python là gì?',
+          mucDoGiaiThich: MucDoGiaiThich.CO_BAN,
+        },
         nguoiDungHocSinh,
       );
 
       expect(ketQua.danhSachTrichDan).toHaveLength(1);
       expect(ketQua.danhSachTrichDan[0].tieuDeTaiLieu).toBe('Giáo trình Python căn bản');
       expect(ketQua.tinNhanTroLy.noiDung).toContain('Giáo trình Python căn bản');
+      expect(ketQua.mucDoGiaiThich).toBe(MucDoGiaiThich.CO_BAN);
+      expect(ketQua.goiYCauHoiTiepTheo?.length).toBe(3);
+      expect(ketQua.goiYBaiTapLuyenTap?.length).toBe(2);
       expect(khoTroLyAi.ghiNhatKy).toHaveBeenCalled();
+    });
+
+    it('từ chối suy đoán khi không có đoạn tài liệu nào vượt ngưỡng tương đồng', async () => {
+      khoTroLyAi.taoPhien.mockResolvedValue({ id: 'phien-2', idNguoiDung: 'hs-1', tieuDe: 'Test', ngayTao: new Date() });
+      khoTroLyAi.taoTinNhan.mockImplementation(async (d: any) => ({
+        id: 'msg-2',
+        ...d,
+        ngayTao: new Date(),
+      }));
+      (prisma.hoSoHocSinh.findUnique as jest.Mock).mockResolvedValue({
+        id: 'hs-prof',
+        danhSachGhiDanh: [{ idLopHocPhan: 'lop-tin-10' }],
+      });
+      dichVuEmbedding.taoVectorEmbedding.mockResolvedValue(new Array(768).fill(0.1));
+      khoTroLyAi.truyHoiDoanTuongDong.mockResolvedValue([
+        {
+          id: 'doan-thap',
+          idTaiLieu: 'tl-1',
+          idLopHocPhan: 'lop-tin-10',
+          soThuTu: 1,
+          noiDung: 'Nội dung về lịch sử máy tính thế hệ thứ nhất.',
+          tieuDeTaiLieu: 'Nhập môn Tin học',
+          loaiTaiLieu: 'GIAO_TRINH',
+          doTuongDong: 0.05,
+        },
+      ]);
+
+      const ketQua = await service.hoiDap(
+        {
+          noiDung: 'Cách cấu hình cụm Kubernetes đa vùng trên đám mây?',
+          mucDoGiaiThich: MucDoGiaiThich.NANG_CAO,
+        },
+        nguoiDungHocSinh,
+      );
+
+      expect(ketQua.danhSachTrichDan).toHaveLength(0);
+      expect(ketQua.tinNhanTroLy.noiDung).toContain('không suy đoán ngoài phạm vi giáo trình');
+      expect(ketQua.mucDoGiaiThich).toBe(MucDoGiaiThich.NANG_CAO);
     });
 
     it('phản hồi lời chào hỏi thân thiện thông qua LLM mà không ép tìm tài liệu', async () => {
@@ -237,7 +295,7 @@ describe('DichVuTroLyAiService', () => {
     });
   });
 
-  describe('BanNhapAI (Human-in-the-loop - Rule 04)', () => {
+  describe('BanNhapAI (Nhóm 3: Human-in-the-loop - Rule 04)', () => {
     it('chỉ giáo viên/admin mới có quyền tạo bản nháp AI', async () => {
       await expect(
         service.taoBanNhapAI(
@@ -283,6 +341,40 @@ describe('DichVuTroLyAiService', () => {
           }),
         }),
       );
+    });
+
+    it('sinh bản nháp câu hỏi theo chương và độ khó từ tài liệu ở trạng thái CHO_DUYET', async () => {
+      (prisma.lopHocPhan.findUnique as jest.Mock).mockResolvedValue({
+        id: 'lop-1',
+        idGiaoVien: 'gv-profile-1',
+        tenLopHocPhan: 'Cấu trúc dữ liệu',
+        monHoc: { tenMonHoc: 'Cấu trúc dữ liệu và Giải thuật' },
+      });
+      (prisma.hoSoGiaoVien.findUnique as jest.Mock).mockResolvedValue({
+        id: 'gv-profile-1',
+        idNguoiDung: 'gv-1-uuid',
+      });
+      khoTroLyAi.taoBanNhap.mockImplementation(async (d: any) => ({
+        id: 'bn-cau-hoi-1',
+        ...d,
+        trangThai: TrangThaiBanNhapAI.CHO_DUYET,
+        ngayTao: new Date(),
+      }));
+
+      const banNhap = await service.sinhBanNhapTuTaiLieu(
+        {
+          idLopHocPhan: 'lop-1',
+          loaiBanNhap: LoaiBanNhapAI.CAU_HOI,
+          chuDe: 'Cây nhị phân tìm kiếm (BST)',
+          mucDoKho: MucDoKho.KHO,
+          soLuongCau: 4,
+        },
+        nguoiDungGiaoVien,
+      );
+
+      expect(banNhap.trangThai).toBe(TrangThaiBanNhapAI.CHO_DUYET);
+      expect((banNhap.duLieuJson as any).danhSachCauHoi).toHaveLength(4);
+      expect(khoTroLyAi.ghiNhatKy).toHaveBeenCalled();
     });
   });
 });

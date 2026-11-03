@@ -30,7 +30,7 @@ import {
   CapNhatTrangThaiBaiKiemTraInput,
 } from '@lms/chung';
 
-@ApiTags('Luyện tập & Thi thử thông minh (AI)')
+@ApiTags('Kiểm tra, Luyện tập & Thi thử')
 @ApiBearerAuth('JWT-auth')
 @UseGuards(XacThucJwtGuard, PhanQuyenCaslGuard)
 @Controller('kiem-tra')
@@ -83,7 +83,7 @@ export class DieuKhienKiemTraController {
 
   @Post('lop/:idLop/sinh-bang-ai')
   @KiemTraQuyen(HanhDong.Tao, DoiTuong.BaiKiemTra)
-  @ApiOperation({ summary: 'Sử dụng AI biên soạn tự động đề luyện tập / thi thử từ tài liệu môn học' })
+  @ApiOperation({ summary: 'Biên soạn tự động đề luyện tập / thi thử từ tài liệu môn học' })
   async sinhDeBangAI(
     @Param('idLop', ParseUUIDPipe) idLop: string,
     @Body(new ZodValidationPipe(sinhDeKiemTraAISchema)) duLieu: SinhDeKiemTraAIInput,
@@ -92,14 +92,14 @@ export class DieuKhienKiemTraController {
     const ketQua = await this.dichVuKiemTra.sinhDeKiemTraBangAI(idLop, duLieu, nguoiDung);
     return {
       thanhCong: true,
-      thongDiep: `Đã biên soạn thông minh đề "${ketQua.tieuDe}" gồm ${duLieu.soLuongCau} câu hỏi trắc nghiệm`,
+      thongDiep: `Đã biên soạn đề "${ketQua.tieuDe}" gồm ${duLieu.soLuongCau} câu hỏi trắc nghiệm`,
       duLieu: ketQua,
     };
   }
 
   @Post(':id/nop-bai')
   @KiemTraQuyen(HanhDong.Tao, DoiTuong.LuotLamBai)
-  @ApiOperation({ summary: 'Nộp bài làm luyện tập / thi thử, chấm điểm tự động và nhận đánh giá AI' })
+  @ApiOperation({ summary: 'Nộp bài làm luyện tập / thi thử và chấm điểm tự động' })
   async nopBai(
     @Param('id', ParseUUIDPipe) id: string,
     @Body(new ZodValidationPipe(nopBaiKiemTraSchema)) duLieu: NopBaiKiemTraInput,

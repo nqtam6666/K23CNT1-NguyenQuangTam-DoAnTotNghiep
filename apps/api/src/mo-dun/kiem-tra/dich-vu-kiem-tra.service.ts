@@ -18,6 +18,7 @@ import {
   LoaiCauHoi,
   LoaiBanNhapAI,
   TrangThaiBanNhapAI,
+  MucDoKho,
   TaoBaiKiemTraInput,
   SinhDeKiemTraAIInput,
   NopBaiKiemTraInput,
@@ -263,8 +264,16 @@ export class DichVuKiemTraService {
             .join('\n\n')
         : `Môn học: ${lop.monHoc?.tenMonHoc || lop.tenLopHocPhan}. Chủ đề: ${duLieu.chuDe}`;
 
-    // 2. Gọi dịch vụ LLM để biên soạn câu hỏi trắc nghiệm
-    const promptBienSoan = `Hãy biên soạn đúng ${duLieu.soLuongCau} câu hỏi trắc nghiệm khách quan (4 phương án A, B, C, D) bằng tiếng Việt chuẩn học thuật cho môn học "${lop.monHoc?.tenMonHoc || lop.tenLopHocPhan}", chủ đề "${duLieu.chuDe}".
+    // 2. Gọi dịch vụ LLM để biên soạn câu hỏi trắc nghiệm theo mức độ khó
+    const mucDoKho = duLieu.mucDoKho || MucDoKho.TRUNG_BINH;
+    const moTaDoKho =
+      mucDoKho === MucDoKho.DE
+        ? 'mức độ DỄ (Nhận biết và Thông hiểu khái niệm cơ bản)'
+        : mucDoKho === MucDoKho.KHO
+          ? 'mức độ KHÓ (Vận dụng cao, phân tích tình huống và tối ưu hóa)'
+          : 'mức độ TRUNG BÌNH (Vận dụng chuẩn theo giáo trình)';
+
+    const promptBienSoan = `Hãy biên soạn đúng ${duLieu.soLuongCau} câu hỏi trắc nghiệm khách quan (4 phương án A, B, C, D) ở ${moTaDoKho} bằng tiếng Việt chuẩn học thuật cho môn học "${lop.monHoc?.tenMonHoc || lop.tenLopHocPhan}", chủ đề "${duLieu.chuDe}".
 Trả về kết quả DUY NHẤT ở định dạng mảng JSON hợp lệ theo cấu trúc sau (không kèm giải thích ngoài JSON):
 [
   {
@@ -356,6 +365,7 @@ Trả về kết quả DUY NHẤT ở định dạng mảng JSON hợp lệ theo
           duLieuJson: {
             chuDe: duLieu.chuDe,
             cheDo: duLieu.cheDo,
+            mucDoKho,
             danhSachCauHoi,
           } as any,
           trangThai: TrangThaiBanNhapAI.DA_DUYET,

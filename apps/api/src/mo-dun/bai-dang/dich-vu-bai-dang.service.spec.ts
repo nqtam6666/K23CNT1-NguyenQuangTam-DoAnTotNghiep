@@ -2,8 +2,8 @@ import { Test, TestingModule } from '@nestjs/testing';
 import { DichVuBaiDangService } from './dich-vu-bai-dang.service';
 import { KhoBaiDangRepository } from './kho-bai-dang.repository';
 import { PrismaService } from '../../cot-loi/csdl/prisma.service';
-import { VaiTro, PayloadJwt } from '@lms/chung';
-import { ForbiddenException, NotFoundException } from '@nestjs/common';
+import { VaiTro, PayloadJwt, ChuDeBaiDang } from '@lms/chung';
+import { ForbiddenException } from '@nestjs/common';
 
 describe('DichVuBaiDangService', () => {
   let service: DichVuBaiDangService;
@@ -61,6 +61,10 @@ describe('DichVuBaiDangService', () => {
       phuHuynhHocSinh: {
         findMany: jest.fn(),
       },
+      nhatKyHeThong: {
+        findMany: jest.fn().mockResolvedValue([]),
+        create: jest.fn().mockResolvedValue({ id: 'nk-1' }),
+      },
     };
 
     const module: TestingModule = await Test.createTestingModule({
@@ -79,12 +83,15 @@ describe('DichVuBaiDangService', () => {
   });
 
   describe('layDanhSachBaiDang', () => {
-    it('cho phép quản trị viên lấy danh sách bài đăng của lớp', async () => {
+    it('cho phép quản trị viên lấy danh sách bài đăng của lớp kèm chủ đề phân loại', async () => {
       mockPrisma.lopHocPhan.findUnique.mockResolvedValue({ id: 'lop-1', idGiaoVien: 'gv-1' });
-      mockKho.layDanhSachTheoLop.mockResolvedValue([{ id: 'bd-1', noiDung: 'Chào cả lớp' }]);
+      mockKho.layDanhSachTheoLop.mockResolvedValue([
+        { id: 'bd-1', noiDung: 'Cho em hỏi công thức tính độ phức tạp thuật toán?', cacBinhLuan: [] },
+      ]);
 
       const ketQua = await service.layDanhSachBaiDang('lop-1', mockAdmin);
       expect(ketQua).toHaveLength(1);
+      expect(ketQua[0].chuDe).toBe(ChuDeBaiDang.HOI_DAP_BAI_HOC);
       expect(mockKho.layDanhSachTheoLop).toHaveBeenCalledWith('lop-1');
     });
 
@@ -107,11 +114,12 @@ describe('DichVuBaiDangService', () => {
 
       const ketQua = await service.taoBaiDang(
         'lop-1',
-        { noiDung: 'Bài mới', ghimDauTrang: true },
+        { noiDung: 'Bài mới', ghimDauTrang: true, chuDe: ChuDeBaiDang.THONG_BAO },
         mockGiaoVien,
       );
 
       expect(ketQua.ghimDauTrang).toBe(true);
+      expect(ketQua.chuDe).toBe(ChuDeBaiDang.THONG_BAO);
       expect(mockKho.taoBaiDang).toHaveBeenCalledWith(
         expect.objectContaining({
           idLopHocPhan: 'lop-1',
@@ -127,17 +135,59 @@ describe('DichVuBaiDangService', () => {
       mockPrisma.ghiDanh.findFirst.mockResolvedValue({ id: 'gd-1' });
       mockKho.taoBaiDang.mockResolvedValue({ id: 'bd-2', noiDung: 'Thắc mắc', ghimDauTrang: false });
 
-      await service.taoBaiDang(
+      const ketQua = await service.taoBaiDang(
         'lop-1',
-        { noiDung: 'Thắc mắc', ghimDauTrang: true },
+        {
+          tieuDe: 'Thắc mắc Chương 2',
+          chuDe: ChuDeBaiDang.HOI_DAP_BAI_HOC,
+          nhanChuong: 'Chương 2',
+          noiDung: 'Thắc mắc',
+          ghimDauTrang: true,
+        },
         mockHocSinh,
       );
 
+      expect(ketQua.tieuDe).toBe('Thắc mắc Chương 2');
+      expect(ketQua.nhanChuong).toBe('Chương 2');
       expect(mockKho.taoBaiDang).toHaveBeenCalledWith(
         expect.objectContaining({
           ghimDauTrang: false,
         }),
       );
+    });
+  });
+
+  describe('danhDauGiaiDap', () => {
+    it('cho phép giảng viên phụ trách đánh dấu câu hỏi đã được giải đáp kèm bình luận chuẩn', async () => {
+      mockKho.timTheoId.mockResolvedValue({
+        id: 'bd-1',
+        idNguoiDung: 'user-hs',
+        lopHocPhan: { id: 'lop-1', idGiaoVien: 'gv-1' },
+        cacBinhLuan: [{ id: '11111111-1111-4111-8111-111111111111', noiDung: 'Lời giải chuẩn' }],
+      });
+      mockPrisma.hoSoGiaoVien.findUnique.mockResolvedValue({ id: 'gv-1' });
+
+      const ketQua = await service.danhDauGiaiDap(
+        'bd-1',
+        { daGiaiDap: true, idBinhLuanGiaiDap: '11111111-1111-4111-8111-111111111111' },
+        mockGiaoVien,
+      );
+
+      expect(ketQua.daGiaiDap).toBe(true);
+      expect(ketQua.idBinhLuanGiaiDap).toBe('11111111-1111-4111-8111-111111111111');
+    });
+
+    it('chặn học sinh khác không phải người đặt câu hỏi đánh dấu giải đáp', async () => {
+      mockKho.timTheoId.mockResolvedValue({
+        id: 'bd-1',
+        idNguoiDung: 'user-hs-khac',
+        lopHocPhan: { id: 'lop-1', idGiaoVien: 'gv-1' },
+        cacBinhLuan: [],
+      });
+
+      await expect(
+        service.danhDauGiaiDap('bd-1', { daGiaiDap: true }, mockHocSinh),
+      ).rejects.toThrow(ForbiddenException);
     });
   });
 

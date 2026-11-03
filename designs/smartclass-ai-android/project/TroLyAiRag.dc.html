@@ -1,0 +1,105 @@
+<!doctype html>
+<html lang="vi">
+<head>
+<meta charset="utf-8">
+<title>05 · Trợ lý Học tập AI (RAG)</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600&amp;family=JetBrains+Mono:wght@400;500;700&amp;display=swap">
+<style>
+body { margin: 0; background: #FAF8F4; color: #2B2A27; font-family: 'Be Vietnam Pro', system-ui, sans-serif; }
+a { color: #059669; text-decoration: none; }
+a:hover { color: #047857; }
+</style>
+</helmet>
+<div style="width: 390px; min-height: 844px; box-sizing: border-box; background: #FAF8F4; color: #2B2A27; display: flex; flex-direction: column; justify-content: space-between">
+  <div style="display: flex; flex-direction: column; gap: 12px; padding: 16px">
+    <div style="background: #FFFDF8; border: 1px solid #E5E2DA; border-radius: 4px; padding: 12px 14px; display: flex; flex-direction: column; gap: 8px">
+      <div style="display: flex; align-items: center; justify-content: space-between; gap: 8px">
+        <div style="display: flex; flex-direction: column; gap: 2px">
+          <span style="font-family: 'JetBrains Mono', monospace; font-size: 11px; letter-spacing: 0.12em; text-transform: uppercase; color: #57534A">TRỢ LÝ HỌC TẬP TRA CỨU HỌC LIỆU</span>
+          <span style="font-family: 'JetBrains Mono', monospace; font-size: 15px; font-weight: 700; color: #2B2A27">Ngữ cảnh: LHP-IT101-01</span>
+        </div>
+        <span style="font-family: 'JetBrains Mono', monospace; font-size: 11px; font-weight: 700; color: #047857; background: #E6F6EF; border: 1px solid #059669; border-radius: 4px; padding: 4px 8px">TRÍCH DẪN NGUỒN</span>
+      </div>
+
+      <div style="display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 6px">
+        <sc-for list="{{dsMucDo}}" as="md" hint-placeholder-count="3">
+          <button type="button" onClick="{{md.chon}}" style="min-height: 44px; background: {{md.bg}}; color: {{md.color}}; border: 1px solid {{md.border}}; border-radius: 4px; font-family: 'JetBrains Mono', monospace; font-size: 11px; font-weight: 700; cursor: pointer">{{md.nhan}}</button>
+        </sc-for>
+      </div>
+    </div>
+
+    <div style="background: #E6F6EF; border: 1px solid #059669; border-radius: 4px; padding: 12px; display: flex; flex-direction: column; gap: 4px; align-self: flex-end; max-width: 310px">
+      <span style="font-family: 'JetBrains Mono', monospace; font-size: 10.5px; font-weight: 700; color: #047857">HỌC SINH HỎI · 14:20</span>
+      <span style="font-size: 13px; line-height: 1.5; color: #2B2A27">Sự khác nhau giữa Abstract Class và Interface trong Java là gì? Khi nào nên dùng Interface?</span>
+    </div>
+
+    <div style="background: #FFFDF8; border: 1px solid #E5E2DA; border-radius: 4px; padding: 14px; display: flex; flex-direction: column; gap: 10px">
+      <div style="display: flex; align-items: center; justify-content: space-between; gap: 8px">
+        <span style="font-family: 'JetBrains Mono', monospace; font-size: 11px; font-weight: 700; color: #047857">PHẢN HỒI TỪ GIÁO TRÌNH LỚP</span>
+        <span style="font-family: 'JetBrains Mono', monospace; font-size: 10.5px; color: #57534A">MỨC ĐỘ: {{mucDoHienTai}}</span>
+      </div>
+
+      <p style="margin: 0; font-size: 13px; line-height: 1.6; color: #2B2A27">1. Abstract Class cho phép khai báo cả thuộc tính trạng thái (state), hàm khởi tạo (constructor) và phương thức đã cài đặt sẵn; một lớp chỉ kế thừa đơn (extends) một Abstract Class.</p>
+      <p style="margin: 0; font-size: 13px; line-height: 1.6; color: #2B2A27">2. Interface định nghĩa bản hợp đồng hành vi; một lớp có thể thực thi (implements) nhiều Interface cùng lúc để tách rời giao diện khỏi cài đặt.</p>
+
+      <div style="background: #FAF8F4; border: 1px solid #E5E2DA; border-radius: 4px; padding: 10px; display: flex; flex-direction: column; gap: 6px">
+        <span style="font-family: 'JetBrains Mono', monospace; font-size: 10.5px; font-weight: 700; color: #57534A">NGUỒN HỌC LIỆU ĐỐI CHIẾU (2 ĐOẠN)</span>
+        <span style="font-family: 'JetBrains Mono', monospace; font-size: 11.5px; color: #047857">[1] Giao_trinh_OOP_Java_Chuong4.pdf · Mục 4.2 (Độ khớp 0.94)</span>
+        <span style="font-family: 'JetBrains Mono', monospace; font-size: 11.5px; color: #047857">[2] Bai_giang_Tuan6_Interface.pdf · Trang 12 (Độ khớp 0.89)</span>
+      </div>
+    </div>
+
+    <div style="background: #FFFDF8; border: 1px solid #E5E2DA; border-radius: 4px; padding: 10px; display: flex; flex-direction: column; gap: 8px">
+      <label for="ai-question" style="font-family: 'JetBrains Mono', monospace; font-size: 11px; color: #57534A">ĐẶT CÂU HỎI TIẾP THEO</label>
+      <div style="display: flex; gap: 8px">
+        <input id="ai-question" type="text" value="Cho ví dụ code đa hình với Interface" style="flex-grow: 1; height: 44px; box-sizing: border-box; padding: 0 10px; background: #FAF8F4; border: 1px solid #E5E2DA; border-radius: 4px; font-size: 13px; color: #2B2A27">
+        <button type="button" style="min-height: 44px; padding: 0 14px; background: {{accent}}; color: #FFFFFF; border: none; border-radius: 4px; font-family: 'Be Vietnam Pro', sans-serif; font-size: 13px; font-weight: 600; cursor: pointer">Gửi</button>
+      </div>
+    </div>
+  </div>
+
+  <nav aria-label="Điều hướng chính" style="background: #FFFDF8; border-top: 1px solid #E5E2DA; padding: 6px 8px; display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 6px">
+    <a href="BangDieuKhien.dc.html" style="min-height: 48px; border-radius: 4px; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 2px; font-family: 'JetBrains Mono', monospace; font-size: 11px; color: #57534A">Tổng quan</a>
+    <a href="KhongGianLop.dc.html" style="min-height: 48px; border-radius: 4px; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 2px; font-family: 'JetBrains Mono', monospace; font-size: 11px; color: #57534A">Lớp học</a>
+    <a href="DiemDanhPin.dc.html" style="min-height: 48px; border-radius: 4px; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 2px; font-family: 'JetBrains Mono', monospace; font-size: 11px; color: #57534A">Lịch học</a>
+    <a href="TroLyAiRag.dc.html" style="min-height: 48px; background: #F3EDE4; border: 1px solid #E5E2DA; border-radius: 4px; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 2px; font-family: 'JetBrains Mono', monospace; font-size: 11px; font-weight: 700; color: #047857">Trợ lý AI</a>
+  </nav>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"accent":{"editor":"color","default":"#059669"},"$preview":{"width":390,"height":844}}'>
+class Component extends DCLogic {
+  constructor(props) {
+    super(props);
+    this.state = { mucDo: 'TRUNG_BINH' };
+  }
+  renderVals() {
+    const accent = this.props.accent ?? '#059669';
+    const items = [
+      { id: 'CO_BAN', nhan: 'CƠ BẢN' },
+      { id: 'TRUNG_BINH', nhan: 'TRUNG BÌNH' },
+      { id: 'NANG_CAO', nhan: 'NÂNG CAO' }
+    ];
+    return {
+      accent,
+      mucDoHienTai: this.state.mucDo,
+      dsMucDo: items.map((m) => {
+        const active = m.id === this.state.mucDo;
+        return {
+          ...m,
+          bg: active ? accent : '#F3EDE4',
+          color: active ? '#FFFFFF' : '#2B2A27',
+          border: active ? accent : '#E5E2DA',
+          chon: () => this.setState({ mucDo: m.id })
+        };
+      })
+    };
+  }
+}
+</script>
+</body>
+</html>

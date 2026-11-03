@@ -1,0 +1,103 @@
+<!doctype html>
+<html lang="vi">
+<head>
+<meta charset="utf-8">
+<title>04 · Lịch học &amp; Điểm danh PIN</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600&amp;family=JetBrains+Mono:wght@400;500;700&amp;display=swap">
+<style>
+body { margin: 0; background: #FAF8F4; color: #2B2A27; font-family: 'Be Vietnam Pro', system-ui, sans-serif; }
+a { color: #059669; text-decoration: none; }
+a:hover { color: #047857; }
+</style>
+</helmet>
+<div style="width: 390px; min-height: 844px; box-sizing: border-box; background: #FAF8F4; color: #2B2A27; display: flex; flex-direction: column; justify-content: space-between">
+  <div style="display: flex; flex-direction: column; gap: 14px; padding: 16px">
+    <div style="background: #FFFDF8; border: 1px solid #E5E2DA; border-radius: 4px; padding: 12px 14px; display: flex; align-items: center; justify-content: space-between; gap: 10px">
+      <div style="display: flex; flex-direction: column; gap: 2px">
+        <span style="font-family: 'JetBrains Mono', monospace; font-size: 11px; letter-spacing: 0.12em; text-transform: uppercase; color: #57534A">THỜI KHÓA BIỂU &amp; CHUYÊN CẦN</span>
+        <span style="font-family: 'JetBrains Mono', monospace; font-size: 16px; font-weight: 700; color: #2B2A27">Tuần 10 · Học kỳ 2</span>
+      </div>
+      <span style="font-family: 'JetBrains Mono', monospace; font-size: 11px; font-weight: 700; color: #0E7490; background: #E6F6F8; border: 1px solid #0EA5C6; border-radius: 4px; padding: 4px 8px">ĐANG MỞ PIN</span>
+    </div>
+
+    <div style="background: #FFFDF8; border: 1px solid #E5E2DA; border-radius: 4px; padding: 16px; display: flex; flex-direction: column; gap: 12px">
+      <div style="display: flex; align-items: center; justify-content: space-between; gap: 8px">
+        <span style="font-family: 'JetBrains Mono', monospace; font-size: 11px; letter-spacing: 0.12em; text-transform: uppercase; color: #57534A">PHIÊN ĐIỂM DANH THÔNG MINH (MÃ PIN 6 SỐ)</span>
+        <span style="font-family: 'JetBrains Mono', monospace; font-size: 11px; font-variant-numeric: tabular-nums; color: #047857">Còn 08:45</span>
+      </div>
+
+      <div style="background: #FAF8F4; border: 1px solid #E5E2DA; border-radius: 4px; padding: 14px; display: flex; flex-direction: column; align-items: center; gap: 6px">
+        <span style="font-family: 'JetBrains Mono', monospace; font-size: 11px; color: #57534A">MÃ ĐIỂM DANH LỚP LHP-IT101-01</span>
+        <span style="font-family: 'JetBrains Mono', monospace; font-size: 28px; font-weight: 700; letter-spacing: 0.22em; font-variant-numeric: tabular-nums; color: {{accent}}">{{maPinHienTai}}</span>
+        <span style="font-size: 12.5px; color: #57534A">Đã điểm danh: {{soLuongCoMat}}/42 học sinh (95.2%)</span>
+      </div>
+
+      <div style="display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px">
+        <button type="button" onClick="{{capMaMoi}}" style="min-height: 44px; background: {{accent}}; color: #FFFFFF; border: none; border-radius: 4px; font-family: 'Be Vietnam Pro', sans-serif; font-size: 13px; font-weight: 600; cursor: pointer">Đổi mã PIN mới</button>
+        <button type="button" style="min-height: 44px; background: #F3EDE4; color: #2B2A27; border: 1px solid #E5E2DA; border-radius: 4px; font-family: 'Be Vietnam Pro', sans-serif; font-size: 13px; font-weight: 600; cursor: pointer">Đóng phiên điểm danh</button>
+      </div>
+    </div>
+
+    <div style="background: #FFFDF8; border: 1px solid #E5E2DA; border-radius: 4px; padding: 14px; display: flex; flex-direction: column; gap: 10px">
+      <span style="font-family: 'JetBrains Mono', monospace; font-size: 11px; letter-spacing: 0.12em; text-transform: uppercase; color: #57534A">LỊCH HỌC TRONG TUẦN</span>
+      <sc-for list="{{dsCaHoc}}" as="ca" hint-placeholder-count="3">
+        <div style="background: #FAF8F4; border: 1px solid #E5E2DA; border-radius: 4px; padding: 10px 12px; display: flex; flex-direction: column; gap: 4px">
+          <div style="display: flex; align-items: center; justify-content: space-between; gap: 8px">
+            <span style="font-family: 'JetBrains Mono', monospace; font-size: 12px; font-weight: 700; color: #047857">{{ca.thu}} · {{ca.tiet}}</span>
+            <span style="font-family: 'JetBrains Mono', monospace; font-size: 11px; color: #57534A">{{ca.phong}}</span>
+          </div>
+          <span style="font-family: 'JetBrains Mono', monospace; font-size: 13.5px; font-weight: 700; color: #2B2A27">{{ca.mon}}</span>
+          <span style="font-size: 12px; color: #57534A">{{ca.ghiChu}}</span>
+        </div>
+      </sc-for>
+    </div>
+
+    <div style="background: #FFFDF8; border: 1px solid #E5E2DA; border-radius: 4px; padding: 14px; display: flex; flex-direction: column; gap: 8px">
+      <span style="font-family: 'JetBrains Mono', monospace; font-size: 11px; letter-spacing: 0.12em; text-transform: uppercase; color: #57534A">ĐƠN XIN NGHỈ PHÉP CHỜ DUYỆT (1)</span>
+      <div style="background: #FAF8F4; border: 1px solid #E5E2DA; border-radius: 4px; padding: 10px 12px; display: flex; align-items: center; justify-content: space-between; gap: 8px">
+        <div style="display: flex; flex-direction: column; gap: 2px">
+          <span style="font-family: 'JetBrains Mono', monospace; font-size: 13px; font-weight: 700; color: #2B2A27">Lê Thu Hà (SV23002)</span>
+          <span style="font-size: 12px; color: #57534A">Lý do: Khám sức khỏe định kỳ</span>
+        </div>
+        <button type="button" style="min-height: 44px; padding: 0 12px; background: #E6F6EF; color: #047857; border: 1px solid #059669; border-radius: 4px; font-family: 'JetBrains Mono', monospace; font-size: 11.5px; font-weight: 700; cursor: pointer">DUYỆT ĐƠN</button>
+      </div>
+    </div>
+  </div>
+
+  <nav aria-label="Điều hướng chính" style="background: #FFFDF8; border-top: 1px solid #E5E2DA; padding: 6px 8px; display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 6px">
+    <a href="BangDieuKhien.dc.html" style="min-height: 48px; border-radius: 4px; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 2px; font-family: 'JetBrains Mono', monospace; font-size: 11px; color: #57534A">Tổng quan</a>
+    <a href="KhongGianLop.dc.html" style="min-height: 48px; border-radius: 4px; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 2px; font-family: 'JetBrains Mono', monospace; font-size: 11px; color: #57534A">Lớp học</a>
+    <a href="DiemDanhPin.dc.html" style="min-height: 48px; background: #F3EDE4; border: 1px solid #E5E2DA; border-radius: 4px; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 2px; font-family: 'JetBrains Mono', monospace; font-size: 11px; font-weight: 700; color: #047857">Lịch học</a>
+    <a href="TroLyAiRag.dc.html" style="min-height: 48px; border-radius: 4px; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 2px; font-family: 'JetBrains Mono', monospace; font-size: 11px; color: #57534A">Trợ lý AI</a>
+  </nav>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"accent":{"editor":"color","default":"#059669"},"$preview":{"width":390,"height":844}}'>
+class Component extends DCLogic {
+  constructor(props) {
+    super(props);
+    this.state = { pinIdx: 0 };
+  }
+  renderVals() {
+    const pins = ['482915', '739204', '615840'];
+    return {
+      accent: this.props.accent ?? '#059669',
+      maPinHienTai: pins[this.state.pinIdx % pins.length],
+      soLuongCoMat: 40,
+      capMaMoi: () => this.setState({ pinIdx: this.state.pinIdx + 1 }),
+      dsCaHoc: [
+        { thu: 'THỨ HAI', tiet: 'Tiết 1 - 3 (07:00 - 09:25)', phong: 'Phòng A302', mon: 'Lập trình hướng đối tượng Java', ghiChu: 'LHP-IT101-01 · Buổi 10: Đa hình & Interface' },
+        { thu: 'THỨ TƯ', tiet: 'Tiết 4 - 6 (09:35 - 12:00)', phong: 'Phòng Lab 2', mon: 'Trí tuệ nhân tạo & Ứng dụng RAG', ghiChu: 'LHP-AI204-02 · Thực hành truy hồi tài liệu' },
+        { thu: 'THỨ SÁU', tiet: 'Tiết 7 - 9 (13:00 - 15:25)', phong: 'Trực tuyến', mon: 'Phát triển Ứng dụng Di động Android', ghiChu: 'LHP-MOB301-01 · Phòng học trực tuyến đang mở' }
+      ]
+    };
+  }
+}
+</script>
+</body>
+</html>

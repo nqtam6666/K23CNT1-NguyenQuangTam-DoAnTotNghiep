@@ -1,0 +1,184 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/bg"
+    android:orientation="vertical">
+
+    <!-- Thanh tiêu đề Lớp học phần -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@color/surface"
+        android:gravity="center_vertical"
+        android:orientation="horizontal"
+        android:padding="12dp">
+
+        <ImageButton
+            android:id="@+id/btnQuayLaiLop"
+            android:layout_width="38dp"
+            android:layout_height="38dp"
+            android:background="@drawable/bg_nut_phu"
+            android:contentDescription="Quay lại"
+            android:padding="8dp"
+            android:src="@drawable/ic_quay_lai" />
+
+        <LinearLayout
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="10dp"
+            android:layout_weight="1"
+            android:orientation="vertical">
+
+            <TextView
+                android:id="@+id/tvMaLopChiTiet"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:fontFamily="monospace"
+                android:text="LHP-TOAN10-01"
+                android:textColor="@color/muted"
+                android:textSize="11sp" />
+
+            <TextView
+                android:id="@+id/tvTenLopChiTiet"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:ellipsize="end"
+                android:fontFamily="monospace"
+                android:maxLines="1"
+                android:text="Chi tiết lớp học phần"
+                android:textColor="@color/text"
+                android:textSize="15sp"
+                android:textStyle="bold" />
+        </LinearLayout>
+
+        <TextView
+            android:id="@+id/tvMaThamGiaChiTiet"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:background="@drawable/bg_nhan_accent"
+            android:fontFamily="monospace"
+            android:paddingHorizontal="8dp"
+            android:paddingVertical="4dp"
+            android:text="MÃ: ------"
+            android:textColor="@color/accent"
+            android:textSize="11sp"
+            android:textStyle="bold" />
+    </LinearLayout>
+
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:background="@color/border" />
+
+    <!-- Thanh 5 Tab chuyển phân hệ -->
+    <HorizontalScrollView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@color/surface"
+        android:scrollbars="none">
+
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:paddingHorizontal="12dp"
+            android:paddingVertical="8dp">
+
+            <TextView
+                android:id="@+id/tabBangTin"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginEnd="8dp"
+                android:background="@drawable/bg_nut_chinh"
+                android:fontFamily="monospace"
+                android:paddingHorizontal="12dp"
+                android:paddingVertical="7dp"
+                android:text="1. Bảng tin"
+                android:textColor="@color/white"
+                android:textSize="12sp"
+                android:textStyle="bold" />
+
+            <TextView
+                android:id="@+id/tabTaiLieu"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginEnd="8dp"
+                android:background="@drawable/bg_nut_phu"
+                android:fontFamily="monospace"
+                android:paddingHorizontal="12dp"
+                android:paddingVertical="7dp"
+                android:text="2. Tài liệu"
+                android:textColor="@color/text"
+                android:textSize="12sp"
+                android:textStyle="bold" />
+
+            <TextView
+                android:id="@+id/tabBaiTap"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginEnd="8dp"
+                android:background="@drawable/bg_nut_phu"
+                android:fontFamily="monospace"
+                android:paddingHorizontal="12dp"
+                android:paddingVertical="7dp"
+                android:text="3. Bài tập"
+                android:textColor="@color/text"
+                android:textSize="12sp"
+                android:textStyle="bold" />
+
+            <TextView
+                android:id="@+id/tabKiemTra"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginEnd="8dp"
+                android:background="@drawable/bg_nut_phu"
+                android:fontFamily="monospace"
+                android:paddingHorizontal="12dp"
+                android:paddingVertical="7dp"
+                android:text="4. Kiểm tra"
+                android:textColor="@color/text"
+                android:textSize="12sp"
+                android:textStyle="bold" />
+
+            <TextView
+                android:id="@+id/tabSoDiem"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:background="@drawable/bg_nut_phu"
+                android:fontFamily="monospace"
+                android:paddingHorizontal="12dp"
+                android:paddingVertical="7dp"
+                android:text="5. Sổ điểm"
+                android:textColor="@color/text"
+                android:textSize="12sp"
+                android:textStyle="bold" />
+        </LinearLayout>
+    </HorizontalScrollView>
+
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:background="@color/border" />
+
+    <!-- Vùng cuộn hiển thị nội dung của Tab đang chọn -->
+    <androidx.swiperefreshlayout.widget.SwipeRefreshLayout
+        android:id="@+id/swipeChiTietLop"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1">
+
+        <ScrollView
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:fillViewport="true">
+
+            <LinearLayout
+                android:id="@+id/khungNoiDungTabLop"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:padding="16dp" />
+        </ScrollView>
+    </androidx.swiperefreshlayout.widget.SwipeRefreshLayout>
+</LinearLayout>

@@ -3,6 +3,7 @@ import {
   Post,
   Get,
   Patch,
+  Delete,
   Param,
   Body,
   Headers,
@@ -23,6 +24,8 @@ import {
   DoiTuong,
   PayloadJwt,
   TrangThaiDiemDanh,
+  diemDanhThuCongSchema,
+  DiemDanhThuCongInput,
   taoMaDiemDanhSchema,
   TaoMaDiemDanhInput,
   diemDanhBangMaSchema,
@@ -33,6 +36,14 @@ import {
   TaoDonXinNghiInput,
   duyetDonXinNghiSchema,
   DuyetDonXinNghiInput,
+  dangKyKhuonMatSchema,
+  DangKyKhuonMatInput,
+  batTatDiemDanhKhuonMatSchema,
+  BatTatDiemDanhKhuonMatInput,
+  diemDanhKhuonMatSchema,
+  DiemDanhKhuonMatInput,
+  diemDanhKhuonMatLopSchema,
+  DiemDanhKhuonMatLopInput,
 } from '@lms/chung';
 
 @ApiTags('Phòng học trực tuyến & Điểm danh')
@@ -129,15 +140,15 @@ export class DieuKhienPhongHoc {
   @ApiOperation({ summary: 'Điểm danh hoặc cập nhật trạng thái điểm danh thủ công' })
   async diemDanhThuCong(
     @Param('idBuoiHoc', ParseUUIDPipe) idBuoiHoc: string,
-    @Body('idHocSinh') idHocSinh: string,
-    @Body('trangThai') trangThai: TrangThaiDiemDanh,
-    @Body('ghiChu') ghiChu?: string,
+    @Body(new ZodValidationPipe(diemDanhThuCongSchema)) duLieu: DiemDanhThuCongInput,
+    @NguoiDungHienTai() nguoiDung: PayloadJwt,
   ) {
     const ketQua = await this.dichVuPhongHoc.diemDanhThuCong(
       idBuoiHoc,
-      idHocSinh,
-      trangThai,
-      ghiChu,
+      duLieu.idHocSinh,
+      duLieu.trangThai as TrangThaiDiemDanh,
+      duLieu.ghiChu,
+      nguoiDung,
     );
 
     return {
@@ -350,6 +361,154 @@ export class DieuKhienPhongHoc {
         duLieu.trangThai === 'DA_DUYET'
           ? 'Đã chấp thuận đơn xin nghỉ phép và cập nhật điểm danh vắng có phép'
           : 'Đã từ chối đơn xin nghỉ phép',
+      duLieu: ketQua,
+    };
+  }
+
+  // ==========================================
+  // ĐIỂM DANH BẰNG KHUÔN MẶT
+  // ==========================================
+
+  /**
+   * Lấy trạng thái hồ sơ khuôn mặt cá nhân
+   */
+  @Get('khuon-mat/ho-so')
+  @ApiBearerAuth('JWT-auth')
+  @UseGuards(XacThucJwtGuard, PhanQuyenCaslGuard)
+  @KiemTraQuyen(HanhDong.Doc, DoiTuong.DuLieuKhuonMat)
+  @ApiOperation({ summary: 'Kiểm tra trạng thái đăng ký dữ liệu khuôn mặt cá nhân' })
+  async layHoSoKhuonMat(@NguoiDungHienTai() nguoiDung: PayloadJwt) {
+    const duLieu = await this.dichVuPhongHoc.layHoSoKhuonMatCaNhan(nguoiDung);
+
+    return {
+      thanhCong: true,
+      duLieu,
+    };
+  }
+
+  /**
+   * Đăng ký hoặc cập nhật vector khuôn mặt cá nhân
+   */
+  @Post('khuon-mat/dang-ky')
+  @ApiBearerAuth('JWT-auth')
+  @UseGuards(XacThucJwtGuard, PhanQuyenCaslGuard)
+  @KiemTraQuyen(HanhDong.Tao, DoiTuong.DuLieuKhuonMat)
+  @ApiOperation({ summary: 'Đăng ký hoặc cập nhật mẫu đặc trưng khuôn mặt cá nhân' })
+  async dangKyKhuonMat(
+    @Body(new ZodValidationPipe(dangKyKhuonMatSchema)) duLieu: DangKyKhuonMatInput,
+    @NguoiDungHienTai() nguoiDung: PayloadJwt,
+  ) {
+    const ketQua = await this.dichVuPhongHoc.dangKyKhuonMat(duLieu, nguoiDung);
+
+    return {
+      thanhCong: true,
+      thongDiep: 'Đã lưu dữ liệu khuôn mặt thành công',
+      duLieu: ketQua,
+    };
+  }
+
+  /**
+   * Xóa dữ liệu khuôn mặt cá nhân
+   */
+  @Delete('khuon-mat/ho-so')
+  @ApiBearerAuth('JWT-auth')
+  @UseGuards(XacThucJwtGuard, PhanQuyenCaslGuard)
+  @KiemTraQuyen(HanhDong.Xoa, DoiTuong.DuLieuKhuonMat)
+  @ApiOperation({ summary: 'Xóa dữ liệu khuôn mặt đã đăng ký của cá nhân' })
+  async xoaHoSoKhuonMat(@NguoiDungHienTai() nguoiDung: PayloadJwt) {
+    const duLieu = await this.dichVuPhongHoc.xoaHoSoKhuonMatCaNhan(nguoiDung);
+
+    return {
+      thanhCong: true,
+      thongDiep: 'Đã xóa dữ liệu khuôn mặt khỏi hồ sơ của bạn',
+      duLieu,
+    };
+  }
+
+  /**
+   * Giáo viên bật hoặc tắt phiên điểm danh khuôn mặt cho buổi học
+   */
+  @Patch('buoi-hoc/:idBuoiHoc/khuon-mat')
+  @ApiBearerAuth('JWT-auth')
+  @UseGuards(XacThucJwtGuard, PhanQuyenCaslGuard)
+  @KiemTraQuyen(HanhDong.Sua, DoiTuong.BanGhiDiemDanh)
+  @ApiOperation({ summary: 'Bật hoặc tắt phiên điểm danh bằng khuôn mặt cho buổi học' })
+  async batTatDiemDanhKhuonMat(
+    @Param('idBuoiHoc', ParseUUIDPipe) idBuoiHoc: string,
+    @Body(new ZodValidationPipe(batTatDiemDanhKhuonMatSchema)) duLieu: BatTatDiemDanhKhuonMatInput,
+    @NguoiDungHienTai() nguoiDung: PayloadJwt,
+  ) {
+    const ketQua = await this.dichVuPhongHoc.batTatDiemDanhKhuonMat(idBuoiHoc, duLieu, nguoiDung);
+
+    return {
+      thanhCong: true,
+      thongDiep: duLieu.batDiemDanhKhuonMat
+        ? 'Đã mở phiên điểm danh bằng khuôn mặt'
+        : 'Đã đóng phiên điểm danh bằng khuôn mặt',
+      duLieu: ketQua,
+    };
+  }
+
+  /**
+   * Học sinh tự điểm danh bằng khuôn mặt trong buổi học
+   */
+  @Post('buoi-hoc/:idBuoiHoc/diem-danh-khuon-mat')
+  @ApiBearerAuth('JWT-auth')
+  @UseGuards(XacThucJwtGuard, PhanQuyenCaslGuard)
+  @KiemTraQuyen(HanhDong.DiemDanh, DoiTuong.BanGhiDiemDanh)
+  @ApiOperation({ summary: 'Học sinh tự điểm danh bằng nhận diện khuôn mặt' })
+  async diemDanhBangKhuonMat(
+    @Param('idBuoiHoc', ParseUUIDPipe) idBuoiHoc: string,
+    @Body(new ZodValidationPipe(diemDanhKhuonMatSchema)) duLieu: DiemDanhKhuonMatInput,
+    @NguoiDungHienTai() nguoiDung: PayloadJwt,
+  ) {
+    const ketQua = await this.dichVuPhongHoc.diemDanhBangKhuonMat(idBuoiHoc, duLieu, nguoiDung);
+
+    return {
+      thanhCong: true,
+      thongDiep: `Điểm danh thành công (độ khớp ${Math.round(ketQua.doTuongDong * 100)}%)`,
+      duLieu: ketQua,
+    };
+  }
+
+  /**
+   * Giáo viên lấy danh sách mẫu vector khuôn mặt của lớp để đối soát camera tại lớp
+   */
+  @Get('lop/:idLop/du-lieu-khuon-mat')
+  @ApiBearerAuth('JWT-auth')
+  @UseGuards(XacThucJwtGuard, PhanQuyenCaslGuard)
+  @KiemTraQuyen(HanhDong.Sua, DoiTuong.BanGhiDiemDanh)
+  @ApiOperation({ summary: 'Lấy danh sách dữ liệu khuôn mặt học sinh trong lớp học phần' })
+  async layDanhSachKhuonMatLop(
+    @Param('idLop', ParseUUIDPipe) idLop: string,
+    @NguoiDungHienTai() nguoiDung: PayloadJwt,
+  ) {
+    const duLieu = await this.dichVuPhongHoc.layDanhSachKhuonMatLop(idLop, nguoiDung);
+
+    return {
+      thanhCong: true,
+      duLieu,
+    };
+  }
+
+  /**
+   * Giáo viên xác nhận lưu điểm danh hàng loạt từ camera lớp học
+   */
+  @Post('buoi-hoc/:idBuoiHoc/diem-danh-khuon-mat-lop')
+  @ApiBearerAuth('JWT-auth')
+  @UseGuards(XacThucJwtGuard, PhanQuyenCaslGuard)
+  @KiemTraQuyen(HanhDong.Sua, DoiTuong.BanGhiDiemDanh)
+  @ApiOperation({ summary: 'Ghi nhận hàng loạt kết quả điểm danh khuôn mặt từ camera lớp học' })
+  async diemDanhKhuonMatTheoLop(
+    @Param('idBuoiHoc', ParseUUIDPipe) idBuoiHoc: string,
+    @Body(new ZodValidationPipe(diemDanhKhuonMatLopSchema)) duLieu: DiemDanhKhuonMatLopInput,
+    @NguoiDungHienTai() nguoiDung: PayloadJwt,
+  ) {
+    const ketQua = await this.dichVuPhongHoc.diemDanhKhuonMatTheoLop(idBuoiHoc, duLieu, nguoiDung);
+
+    return {
+      thanhCong: true,
+      thongDiep: `Đã điểm danh ${ketQua.soLuongCapNhat} học sinh bằng nhận diện khuôn mặt`,
       duLieu: ketQua,
     };
   }

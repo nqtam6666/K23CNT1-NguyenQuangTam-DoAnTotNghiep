@@ -11,9 +11,11 @@ import { AccessToken, WebhookReceiver } from 'livekit-server-sdk';
 import { PrismaService } from '../../cot-loi/csdl/prisma.service';
 import { KhoPhongHoc } from './kho-phong-hoc.repository';
 import { DichVuCaiDatService } from '../cai-dat/dich-vu-cai-dat.service';
+import { chuanHoaVectorKhuonMat, doiSoatVectorKhuonMat } from './tien-ich-khuon-mat';
 import {
   KetQuaTokenLiveKit,
   PayloadJwt,
+  PhuongThucDiemDanh,
   TrangThaiBuoiHoc,
   TrangThaiDiemDanh,
   TrangThaiDonXinNghi,
@@ -21,8 +23,15 @@ import {
   DiemDanhHangLoatInput,
   TaoDonXinNghiInput,
   DuyetDonXinNghiInput,
+  DangKyKhuonMatInput,
+  BatTatDiemDanhKhuonMatInput,
+  DiemDanhKhuonMatInput,
+  DiemDanhKhuonMatLopInput,
   ThongKeChuyenCanLop,
   ChiTietChuyenCanHocSinh,
+  HoSoKhuonMat,
+  MucDuLieuKhuonMatLop,
+  KetQuaDiemDanhKhuonMat,
 } from '@lms/chung';
 
 @Injectable()
@@ -38,6 +47,63 @@ export class DichVuPhongHoc {
 
   private layIdNguoiDung(nguoiDung: PayloadJwt): string {
     return nguoiDung.sub || (nguoiDung as any).id;
+  }
+
+  private laQuanTriHoacGiaoVu(vaiTro: VaiTro): boolean {
+    return vaiTro === VaiTro.QUAN_TRI_VIEN || vaiTro === VaiTro.GIAO_VU;
+  }
+
+  private kiemTraQuyenQuanLyLop(
+    idNguoiDungGiaoVien: string | undefined,
+    nguoiDung: PayloadJwt,
+    thongDiepLoi: string,
+  ): void {
+    const idNguoiDung = this.layIdNguoiDung(nguoiDung);
+    const laQuanTri = this.laQuanTriHoacGiaoVu(nguoiDung.vaiTro);
+    const laGiaoVienLop = Boolean(idNguoiDungGiaoVien && idNguoiDungGiaoVien === idNguoiDung);
+
+    if (!laQuanTri && !laGiaoVienLop) {
+      throw new ForbiddenException({
+        thanhCong: false,
+        thongDiep: thongDiepLoi,
+      });
+    }
+  }
+
+  private tinhTrangThaiVaDiMuon(thoiGianBDBuoiHoc: Date | string, soPhutChoPhepTre: number) {
+    const phutTre =
+      (Date.now() - new Date(thoiGianBDBuoiHoc).getTime()) / (60 * 1000);
+    const trangThai =
+      phutTre > soPhutChoPhepTre ? TrangThaiDiemDanh.DI_MUON : TrangThaiDiemDanh.CO_MAT;
+    return {
+      trangThai,
+      phutTre: Math.max(0, Math.round(phutTre)),
+    };
+  }
+
+  private async ghiNhatKyKhuonMat(
+    idNguoiDung: string,
+    hanhDong: string,
+    idThucThe: string,
+    chiTiet: Record<string, unknown>,
+  ): Promise<void> {
+    if (!this.prisma.nhatKyHeThong?.create) {
+      return;
+    }
+
+    try {
+      await this.prisma.nhatKyHeThong.create({
+        data: {
+          idNguoiDung,
+          hanhDong,
+          thucThe: 'DuLieuKhuonMat',
+          idThucThe,
+          chiTiet: chiTiet as any,
+        },
+      });
+    } catch {
+      // Không chặn luồng chính nếu bảng nhật ký chưa sẵn sàng
+    }
   }
 
   /**
@@ -175,6 +241,7 @@ export class DichVuPhongHoc {
               hoSo.id,
               TrangThaiDiemDanh.CO_MAT,
               'Tham gia phòng học trực tuyến',
+              PhuongThucDiemDanh.TRUC_TUYEN,
             );
           }
         }
@@ -285,6 +352,7 @@ export class DichVuPhongHoc {
               hoSo.id,
               TrangThaiDiemDanh.CO_MAT,
               'Có mặt qua phòng học trực tuyến',
+              PhuongThucDiemDanh.TRUC_TUYEN,
             );
           }
         }
@@ -322,7 +390,14 @@ export class DichVuPhongHoc {
       });
     }
 
-    if (nguoiDung.vaiTro === VaiTro.HOC_SINH) {
+    let idHocSinhCaNhan: string | null = null;
+    if (nguoiDung.vaiTro === VaiTro.GIAO_VIEN) {
+      this.kiemTraQuyenQuanLyLop(
+        lopHocPhan.giaoVien?.idNguoiDung,
+        nguoiDung,
+        'Bạn không có quyền xem báo cáo điểm danh của lớp học phần này.',
+      );
+    } else if (nguoiDung.vaiTro === VaiTro.HOC_SINH) {
       const hoSo = await this.prisma.hoSoHocSinh.findUnique({
         where: { idNguoiDung },
       });
@@ -346,6 +421,7 @@ export class DichVuPhongHoc {
           thongDiep: 'Bạn không thuộc lớp học phần này',
         });
       }
+      idHocSinhCaNhan = hoSo.id;
     }
 
     const buoiHoc = await this.prisma.buoiHoc.findUnique({
@@ -354,11 +430,18 @@ export class DichVuPhongHoc {
     const nhatKy = await this.khoPhongHoc.layNhatKyTheoBuoi(idBuoiHoc);
     const diemDanh = await this.khoPhongHoc.layDanhSachDiemDanh(idBuoiHoc);
 
+    const danhSachNhatKy = idHocSinhCaNhan
+      ? nhatKy.filter((nk: any) => nk.idNguoiDung === idNguoiDung)
+      : nhatKy;
+    const danhSachDiemDanh = idHocSinhCaNhan
+      ? diemDanh.filter((dd: any) => dd.idHocSinh === idHocSinhCaNhan)
+      : diemDanh;
+
     return {
       idBuoiHoc,
       buoiHoc,
-      danhSachNhatKy: nhatKy,
-      danhSachDiemDanh: diemDanh,
+      danhSachNhatKy,
+      danhSachDiemDanh,
     };
   }
 
@@ -369,9 +452,45 @@ export class DichVuPhongHoc {
     idBuoiHoc: string,
     idHocSinh: string,
     trangThai: TrangThaiDiemDanh,
-    ghiChu?: string,
+    ghiChu: string | undefined,
+    nguoiDung: PayloadJwt,
   ) {
-    return this.khoPhongHoc.diemDanhHocSinh(idBuoiHoc, idHocSinh, trangThai, ghiChu);
+    const buoiHoc = await this.khoPhongHoc.timBuoiHocTheoId(idBuoiHoc);
+    if (!buoiHoc) {
+      throw new NotFoundException({
+        thanhCong: false,
+        thongDiep: 'Buổi học không tồn tại',
+      });
+    }
+
+    this.kiemTraQuyenQuanLyLop(
+      buoiHoc.lopHocPhan?.giaoVien?.idNguoiDung,
+      nguoiDung,
+      'Chỉ giáo viên phụ trách lớp học phần mới được phép điểm danh.',
+    );
+
+    const daGhiDanh = await this.prisma.ghiDanh.findUnique({
+      where: {
+        idLopHocPhan_idHocSinh: {
+          idLopHocPhan: buoiHoc.idLopHocPhan,
+          idHocSinh,
+        },
+      },
+    });
+    if (!daGhiDanh) {
+      throw new BadRequestException({
+        thanhCong: false,
+        thongDiep: 'Học sinh không thuộc danh sách ghi danh của lớp học phần này',
+      });
+    }
+
+    return this.khoPhongHoc.diemDanhHocSinh(
+      idBuoiHoc,
+      idHocSinh,
+      trangThai,
+      ghiChu,
+      PhuongThucDiemDanh.THU_CONG,
+    );
   }
 
   /**
@@ -414,6 +533,8 @@ export class DichVuPhongHoc {
           update: {
             trangThai: muc.trangThai as TrangThaiDiemDanh,
             ghiChu: muc.ghiChu,
+            phuongThuc: PhuongThucDiemDanh.THU_CONG,
+            doTinCay: null,
             ngayDiemDanh: new Date(),
           },
           create: {
@@ -421,6 +542,8 @@ export class DichVuPhongHoc {
             idHocSinh: muc.idHocSinh,
             trangThai: muc.trangThai as TrangThaiDiemDanh,
             ghiChu: muc.ghiChu,
+            phuongThuc: PhuongThucDiemDanh.THU_CONG,
+            doTinCay: null,
           },
         }),
       ),
@@ -561,6 +684,7 @@ export class DichVuPhongHoc {
       hoSo.id,
       TrangThaiDiemDanh.CO_MAT,
       'Điểm danh thông minh bằng mã phiên',
+      PhuongThucDiemDanh.MA_PIN,
     );
   }
 
@@ -631,6 +755,7 @@ export class DichVuPhongHoc {
           idHocSinh,
           TrangThaiDiemDanh.VANG_CO_PHEP,
           'Đã duyệt đơn xin nghỉ phép',
+          PhuongThucDiemDanh.DON_XIN_NGHI,
         );
         soVangCoPhep++;
         continue;
@@ -653,6 +778,7 @@ export class DichVuPhongHoc {
             idHocSinh,
             TrangThaiDiemDanh.DI_MUON,
             `Vào phòng trực tuyến muộn ${Math.round(phutTre)} phút`,
+            PhuongThucDiemDanh.TRUC_TUYEN,
           );
           soDiMuon++;
         } else {
@@ -661,13 +787,14 @@ export class DichVuPhongHoc {
             idHocSinh,
             TrangThaiDiemDanh.CO_MAT,
             'Hiện diện đầy đủ trên phòng học trực tuyến',
+            PhuongThucDiemDanh.TRUC_TUYEN,
           );
           soCoMat++;
         }
         continue;
       }
 
-      // Nếu đã điểm danh bằng mã PIN hoặc thủ công trước đó thì giữ nguyên
+      // Nếu đã điểm danh bằng mã PIN, khuôn mặt hoặc thủ công trước đó thì giữ nguyên
       const hienCo = mapHienCo.get(idHocSinh);
       if (hienCo) {
         if (hienCo.trangThai === TrangThaiDiemDanh.CO_MAT) soCoMat++;
@@ -683,6 +810,7 @@ export class DichVuPhongHoc {
         idHocSinh,
         TrangThaiDiemDanh.VANG_KHONG_PHEP,
         'Chưa ghi nhận tham gia buổi học',
+        PhuongThucDiemDanh.THU_CONG,
       );
       soVangKhongPhep++;
     }
@@ -712,6 +840,56 @@ export class DichVuPhongHoc {
         thanhCong: false,
         thongDiep: 'Buổi học không thuộc lớp học phần này.',
       });
+    }
+
+    if (nguoiDung.vaiTro === VaiTro.HOC_SINH) {
+      const hoSo = await this.prisma.hoSoHocSinh.findUnique({
+        where: { idNguoiDung },
+      });
+      if (!hoSo) {
+        throw new ForbiddenException({
+          thanhCong: false,
+          thongDiep: 'Hồ sơ học sinh chưa được khởi tạo.',
+        });
+      }
+      const daGhiDanh = await this.prisma.ghiDanh.findUnique({
+        where: {
+          idLopHocPhan_idHocSinh: {
+            idLopHocPhan,
+            idHocSinh: hoSo.id,
+          },
+        },
+      });
+      if (!daGhiDanh) {
+        throw new ForbiddenException({
+          thanhCong: false,
+          thongDiep: 'Bạn không thuộc danh sách lớp học phần này.',
+        });
+      }
+    } else if (nguoiDung.vaiTro === VaiTro.PHU_HUYNH) {
+      const lienKet = await this.prisma.phuHuynhHocSinh.findMany({
+        where: { idPhuHuynh: idNguoiDung },
+        select: { idHocSinh: true },
+      });
+      const dsIdHocSinh = lienKet.map((lk) => lk.idHocSinh);
+      if (dsIdHocSinh.length === 0) {
+        throw new ForbiddenException({
+          thanhCong: false,
+          thongDiep: 'Tài khoản phụ huynh chưa được liên kết với học sinh nào.',
+        });
+      }
+      const coConTrongLop = await this.prisma.ghiDanh.findFirst({
+        where: {
+          idLopHocPhan,
+          idHocSinh: { in: dsIdHocSinh },
+        },
+      });
+      if (!coConTrongLop) {
+        throw new ForbiddenException({
+          thanhCong: false,
+          thongDiep: 'Học sinh liên kết không thuộc lớp học phần này.',
+        });
+      }
     }
 
     return this.khoPhongHoc.taoDonXinNghi(
@@ -778,6 +956,7 @@ export class DichVuPhongHoc {
         don.nguoiGui.hoSoHocSinh.id,
         TrangThaiDiemDanh.VANG_CO_PHEP,
         `Đơn xin nghỉ đã duyệt: ${don.lyDo.slice(0, 100)}`,
+        PhuongThucDiemDanh.DON_XIN_NGHI,
       );
     }
 
@@ -791,9 +970,15 @@ export class DichVuPhongHoc {
     idLopHocPhan: string,
     nguoiDung: PayloadJwt,
   ): Promise<ThongKeChuyenCanLop> {
+    const idNguoiDung = this.layIdNguoiDung(nguoiDung);
     const lop = await this.prisma.lopHocPhan.findUnique({
       where: { id: idLopHocPhan },
       include: {
+        giaoVien: {
+          select: {
+            idNguoiDung: true,
+          },
+        },
         cacBuoiHoc: {
           include: {
             banGhiDiemDanh: true,
@@ -835,12 +1020,56 @@ export class DichVuPhongHoc {
       });
     }
 
-    const soDonChoDuyet = await this.prisma.donXinNghi.count({
-      where: {
-        buoiHoc: { idLopHocPhan },
-        trangThai: TrangThaiDonXinNghi.CHO_DUYET,
-      },
-    });
+    let danhSachGhiDanhLoc = lop.danhSachGhiDanh;
+    let laVaiTroQuanLyLop = this.laQuanTriHoacGiaoVu(nguoiDung.vaiTro);
+
+    if (nguoiDung.vaiTro === VaiTro.GIAO_VIEN) {
+      this.kiemTraQuyenQuanLyLop(
+        lop.giaoVien?.idNguoiDung,
+        nguoiDung,
+        'Chỉ giáo viên phụ trách lớp học phần mới được xem thống kê chuyên cần.',
+      );
+      laVaiTroQuanLyLop = true;
+    } else if (nguoiDung.vaiTro === VaiTro.HOC_SINH) {
+      const hoSo = await this.prisma.hoSoHocSinh.findUnique({
+        where: { idNguoiDung },
+      });
+      if (!hoSo) {
+        throw new ForbiddenException({
+          thanhCong: false,
+          thongDiep: 'Bạn không có quyền truy cập lớp học phần này.',
+        });
+      }
+      danhSachGhiDanhLoc = lop.danhSachGhiDanh.filter((gd) => gd.idHocSinh === hoSo.id);
+      if (danhSachGhiDanhLoc.length === 0) {
+        throw new ForbiddenException({
+          thanhCong: false,
+          thongDiep: 'Bạn không thuộc danh sách lớp học phần này.',
+        });
+      }
+    } else if (nguoiDung.vaiTro === VaiTro.PHU_HUYNH) {
+      const lienKet = await this.prisma.phuHuynhHocSinh.findMany({
+        where: { idPhuHuynh: idNguoiDung },
+        select: { idHocSinh: true },
+      });
+      const dsIdCon = new Set(lienKet.map((lk) => lk.idHocSinh));
+      danhSachGhiDanhLoc = lop.danhSachGhiDanh.filter((gd) => dsIdCon.has(gd.idHocSinh));
+      if (danhSachGhiDanhLoc.length === 0) {
+        throw new ForbiddenException({
+          thanhCong: false,
+          thongDiep: 'Học sinh liên kết không thuộc lớp học phần này.',
+        });
+      }
+    }
+
+    const soDonChoDuyet = laVaiTroQuanLyLop
+      ? await this.prisma.donXinNghi.count({
+          where: {
+            buoiHoc: { idLopHocPhan },
+            trangThai: TrangThaiDonXinNghi.CHO_DUYET,
+          },
+        })
+      : 0;
 
     const nguongBuoiVangCamThi =
       (await this.dichVuCaiDat?.layGiaTriSo('diem_danh.nguong_buoi_vang_cam_thi', 3)) ?? 3;
@@ -861,7 +1090,7 @@ export class DichVuPhongHoc {
     const cacBuoiCoDiemDanh = lop.cacBuoiHoc.filter((b) => b.banGhiDiemDanh.length > 0);
     const soBuoiDaToChuc = cacBuoiCoDiemDanh.length;
 
-    const danhSachHocSinh: ChiTietChuyenCanHocSinh[] = lop.danhSachGhiDanh.map((gd) => {
+    const danhSachHocSinh: ChiTietChuyenCanHocSinh[] = danhSachGhiDanhLoc.map((gd) => {
       const hs = gd.hocSinh;
       let soBuoiCoMat = 0;
       let soBuoiDiMuon = 0;
@@ -949,6 +1178,386 @@ export class DichVuPhongHoc {
       soHocSinhNguyCoCamThi,
       soDonXinNghiChoDuyet: soDonChoDuyet,
       danhSachHocSinh,
+    };
+  }
+
+  // ==========================================
+  // ĐIỂM DANH BẰNG KHUÔN MẶT
+  // ==========================================
+
+  /**
+   * Lấy trạng thái đăng ký dữ liệu khuôn mặt cá nhân (không trả vector thô)
+   */
+  async layHoSoKhuonMatCaNhan(nguoiDung: PayloadJwt): Promise<HoSoKhuonMat> {
+    const idNguoiDung = this.layIdNguoiDung(nguoiDung);
+    const banGhi = await this.khoPhongHoc.timDuLieuKhuonMatTheoNguoiDung(idNguoiDung);
+
+    if (!banGhi || !banGhi.kichHoat) {
+      return {
+        daDangKy: false,
+        soMauChup: 0,
+        diemChatLuong: null,
+        kichHoat: false,
+        ngayDangKy: null,
+        ngayCapNhat: null,
+      };
+    }
+
+    return {
+      daDangKy: true,
+      soMauChup: banGhi.soMauChup,
+      diemChatLuong: banGhi.diemChatLuong ?? null,
+      kichHoat: banGhi.kichHoat,
+      ngayDangKy: banGhi.ngayDangKy,
+      ngayCapNhat: banGhi.ngayCapNhat,
+    };
+  }
+
+  /**
+   * Đăng ký hoặc cập nhật mẫu đặc trưng khuôn mặt cá nhân
+   */
+  async dangKyKhuonMat(duLieu: DangKyKhuonMatInput, nguoiDung: PayloadJwt): Promise<HoSoKhuonMat> {
+    const idNguoiDung = this.layIdNguoiDung(nguoiDung);
+    let vectorChuanHoa: number[];
+    try {
+      vectorChuanHoa = chuanHoaVectorKhuonMat(duLieu.vectorKhuonMat);
+    } catch {
+      throw new BadRequestException({
+        thanhCong: false,
+        thongDiep: 'Dữ liệu khuôn mặt không hợp lệ. Vui lòng chụp lại nơi đủ ánh sáng.',
+      });
+    }
+
+    const banGhi = await this.khoPhongHoc.luuDuLieuKhuonMat(
+      idNguoiDung,
+      vectorChuanHoa,
+      duLieu.soMauChup,
+      duLieu.diemChatLuong,
+    );
+
+    await this.ghiNhatKyKhuonMat(idNguoiDung, 'DANG_KY_KHUON_MAT', banGhi.id, {
+      soMauChup: banGhi.soMauChup,
+      diemChatLuong: banGhi.diemChatLuong,
+    });
+
+    return {
+      daDangKy: true,
+      soMauChup: banGhi.soMauChup,
+      diemChatLuong: banGhi.diemChatLuong ?? null,
+      kichHoat: banGhi.kichHoat,
+      ngayDangKy: banGhi.ngayDangKy,
+      ngayCapNhat: banGhi.ngayCapNhat,
+    };
+  }
+
+  /**
+   * Xóa dữ liệu khuôn mặt cá nhân theo yêu cầu người dùng
+   */
+  async xoaHoSoKhuonMatCaNhan(nguoiDung: PayloadJwt) {
+    const idNguoiDung = this.layIdNguoiDung(nguoiDung);
+    const daXoa = await this.khoPhongHoc.xoaDuLieuKhuonMat(idNguoiDung);
+    if (daXoa) {
+      await this.ghiNhatKyKhuonMat(idNguoiDung, 'XOA_KHUON_MAT', daXoa.id, {
+        daXoa: true,
+      });
+    }
+
+    return {
+      daXoa: Boolean(daXoa),
+    };
+  }
+
+  /**
+   * Giáo viên bật hoặc tắt phiên điểm danh khuôn mặt cho buổi học
+   */
+  async batTatDiemDanhKhuonMat(
+    idBuoiHoc: string,
+    duLieu: BatTatDiemDanhKhuonMatInput,
+    nguoiDung: PayloadJwt,
+  ) {
+    const buoiHoc = await this.khoPhongHoc.timBuoiHocTheoId(idBuoiHoc);
+    if (!buoiHoc) {
+      throw new NotFoundException({
+        thanhCong: false,
+        thongDiep: 'Buổi học không tồn tại',
+      });
+    }
+
+    this.kiemTraQuyenQuanLyLop(
+      buoiHoc.lopHocPhan?.giaoVien?.idNguoiDung,
+      nguoiDung,
+      'Chỉ giáo viên phụ trách lớp học phần mới được điều khiển phiên điểm danh khuôn mặt.',
+    );
+
+    const han = duLieu.batDiemDanhKhuonMat
+      ? new Date(Date.now() + duLieu.thoiHanPhut * 60 * 1000)
+      : null;
+
+    return this.khoPhongHoc.capNhatTrangThaiDiemDanhKhuonMat(
+      idBuoiHoc,
+      duLieu.batDiemDanhKhuonMat,
+      han,
+    );
+  }
+
+  /**
+   * Học sinh tự điểm danh bằng khuôn mặt kèm kiểm tra ngưỡng khớp và đi muộn
+   */
+  async diemDanhBangKhuonMat(
+    idBuoiHoc: string,
+    duLieu: DiemDanhKhuonMatInput,
+    nguoiDung: PayloadJwt,
+  ): Promise<KetQuaDiemDanhKhuonMat> {
+    const idNguoiDung = this.layIdNguoiDung(nguoiDung);
+    const buoiHoc = await this.khoPhongHoc.timBuoiHocTheoId(idBuoiHoc);
+    if (!buoiHoc) {
+      throw new NotFoundException({
+        thanhCong: false,
+        thongDiep: 'Buổi học không tồn tại',
+      });
+    }
+
+    const hoSo = await this.prisma.hoSoHocSinh.findUnique({
+      where: { idNguoiDung },
+    });
+    if (!hoSo) {
+      throw new ForbiddenException({
+        thanhCong: false,
+        thongDiep: 'Chỉ tài khoản học sinh mới có thể tự điểm danh bằng khuôn mặt.',
+      });
+    }
+
+    const daGhiDanh = await this.prisma.ghiDanh.findUnique({
+      where: {
+        idLopHocPhan_idHocSinh: {
+          idLopHocPhan: buoiHoc.idLopHocPhan,
+          idHocSinh: hoSo.id,
+        },
+      },
+    });
+    if (!daGhiDanh) {
+      throw new ForbiddenException({
+        thanhCong: false,
+        thongDiep: 'Bạn không thuộc danh sách lớp học phần này.',
+      });
+    }
+
+    if (!buoiHoc.batDiemDanhKhuonMat || !buoiHoc.hanDiemDanhKhuonMat) {
+      throw new BadRequestException({
+        thanhCong: false,
+        thongDiep: 'Giảng viên chưa mở điểm danh bằng khuôn mặt cho buổi học này.',
+      });
+    }
+
+    if (new Date() > new Date(buoiHoc.hanDiemDanhKhuonMat)) {
+      throw new BadRequestException({
+        thanhCong: false,
+        thongDiep: 'Phiên điểm danh khuôn mặt đã hết thời hạn. Vui lòng liên hệ giảng viên.',
+      });
+    }
+
+    const duLieuMau = await this.khoPhongHoc.timDuLieuKhuonMatTheoNguoiDung(idNguoiDung);
+    if (!duLieuMau || !duLieuMau.kichHoat || !Array.isArray(duLieuMau.vectorDacTrung)) {
+      throw new BadRequestException({
+        thanhCong: false,
+        thongDiep: 'Bạn chưa đăng ký mẫu khuôn mặt trong hồ sơ cá nhân.',
+      });
+    }
+
+    const nguongKhop =
+      (await this.dichVuCaiDat?.layGiaTriSo('diem_danh.nguong_khop_khuon_mat', 0.78)) ?? 0.78;
+    const soPhutChoPhepTre =
+      (await this.dichVuCaiDat?.layGiaTriSo('diem_danh.so_phut_tinh_di_muon', 15)) ?? 15;
+
+    let ketQuaDoiSoat: { khoangCach: number; doTuongDongCosine: number; doTuongDong: number };
+    try {
+      ketQuaDoiSoat = doiSoatVectorKhuonMat(
+        duLieu.vectorKhuonMat,
+        duLieuMau.vectorDacTrung as number[],
+      );
+    } catch {
+      throw new BadRequestException({
+        thanhCong: false,
+        thongDiep: 'Dữ liệu đối soát khuôn mặt không hợp lệ.',
+      });
+    }
+
+    const khop = ketQuaDoiSoat.doTuongDong >= nguongKhop;
+    await this.ghiNhatKyKhuonMat(idNguoiDung, 'DOI_SOAT_KHUON_MAT', idBuoiHoc, {
+      khop,
+      doTinCay: ketQuaDoiSoat.doTuongDong,
+      nguongKhop,
+      idBuoiHoc,
+    });
+
+    if (!khop) {
+      throw new BadRequestException({
+        thanhCong: false,
+        thongDiep: `Khuôn mặt chưa khớp (độ tin cậy ${Math.round(ketQuaDoiSoat.doTuongDong * 100)}%, yêu cầu tối thiểu ${Math.round(nguongKhop * 100)}%). Vui lòng nhìn thẳng vào camera nơi đủ ánh sáng và thử lại.`,
+      });
+    }
+
+    const { trangThai, phutTre } = this.tinhTrangThaiVaDiMuon(
+      buoiHoc.thoiGianBD,
+      soPhutChoPhepTre,
+    );
+    const ghiChu =
+      trangThai === TrangThaiDiemDanh.DI_MUON
+        ? `Điểm danh khuôn mặt (muộn ${phutTre} phút, khớp ${Math.round(ketQuaDoiSoat.doTuongDong * 100)}%)`
+        : `Điểm danh khuôn mặt hợp lệ (khớp ${Math.round(ketQuaDoiSoat.doTuongDong * 100)}%)`;
+
+    const banGhi = await this.khoPhongHoc.diemDanhHocSinh(
+      idBuoiHoc,
+      hoSo.id,
+      trangThai,
+      ghiChu,
+      PhuongThucDiemDanh.KHUON_MAT,
+      ketQuaDoiSoat.doTuongDong,
+    );
+
+    return {
+      banGhi: {
+        ...(banGhi as any),
+        trangThai: banGhi.trangThai as TrangThaiDiemDanh,
+        phuongThuc: PhuongThucDiemDanh.KHUON_MAT,
+        doTinCay: ketQuaDoiSoat.doTuongDong,
+      },
+      doTuongDong: ketQuaDoiSoat.doTuongDong,
+      khoangCach: ketQuaDoiSoat.khoangCach,
+      trangThai: banGhi.trangThai as TrangThaiDiemDanh,
+      thongDiep: ghiChu,
+    };
+  }
+
+  /**
+   * Giáo viên lấy danh sách mẫu khuôn mặt của học sinh trong lớp để đối soát camera lớp học
+   */
+  async layDanhSachKhuonMatLop(
+    idLopHocPhan: string,
+    nguoiDung: PayloadJwt,
+  ): Promise<MucDuLieuKhuonMatLop[]> {
+    const lop = await this.prisma.lopHocPhan.findUnique({
+      where: { id: idLopHocPhan },
+      include: {
+        giaoVien: {
+          select: { idNguoiDung: true },
+        },
+      },
+    });
+    if (!lop) {
+      throw new NotFoundException({
+        thanhCong: false,
+        thongDiep: 'Lớp học phần không tồn tại',
+      });
+    }
+
+    this.kiemTraQuyenQuanLyLop(
+      lop.giaoVien?.idNguoiDung,
+      nguoiDung,
+      'Chỉ giáo viên phụ trách lớp học phần mới được truy cập dữ liệu điểm danh của lớp.',
+    );
+
+    const danhSachGhiDanh = await this.khoPhongHoc.layDanhSachKhuonMatTheoLop(idLopHocPhan);
+    const ketQua: MucDuLieuKhuonMatLop[] = [];
+
+    for (const gd of danhSachGhiDanh) {
+      const hs = gd.hocSinh;
+      const vector = hs?.nguoiDung?.duLieuKhuonMat?.vectorDacTrung;
+      if (!hs || !Array.isArray(vector) || vector.length !== 128) {
+        continue;
+      }
+      ketQua.push({
+        idHocSinh: hs.id,
+        idNguoiDung: hs.nguoiDung.id,
+        maHocSinh: hs.maHocSinh,
+        hoTen: hs.nguoiDung.hoTen,
+        anhDaiDien: hs.nguoiDung.anhDaiDien,
+        vectorKhuonMat: vector as number[],
+      });
+    }
+
+    return ketQua;
+  }
+
+  /**
+   * Giáo viên ghi nhận hàng loạt kết quả nhận diện khuôn mặt từ camera lớp học
+   */
+  async diemDanhKhuonMatTheoLop(
+    idBuoiHoc: string,
+    duLieu: DiemDanhKhuonMatLopInput,
+    nguoiDung: PayloadJwt,
+  ) {
+    const idNguoiDung = this.layIdNguoiDung(nguoiDung);
+    const buoiHoc = await this.khoPhongHoc.timBuoiHocTheoId(idBuoiHoc);
+    if (!buoiHoc) {
+      throw new NotFoundException({
+        thanhCong: false,
+        thongDiep: 'Buổi học không tồn tại',
+      });
+    }
+
+    this.kiemTraQuyenQuanLyLop(
+      buoiHoc.lopHocPhan?.giaoVien?.idNguoiDung,
+      nguoiDung,
+      'Chỉ giáo viên phụ trách lớp học phần mới được xác nhận điểm danh khuôn mặt cho lớp.',
+    );
+
+    const nguongKhop =
+      (await this.dichVuCaiDat?.layGiaTriSo('diem_danh.nguong_khop_khuon_mat', 0.78)) ?? 0.78;
+    const soPhutChoPhepTre =
+      (await this.dichVuCaiDat?.layGiaTriSo('diem_danh.so_phut_tinh_di_muon', 15)) ?? 15;
+
+    const danhSachGhiDanh = await this.prisma.ghiDanh.findMany({
+      where: { idLopHocPhan: buoiHoc.idLopHocPhan },
+      select: { idHocSinh: true },
+    });
+    const tapHocSinhLop = new Set(danhSachGhiDanh.map((gd) => gd.idHocSinh));
+
+    const mucHopLe = duLieu.danhSachNhanDien.filter(
+      (muc) => tapHocSinhLop.has(muc.idHocSinh) && muc.doTinCay >= nguongKhop,
+    );
+
+    if (mucHopLe.length === 0) {
+      throw new BadRequestException({
+        thanhCong: false,
+        thongDiep: `Không có học sinh hợp lệ đạt ngưỡng độ tin cậy tối thiểu (${Math.round(nguongKhop * 100)}%).`,
+      });
+    }
+
+    const { trangThai, phutTre } = this.tinhTrangThaiVaDiMuon(
+      buoiHoc.thoiGianBD,
+      soPhutChoPhepTre,
+    );
+
+    const daLuu = [];
+    for (const muc of mucHopLe) {
+      const doTinCayLamTron = Number(muc.doTinCay.toFixed(4));
+      const ghiChu =
+        trangThai === TrangThaiDiemDanh.DI_MUON
+          ? `Điểm danh camera lớp (muộn ${phutTre} phút, khớp ${Math.round(doTinCayLamTron * 100)}%)`
+          : `Điểm danh camera lớp (khớp ${Math.round(doTinCayLamTron * 100)}%)`;
+
+      const banGhi = await this.khoPhongHoc.diemDanhHocSinh(
+        idBuoiHoc,
+        muc.idHocSinh,
+        trangThai,
+        ghiChu,
+        PhuongThucDiemDanh.KHUON_MAT,
+        doTinCayLamTron,
+      );
+      daLuu.push(banGhi);
+    }
+
+    await this.ghiNhatKyKhuonMat(idNguoiDung, 'DIEM_DANH_KHUON_MAT_LOP', idBuoiHoc, {
+      idBuoiHoc,
+      soLuongXacNhan: daLuu.length,
+      trangThaiApDung: trangThai,
+    });
+
+    return {
+      idBuoiHoc,
+      soLuongCapNhat: daLuu.length,
+      trangThaiApDung: trangThai,
     };
   }
 }

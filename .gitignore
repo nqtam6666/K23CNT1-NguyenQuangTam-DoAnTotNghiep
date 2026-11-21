@@ -95,6 +95,8 @@ pnpm-debug.log*
 *.temp
 uploads/*
 !uploads/**/.gitkeep
+apps/api/uploads/*
+!apps/api/uploads/**/.gitkeep
 
 # ==========================================
 # 6. HỆ ĐIỀU HÀNH & MÔI TRƯỜNG PHÁT TRIỂN (IDE)

@@ -913,6 +913,25 @@ export const DANH_MUC_CAI_DAT_HE_THONG: DinhNghiaKhoaCaiDat[] = [
     buocNhay: 0.25,
     donVi: 'điểm',
   },
+  {
+    khoa: 'diem_danh.nguong_khop_khuon_mat',
+    nhan: 'Ngưỡng độ tương đồng nhận diện khuôn mặt',
+    moTa: 'Độ tương đồng tối thiểu (từ 0.55 đến 0.95) để xác thực sinh viên khi điểm danh bằng khuôn mặt.',
+    nhom: 'diem_danh',
+    phanNhom: 'khuon-mat',
+    tieuDePhanNhom: 'Nhận diện khuôn mặt',
+    moTaPhanNhom: 'Kiểm soát độ chặt khi đối soát vector đặc trưng khuôn mặt 128 chiều.',
+    kieu: 'number',
+    kieuDuLieuDb: 'SO',
+    macDinh: '0.78',
+    congKhai: false,
+    nguyHiem: false,
+    mucUuTien: 'NEN_CO',
+    min: 0.55,
+    max: 0.95,
+    buocNhay: 0.02,
+    donVi: 'tỷ lệ',
+  },
 
   // =========================================================================
   // 4. NHÓM PHÒNG HỌC TRỰC TUYẾN

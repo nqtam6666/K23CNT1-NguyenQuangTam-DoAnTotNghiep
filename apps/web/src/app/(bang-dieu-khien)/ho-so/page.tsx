@@ -29,6 +29,7 @@ import {
   RefreshCw,
   Mail,
   Send,
+  ScanFace,
 } from 'lucide-react';
 import {
   capNhatHoSoSchema,
@@ -39,6 +40,8 @@ import {
   TuyChonCaNhan,
   TUY_CHON_CA_NHAN_MAC_DINH,
   KetQuaGuiThuThongBaoDaKenh,
+  HoSoKhuonMat,
+  VaiTro,
 } from '@lms/chung';
 import { mayKhachApi } from '../../../tien-ich/may-khach-api';
 import { thongBao } from '../../../tien-ich/thong-bao';
@@ -46,6 +49,7 @@ import { KhungXuongHoSo } from '../../../thanh-phan/khung-xuong';
 import { AnhDaiDien } from '../../../thanh-phan/anh-dai-dien';
 import { HopThoaiDoiAnhDaiDien } from '../../../thanh-phan/hop-thoai-doi-anh-dai-dien';
 import { HopThoai } from '../../../thanh-phan/hop-thoai';
+import { HopThoaiKhuonMat } from '../../../thanh-phan/hop-thoai-khuon-mat';
 import { CongTac } from '../../../thanh-phan/cong-tac';
 import { phatThongBaoManHinhWindows } from '../../../thanh-phan/hop-thong-bao';
 
@@ -121,6 +125,8 @@ export default function TrangHoSoCaNhan() {
   const [tuyChon, setTuyChon] = useState<TuyChonCaNhan>(TUY_CHON_CA_NHAN_MAC_DINH);
   const [moXacNhanXoaLichSuAi, setMoXacNhanXoaLichSuAi] = useState(false);
   const [moXacNhanDangXuatTatCa, setMoXacNhanDangXuatTatCa] = useState(false);
+  const [moModalDangKyKhuonMat, setMoModalDangKyKhuonMat] = useState(false);
+  const [moXacNhanXoaKhuonMat, setMoXacNhanXoaKhuonMat] = useState(false);
 
   // 1. Lấy hồ sơ cá nhân
   const { data: hoSo, isLoading } = useQuery({
@@ -173,6 +179,36 @@ export default function TrangHoSoCaNhan() {
       return res.data?.duLieu || [];
     },
     enabled: tabHienTai === 'doi-mat-khau',
+  });
+
+  // 3b. Lấy trạng thái đăng ký khuôn mặt (cho Học sinh)
+  const {
+    data: hoSoKhuonMat,
+    isLoading: dangTaiKhuonMat,
+  } = useQuery<HoSoKhuonMat>({
+    queryKey: ['ho-so-khuon-mat-ca-nhan'],
+    queryFn: async () => {
+      const res = await mayKhachApi.get('/phong-hoc-truc-tuyen/khuon-mat/ho-so');
+      return res.data?.duLieu || res.data;
+    },
+    enabled: hoSo?.vaiTro === VaiTro.HOC_SINH,
+  });
+
+  const dotXoaKhuonMat = useMutation({
+    mutationFn: async () => {
+      await mayKhachApi.delete('/phong-hoc-truc-tuyen/khuon-mat/ho-so');
+    },
+    onSuccess: () => {
+      setMoXacNhanXoaKhuonMat(false);
+      queryClient.invalidateQueries({ queryKey: ['ho-so-khuon-mat-ca-nhan'] });
+      thongBao.thanhCong(
+        'Đã xóa dữ liệu khuôn mặt',
+        'Dữ liệu khuôn mặt phục vụ điểm danh đã được gỡ bỏ khỏi hồ sơ của bạn.',
+      );
+    },
+    onError: (loi: any) => {
+      thongBao.loiHeThong(loi, 'Không thể xóa dữ liệu khuôn mặt');
+    },
   });
 
   // 4. Form cập nhật thông tin cá nhân
@@ -767,6 +803,73 @@ export default function TrangHoSoCaNhan() {
               </div>
             )}
           </div>
+
+          {/* Khu vực đăng ký khuôn mặt điểm danh (chỉ hiện với Học sinh) */}
+          {hoSo?.vaiTro === VaiTro.HOC_SINH && (
+            <div className="lg:col-span-12 p-6 rounded-[var(--radius)] bg-[var(--surface)] border border-[var(--border)] flex flex-col md:flex-row md:items-center justify-between gap-4">
+              <div className="flex items-start gap-3">
+                <div className="w-10 h-10 rounded-[var(--radius)] bg-[var(--accent-soft)] border border-[var(--accent)] text-[var(--accent)] flex items-center justify-center shrink-0">
+                  <ScanFace className="w-5 h-5 stroke-[1.5]" />
+                </div>
+                <div className="space-y-1">
+                  <div className="flex items-center gap-2 flex-wrap">
+                    <p className="font-sans font-bold text-[var(--text)] text-sm">
+                      Dữ liệu khuôn mặt điểm danh
+                    </p>
+                    {dangTaiKhuonMat ? (
+                      <span className="px-2 py-0.5 text-[11px] font-mono rounded-[var(--radius)] border border-[var(--border)] bg-[var(--bg)] text-[var(--muted)]">
+                        Đang kiểm tra...
+                      </span>
+                    ) : hoSoKhuonMat?.daDangKy ? (
+                      <span className="px-2 py-0.5 text-[11px] font-mono rounded-[var(--radius)] border border-[var(--accent)] bg-[var(--accent-soft)] text-[var(--accent)]">
+                        Đã đăng ký ({hoSoKhuonMat.soMauChup || 3} mẫu)
+                      </span>
+                    ) : (
+                      <span className="px-2 py-0.5 text-[11px] font-mono rounded-[var(--radius)] border border-[var(--border)] bg-[var(--bg)] text-[var(--muted)]">
+                        Chưa đăng ký
+                      </span>
+                    )}
+                  </div>
+                  <p className="text-xs text-[var(--muted)]">
+                    Dùng để tự điểm danh qua camera trong các buổi học có mở điểm danh bằng khuôn mặt.
+                    {hoSoKhuonMat?.ngayCapNhat && (
+                      <>
+                        {' '}
+                        Cập nhật gần nhất:{' '}
+                        <span className="font-mono">
+                          {new Date(hoSoKhuonMat.ngayCapNhat).toLocaleDateString('vi-VN')}
+                        </span>
+                        .
+                      </>
+                    )}
+                  </p>
+                </div>
+              </div>
+
+              <div className="flex flex-wrap items-center gap-2 shrink-0">
+                <button
+                  type="button"
+                  onClick={() => setMoModalDangKyKhuonMat(true)}
+                  className="inline-flex items-center gap-1.5 px-3.5 py-2 text-xs font-semibold text-white bg-[var(--accent)] rounded-[var(--radius)] hover:opacity-95 transition-opacity cursor-pointer"
+                >
+                  <Camera className="w-3.5 h-3.5 stroke-[1.5]" />
+                  <span>
+                    {hoSoKhuonMat?.daDangKy ? 'Cập nhật khuôn mặt' : 'Đăng ký khuôn mặt'}
+                  </span>
+                </button>
+                {hoSoKhuonMat?.daDangKy && (
+                  <button
+                    type="button"
+                    onClick={() => setMoXacNhanXoaKhuonMat(true)}
+                    className="inline-flex items-center gap-1.5 px-3 py-2 text-xs font-semibold text-[var(--danger)] bg-[var(--surface)] border border-[var(--danger)] rounded-[var(--radius)] hover:bg-[var(--danger-soft)] transition-colors cursor-pointer"
+                  >
+                    <Trash2 className="w-3.5 h-3.5 stroke-[1.5]" />
+                    <span>Xóa dữ liệu</span>
+                  </button>
+                )}
+              </div>
+            </div>
+          )}
         </div>
       )}
 
@@ -1430,6 +1533,49 @@ export default function TrangHoSoCaNhan() {
             >
               {dotXoaLichSuAi.isPending && <Loader2 className="w-3.5 h-3.5 animate-spin" />}
               <span>Xóa toàn bộ lịch sử</span>
+            </button>
+          </div>
+        </div>
+      </HopThoai>
+      {/* HỘP THOẠI ĐĂNG KÝ / CẬP NHẬT KHUÔN MẶT */}
+      <HopThoaiKhuonMat
+        mo={moModalDangKyKhuonMat}
+        onDong={() => setMoModalDangKyKhuonMat(false)}
+        cheDo="dang-ky"
+        onThanhCong={() => {
+          queryClient.invalidateQueries({ queryKey: ['ho-so-khuon-mat-ca-nhan'] });
+        }}
+      />
+
+      {/* HỘP THOẠI XÁC NHẬN XÓA DỮ LIỆU KHUÔN MẶT */}
+      <HopThoai
+        mo={moXacNhanXoaKhuonMat}
+        onDong={() => setMoXacNhanXoaKhuonMat(false)}
+        eyebrow="DỮ LIỆU KHUÔN MẶT"
+        tieuDe="Xóa dữ liệu khuôn mặt điểm danh"
+        moTa="Sau khi xóa, bạn sẽ cần đăng ký lại nếu muốn sử dụng tính năng điểm danh bằng khuôn mặt."
+        kichThuoc="nho"
+      >
+        <div className="space-y-4">
+          <p className="text-xs text-[var(--muted)] leading-relaxed">
+            Bạn có chắc chắn muốn xóa mẫu khuôn mặt đã lưu trên hệ thống?
+          </p>
+          <div className="flex items-center justify-end gap-2.5 pt-3 border-t border-[var(--border)]">
+            <button
+              type="button"
+              onClick={() => setMoXacNhanXoaKhuonMat(false)}
+              className="px-4 py-2 text-xs font-semibold text-[var(--text)] bg-[var(--surface)] border border-[var(--border)] rounded-[var(--radius)] hover:bg-[var(--active-bg)] transition-colors cursor-pointer"
+            >
+              Hủy
+            </button>
+            <button
+              type="button"
+              onClick={() => dotXoaKhuonMat.mutate()}
+              disabled={dotXoaKhuonMat.isPending}
+              className="inline-flex items-center gap-1.5 px-4 py-2 text-xs font-semibold text-white bg-[var(--danger)] rounded-[var(--radius)] hover:opacity-95 transition-opacity disabled:opacity-50 cursor-pointer"
+            >
+              {dotXoaKhuonMat.isPending && <Loader2 className="w-3.5 h-3.5 animate-spin" />}
+              <span>Xóa dữ liệu</span>
             </button>
           </div>
         </div>

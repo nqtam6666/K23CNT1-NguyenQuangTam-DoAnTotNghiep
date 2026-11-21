@@ -22,6 +22,7 @@ export enum DoiTuong {
   BaiTap = 'BaiTap',
   BaiNop = 'BaiNop',
   BanGhiDiemDanh = 'BanGhiDiemDanh',
+  DuLieuKhuonMat = 'DuLieuKhuonMat',
   NhatKyThamGia = 'NhatKyThamGia',
   DonXinNghi = 'DonXinNghi',
   CotDiem = 'CotDiem',

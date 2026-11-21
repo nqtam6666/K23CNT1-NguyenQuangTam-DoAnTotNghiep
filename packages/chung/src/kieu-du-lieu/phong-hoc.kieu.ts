@@ -3,6 +3,7 @@ import {
   TrangThaiBuoiHoc,
   TrangThaiDiemDanh,
   TrangThaiDonXinNghi,
+  PhuongThucDiemDanh,
 } from '../hang-so/trang-thai.hang-so';
 
 export interface PhongTrucTuyen {
@@ -44,6 +45,8 @@ export interface BanGhiDiemDanh {
   idBuoiHoc: string;
   idHocSinh: string;
   trangThai: TrangThaiDiemDanh;
+  phuongThuc?: PhuongThucDiemDanh;
+  doTinCay?: number | null;
   ghiChu?: string | null;
   ngayDiemDanh: Date | string;
   hocSinh?: {
@@ -55,6 +58,32 @@ export interface BanGhiDiemDanh {
       anhDaiDien?: string | null;
     };
   };
+}
+
+export interface HoSoKhuonMat {
+  daDangKy: boolean;
+  kichHoat: boolean;
+  soMauChup?: number;
+  diemChatLuong?: number | null;
+  ngayDangKy?: Date | string | null;
+  ngayCapNhat?: Date | string | null;
+}
+
+export interface MucDuLieuKhuonMatLop {
+  idHocSinh: string;
+  idNguoiDung: string;
+  maHocSinh: string;
+  hoTen: string;
+  anhDaiDien?: string | null;
+  vectorKhuonMat: number[];
+}
+
+export interface KetQuaDiemDanhKhuonMat {
+  banGhi: BanGhiDiemDanh;
+  doTuongDong: number;
+  khoangCach: number;
+  trangThai: TrangThaiDiemDanh;
+  thongDiep: string;
 }
 
 export interface DonXinNghi {

@@ -10,6 +10,14 @@ export enum TrangThaiDiemDanh {
   DI_MUON = 'DI_MUON',
 }
 
+export enum PhuongThucDiemDanh {
+  THU_CONG = 'THU_CONG',
+  MA_PIN = 'MA_PIN',
+  TRUC_TUYEN = 'TRUC_TUYEN',
+  KHUON_MAT = 'KHUON_MAT',
+  DON_XIN_NGHI = 'DON_XIN_NGHI',
+}
+
 export enum TrangThaiBaiNop {
   CHUA_NOP = 'CHUA_NOP',
   DA_NOP = 'DA_NOP',

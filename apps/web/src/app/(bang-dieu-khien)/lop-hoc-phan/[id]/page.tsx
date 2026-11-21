@@ -127,6 +127,12 @@ export default function TrangChiTietLopHocPhan({ params }: { params: Promise<{ i
     enabled: !!lopHocPhan,
   });
 
+  const coQuyenXemThanhVien = Boolean(
+    nguoiDungHienTai?.vaiTro &&
+      nguoiDungHienTai.vaiTro !== VaiTro.HOC_SINH &&
+      nguoiDungHienTai.vaiTro !== VaiTro.PHU_HUYNH,
+  );
+
   // Lấy danh sách học sinh ghi danh
   const { data: danhSachGhiDanh, isLoading: dangTaiGhiDanh } = useQuery<GhiDanh[]>({
     queryKey: ['ghi-danh-lop', id],
@@ -134,7 +140,8 @@ export default function TrangChiTietLopHocPhan({ params }: { params: Promise<{ i
       const res = await mayKhachApi.get(`/lop-hoc-phan/${id}/ghi-danh`);
       return res.data.duLieu || [];
     },
-    enabled: !!lopHocPhan,
+    enabled: !!lopHocPhan && coQuyenXemThanhVien,
+    retry: false,
   });
 
   // Lấy danh sách học sinh (để giáo vụ chọn thêm)
@@ -293,7 +300,7 @@ export default function TrangChiTietLopHocPhan({ params }: { params: Promise<{ i
         </p>
         <Link
           href="/lop-hoc-phan"
-          className="inline-flex items-center gap-2 px-4 py-2 bg-[var(--accent)] text-white rounded-[var(--radius)] text-sm font-medium hover:bg-[var(--accent-hover)]"
+          className="inline-flex items-center gap-2 px-4 py-2 bg-[var(--accent)] text-white rounded-[var(--radius)] text-sm font-medium hover:brightness-95"
         >
           <ArrowLeft className="w-4 h-4" /> Quay lại danh sách lớp
         </Link>
@@ -309,11 +316,15 @@ export default function TrangChiTietLopHocPhan({ params }: { params: Promise<{ i
     { id: 'diem-danh', nhan: 'Điểm danh thông minh', icon: QrCode },
     { id: 'so-diem', nhan: 'Kết quả học phần', icon: GraduationCap },
     { id: 'thoi-khoa-bieu', nhan: 'Thời khóa biểu', icon: Clock },
-    {
-      id: 'hoc-sinh',
-      nhan: `Thành viên (${lopHocPhan._count?.danhSachGhiDanh || 0})`,
-      icon: Users,
-    },
+    ...(coQuyenXemThanhVien
+      ? [
+          {
+            id: 'hoc-sinh' as const,
+            nhan: `Thành viên (${lopHocPhan._count?.danhSachGhiDanh || 0})`,
+            icon: Users,
+          },
+        ]
+      : []),
   ] as const;
 
   return (
@@ -427,7 +438,7 @@ export default function TrangChiTietLopHocPhan({ params }: { params: Promise<{ i
 
               <Link
                 href={`/lop-hoc-phan/${id}/phong-hoc`}
-                className="inline-flex items-center justify-center gap-2 px-4 py-2.5 bg-[var(--accent)] hover:bg-[var(--accent-hover)] text-white font-semibold rounded-[var(--radius)] text-[13px] transition-colors"
+                className="inline-flex items-center justify-center gap-2 px-4 py-2.5 bg-[var(--accent)] hover:brightness-95 text-white font-semibold rounded-[var(--radius)] text-[13px] transition-colors"
               >
                 <Video className="w-4 h-4" strokeWidth={1.75} />
                 Vào phòng học trực tuyến
@@ -553,7 +564,7 @@ export default function TrangChiTietLopHocPhan({ params }: { params: Promise<{ i
                       setThongBaoLoi(null);
                       setMoModalTkb(true);
                     }}
-                    className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-[var(--accent)] hover:bg-[var(--accent-hover)] text-white text-xs font-semibold rounded-[var(--radius)] transition-colors cursor-pointer"
+                    className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-[var(--accent)] hover:brightness-95 text-white text-xs font-semibold rounded-[var(--radius)] transition-colors cursor-pointer"
                   >
                     <Plus className="w-3.5 h-3.5" />
                     Thêm tiết học
@@ -659,7 +670,7 @@ export default function TrangChiTietLopHocPhan({ params }: { params: Promise<{ i
                   setThongBaoLoi(null);
                   setMoModalGhiDanh(true);
                 }}
-                className="inline-flex items-center gap-2 px-3.5 py-2 bg-[var(--accent)] hover:bg-[var(--accent-hover)] text-white text-xs font-semibold rounded-[var(--radius)] transition-colors cursor-pointer"
+                className="inline-flex items-center gap-2 px-3.5 py-2 bg-[var(--accent)] hover:brightness-95 text-white text-xs font-semibold rounded-[var(--radius)] transition-colors cursor-pointer"
               >
                 <UserPlus className="w-4 h-4" />
                 Thêm Sinh viên
@@ -821,7 +832,7 @@ export default function TrangChiTietLopHocPhan({ params }: { params: Promise<{ i
               type="button"
               disabled={taoTkbMutation.isPending}
               onClick={() => taoTkbMutation.mutate(formTkb)}
-              className="px-4 py-2 bg-[var(--accent)] hover:bg-[var(--accent-hover)] text-white rounded-[var(--radius)] text-xs font-semibold disabled:opacity-50 cursor-pointer"
+              className="px-4 py-2 bg-[var(--accent)] hover:brightness-95 text-white rounded-[var(--radius)] text-xs font-semibold disabled:opacity-50 cursor-pointer"
             >
               {taoTkbMutation.isPending ? 'Đang lưu...' : 'Thêm tiết học'}
             </button>
@@ -867,7 +878,7 @@ export default function TrangChiTietLopHocPhan({ params }: { params: Promise<{ i
               type="button"
               disabled={!idHocSinhChon || ghiDanhMutation.isPending}
               onClick={() => ghiDanhMutation.mutate(idHocSinhChon)}
-              className="px-4 py-2 bg-[var(--accent)] hover:bg-[var(--accent-hover)] text-white rounded-[var(--radius)] text-xs font-semibold disabled:opacity-50 cursor-pointer"
+              className="px-4 py-2 bg-[var(--accent)] hover:brightness-95 text-white rounded-[var(--radius)] text-xs font-semibold disabled:opacity-50 cursor-pointer"
             >
               {ghiDanhMutation.isPending ? 'Đang ghi danh...' : 'Ghi danh'}
             </button>
@@ -913,7 +924,7 @@ export default function TrangChiTietLopHocPhan({ params }: { params: Promise<{ i
               type="button"
               disabled={!idLopHanhChinhChon || ghiDanhTheoLopMutation.isPending}
               onClick={() => ghiDanhTheoLopMutation.mutate(idLopHanhChinhChon)}
-              className="px-4 py-2 bg-[var(--accent)] hover:bg-[var(--accent-hover)] text-white rounded-[var(--radius)] text-xs font-semibold disabled:opacity-50 cursor-pointer"
+              className="px-4 py-2 bg-[var(--accent)] hover:brightness-95 text-white rounded-[var(--radius)] text-xs font-semibold disabled:opacity-50 cursor-pointer"
             >
               {ghiDanhTheoLopMutation.isPending ? 'Đang import...' : 'Tiến hành ghi danh'}
             </button>

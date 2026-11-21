@@ -23,6 +23,7 @@ import {
 import * as path from 'path';
 import * as fs from 'fs';
 import { randomUUID } from 'crypto';
+import { timTepTaiLenTonTai } from '../../cot-loi/tien-ich/duong-dan-tai-len';
 
 @Injectable()
 export class DichVuTaiLieuService {
@@ -662,8 +663,8 @@ export class DichVuTaiLieuService {
 
     // Xóa file vật lý trên disk nếu tồn tại
     try {
-      const duongDanTep = path.join(process.cwd(), taiLieu.duongDanTep.replace(/^\//, ''));
-      if (fs.existsSync(duongDanTep)) {
+      const duongDanTep = timTepTaiLenTonTai(taiLieu.duongDanTep);
+      if (duongDanTep) {
         await fs.promises.unlink(duongDanTep);
       }
     } catch {

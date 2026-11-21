@@ -1,6 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { PrismaService } from '../../cot-loi/csdl/prisma.service';
 import {
+  PhuongThucDiemDanh,
   TrangThaiBuoiHoc,
   TrangThaiDiemDanh,
   TrangThaiDonXinNghi,
@@ -230,6 +231,8 @@ export class KhoPhongHoc {
     idHocSinh: string,
     trangThai: TrangThaiDiemDanh,
     ghiChu?: string,
+    phuongThuc: PhuongThucDiemDanh = PhuongThucDiemDanh.THU_CONG,
+    doTinCay: number | null = null,
   ) {
     return this.prisma.banGhiDiemDanh.upsert({
       where: {
@@ -241,6 +244,8 @@ export class KhoPhongHoc {
       update: {
         trangThai,
         ghiChu,
+        phuongThuc,
+        doTinCay,
         ngayDiemDanh: new Date(),
       },
       create: {
@@ -248,6 +253,8 @@ export class KhoPhongHoc {
         idHocSinh,
         trangThai,
         ghiChu,
+        phuongThuc,
+        doTinCay,
       },
     });
   }
@@ -397,6 +404,127 @@ export class KhoPhongHoc {
       data: {
         trangThai,
         phanHoi,
+      },
+    });
+  }
+
+  /**
+   * Bật hoặc tắt chế độ điểm danh khuôn mặt cho buổi học
+   */
+  async capNhatTrangThaiDiemDanhKhuonMat(
+    idBuoiHoc: string,
+    batDiemDanhKhuonMat: boolean,
+    hanDiemDanhKhuonMat: Date | null,
+  ) {
+    return this.prisma.buoiHoc.update({
+      where: { id: idBuoiHoc },
+      data: {
+        batDiemDanhKhuonMat,
+        hanDiemDanhKhuonMat,
+        trangThai: batDiemDanhKhuonMat ? TrangThaiBuoiHoc.DANG_DIEN_RA : undefined,
+      },
+    });
+  }
+
+  /**
+   * Tìm dữ liệu vector khuôn mặt đã đăng ký của người dùng
+   */
+  async timDuLieuKhuonMatTheoNguoiDung(idNguoiDung: string) {
+    return this.prisma.duLieuKhuonMat.findUnique({
+      where: { idNguoiDung },
+    });
+  }
+
+  /**
+   * Lưu hoặc cập nhật vector khuôn mặt của người dùng và đồng bộ cột vector pgvector (nếu có)
+   */
+  async luuDuLieuKhuonMat(
+    idNguoiDung: string,
+    vectorDacTrung: number[],
+    soMauChup: number,
+    diemChatLuong: number | null,
+  ) {
+    const banGhi = await this.prisma.duLieuKhuonMat.upsert({
+      where: { idNguoiDung },
+      update: {
+        vectorDacTrung,
+        soMauChup,
+        diemChatLuong,
+        kichHoat: true,
+      },
+      create: {
+        idNguoiDung,
+        vectorDacTrung,
+        soMauChup,
+        diemChatLuong,
+        kichHoat: true,
+      },
+    });
+
+    if (typeof this.prisma.$executeRaw === 'function') {
+      const chuoiVector = `[${vectorDacTrung.join(',')}]`;
+      try {
+        await this.prisma.$executeRaw`
+          UPDATE du_lieu_khuon_mat
+          SET vector_nhung = ${chuoiVector}::vector
+          WHERE id = ${banGhi.id}::uuid
+        `;
+      } catch {
+        // Bỏ qua nếu môi trường kiểm thử hoặc DB chưa kích hoạt extension vector
+      }
+    }
+
+    return banGhi;
+  }
+
+  /**
+   * Xóa hồ sơ dữ liệu khuôn mặt của người dùng
+   */
+  async xoaDuLieuKhuonMat(idNguoiDung: string) {
+    const hienCo = await this.prisma.duLieuKhuonMat.findUnique({
+      where: { idNguoiDung },
+    });
+    if (!hienCo) {
+      return null;
+    }
+
+    return this.prisma.duLieuKhuonMat.delete({
+      where: { idNguoiDung },
+    });
+  }
+
+  /**
+   * Lấy danh sách dữ liệu khuôn mặt của học sinh đã ghi danh trong lớp học phần
+   */
+  async layDanhSachKhuonMatTheoLop(idLopHocPhan: string) {
+    return this.prisma.ghiDanh.findMany({
+      where: { idLopHocPhan },
+      include: {
+        hocSinh: {
+          select: {
+            id: true,
+            maHocSinh: true,
+            nguoiDung: {
+              select: {
+                id: true,
+                hoTen: true,
+                anhDaiDien: true,
+                duLieuKhuonMat: {
+                  where: { kichHoat: true },
+                  select: {
+                    vectorDacTrung: true,
+                    soMauChup: true,
+                    diemChatLuong: true,
+                    ngayCapNhat: true,
+                  },
+                },
+              },
+            },
+          },
+        },
+      },
+      orderBy: {
+        hocSinh: { maHocSinh: 'asc' },
       },
     });
   }

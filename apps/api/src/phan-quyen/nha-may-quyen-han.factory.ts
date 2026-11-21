@@ -58,6 +58,7 @@ export class NhaMayQuyenHan {
         DoiTuong.BuoiHoc,
         DoiTuong.NhatKyThamGia,
         DoiTuong.BanGhiDiemDanh,
+        DoiTuong.DuLieuKhuonMat,
         DoiTuong.DonXinNghi,
         DoiTuong.GhiDanh,
         DoiTuong.HoSoHocSinh,
@@ -88,6 +89,7 @@ export class NhaMayQuyenHan {
         DoiTuong.DiemSo,
         DoiTuong.SoDiem,
         DoiTuong.BanGhiDiemDanh,
+        DoiTuong.DuLieuKhuonMat,
         DoiTuong.BanNhapAI,
         DoiTuong.PhienTroLy,
         DoiTuong.BaoLoiDongGop,
@@ -105,6 +107,7 @@ export class NhaMayQuyenHan {
         DoiTuong.DiemSo,
         DoiTuong.SoDiem,
         DoiTuong.BanGhiDiemDanh,
+        DoiTuong.DuLieuKhuonMat,
         DoiTuong.DonXinNghi,
         DoiTuong.BanNhapAI,
       ]);
@@ -117,6 +120,7 @@ export class NhaMayQuyenHan {
         DoiTuong.CauHoi,
         DoiTuong.CotDiem,
         DoiTuong.DiemSo,
+        DoiTuong.DuLieuKhuonMat,
         DoiTuong.BanNhapAI,
         DoiTuong.PhienTroLy,
         DoiTuong.BaoLoiDongGop,
@@ -150,6 +154,7 @@ export class NhaMayQuyenHan {
         DoiTuong.NhatKyThamGia,
         DoiTuong.ThongBao,
         DoiTuong.BanGhiDiemDanh,
+        DoiTuong.DuLieuKhuonMat,
         DoiTuong.DonXinNghi,
         DoiTuong.CotDiem,
         DoiTuong.DiemSo,
@@ -164,14 +169,16 @@ export class NhaMayQuyenHan {
         DoiTuong.BaiNop,
         DoiTuong.LuotLamBai,
         DoiTuong.DonXinNghi,
+        DoiTuong.DuLieuKhuonMat,
         DoiTuong.PhienTroLy,
         DoiTuong.BaoLoiDongGop,
       ]);
-      can(HanhDong.Sua, DoiTuong.BaiNop);
+      can(HanhDong.Sua, [DoiTuong.BaiNop, DoiTuong.DuLieuKhuonMat]);
       can(HanhDong.DiemDanh, DoiTuong.BanGhiDiemDanh);
       can(HanhDong.Xoa, [
         DoiTuong.BaiDang,
         DoiTuong.BinhLuan,
+        DoiTuong.DuLieuKhuonMat,
         DoiTuong.PhienTroLy,
         DoiTuong.BaoLoiDongGop,
       ]);

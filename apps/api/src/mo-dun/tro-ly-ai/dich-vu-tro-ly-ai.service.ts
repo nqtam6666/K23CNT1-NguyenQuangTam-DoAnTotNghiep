@@ -33,8 +33,8 @@ import {
   CauHinhLlm,
   MaLoiNghiepVu,
 } from '@lms/chung';
-import { join } from 'path';
-import { existsSync, readFileSync } from 'fs';
+import { readFileSync } from 'fs';
+import { timTepTaiLenTonTai } from '../../cot-loi/tien-ich/duong-dan-tai-len';
 
 @Injectable()
 export class DichVuTroLyAiService {
@@ -166,8 +166,8 @@ export class DichVuTroLyAiService {
 
     let noiDungVanBan = `${taiLieu.tieuDe}\n${taiLieu.moTa || ''}\n`;
 
-    const duongDanVatLy = join(process.cwd(), taiLieu.duongDanTep.replace(/^\//, ''));
-    if (existsSync(duongDanVatLy)) {
+    const duongDanVatLy = timTepTaiLenTonTai(taiLieu.duongDanTep);
+    if (duongDanVatLy) {
       try {
         const noiDungTep = readFileSync(duongDanVatLy, 'utf-8');
         const chuoiSach = noiDungTep.replace(/[\x00-\x08\x0B\x0C\x0E-\x1F]/g, ' ');

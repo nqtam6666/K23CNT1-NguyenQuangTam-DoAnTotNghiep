@@ -64,7 +64,8 @@ describe('DichVuLlmService', () => {
       });
 
       expect(ketQua.dungDuPhong).toBe(true);
-      expect(ketQua.vanBan).toContain('Trợ lý AI học thuật');
+      expect(ketQua.vanBan).toContain('Trợ lý học tập');
+      expect(ketQua.vanBan).toContain('SmartClass AI');
     });
 
     it('xử lý lời chào hỏi mượt mà qua bộ dự phòng khi offline', async () => {
@@ -74,7 +75,8 @@ describe('DichVuLlmService', () => {
       });
 
       expect(ketQua.dungDuPhong).toBe(true);
-      expect(ketQua.vanBan).toContain('Hệ thống Quản lý Học tập LMS');
+      expect(ketQua.vanBan).toContain('SmartClass AI');
+      expect(ketQua.vanBan).toContain('Tra cứu và giải đáp học liệu');
     });
   });
 

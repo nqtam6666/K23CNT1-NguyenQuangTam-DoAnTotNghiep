@@ -33,6 +33,16 @@ enum TrangThaiDiemDanh {
   @@map("trang_thai_diem_danh")
 }
 
+enum PhuongThucDiemDanh {
+  THU_CONG
+  MA_PIN
+  TRUC_TUYEN
+  KHUON_MAT
+  DON_XIN_NGHI
+
+  @@map("phuong_thuc_diem_danh")
+}
+
 enum TrangThaiBaiNop {
   CHUA_NOP
   DA_NOP
@@ -195,6 +205,7 @@ model NguoiDung {
   cacNhatKyHeThong  NhatKyHeThong[]
   cacBaoLoiDaGui    BaoLoiDongGop[]     @relation("NguoiGuiBaoLoi")
   cacBaoLoiDaXuLy   BaoLoiDongGop[]     @relation("NguoiXuLyBaoLoi")
+  duLieuKhuonMat    DuLieuKhuonMat?
 
   @@map("nguoi_dung")
   @@index([email])
@@ -394,9 +405,11 @@ model BuoiHoc {
   thoiGianBD    DateTime         @map("thoi_gian_bd") @db.Timestamptz(6)
   thoiGianKT    DateTime         @map("thoi_gian_kt") @db.Timestamptz(6)
   trangThai     TrangThaiBuoiHoc @default(CHUA_BAT_DAU) @map("trang_thai")
-  maDiemDanh    String?          @map("ma_diem_danh") @db.VarChar(10)
-  hanMaDiemDanh DateTime?        @map("han_ma_diem_danh") @db.Timestamptz(6)
-  ngayTao       DateTime         @default(now()) @map("ngay_tao") @db.Timestamptz(6)
+  maDiemDanh          String?          @map("ma_diem_danh") @db.VarChar(10)
+  hanMaDiemDanh       DateTime?        @map("han_ma_diem_danh") @db.Timestamptz(6)
+  batDiemDanhKhuonMat Boolean          @default(false) @map("bat_diem_danh_khuon_mat")
+  hanDiemDanhKhuonMat DateTime?        @map("han_diem_danh_khuon_mat") @db.Timestamptz(6)
+  ngayTao             DateTime         @default(now()) @map("ngay_tao") @db.Timestamptz(6)
 
   lopHocPhan      LopHocPhan       @relation(fields: [idLopHocPhan], references: [id], onDelete: Cascade)
   banGhiDiemDanh  BanGhiDiemDanh[]
@@ -584,18 +597,36 @@ model LuotLamBai {
 // ==========================================
 
 model BanGhiDiemDanh {
-  id          String            @id @default(uuid()) @map("id") @db.Uuid
-  idBuoiHoc   String            @map("id_buoi_hoc") @db.Uuid
-  idHocSinh   String            @map("id_hoc_sinh") @db.Uuid
-  trangThai   TrangThaiDiemDanh @default(CO_MAT) @map("trang_thai")
-  ghiChu      String?           @map("ghi_chu") @db.VarChar(255)
-  ngayDiemDanh DateTime         @default(now()) @map("ngay_diem_danh") @db.Timestamptz(6)
+  id           String             @id @default(uuid()) @map("id") @db.Uuid
+  idBuoiHoc    String             @map("id_buoi_hoc") @db.Uuid
+  idHocSinh    String             @map("id_hoc_sinh") @db.Uuid
+  trangThai    TrangThaiDiemDanh  @default(CO_MAT) @map("trang_thai")
+  phuongThuc   PhuongThucDiemDanh @default(THU_CONG) @map("phuong_thuc")
+  doTinCay     Float?             @map("do_tin_cay")
+  ghiChu       String?            @map("ghi_chu") @db.VarChar(255)
+  ngayDiemDanh DateTime           @default(now()) @map("ngay_diem_danh") @db.Timestamptz(6)
 
   buoiHoc BuoiHoc     @relation(fields: [idBuoiHoc], references: [id], onDelete: Cascade)
   hocSinh HoSoHocSinh @relation(fields: [idHocSinh], references: [id], onDelete: Cascade)
 
   @@unique([idBuoiHoc, idHocSinh])
   @@map("ban_ghi_diem_danh")
+}
+
+model DuLieuKhuonMat {
+  id             String                 @id @default(uuid()) @map("id") @db.Uuid
+  idNguoiDung    String                 @unique @map("id_nguoi_dung") @db.Uuid
+  vectorDacTrung Json                   @map("vector_dac_trung") // Mảng 128 số thực chuẩn hóa L2
+  vectorNhung    Unsupported("vector(128)")? @map("vector_nhung")
+  soMauChup      Int                    @default(3) @map("so_mau_chup")
+  diemChatLuong  Float?                 @map("diem_chat_luong")
+  kichHoat       Boolean                @default(true) @map("kich_hoat")
+  ngayDangKy     DateTime               @default(now()) @map("ngay_dang_ky") @db.Timestamptz(6)
+  ngayCapNhat    DateTime               @updatedAt @map("ngay_cap_nhat") @db.Timestamptz(6)
+
+  nguoiDung NguoiDung @relation(fields: [idNguoiDung], references: [id], onDelete: Cascade)
+
+  @@map("du_lieu_khuon_mat")
 }
 
 model NhatKyThamGia {

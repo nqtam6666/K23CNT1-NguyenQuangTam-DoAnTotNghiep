@@ -171,6 +171,9 @@ importers:
       '@tanstack/react-query-devtools':
         specifier: ^5.66.9
         version: 5.104.1(@tanstack/react-query@5.104.1(react@19.3.0))(@types/react@19.3.0)(csstype@3.2.3)(react@19.3.0)
+      '@vladmandic/face-api':
+        specifier: ^1.7.15
+        version: 1.7.15
       axios:
         specifier: ^1.8.1
         version: 1.20.0
@@ -2536,6 +2539,10 @@ packages:
 
   '@ungap/structured-clone@1.4.0':
     resolution: {integrity: sha512-1mEZtMKPM09vDmQt5y7YvmN2+DFTP7Tg0EWXdic8/C6VRnpb33e4ghisCIE3WZjsE2N8mf+QV1Zqh7ZFYLWInQ==}
+
+  '@vladmandic/face-api@1.7.15':
+    resolution: {integrity: sha512-WDMmK3CfNLo8jylWqMoQgf4nIst3M0fzx1dnac96wv/dvMTN4DxC/Pq1DGtduDk1lktCamQ3MIDXFnvrdHTXDw==}
+    engines: {node: '>=14.0.0'}
 
   '@webassemblyjs/ast@1.14.1':
     resolution: {integrity: sha512-nuBEDgQfm1ccRp/8bCQrx1frohyufl4JlbMMZ4P1wpeOfDhF6FQkxZJ1b/e+PLwr6X1Nhw6OLme5usuBWYBvuQ==}
@@ -8599,6 +8606,8 @@ snapshots:
       '@ucast/core': 1.10.2
 
   '@ungap/structured-clone@1.4.0': {}
+
+  '@vladmandic/face-api@1.7.15': {}
 
   '@webassemblyjs/ast@1.14.1':
     dependencies:

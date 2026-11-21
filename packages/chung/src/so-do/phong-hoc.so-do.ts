@@ -65,3 +65,50 @@ export const duyetDonXinNghiSchema = z.object({
 
 export type DuyetDonXinNghiInput = z.infer<typeof duyetDonXinNghiSchema>;
 
+// ==========================================
+// ĐIỂM DANH BẰNG KHUÔN MẶT
+// ==========================================
+
+export const vectorKhuonMatSchema = z
+  .array(z.number().finite('Giá trị vector đặc trưng phải là số hữu hạn').min(-10).max(10))
+  .length(128, 'Vector đặc trưng khuôn mặt phải có đúng 128 chiều');
+
+export const dangKyKhuonMatSchema = z.object({
+  vectorKhuonMat: vectorKhuonMatSchema,
+  soMauChup: z.number().int().min(1).max(10).default(3),
+  diemChatLuong: z.number().finite().min(0.4, 'Chất lượng ảnh khuôn mặt quá thấp').max(1).default(0.85),
+  daXacThucNguoiThat: z.boolean().default(true),
+});
+
+export type DangKyKhuonMatInput = z.infer<typeof dangKyKhuonMatSchema>;
+
+export const batTatDiemDanhKhuonMatSchema = z.object({
+  batDiemDanhKhuonMat: z.boolean(),
+  thoiHanPhut: z.number().int().min(1).max(180).default(15),
+});
+
+export type BatTatDiemDanhKhuonMatInput = z.infer<typeof batTatDiemDanhKhuonMatSchema>;
+
+export const diemDanhKhuonMatSchema = z.object({
+  vectorKhuonMat: vectorKhuonMatSchema,
+  diemChatLuong: z.number().finite().min(0.4).max(1).default(0.85),
+  daXacThucNguoiThat: z.boolean().refine((v) => v === true, {
+    message: 'Cần hoàn tất bước xác thực người thật trên camera trước khi điểm danh',
+  }),
+});
+
+export type DiemDanhKhuonMatInput = z.infer<typeof diemDanhKhuonMatSchema>;
+
+export const diemDanhKhuonMatLopSchema = z.object({
+  danhSachNhanDien: z
+    .array(
+      z.object({
+        idHocSinh: z.string().uuid('ID học sinh không hợp lệ'),
+        doTinCay: z.number().finite().min(0.5).max(1),
+      }),
+    )
+    .min(1, 'Cần ít nhất 1 sinh viên được nhận diện để lưu điểm danh'),
+});
+
+export type DiemDanhKhuonMatLopInput = z.infer<typeof diemDanhKhuonMatLopSchema>;
+

@@ -261,7 +261,7 @@ export default function TrangLopHocPhan() {
                 });
                 setMoModalTaoLop(true);
               }}
-              className="inline-flex items-center gap-2 px-4 py-2.5 bg-[var(--accent)] hover:bg-[var(--accent-hover)] text-white text-[13px] font-semibold rounded-[var(--radius)] transition-colors cursor-pointer"
+              className="inline-flex items-center gap-2 px-4 py-2.5 bg-[var(--accent)] hover:brightness-95 text-white text-[13px] font-semibold rounded-[var(--radius)] transition-colors cursor-pointer"
             >
               <Plus className="w-4 h-4" strokeWidth={1.75} />
               Tạo Lớp học phần
@@ -468,7 +468,7 @@ export default function TrangLopHocPhan() {
 
                   <Link
                     href={`/lop-hoc-phan/${lop.id}`}
-                    className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-[var(--radius)] bg-[var(--accent)] hover:bg-[var(--accent-hover)] text-white text-[12.5px] font-semibold transition-colors"
+                    className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-[var(--radius)] bg-[var(--accent)] hover:brightness-95 text-white text-[12.5px] font-semibold transition-colors"
                   >
                     <span>Vào lớp</span>
                     <ArrowRight className="w-3.5 h-3.5" strokeWidth={1.75} />
@@ -529,7 +529,7 @@ export default function TrangLopHocPhan() {
               type="button"
               disabled={!maThamGia.trim() || thamGiaMutation.isPending}
               onClick={() => thamGiaMutation.mutate(maThamGia.trim())}
-              className="px-5 py-2.5 bg-[var(--accent)] hover:bg-[var(--accent-hover)] text-white rounded-[var(--radius)] text-xs font-semibold disabled:opacity-50 cursor-pointer"
+              className="px-5 py-2.5 bg-[var(--accent)] hover:brightness-95 text-white rounded-[var(--radius)] text-xs font-semibold disabled:opacity-50 cursor-pointer"
             >
               {thamGiaMutation.isPending ? 'Đang xác thực...' : 'Tham gia ngay'}
             </button>
@@ -665,7 +665,7 @@ export default function TrangLopHocPhan() {
                 luuLopMutation.isPending
               }
               onClick={() => luuLopMutation.mutate(formTaoLop)}
-              className="px-5 py-2.5 bg-[var(--accent)] hover:bg-[var(--accent-hover)] text-white rounded-[var(--radius)] text-xs font-semibold disabled:opacity-50 cursor-pointer"
+              className="px-5 py-2.5 bg-[var(--accent)] hover:brightness-95 text-white rounded-[var(--radius)] text-xs font-semibold disabled:opacity-50 cursor-pointer"
             >
               {luuLopMutation.isPending
                 ? 'Đang lưu...'

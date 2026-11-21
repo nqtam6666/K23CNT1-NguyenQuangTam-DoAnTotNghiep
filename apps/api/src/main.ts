@@ -7,6 +7,7 @@ import { join } from 'path';
 import { existsSync, mkdirSync } from 'fs';
 import { AppModule } from './app.module';
 import { boSungZodVaoSwagger } from './cot-loi/tai-lieu/bo-sung-zod-swagger';
+import { layCacThuMucTaiLen } from './cot-loi/tien-ich/duong-dan-tai-len';
 
 async function khoiChay() {
   const nhatKy = new Logger('LMS-KhoiDong');
@@ -36,7 +37,11 @@ async function khoiChay() {
   if (!existsSync(thuMucBaiNop)) {
     mkdirSync(thuMucBaiNop, { recursive: true });
   }
-  app.use('/uploads', express.static(thuMucTaiLen));
+  for (const thuMuc of layCacThuMucTaiLen()) {
+    if (existsSync(thuMuc)) {
+      app.use('/uploads', express.static(thuMuc));
+    }
+  }
 
   // 2. Cấu hình CORS an toàn (hỗ trợ cả Web trình duyệt và WebView máy ảo Android 10.0.2.2)
   const urlFrontend = process.env.URL_UNG_DUNG_WEB || 'http://localhost:3000';

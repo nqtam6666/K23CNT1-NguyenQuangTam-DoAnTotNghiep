@@ -427,7 +427,7 @@ export default function TrangTroLyHocTap() {
                 setIdLopBanNhap(idLopLoc || danhSachLop[0]?.id || '');
                 setMoModalBanNhap(true);
               }}
-              className="inline-flex items-center gap-2 rounded-[var(--radius)] bg-[var(--accent)] px-4 py-2 text-xs font-semibold text-white hover:bg-[var(--accent-hover)] transition-colors cursor-pointer"
+              className="inline-flex items-center gap-2 rounded-[var(--radius)] bg-[var(--accent)] px-4 py-2 text-xs font-semibold text-white hover:brightness-95 transition-colors cursor-pointer"
             >
               <Layers className="w-4 h-4" />
               Biên soạn câu hỏi / Giáo án từ tài liệu
@@ -449,7 +449,7 @@ export default function TrangTroLyHocTap() {
               setGoiYBaiTapLuyenTap([]);
               setIdTinNhanTrichDanChon(null);
             }}
-            className="w-full inline-flex items-center justify-center gap-2 px-3.5 py-2.5 rounded-[var(--radius)] bg-[var(--accent)] hover:bg-[var(--accent-hover)] text-white text-xs font-semibold transition-colors cursor-pointer"
+            className="w-full inline-flex items-center justify-center gap-2 px-3.5 py-2.5 rounded-[var(--radius)] bg-[var(--accent)] hover:brightness-95 text-white text-xs font-semibold transition-colors cursor-pointer"
           >
             <Plus className="w-4 h-4" strokeWidth={1.75} />
             Hội thoại mới
@@ -877,7 +877,7 @@ export default function TrangTroLyHocTap() {
               <button
                 type="submit"
                 disabled={!cauHoiNhap.trim() || mutationHoiDap.isPending}
-                className="inline-flex items-center justify-center w-10 h-10 rounded-[var(--radius)] bg-[var(--accent)] text-white hover:bg-[var(--accent-hover)] disabled:opacity-50 disabled:cursor-not-allowed transition-colors shrink-0 cursor-pointer"
+                className="inline-flex items-center justify-center w-10 h-10 rounded-[var(--radius)] bg-[var(--accent)] text-white hover:brightness-95 disabled:opacity-50 disabled:cursor-not-allowed transition-colors shrink-0 cursor-pointer"
               >
                 {mutationHoiDap.isPending ? (
                   <Loader2 className="w-4 h-4 animate-spin" />
@@ -1105,7 +1105,7 @@ export default function TrangTroLyHocTap() {
                                 trangThai: TrangThaiBanNhapAI.DA_DUYET,
                               })
                             }
-                            className="flex-1 py-1.5 px-3 rounded-[var(--radius)] bg-[var(--accent)] hover:bg-[var(--accent-hover)] text-white text-[11px] font-semibold transition-colors cursor-pointer"
+                            className="flex-1 py-1.5 px-3 rounded-[var(--radius)] bg-[var(--accent)] hover:brightness-95 text-white text-[11px] font-semibold transition-colors cursor-pointer"
                           >
                             {nhanNutDuyet(bn.loaiBanNhap)}
                           </button>
@@ -1357,7 +1357,7 @@ export default function TrangTroLyHocTap() {
                     !idLopBanNhap ||
                     mutationSinhBanNhapTuTaiLieu.isPending
                   }
-                  className="inline-flex items-center gap-2 rounded-[var(--radius)] bg-[var(--accent)] px-4 py-2 text-xs font-semibold text-white hover:bg-[var(--accent-hover)] disabled:opacity-50 cursor-pointer"
+                  className="inline-flex items-center gap-2 rounded-[var(--radius)] bg-[var(--accent)] px-4 py-2 text-xs font-semibold text-white hover:brightness-95 disabled:opacity-50 cursor-pointer"
                 >
                   {mutationSinhBanNhapTuTaiLieu.isPending ? (
                     <>
@@ -1495,7 +1495,7 @@ export default function TrangTroLyHocTap() {
                 <button
                   type="submit"
                   disabled={!tieuDeBanNhap.trim() || !idLopBanNhap || mutationTaoBanNhap.isPending}
-                  className="inline-flex items-center gap-2 rounded-[var(--radius)] bg-[var(--accent)] px-4 py-2 text-xs font-semibold text-white hover:bg-[var(--accent-hover)] disabled:opacity-50 cursor-pointer"
+                  className="inline-flex items-center gap-2 rounded-[var(--radius)] bg-[var(--accent)] px-4 py-2 text-xs font-semibold text-white hover:brightness-95 disabled:opacity-50 cursor-pointer"
                 >
                   {mutationTaoBanNhap.isPending ? 'Đang lưu...' : 'Lưu bản nháp'}
                 </button>

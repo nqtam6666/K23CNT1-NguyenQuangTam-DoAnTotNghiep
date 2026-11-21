@@ -13,18 +13,27 @@ import {
   Save,
   Check,
   X,
+  ScanFace,
+  Camera,
 } from 'lucide-react';
 import { mayKhachApi } from '../../../../../tien-ich/may-khach-api';
 import { thongBao } from '../../../../../tien-ich/thong-bao';
 import { HopThoai } from '../../../../../thanh-phan/hop-thoai';
 import {
+  HopThoaiKhuonMat,
+  CheDoHopThoaiKhuonMat,
+} from '../../../../../thanh-phan/hop-thoai-khuon-mat';
+import {
   BuoiHoc,
   PayloadJwt,
   VaiTro,
   TrangThaiDiemDanh,
+  PhuongThucDiemDanh,
   TrangThaiDonXinNghi,
   ThongKeChuyenCanLop,
   DonXinNghi,
+  HoSoKhuonMat,
+  BanGhiDiemDanh,
 } from '@lms/chung';
 
 interface ThuocTinhTabDiemDanh {
@@ -64,10 +73,24 @@ export function TabDiemDanh({
   const [idBuoiHocXinNghi, setIdBuoiHocXinNghi] = useState<string>('');
   const [lyDoNghi, setLyDoNghi] = useState('');
 
+  // Modal điểm danh khuôn mặt
+  const [moModalKhuonMat, setMoModalKhuonMat] = useState(false);
+  const [cheDoKhuonMat, setCheDoKhuonMat] =
+    useState<CheDoHopThoaiKhuonMat>('diem-danh-ca-nhan');
+
   useEffect(() => {
     if (!idBuoiHocChon && danhSachBuoiHoc.length > 0) {
-      setIdBuoiHocChon(danhSachBuoiHoc[0].id);
-      setIdBuoiHocXinNghi(danhSachBuoiHoc[0].id);
+      const bayGio = new Date();
+      const buoiUuTien =
+        danhSachBuoiHoc.find(
+          (b) =>
+            (b.batDiemDanhKhuonMat &&
+              b.hanDiemDanhKhuonMat &&
+              new Date(b.hanDiemDanhKhuonMat) > bayGio) ||
+            (b.maDiemDanh && b.hanMaDiemDanh && new Date(b.hanMaDiemDanh) > bayGio),
+        ) || danhSachBuoiHoc[danhSachBuoiHoc.length - 1];
+      setIdBuoiHocChon(buoiUuTien.id);
+      setIdBuoiHocXinNghi(buoiUuTien.id);
     }
   }, [danhSachBuoiHoc, idBuoiHocChon]);
 
@@ -118,6 +141,43 @@ export function TabDiemDanh({
     queryFn: async () => {
       const res = await mayKhachApi.get(`/phong-hoc-truc-tuyen/lop/${idLopHocPhan}/don-xin-nghi`);
       return res.data?.duLieu || res.data || [];
+    },
+  });
+
+  // 4. Lấy hồ sơ đăng ký khuôn mặt (cho Học sinh)
+  const { data: hoSoKhuonMat } = useQuery<HoSoKhuonMat>({
+    queryKey: ['ho-so-khuon-mat-ca-nhan'],
+    queryFn: async () => {
+      const res = await mayKhachApi.get('/phong-hoc-truc-tuyen/khuon-mat/ho-so');
+      return res.data?.duLieu || res.data;
+    },
+    enabled: laHocSinh,
+  });
+
+  // Mutation: Bật/tắt phiên điểm danh bằng khuôn mặt (GV)
+  const batTatKhuonMatMutation = useMutation({
+    mutationFn: async (bat: boolean) => {
+      const res = await mayKhachApi.patch(
+        `/phong-hoc-truc-tuyen/buoi-hoc/${idBuoiHocChon}/khuon-mat`,
+        {
+          batDiemDanhKhuonMat: bat,
+          thoiHanPhut,
+        },
+      );
+      return res.data?.duLieu || res.data;
+    },
+    onSuccess: (_, bat) => {
+      queryClient.invalidateQueries({ queryKey: ['diem-danh-buoi', idBuoiHocChon] });
+      queryClient.invalidateQueries({ queryKey: ['buoi-hoc-lop', idLopHocPhan] });
+      thongBao.thanhCong(
+        bat ? 'Đã mở điểm danh khuôn mặt' : 'Đã đóng điểm danh khuôn mặt',
+        bat
+          ? `Học sinh có thể tự điểm danh bằng camera trong ${thoiHanPhut} phút.`
+          : 'Phiên tự điểm danh bằng khuôn mặt đã được đóng.',
+      );
+    },
+    onError: (err: any) => {
+      thongBao.loiHeThong(err, 'Không thể cập nhật trạng thái điểm danh khuôn mặt');
     },
   });
 
@@ -285,6 +345,20 @@ export function TabDiemDanh({
     ? new Date(buoiHocDangChon.hanMaDiemDanh)
     : null;
   const maConHieuLuc = Boolean(maDiemDanhHienTai && hanMaDiemDanh && hanMaDiemDanh > new Date());
+
+  const hanKhuonMat = buoiHocDangChon?.hanDiemDanhKhuonMat
+    ? new Date(buoiHocDangChon.hanDiemDanhKhuonMat)
+    : null;
+  const khuonMatConHieuLuc = Boolean(
+    buoiHocDangChon?.batDiemDanhKhuonMat && hanKhuonMat && hanKhuonMat > new Date(),
+  );
+
+  const banDoDiemDanhBuoi = new Map<string, BanGhiDiemDanh>(
+    ((duLieuBuoiHoc?.danhSachDiemDanh || []) as BanGhiDiemDanh[]).map((bg) => [
+      bg.idHocSinh,
+      bg,
+    ]),
+  );
 
   // Danh sách học sinh để điểm danh theo buổi (lấy từ thongKeChuyenCan kết hợp danhSachDiemDanh của buổi)
   const danhSachHocSinhLop = thongKeChuyenCan?.danhSachHocSinh || [];
@@ -501,7 +575,7 @@ export function TabDiemDanh({
                         type="button"
                         onClick={() => taoMaPinMutation.mutate()}
                         disabled={taoMaPinMutation.isPending}
-                        className="w-full py-[11px] rounded-[4px] bg-[var(--accent)] hover:brightness-95 text-white font-semibold text-xs transition-all shadow-[0_2px_8px_-2px_color-mix(in_srgb,var(--accent)_30%,transparent)] cursor-pointer"
+                        className="w-full py-[11px] rounded-[var(--radius)] bg-[var(--accent)] hover:brightness-95 text-white font-semibold text-xs transition-all cursor-pointer"
                       >
                         {taoMaPinMutation.isPending
                           ? 'Đang khởi tạo mã...'
@@ -509,6 +583,53 @@ export function TabDiemDanh({
                             ? 'Đổi mã PIN mới'
                             : 'Mở mã PIN điểm danh'}
                       </button>
+
+                      {/* Điều khiển điểm danh bằng khuôn mặt (GV) */}
+                      <div className="pt-3 border-t border-[var(--border)] space-y-2.5">
+                        <div className="flex items-center justify-between gap-2">
+                          <span className="inline-flex items-center gap-1.5 text-xs font-mono font-bold text-[var(--text)]">
+                            <ScanFace className="w-4 h-4 text-[var(--accent)]" strokeWidth={1.5} />
+                            Điểm danh khuôn mặt
+                          </span>
+                          {khuonMatConHieuLuc && hanKhuonMat && (
+                            <span className="font-mono text-[11px] text-[var(--accent)]">
+                              Đến{' '}
+                              {hanKhuonMat.toLocaleTimeString('vi-VN', {
+                                hour: '2-digit',
+                                minute: '2-digit',
+                              })}
+                            </span>
+                          )}
+                        </div>
+                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                          <button
+                            type="button"
+                            onClick={() => batTatKhuonMatMutation.mutate(!khuonMatConHieuLuc)}
+                            disabled={batTatKhuonMatMutation.isPending}
+                            className={`inline-flex items-center justify-center gap-1.5 py-2 px-3 rounded-[var(--radius)] border text-xs font-semibold transition-colors cursor-pointer ${
+                              khuonMatConHieuLuc
+                                ? 'border-[var(--danger)] bg-[var(--danger-soft)] text-[var(--danger)]'
+                                : 'border-[var(--border)] bg-[var(--surface)] text-[var(--text)] hover:border-[var(--accent)]'
+                            }`}
+                          >
+                            <ScanFace className="w-3.5 h-3.5" strokeWidth={1.5} />
+                            <span>
+                              {khuonMatConHieuLuc ? 'Đóng phiên tự quét' : 'Mở phiên tự quét'}
+                            </span>
+                          </button>
+                          <button
+                            type="button"
+                            onClick={() => {
+                              setCheDoKhuonMat('camera-lop');
+                              setMoModalKhuonMat(true);
+                            }}
+                            className="inline-flex items-center justify-center gap-1.5 py-2 px-3 rounded-[var(--radius)] border border-[var(--accent)] bg-[var(--accent-soft)] text-xs font-semibold text-[var(--accent)] hover:opacity-90 transition-opacity cursor-pointer"
+                          >
+                            <Camera className="w-3.5 h-3.5" strokeWidth={1.5} />
+                            <span>Camera lớp</span>
+                          </button>
+                        </div>
+                      </div>
                     </>
                   ) : (
                     <>
@@ -542,6 +663,57 @@ export function TabDiemDanh({
                             : 'Xác nhận điểm danh'}
                         </button>
                       </div>
+
+                      {/* Tự điểm danh bằng khuôn mặt (Học sinh) */}
+                      {laHocSinh && (
+                        <div className="pt-3 border-t border-[var(--border)] space-y-2">
+                          <div className="flex items-center justify-between gap-2">
+                            <span className="inline-flex items-center gap-1.5 text-xs font-mono font-bold text-[var(--text)]">
+                              <ScanFace className="w-4 h-4 text-[var(--accent)]" strokeWidth={1.5} />
+                              Điểm danh khuôn mặt
+                            </span>
+                            {khuonMatConHieuLuc && hanKhuonMat && (
+                              <span className="font-mono text-[11px] text-[var(--accent)]">
+                                Mở đến{' '}
+                                {hanKhuonMat.toLocaleTimeString('vi-VN', {
+                                  hour: '2-digit',
+                                  minute: '2-digit',
+                                })}
+                              </span>
+                            )}
+                          </div>
+
+                          {!hoSoKhuonMat?.daDangKy ? (
+                            <button
+                              type="button"
+                              onClick={() => {
+                                setCheDoKhuonMat('dang-ky');
+                                setMoModalKhuonMat(true);
+                              }}
+                              className="w-full inline-flex items-center justify-center gap-1.5 py-2.5 px-3 rounded-[var(--radius)] border border-[var(--border)] bg-[var(--surface)] text-xs font-semibold text-[var(--text)] hover:border-[var(--accent)] transition-colors cursor-pointer"
+                            >
+                              <Camera className="w-3.5 h-3.5 text-[var(--accent)]" strokeWidth={1.5} />
+                              <span>Đăng ký khuôn mặt trước khi điểm danh</span>
+                            </button>
+                          ) : khuonMatConHieuLuc ? (
+                            <button
+                              type="button"
+                              onClick={() => {
+                                setCheDoKhuonMat('diem-danh-ca-nhan');
+                                setMoModalKhuonMat(true);
+                              }}
+                              className="w-full inline-flex items-center justify-center gap-1.5 py-2.5 px-3 rounded-[var(--radius)] border border-[var(--accent)] bg-[var(--accent-soft)] text-xs font-semibold text-[var(--accent)] hover:opacity-90 transition-opacity cursor-pointer"
+                            >
+                              <ScanFace className="w-3.5 h-3.5" strokeWidth={1.5} />
+                              <span>Mở camera điểm danh ngay</span>
+                            </button>
+                          ) : (
+                            <p className="text-[11px] text-[var(--muted)]">
+                              Giảng viên chưa mở điểm danh bằng khuôn mặt cho buổi học này.
+                            </p>
+                          )}
+                        </div>
+                      )}
                     </>
                   )}
                 </div>
@@ -570,13 +742,29 @@ export function TabDiemDanh({
                             trangThai: TrangThaiDiemDanh.CO_MAT,
                             ghiChu: '',
                           };
+                          const banGhiBuoi = banDoDiemDanhBuoi.get(hs.idHocSinh);
+                          const nhanPhuongThuc =
+                            banGhiBuoi?.phuongThuc === PhuongThucDiemDanh.KHUON_MAT
+                              ? `Khuôn mặt${banGhiBuoi.doTinCay ? ` (${Math.round(banGhiBuoi.doTinCay * 100)}%)` : ''}`
+                              : banGhiBuoi?.phuongThuc === PhuongThucDiemDanh.MA_PIN
+                                ? 'Mã PIN'
+                                : banGhiBuoi?.phuongThuc === PhuongThucDiemDanh.TRUC_TUYEN
+                                  ? 'Phòng trực tuyến'
+                                  : banGhiBuoi?.phuongThuc === PhuongThucDiemDanh.DON_XIN_NGHI
+                                    ? 'Đơn xin nghỉ'
+                                    : null;
                           return (
                             <tr key={hs.idHocSinh} className="hover:bg-muted/20">
                               <td className="py-3 px-4 font-mono font-semibold text-primary">
                                 {hs.maHocSinh}
                               </td>
                               <td className="py-3 px-4 font-semibold text-foreground">
-                                {hs.hoTen}
+                                <div>{hs.hoTen}</div>
+                                {nhanPhuongThuc && (
+                                  <span className="mt-1 inline-flex items-center px-1.5 py-0.5 rounded-[var(--radius)] border border-[var(--border)] bg-[var(--bg)] font-mono text-[10px] font-medium text-[var(--muted)]">
+                                    {nhanPhuongThuc}
+                                  </span>
+                                )}
                               </td>
                               <td className="py-3 px-4">
                                 <div className="flex flex-wrap items-center gap-1.5">
@@ -641,7 +829,7 @@ export function TabDiemDanh({
                                     }))
                                   }
                                   placeholder="Ghi chú (nếu có)..."
-                                  className="w-full rounded-lg border border-input bg-background px-2.5 py-1 text-xs focus:border-primary focus:outline-none"
+                                  className="w-full rounded-[var(--radius)] border border-input bg-background px-2.5 py-1 text-xs focus:border-primary focus:outline-none"
                                 />
                               </td>
                             </tr>
@@ -724,9 +912,9 @@ export function TabDiemDanh({
                         </td>
                         <td className="py-3 px-4">
                           <div className="flex items-center gap-2">
-                            <div className="w-24 h-2 bg-muted rounded-full overflow-hidden">
+                            <div className="w-24 h-2 bg-muted rounded-[var(--radius)] overflow-hidden">
                               <div
-                                className={`h-full rounded-full ${
+                                className={`h-full rounded-[var(--radius)] ${
                                   hs.tyLeChuyenCan >= 85
                                     ? 'bg-accent'
                                     : hs.tyLeChuyenCan >= 80
@@ -741,15 +929,15 @@ export function TabDiemDanh({
                         </td>
                         <td className="py-3 px-4 text-right">
                           {hs.mucCanhBao === 'AN_TOAN' ? (
-                            <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full bg-accent/10 text-accent font-semibold">
+                            <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-[var(--radius)] bg-accent/10 text-accent font-semibold">
                               <CheckCircle2 className="w-3.5 h-3.5" /> Đủ điều kiện dự thi
                             </span>
                           ) : hs.mucCanhBao === 'LUU_Y' ? (
-                            <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full bg-accent/10 text-accent font-semibold">
+                            <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-[var(--radius)] bg-accent/10 text-accent font-semibold">
                               <AlertTriangle className="w-3.5 h-3.5" /> Cần lưu ý chuyên cần
                             </span>
                           ) : (
-                            <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full bg-danger/10 text-danger font-semibold">
+                            <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-[var(--radius)] bg-danger/10 text-danger font-semibold">
                               <ShieldAlert className="w-3.5 h-3.5" /> Nguy cơ cấm thi
                             </span>
                           )}
@@ -821,15 +1009,15 @@ export function TabDiemDanh({
                       <td className="py-3 px-4 text-muted-foreground">{don.lyDo}</td>
                       <td className="py-3 px-4">
                         {don.trangThai === TrangThaiDonXinNghi.DA_DUYET ? (
-                          <span className="px-2.5 py-0.5 rounded-full bg-accent/10 text-accent font-semibold">
+                          <span className="px-2.5 py-0.5 rounded-[var(--radius)] bg-accent/10 text-accent font-semibold">
                             Đã duyệt
                           </span>
                         ) : don.trangThai === TrangThaiDonXinNghi.TU_CHOI ? (
-                          <span className="px-2.5 py-0.5 rounded-full bg-danger/10 text-danger font-semibold">
+                          <span className="px-2.5 py-0.5 rounded-[var(--radius)] bg-danger/10 text-danger font-semibold">
                             Từ chối
                           </span>
                         ) : (
-                          <span className="px-2.5 py-0.5 rounded-full bg-accent/10 text-accent font-semibold">
+                          <span className="px-2.5 py-0.5 rounded-[var(--radius)] bg-accent/10 text-accent font-semibold">
                             Chờ duyệt
                           </span>
                         )}
@@ -846,7 +1034,7 @@ export function TabDiemDanh({
                                     trangThai: 'DA_DUYET',
                                   })
                                 }
-                                className="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg bg-accent hover:bg-accent text-white font-semibold cursor-pointer"
+                                className="inline-flex items-center gap-1 px-2.5 py-1 rounded-[var(--radius)] bg-accent hover:bg-accent text-white font-semibold cursor-pointer"
                               >
                                 <Check className="w-3.5 h-3.5" /> Duyệt
                               </button>
@@ -858,7 +1046,7 @@ export function TabDiemDanh({
                                     trangThai: 'TU_CHOI',
                                   })
                                 }
-                                className="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg bg-danger hover:bg-danger text-white font-semibold cursor-pointer"
+                                className="inline-flex items-center gap-1 px-2.5 py-1 rounded-[var(--radius)] bg-danger hover:bg-danger text-white font-semibold cursor-pointer"
                               >
                                 <X className="w-3.5 h-3.5" /> Từ chối
                               </button>
@@ -937,6 +1125,20 @@ export function TabDiemDanh({
           </div>
         </form>
       </HopThoai>
+
+      {/* Modal Đăng ký / Điểm danh khuôn mặt */}
+      <HopThoaiKhuonMat
+        mo={moModalKhuonMat}
+        onDong={() => setMoModalKhuonMat(false)}
+        cheDo={cheDoKhuonMat}
+        idLopHocPhan={idLopHocPhan}
+        idBuoiHoc={idBuoiHocChon}
+        onThanhCong={() => {
+          queryClient.invalidateQueries({ queryKey: ['ho-so-khuon-mat-ca-nhan'] });
+          queryClient.invalidateQueries({ queryKey: ['diem-danh-buoi', idBuoiHocChon] });
+          queryClient.invalidateQueries({ queryKey: ['thong-ke-chuyen-can', idLopHocPhan] });
+        }}
+      />
     </div>
   );
 }

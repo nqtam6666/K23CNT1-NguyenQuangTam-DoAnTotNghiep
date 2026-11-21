@@ -123,6 +123,8 @@ export interface BuoiHoc {
   trangThai: TrangThaiBuoiHoc;
   maDiemDanh?: string | null;
   hanMaDiemDanh?: string | Date | null;
+  batDiemDanhKhuonMat?: boolean;
+  hanDiemDanhKhuonMat?: string | Date | null;
   ngayTao: string | Date;
   lopHocPhan?: LopHocPhan;
 }
